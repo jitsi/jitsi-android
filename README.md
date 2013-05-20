@@ -1,6 +1,5 @@
-Jitsi is an audio/video and chat communicator.
-
+Jitsi for Android is an Android port of the Jitsi project: The most feature-rich communicator with support for encrypted audio/video, chat and presence over SIP and XMPP
 
 references
 ----------
-* [jitsi homepage](https://jitsi.org/)
+* [Jitsi homepage](https://jitsi.org/)
