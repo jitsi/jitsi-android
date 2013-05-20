@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/background">
+
+    <LinearLayout
+        android:id="@+id/layout1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/screen_padding"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/callField"
+            android:layout_width="@dimen/call_field_width"
+            android:hint="@string/enter_name_or_number"
+            android:layout_height="50dp"
+            android:layout_marginRight="@dimen/between_padding"
+            android:inputType="text"
+            android:layout_gravity="center_horizontal"/>
+    </LinearLayout>
+
+    <ImageButton
+             android:id="@+id/callButtonFull"
+             android:src="@drawable/callbutton"
+             android:background="#40000000"
+             android:contentDescription="@string/call"
+             android:layout_width="fill_parent"
+             android:layout_height="100dp"
+             android:layout_alignParentBottom="true"
+             android:focusable="true"/>
+</RelativeLayout>

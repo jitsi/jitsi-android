@@ -1,0 +1,7 @@
+bin
+gen
+libs
+.gitignore.swp
+*.iws
+cache.properties
+local.properties

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:padding="@dimen/screen_padding"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical"
+        android:background="@drawable/loginbackground">
+
+        <Spinner
+            android:id="@+id/networkSpinner"
+            android:prompt="@string/choose_network"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/between_padding"
+            android:background="@drawable/whitespinner"/>
+
+        <EditText
+            android:id="@+id/usernameField"
+            style="@style/JitsiLoginTextView"
+            android:hint="@string/username"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:padding="10dp"
+            android:inputType="text"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/between_padding"/>
+
+        <EditText
+            android:id="@+id/passwordField"
+            style="@style/JitsiLoginTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:padding="10dp"
+            android:inputType="textPassword"
+            android:hint="@string/password"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/between_padding"/>
+
+        <Button
+            android:id="@+id/signInButton"
+            android:text="@string/service_gui_SIGN_IN"
+            android:focusable="true"
+            android:textColor="#ffffff"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/signin_button"
+            android:layout_marginBottom="@dimen/between_padding"/>
+</LinearLayout>

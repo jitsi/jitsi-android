@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+            android:title="Jitsi Preferences" />
+
+    <PreferenceScreen
+        android:key="general_settings"
+        android:title="General"
+        android:summary="Configure general preferences">
+
+        <intent
+            android:action="org.jitsi.android.gui.account.AccountPreferencesActivity.ACCOUNT_SETUP"
+            android:targetPackage="org.jitsi"
+            android:targetClass="org.jitsi.android.gui.account.AccountPreferencesActivity" />
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:key="chat_settings"
+        android:title="Chat"
+        android:summary="Configure chat preferences">
+
+        <intent
+            android:action="org.jitsi.android.gui.account.AccountPreferencesActivity.ACCOUNT_SETUP"
+            android:targetPackage="org.jitsi"
+            android:targetClass="org.jitsi.android.gui.account.AccountPreferencesActivity" />
+    </PreferenceScreen>
+
+</PreferenceScreen>

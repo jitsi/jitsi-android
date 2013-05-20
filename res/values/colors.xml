@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<color name="blue">#2da8ca</color>
+<color name="white">#ffffff</color>
+<color name="black">#000000</color>
+<color name="transparent_black">#50000000</color>
+<color name="red_padlock">#ff0000</color>
+<color name="green_padlock">#008800</color>
+<color name="orange_padlock">#AA6600</color>
+<color name="status_bar_icon_bg">#1D3741</color>
+<color name="status_bar_button">#086882</color>
+<color name="status_bar_hangup">#d80005</color>
+</resources>

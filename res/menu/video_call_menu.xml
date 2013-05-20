@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Show ZRTP call info -->
+    <item android:id="@+id/call_zrtp_info_item"
+          android:title="@string/show_call_zrtp_info">
+    </item>
+    <!-- Show call info -->
+    <item android:id="@+id/call_info_item"
+          android:title="@string/show_call_info">
+    </item>
+    <item android:id="@+id/video_resolution"
+          android:title="@string/video_resolution">
+        <menu>
+            <item android:id="@+id/low_resolution"
+                  android:title="@string/low_video_resolution" />
+            <item android:id="@+id/high_resolution"
+                  android:title="@string/high_video_resolution" />
+        </menu>
+    </item>
+</menu>

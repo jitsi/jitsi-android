@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/background">
+
+    <LinearLayout
+        android:id="@+id/layout1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/screen_padding"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <ImageView
+             android:id="@+id/calleeAvatar"
+             android:src="@drawable/personphoto"
+             android:contentDescription="@string/call"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_gravity="center_horizontal"
+             android:paddingBottom="@dimen/between_padding"/>
+
+        <TextView
+            android:id="@+id/calleeDisplayName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:layout_gravity="center_horizontal"
+            android:paddingBottom="@dimen/between_padding"/>
+
+        <TextView
+            android:id="@+id/calleeAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/label_text_size"
+            android:layout_gravity="center_horizontal"
+            android:paddingBottom="@dimen/between_padding"/>
+    </LinearLayout>
+
+    <!-- ImageView
+        android:id="@+id/fadeBackground"
+        android:src="@drawable/fade"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="0px"/-->
+
+    <LinearLayout
+        android:id="@+id/layout2"
+        android:layout_alignParentBottom="true"
+        android:layout_width="fill_parent"
+        android:layout_height="100dp"
+        android:orientation="horizontal"
+        android:paddingBottom="0px"
+        android:background="#40000000">
+
+ <ImageButton
+                android:id="@+id/answerVideoButton"
+                android:src="@drawable/acceptvideocall"
+                android:background="@drawable/image_button_background"
+                android:contentDescription="@string/accept_call_video"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:focusable="true"
+                android:onClick="onAnswerWithVideoClicked"/>
+
+        <ImageButton
+             android:id="@+id/callButton"
+             android:src="@drawable/callbutton"
+             android:background="@drawable/image_button_background"
+             android:contentDescription="@string/call"
+             android:layout_width="wrap_content"
+             android:layout_height="fill_parent"
+             android:layout_weight="1"
+             android:layout_gravity="center_vertical"
+             android:focusable="true"/>
+
+        <ImageButton
+             android:id="@+id/hangupButton"
+             android:src="@drawable/callhangup"
+             android:background="@drawable/image_button_background"
+             android:contentDescription="@string/hang_up"
+             android:layout_width="wrap_content"
+             android:layout_height="fill_parent"
+             android:layout_weight="1"
+             android:layout_gravity="center_vertical"
+             android:focusable="true"/>
+    </LinearLayout>
+</RelativeLayout>

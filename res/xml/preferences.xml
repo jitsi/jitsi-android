@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="First Category"
+        android:key="first_category"
+           >
+        <CheckBoxPreference
+                android:key="Enable Autoconnect"
+                android:summary="automatically connect at startup"
+                android:title="Enable autoconnection"
+                android:defaultValue="true"
+                />
+         <CheckBoxPreference
+                android:key="Enable mobileclient"
+                android:summary="Enable or disable mobileclient sign"
+                android:title="Enable mobileclient"
+                android:defaultValue="true"
+                />
+        <CheckBoxPreference
+                android:key="Notifications"
+                android:summary="Enable or disable notifications"
+                android:title="Enable notifications"
+                android:defaultValue="true"
+                />
+        <CheckBoxPreference
+                android:key="Geolocalizations"
+                android:summary="Enable or disable Geolocalizations"
+                android:title="Enable Geoloc"
+                android:defaultValue="false"
+                />
+        <CheckBoxPreference
+            android:key="perform_updates"
+            android:summary="Enable or disable data updates"
+            android:title="Enable updates"
+            android:defaultValue="true"
+        />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Second Category"
+        android:key="second_category">
+
+        <EditTextPreference
+            android:key="welcome_message"
+            android:title="Welcome Message"
+            android:summary="Define the Welcome message to be shown"
+            android:dialogTitle="Welcome Message"
+            android:dialogMessage="Provide a message"
+            android:defaultValue="Hi im using JITSI" />
+
+        <RingtonePreference
+                android:key="ringtone"
+
+                android:title="Ringtone Preference"
+                android:showDefault="true"
+                android:showSilent="true"
+                android:summary="Pick a tone, any tone"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

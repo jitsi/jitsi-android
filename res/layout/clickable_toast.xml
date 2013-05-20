@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+              android:background="@drawable/clickable_toast_bg"
+              android:padding="8dp">
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Some text to click..."
+            android:id="@+id/toast_msg"
+            android:clickable="true"
+            />
+</LinearLayout>

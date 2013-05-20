@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+      package="org.jitsi"
+      android:versionCode="1"
+      android:versionName="1.0">
+    <application    android:label="@string/app_name"
+                    android:icon="@drawable/icon"
+                    android:theme="@style/JitsiTheme"
+                    android:name=".android.JitsiApplication">
+        <activity android:name=".android.gui.Jitsi"
+                  android:label="@string/app_name"
+                  android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".android.gui.account.AccountsStatusActivity"
+                  android:label="@string/app_name">
+        </activity>
+        <activity android:name=".android.gui.account.AccountEnableActivity"
+                  android:label="@string/app_name">
+        </activity>
+        <activity android:name=".android.gui.account.PresenceStatusActivity"
+                  android:label="@string/app_name">
+        </activity>
+        <activity android:name=".android.gui.account.AccountLoginActivity"
+                    android:label="@string/app_name">
+        </activity>
+        <!-- Dialog Activity -->
+        <activity android:name=".android.gui.DialogActivity"
+                  android:theme="@android:style/Theme.Holo.Dialog.MinWidth"/>
+        <activity android:name=".android.gui.call.CallContactActivity"
+                    android:label="@string/app_name"
+                    android:icon="@drawable/icon"
+                    android:launchMode="singleTask">
+            <intent-filter> 
+                <action android:name="android.intent.action.CALL" />
+                <action android:name="android.intent.action.CALL_PRIVILEGED" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="tel" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".android.gui.call.VideoCallActivity"
+                    android:label="@string/app_name"
+                    android:launchMode="singleInstance">
+        </activity>
+        <activity android:name=".android.gui.call.ReceivedCallActivity"
+                    android:label="@string/app_name">
+        </activity>
+        <!-- Call control from the status bar notification -->
+        <receiver android:name=".android.gui.call.notification.CallControl" >
+            <intent-filter>
+                <action android:name="org.jitsi.call.control" />
+            </intent-filter>
+        </receiver>
+        <!--<activity android:name=".android.gui.account.AccountPreferencesActivity"
+            android:configChanges="orientation|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+               <action android:name="android.intent.action.MANAGE_NETWORK_USAGE" />
+               <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>-->
+        <service android:name=".service.osgi.OSGiService" />
+        <service android:name=".android.gui.account.AccountAuthenticatorService"
+              android:exported="true" android:process=":auth">
+          <intent-filter>
+              <action android:name="android.accounts.AccountAuthenticator" />
+          </intent-filter>
+          <meta-data android:name="android.accounts.AccountAuthenticator"
+              android:resource="@xml/authenticator" />
+      </service>
+    </application>
+    <uses-feature android:glEsVersion="0x00020000"/>
+    <uses-feature android:name="android.hardware.sip.voip" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-sdk android:minSdkVersion="11" />
+</manifest>

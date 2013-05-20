@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:background="@drawable/background"
+              android:gravity="center_horizontal"
+              >
+
+            <ImageView
+                    android:id="@+id/accountAvatar"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_alignParentLeft="true"
+                    android:src="@drawable/personphoto"
+                    android:background="@color/white"
+                    android:clickable="true"
+                    android:onClick="onAvatarClicked"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginLeft="10dp"
+                    />
+            <Spinner
+                    android:layout_width="fill_parent"
+                    android:layout_height="50dp"
+                    android:id="@+id/presenceStatusSpinner"
+                    android:layout_marginLeft="10dp"
+                    android:spinnerMode="dropdown"
+                    android:layout_toRightOf="@+id/accountAvatar"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center_vertical"
+                    android:layout_alignTop="@+id/accountAvatar"
+                    android:layout_alignRight="@+id/presenceStatusMessageEdit"
+                    />
+        <EditText
+                style="@style/MediumFont"
+
+                android:id="@+id/presenceStatusMessageEdit"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_width="@dimen/status_screen_width"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:hint="@string/service_gui_EDIT_STATUS_MSG_TIP"
+                android:editable="true" android:enabled="true"
+                android:focusable="true"
+                android:inputType="textCapSentences|textMultiLine"
+                android:layout_centerHorizontal="true"
+                android:layout_toRightOf="@+id/accountAvatar"
+                android:layout_alignBottom="@+id/accountAvatar"
+                android:layout_below="@+id/presenceStatusSpinner"
+
+                />
+        <!--<Button
+                style="@style/MediumFont"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/service_gui_SET_STATUS"
+                android:id="@+id/button"
+                android:layout_gravity="center"
+                android:onClick="onSetStatusButtonClicked"
+                android:layout_below="@+id/presenceStatusMessageEdit"
+                android:layout_centerHorizontal="true"/>-->
+</RelativeLayout>

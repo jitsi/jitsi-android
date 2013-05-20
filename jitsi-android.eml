@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component inheritJdk="true">
+	<contentEntry url="file://$MODULE_DIR$"/>
+	<lib name="android-support-v4.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/android-support-v4.jar!/"/>
+	</lib>
+	<lib name="java-stubs.jar" scope="COMPILE">
+		<srcroot url="jar://$MODULE_DIR$/lib/java-stubs.jar!/"/>
+		<relative-module-src project-related="jar://$PROJECT_DIR$/lib/java-stubs.jar!/"/>
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/java-stubs.jar!/"/>
+	</lib>
+	<lib name="log4j-1.2.8.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/log4j-1.2.8.jar!/"/>
+	</lib>
+	<lib name="osgi.core.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/osgi.core.jar!/"/>
+	</lib>
+	<lib name="package-renamer.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/installer-exclude/package-renamer.jar!/"/>
+	</lib>
+	<lib name="jarjar.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/installer-exclude/jarjar.jar!/"/>
+	</lib>
+	<lib name="asm-4.1.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/installer-exclude/asm-4.1.jar!/"/>
+	</lib>
+	<lib name="asm-commons-4.1.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/installer-exclude/asm-commons-4.1.jar!/"/>
+	</lib>
+	<lib name="argdelegation-service.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/argdelegation-service.jar!/"/>
+	</lib>
+	<lib name="bccontrib.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/bccontrib.jar!/"/>
+	</lib>
+	<lib name="bouncycastle.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/bouncycastle.jar!/"/>
+	</lib>
+	<lib name="certificate.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/certificate.jar!/"/>
+	</lib>
+	<lib name="contactlist.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/contactlist.jar!/"/>
+	</lib>
+	<lib name="contactsource.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/contactsource.jar!/"/>
+	</lib>
+	<lib name="credentialsstorage.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/credentialsstorage.jar!/"/>
+	</lib>
+	<lib name="customcontactactions.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/customcontactactions.jar!/"/>
+	</lib>
+	<lib name="dns.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/dns.jar!/"/>
+	</lib>
+	<lib name="dnsservice.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/dnsservice.jar!/"/>
+	</lib>
+	<lib name="fileaccess.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/fileaccess.jar!/"/>
+	</lib>
+	<lib name="httputil.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/httputil.jar!/"/>
+	</lib>
+	<lib name="hid-service.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/hid-service.jar!/"/>
+	</lib>
+	<lib name="history.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/history.jar!/"/>
+	</lib>
+	<lib name="json.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/json.jar!/"/>
+	</lib>
+	<lib name="googlecontacts-service.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/googlecontacts-service.jar!/"/>
+	</lib>
+	<lib name="libjitsi.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/libjitsi.jar!/"/>
+	</lib>
+	<lib name="msghistory.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/msghistory.jar!/"/>
+	</lib>
+	<lib name="netaddr.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/netaddr.jar!/"/>
+	</lib>
+	<lib name="notification-handlers.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/notification-handlers.jar!/"/>
+	</lib>
+	<lib name="notification-service.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/notification-service.jar!/"/>
+	</lib>
+	<lib name="notification-wiring.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/notification-wiring.jar!/"/>
+	</lib>
+	<lib name="packetlogging.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/packetlogging.jar!/"/>
+	</lib>
+	<lib name="plugin-loggingutils.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/plugin-loggingutils.jar!/"/>
+	</lib>
+	<lib name="protocol-jabber.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/protocol-jabber.jar!/"/>
+	</lib>
+	<lib name="protocol-sip.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/protocol-sip.jar!/"/>
+	</lib>
+	<lib name="protocol.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/protocol.jar!/"/>
+	</lib>
+	<lib name="reconnectplugin.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/reconnectplugin.jar!/"/>
+	</lib>
+	<lib name="resourcemanager.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/resourcemanager.jar!/"/>
+	</lib>
+	<lib name="sdes4j.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/sdes4j.jar!/"/>
+	</lib>
+	<lib name="smacklib.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/smacklib.jar!/"/>
+	</lib>
+	<lib name="sysactivitynotifications.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/sysactivitynotifications.jar!/"/>
+	</lib>
+	<lib name="systray-service.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/systray-service.jar!/"/>
+	</lib>
+	<lib name="ui-service.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/ui-service.jar!/"/>
+	</lib>
+	<lib name="util.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/util.jar!/"/>
+	</lib>
+	<lib name="version-impl.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/version-impl.jar!/"/>
+	</lib>
+	<lib name="zrtp4j.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/zrtp4j.jar!/"/>
+	</lib>
+</component>

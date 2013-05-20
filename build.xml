@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="jitsi-android" default="help">
+
+    <!-- The local.properties file is created and updated by the 'android' tool.
+         It contains the path to the SDK. It should *NOT* be checked into
+         Version Control Systems. -->
+    <property file="local.properties" />
+
+    <!-- The ant.properties file can be created by you. It is only edited by the
+         'android' tool to add properties to it.
+         This is the place to change some Ant specific build properties.
+         Here are some properties you may want to change/update:
+
+         source.dir
+             The name of the source directory. Default is 'src'.
+         out.dir
+             The name of the output directory. Default is 'bin'.
+
+         For other overridable properties, look at the beginning of the rules
+         files in the SDK, at tools/ant/build.xml
+
+         Properties related to the SDK location or the project target should
+         be updated using the 'android' tool with the 'update' action.
+
+         This file is an integral part of the build system for your
+         application and should be checked into Version Control Systems.
+
+         -->
+    <property file="ant.properties" />
+
+    <!-- The project.properties file is created and updated by the 'android'
+         tool, as well as ADT.
+
+         This contains project specific properties such as project target, and library
+         dependencies. Lower level build properties are stored in ant.properties
+         (or in .classpath for Eclipse projects).
+
+         This file is an integral part of the build system for your
+         application and should be checked into Version Control Systems. -->
+    <loadproperties srcFile="project.properties" />
+
+    <!-- quick check on sdk.dir -->
+    <fail
+            message="sdk.dir is missing. Make sure to generate local.properties using 'android update project' or to inject it through an env var"
+            unless="sdk.dir"
+    />
+
+    <!--target name="-pre-build">
+    </target-->
+
+    <!-- before compilation clears libs folder and populated
+     with all the libraries and binaries we use -->
+    <target name="-pre-compile">
+        <mkdir dir="libs"/>
+
+        <!-- always include the jars we will manipulate
+            or we can manipulate the already modified one
+            and also we need the orig files during compilation
+            -->
+        <delete>
+            <fileset dir="libs">
+                <include name="protocol.jar"/>
+                <include name="smacklib.jar"/>
+                <include name="protocol-sip.jar"/>
+                <include name="protocol-jabber.jar"/>
+                <include name="libjitsi.jar"/>
+                <include name="java-stubs.jar"/>
+                <include name="resourcemanager.jar"/>
+            </fileset>
+        </delete>
+
+        <copy todir="libs" verbose="true">
+            <fileset dir="lib">
+                <include name="*.jar"/>
+                <or>
+                    <modified/>
+                    <present present="srconly" targetdir="libs"/>
+                </or>
+            </fileset>
+            <fileset dir="lib/bundles">
+                <include name="*.jar"/>
+                <or>
+                    <modified/>
+                    <present present="srconly" targetdir="libs"/>
+                </or>
+            </fileset>
+            <fileset dir="lib/native">
+                <include name="**/*"/>
+                <or>
+                    <modified/>
+                    <present present="srconly" targetdir="libs"/>
+                </or>
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- after compilation has finished
+     rename some package names.
+     sip protocol, to use our lib version not the one bundled into android
+     jabber protocol, libjitsi, to use libs from desktop version
+     without modifications
+     -->
+    <target name="-post-compile">
+
+        <!--delete dir="${out.classes.absolute.dir}/java"/>
+        <delete dir="${out.classes.absolute.dir}/javax"/-->
+        <!--delete file="libs/java-stubs.jar"/-->
+
+        <!-- target to rename packages in class files outside jar file -->
+        <taskdef name="package-rename"
+            classname="org.jitsi.util.asm.PackageRenamer"
+            classpath="lib/installer-exclude/package-renamer.jar:lib/installer-exclude/asm-commons-4.1.jar:lib/installer-exclude/asm-4.1.jar"/>
+        <!-- rename class that were just compiled -->
+        <package-rename>
+            <fileset dir="${out.classes.absolute.dir}">
+                <include name="**/*"/>
+                <modified/>
+            </fileset>
+            <rule pattern="java.awt.**"
+                  result="org.jitsi.android.util.java.awt.@1"/>
+            <rule pattern="javax.swing.**"
+                  result="org.jitsi.android.util.javax.swing.@1"/>
+
+        </package-rename>
+
+        <!-- task to rename packages in jar files -->
+        <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
+            classpath="lib/installer-exclude/jarjar.jar"/>
+
+        <!-- renames packages as different versions are used in devices -->
+        <jarjar jarfile="libs/protocol-sip.jar">
+            <zipfileset src="lib/bundles/protocol-sip.jar"/>
+
+            <!-- Reported by Pawel Domas
+                renaming this strings leads to Exception -
+                ClassNotFoundException: org.jitsi.gov.nist.org.jitsi.javax.sip.header.HeaderFactoryImpl
+                The cause is javax.sip.SipFactory constructing the header
+                factories by name and renaming causes wrong classnames.
+            -->
+            <rule pattern="javax.sip.header.HeaderFactoryImpl"
+                  result="javax.sip.header.HeaderFactoryImpl"/>
+            <rule pattern="javax.sip.message.MessageFactoryImpl"
+                  result="javax.sip.message.MessageFactoryImpl"/>
+            <rule pattern="javax.sip.address.AddressFactoryImpl"
+                  result="javax.sip.address.AddressFactoryImpl"/>
+
+            <rule pattern="javax.sip.**"
+                  result="org.jitsi.javax.sip.@1"/>
+            <rule pattern="gov.nist.core.**"
+                  result="org.jitsi.gov.nist.core.@1"/>
+            <rule pattern="gov.nist.javax.sip.**"
+                  result="org.jitsi.gov.nist.javax.sip.@1"/>
+
+            <rule pattern="java.awt.**"
+                  result="org.jitsi.android.util.java.awt.@1"/>
+        </jarjar>
+
+        <!-- renaming packages in order to use vanilla smack in android -->
+        <jarjar jarfile="libs/smacklib.jar">
+            <zipfileset src="lib/bundles/smacklib.jar"/>
+            <rule pattern="org.xmlpull.v1.**"
+                  result="org.jitsi.org.xmlpull.v1.@1"/>
+            <rule pattern="java.beans.**"
+                  result="org.jitsi.android.util.java.beans.@1"/>
+            <rule pattern="javax.security.sasl.**"
+                  result="org.apache.harmony.javax.security.sasl.@1"/>
+            <rule pattern="javax.security.auth.**"
+                  result="org.apache.harmony.javax.security.auth.@1"/>
+        </jarjar>
+        <!-- renaming packages in order to use vanilla smack in android -->
+        <jarjar jarfile="libs/protocol-jabber.jar">
+            <zipfileset src="lib/bundles/protocol-jabber.jar"/>
+            <rule pattern="org.xmlpull.v1.**"
+                  result="org.jitsi.org.xmlpull.v1.@1"/>
+            <rule pattern="java.beans.**"
+                  result="org.jitsi.android.util.java.beans.@1"/>
+            <rule pattern="javax.security.sasl.**"
+                  result="org.apache.harmony.javax.security.sasl.@1"/>
+            <rule pattern="javax.security.auth.**"
+                  result="org.apache.harmony.javax.security.auth.@1"/>
+
+            <rule pattern="java.awt.**"
+                  result="org.jitsi.android.util.java.awt.@1"/>
+        </jarjar>
+
+        <!-- fix loading some classes -->
+        <jarjar jarfile="libs/protocol.jar">
+            <zipfileset src="lib/bundles/protocol.jar"/>
+            <rule pattern="java.awt.**"
+                  result="org.jitsi.android.util.java.awt.@1"/>
+            <rule pattern="javax.swing.**"
+                  result="org.jitsi.android.util.javax.swing.@1"/>
+            <rule pattern="javax.sound.**"
+                  result="org.jitsi.android.util.javax.sound.@1"/>
+        </jarjar>
+
+        <!-- fix loading some classes -->
+        <jarjar jarfile="libs/libjitsi.jar">
+            <zipfileset src="lib/bundles/libjitsi.jar"/>
+            <rule pattern="java.awt.**"
+                  result="org.jitsi.android.util.java.awt.@1"/>
+            <rule pattern="javax.swing.**"
+                  result="org.jitsi.android.util.javax.swing.@1"/>
+            <rule pattern="javax.sound.**"
+                  result="org.jitsi.android.util.javax.sound.@1"/>
+        </jarjar>
+
+        <!-- and finally the stubs we use for common java
+         packages that are missing in android, in order to
+         use the desktop version of files without modification
+         and for easy merging-->
+        <jarjar jarfile="libs/java-stubs.jar">
+            <zipfileset src="lib/java-stubs.jar"/>
+            <rule pattern="java.awt.**"
+                  result="org.jitsi.android.util.java.awt.@1"/>
+            <rule pattern="java.beans.**"
+                  result="org.jitsi.android.util.java.beans.@1"/>
+            <rule pattern="javax.sound.**"
+                  result="org.jitsi.android.util.javax.sound.@1"/>
+            <rule pattern="javax.swing.**"
+                  result="org.jitsi.android.util.javax.swing.@1"/>
+        </jarjar>
+
+        <!-- fix loading some classes -->
+        <jarjar jarfile="libs/resourcemanager.jar">
+            <zipfileset src="lib/bundles/resourcemanager.jar"/>
+            <rule pattern="javax.swing.**"
+                  result="org.jitsi.android.util.javax.swing.@1"/>
+        </jarjar>
+    </target>
+
+    <!-- version-tag: custom -->
+    <import file="${sdk.dir}/tools/ant/build.xml" />
+
+    <target name="compile" depends="-compile"/>
+
+    <target name="debug-install" depends="debug">
+        <copy file="./bin/jitsi-android-debug.apk"
+            tofile="./bin/classes/jitsi-android.apk"/>
+    </target>
+
+    <target name="adb-install">
+        <exec executable="${sdk.dir}/platform-tools/adb" >
+            <arg line=" install -r ./bin/jitsi-android-debug.apk"/>
+        </exec>
+    </target>
+
+    <!-- install and starts jitsi apk -->
+    <target name="adb-install-and-run" depends="adb-install">
+        <exec executable="${sdk.dir}/platform-tools/adb" >
+            <arg line=" shell am start -n org.jitsi/org.jitsi.android.gui.Jitsi"/>
+        </exec>
+    </target>
+
+    <target name="rebuild-and-deploy"
+        depends="-pre-compile,compile,-post-compile,debug-install,adb-install"
+        />
+
+    <!-- Copies/Updates jitsi bundles from the jitsi project path to the
+        current libs folder. Copies only the bundles that are already present
+        in the lib/bundles folder.
+     -->
+    <target name="copy-jitsi-bundles"
+            depends="jitsi-path-warning"
+            if="jitsi.path">
+        <copy todir="lib/bundles" verbose="true" overwrite="true">
+            <fileset dir="./${jitsi.path}/sc-bundles">
+                <include name="*.jar"/>
+                <not>
+                    <present present="srconly" targetdir="lib/bundles"/>
+                </not>
+            </fileset>
+        </copy>
+        <copy todir="lib/bundles" verbose="true" overwrite="true">
+            <fileset dir="./${jitsi.path}/sc-bundles/os-specific/android">
+                <include name="*.jar"/>
+                <not>
+                    <present present="srconly" targetdir="lib/bundles"/>
+                </not>
+            </fileset>
+        </copy>
+    </target>
+    <!-- prints waring if jitsi.path is not set -->
+    <target name="jitsi-path-warning" unless="jitsi.path">
+        <echo message=""/>
+        <echo message="Please specify jitsi.path param.
+        A relative path from the current folder (-Djitsi.path=~/projects/jitsi)"/>
+        <echo message=""/>
+    </target>
+
+</project>
