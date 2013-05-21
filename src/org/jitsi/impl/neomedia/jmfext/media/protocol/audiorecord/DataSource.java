@@ -17,6 +17,7 @@ import android.os.Process; // disambiguation
 import org.jitsi.impl.neomedia.jmfext.media.protocol.*;
 import net.java.sip.communicator.util.*;
 import org.jitsi.impl.neomedia.*;
+import org.jitsi.service.neomedia.*;
 
 /**
  * Implements an audio <tt>CaptureDevice</tt> using {@link AudioRecord}.
@@ -440,7 +441,7 @@ public class DataSource
             // Apply software gain.
             if (gainControl != null)
             {
-                AbstractVolumeControl.applyGain(
+                BasicVolumeControl.applyGain(
                         gainControl,
                         bytes, buffer.getOffset(), buffer.getLength());
             }

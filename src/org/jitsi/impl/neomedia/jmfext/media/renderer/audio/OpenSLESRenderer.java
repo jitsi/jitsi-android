@@ -11,6 +11,7 @@ import javax.media.format.*;
 
 import org.jitsi.impl.neomedia.*;
 import org.jitsi.impl.neomedia.device.*;
+import org.jitsi.service.neomedia.*;
 import org.jitsi.service.neomedia.codec.*;
 
 /**
@@ -256,7 +257,7 @@ public class OpenSLESRenderer
                         // Apply software gain.
                         if (gainControl != null)
                         {
-                            AbstractVolumeControl.applyGain(
+                            BasicVolumeControl.applyGain(
                                     gainControl,
                                     (byte[]) data, offset, length);
                         }

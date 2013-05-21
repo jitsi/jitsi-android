@@ -14,6 +14,7 @@ import javax.media.format.AudioFormat; // disambiguation
 import org.jitsi.impl.neomedia.device.*;
 import net.java.sip.communicator.util.*;
 import org.jitsi.impl.neomedia.*;
+import org.jitsi.service.neomedia.*;
 import org.jitsi.service.neomedia.codec.*;
 
 /**
@@ -32,8 +33,8 @@ public class AudioTrackRenderer
         = Logger.getLogger(AudioTrackRenderer.class);
 
     private static final int ABSTRACT_VOLUME_CONTROL_PERCENT_RANGE
-        = (AbstractVolumeControl.MAX_VOLUME_PERCENT
-                - AbstractVolumeControl.MIN_VOLUME_PERCENT)
+        = (BasicVolumeControl.MAX_VOLUME_PERCENT
+                - BasicVolumeControl.MIN_VOLUME_PERCENT)
             / 100;
 
     /**
@@ -69,7 +70,7 @@ public class AudioTrackRenderer
     /**
      * The indicator which determines whether the gain specified by
      * {@link #gainControl} is to be applied in a software manner using
-     * {@link AbstractVolumeControl#applyGain(GainControl, byte[], int, int)} or
+     * {@link BasicVolumeControl#applyGain(GainControl, byte[], int, int)} or
      * in a hardware manner using
      * {@link AudioTrack#setStereoVolume(float, float)}.
      */
@@ -536,7 +537,7 @@ public class AudioTrackRenderer
                         {
                             if (USE_SOFTWARE_GAIN)
                             {
-                                AbstractVolumeControl.applyGain(
+                                BasicVolumeControl.applyGain(
                                         gainControl,
                                         bytes, offset, length);
                             }
@@ -592,7 +593,7 @@ public class AudioTrackRenderer
                                     if ((setStereoVolume != AudioTrack.SUCCESS)
                                             || (volume > maxVolume))
                                     {
-                                        AbstractVolumeControl.applyGain(
+                                        BasicVolumeControl.applyGain(
                                                 gainControl,
                                                 bytes, offset, length);
                                     }
