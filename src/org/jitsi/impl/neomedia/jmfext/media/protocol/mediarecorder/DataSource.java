@@ -382,6 +382,12 @@ public class DataSource
             {
                 camera = getCamera();
 
+                // Adjust preview display orientation
+                int rotation
+                        = getCameraDisplayRotation(
+                        camera, surfaceProvider.getDisplayRotation());
+                camera.setDisplayOrientation(rotation);
+
                 Format[] streamFormats = getStreamFormats();
 
                 if (camera != null)
@@ -1795,6 +1801,48 @@ public class DataSource
     }
 
     /**
+     * Calculates camera preview orientation value for the
+     * {@link Display}'s <tt>rotation</tt> in degrees.
+     * @param camera the <tt>Camera</tt> for which we are calculating
+     *        the rotation.
+     * @param rotation current {@link Display} rotation value.
+     * @return camera preview orientation value in degrees that can be used to
+     *         adjust the preview using method
+     *         {@link Camera#setDisplayOrientation(int)}.
+     */
+    public static int getCameraDisplayRotation(Camera camera,
+                                               int rotation)
+    {
+        int cameraId = cameras.keyAt(cameras.indexOfValue(camera));
+        Camera.CameraInfo info = new Camera.CameraInfo();
+        Camera.getCameraInfo(cameraId, info);
+
+        int degrees = 0;
+        switch (rotation)
+        {
+            case Surface.ROTATION_0: degrees = 0; break;
+            case Surface.ROTATION_90: degrees = 90; break;
+            case Surface.ROTATION_180: degrees = 180; break;
+            case Surface.ROTATION_270: degrees = 270; break;
+        }
+
+        int facing = info.facing;
+
+        int result;
+        if (facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
+        {
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        }
+        else
+        {
+            // back-facing
+            result = (info.orientation - degrees + 360) % 360;
+        }
+        return result;
+    }
+
+    /**
      * It's a workaround which allows not changing
      * the OperationSetVideoTelephony and related APIs.<br/>
      * Preview surface is required before {@link Camera} is
@@ -1822,5 +1870,15 @@ public class DataSource
          * release the {@link Surface} object.
          */
         public void onPreviewSurfaceReleased();
+
+        /**
+         * Should return current {@link Display} rotation as defined in
+         * {@link android.view.Display#getRotation()}.
+         *
+         * @return current {@link Display} rotation as one of values:
+         *         {@link Surface#ROTATION_0}, {@link Surface#ROTATION_90},
+         *         {@link Surface#ROTATION_180}, {@link Surface#ROTATION_270}.
+         */
+        public int getDisplayRotation();
     }
 }

@@ -482,12 +482,11 @@ public class VideoCallActivity
             CallNotificationManager.get()
                     .stopNotification(this, callIdentifier);
 
-            logger.warn("Was video enabled ? "+wasVideoEnabled);
-            // Restores local video state
-            if(wasVideoEnabled)
-            {
-                setLocalVideoEnabled(true);
-            }
+        }
+        // Restores local video state
+        if(wasVideoEnabled)
+        {
+            setLocalVideoEnabled(true);
         }
         // Registers as the call state listener
         call.addCallChangeListener(this);
@@ -1415,6 +1414,14 @@ public class VideoCallActivity
         }
 
         /**
+         * {@inheritDoc}
+         */
+        public int getDisplayRotation()
+        {
+            return getWindowManager().getDefaultDisplay().getRotation();
+        }
+
+        /**
          * Hides the local video preview component causing the <tt>Surface</tt>
          * to be destroyed.
          */
@@ -1702,6 +1709,8 @@ public class VideoCallActivity
         videoCallIntent.putExtra(
                 CallManager.CALL_IDENTIFIER,
                 callIdentifier);
+
+        wasVideoEnabled = false;
 
         return videoCallIntent;
     }
