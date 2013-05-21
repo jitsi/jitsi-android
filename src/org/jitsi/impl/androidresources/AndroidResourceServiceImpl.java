@@ -255,6 +255,13 @@ public class AndroidResourceServiceImpl
      */
     public InputStream getImageInputStream(String key) 
     {
+        // Try to lookup images.properties for key mapping
+        String resolvedPath = super.getImagePath(key);
+        if(resolvedPath != null)
+        {
+            key = resolvedPath;
+        }
+
         int id = getDrawableId(key);
         if(id != 0)
         {
