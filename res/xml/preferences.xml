@@ -2,63 +2,92 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!--<PreferenceCategory
+        android:title="@string/service_gui_settings_GENERAL"
+        android:key="@string/pref_cat_settings_general" >
+        <ListPreference
+                android:title="@string/service_gui_settings_LOCALE"
+                android:key="@string/pref_key_locale"
+                />
+    </PreferenceCategory>-->
     <PreferenceCategory
-        android:title="First Category"
-        android:key="first_category"
-           >
+            android:title="@string/service_gui_settings_CALL"
+            android:key="@string/pref_cat_settings_call" >
         <CheckBoxPreference
-                android:key="Enable Autoconnect"
-                android:summary="automatically connect at startup"
-                android:title="Enable autoconnection"
-                android:defaultValue="true"
-                />
-         <CheckBoxPreference
-                android:key="Enable mobileclient"
-                android:summary="Enable or disable mobileclient sign"
-                android:title="Enable mobileclient"
-                android:defaultValue="true"
+                android:title="@string/service_gui_settings_NORMALIZE_NUMBER"
+                android:key="@string/pref_key_normalize_pnumber"
+                android:summaryOn="@string/service_gui_settings_NORMALIZE_ON"
+                android:summaryOff="@string/service_gui_settings_NORMALIZE_OFF"
                 />
         <CheckBoxPreference
-                android:key="Notifications"
-                android:summary="Enable or disable notifications"
-                android:title="Enable notifications"
-                android:defaultValue="true"
+                android:title="@string/service_gui_settings_ALLOW_ALPHA_PNUMBER"
+                android:key="@string/pref_key_accept_alpha_pnumbers"
+                android:summaryOn="@string/service_gui_settings_ALLOW_ALPHA_ON"
+                android:summaryOff="@string/service_gui_settings_ALLOW_ALPHA_OFF"
                 />
-        <CheckBoxPreference
-                android:key="Geolocalizations"
-                android:summary="Enable or disable Geolocalizations"
-                android:title="Enable Geoloc"
-                android:defaultValue="false"
-                />
-        <CheckBoxPreference
-            android:key="perform_updates"
-            android:summary="Enable or disable data updates"
-            android:title="Enable updates"
-            android:defaultValue="true"
-        />
-
     </PreferenceCategory>
-
     <PreferenceCategory
-        android:title="Second Category"
-        android:key="second_category">
-
+            android:title="@string/service_gui_settings_AUDIO"
+            android:key="@string/pref_cat_settings_audio">
+        <CheckBoxPreference
+                android:title="@string/service_gui_settings_ECHO_CANCEL"
+                android:key="@string/pref_key_audio_echo_cancel"
+                android:summaryOn="@string/service_gui_settings_ECHO_CANCEL_ON"
+                android:summaryOff="@string/service_gui_settings_ECHO_CANCEL_OFF"
+                />
+        <CheckBoxPreference
+                android:title="@string/service_gui_settings_DENOISE"
+                android:key="@string/pref_key_audio_denoise"
+                android:summaryOn="@string/service_gui_settings_DENOISE_ON"
+                android:summaryOff="@string/service_gui_settings_DENOISE_OFF"
+                />
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_AUDIO_CODECS_TITLE"
+                android:summary="@string/service_gui_settings_AUDIO_CODECS_SUMMARY">
+            <intent android:action=".android.gui.settings.EncodingSettings">
+                <extra android:name="media_type" android:value="media_type.AUDIO" />
+            </intent>
+        </PreferenceScreen>
+    </PreferenceCategory>
+    <PreferenceCategory
+            android:title="@string/service_gui_settings_VIDEO"
+            android:key="@string/pref_cat_settings_video">
+        <ListPreference
+                android:title="@string/service_gui_settings_CAMERA"
+                android:key="@string/pref_key_video_camera"
+                />
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_VIDEO_CODECS_TITLE"
+                android:summary="@string/service_gui_settings_VIDEO_CODECS_SUMMARY">
+            <intent android:action=".android.gui.settings.EncodingSettings">
+                <extra android:name="media_type" android:value="media_type.VIDEO" />
+            </intent>
+        </PreferenceScreen>
+        <ListPreference
+                android:title="@string/service_gui_settings_VIDEO_RESOLUTION"
+                android:key="@string/pref_key_video_resolution" />
+        <CheckBoxPreference
+                android:title="@string/service_gui_settings_VIDEO_FRAME_RATE"
+                android:key="@string/pref_key_video_limit_fps"
+                android:summaryOff="@string/service_gui_settings_LIMIT_FPS_OFF"
+                android:summaryOn="@string/service_gui_settings_LIMIT_FPS_ON"
+                />
         <EditTextPreference
-            android:key="welcome_message"
-            android:title="Welcome Message"
-            android:summary="Define the Welcome message to be shown"
-            android:dialogTitle="Welcome Message"
-            android:dialogMessage="Provide a message"
-            android:defaultValue="Hi im using JITSI" />
-
-        <RingtonePreference
-                android:key="ringtone"
-
-                android:title="Ringtone Preference"
-                android:showDefault="true"
-                android:showSilent="true"
-                android:summary="Pick a tone, any tone"/>
-
+                android:title="@string/service_gui_settings_VIDEO_TARGET_FPS"
+                android:dialogMessage="@string/service_gui_settings_VIDEO_FPS_DESC"
+                android:key="@string/pref_key_video_target_fps"
+                android:dependency="@string/pref_key_video_limit_fps"
+                android:inputType="number"
+                />
+        <EditTextPreference
+                android:title="@string/service_gui_settings_VIDEO_MAX_BANDWIDTH"
+                android:key="@string/pref_key_video_max_bandwidth"
+                android:inputType="number"
+                />
+        <EditTextPreference
+                android:title="@string/service_gui_settings_VIDEO_BITRATE"
+                android:key="@string/pref_key_video_bitrate"
+                android:inputType="number"
+                />
     </PreferenceCategory>
-
 </PreferenceScreen>

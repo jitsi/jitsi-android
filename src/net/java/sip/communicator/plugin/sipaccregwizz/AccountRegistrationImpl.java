@@ -11,9 +11,9 @@ import java.util.Map.Entry;
 
 import net.java.sip.communicator.service.gui.*;
 import net.java.sip.communicator.service.protocol.*;
+import net.java.sip.communicator.service.protocol.sip.*;
 import net.java.sip.communicator.util.Logger;
 
-import org.jitsi.util.*;
 import org.osgi.framework.*;
 
 /**
@@ -88,185 +88,27 @@ public class AccountRegistrationImpl
         throws OperationFailedException
     {
         HashMap<String, String> accountProperties
-            = new HashMap<String, String>();
+                = new HashMap<String, String>();
 
-        accountProperties.put(  ProtocolProviderFactory.PROTOCOL,
-                                getProtocolName());
+        String protocolIconPath = getProtocolIconPath();
+        String accountIconPath = getAccountIconPath();
 
-        if(registration.isRememberPassword())
+        registration.storeProperties(
+                userName, passwd,
+                protocolIconPath, accountIconPath,
+                isModification(),
+                accountProperties);
+
+        if(isModification())
         {
-            accountProperties.put(ProtocolProviderFactory.PASSWORD, passwd);
+            accountProperties.put(ProtocolProviderFactory.USER_ID, userName);
+            providerFactory.modifyAccount(  protocolProvider,
+                                            accountProperties);
+
+            setModification(false);
+
+            return protocolProvider;
         }
-        else
-        {
-            // clear password if requested
-            registration.setPassword(null);
-        }
-
-        String serverAddress = null;
-        String serverFromUsername = getServerFromUserName(userName);
-
-        if (registration.getServerAddress() != null)
-            serverAddress = registration.getServerAddress();
-
-        if(serverFromUsername == null
-            && registration.getDefaultDomain() != null)
-        {
-            // we have only a username and we want to add
-            // a default domain
-            userName = userName + "@" + registration.getDefaultDomain();
-
-            if(serverAddress == null)
-                serverAddress = registration.getDefaultDomain();
-        }
-        else if(serverAddress == null &&
-            serverFromUsername != null)
-        {
-            serverAddress = serverFromUsername;
-        }
-
-        if (serverAddress != null)
-        {
-            accountProperties.put(ProtocolProviderFactory.SERVER_ADDRESS,
-                serverAddress);
-
-            if (userName.indexOf(serverAddress) < 0)
-                accountProperties.put(
-                    ProtocolProviderFactory.IS_SERVER_OVERRIDDEN,
-                    Boolean.toString(true));
-        }
-
-        accountProperties.put(ProtocolProviderFactory.DISPLAY_NAME,
-            registration.getDisplayName());
-
-        accountProperties.put(ProtocolProviderFactory.AUTHORIZATION_NAME,
-            registration.getAuthorizationName());
-
-        accountProperties.put(ProtocolProviderFactory.SERVER_PORT,
-            registration.getServerPort());
-
-        if(registration.isProxyAutoConfigure())
-        {
-            accountProperties.put(ProtocolProviderFactory.PROXY_AUTO_CONFIG,
-                    Boolean.TRUE.toString());
-        }
-        else
-        {
-            accountProperties.put(ProtocolProviderFactory.PROXY_AUTO_CONFIG,
-                    Boolean.FALSE.toString());
-
-            accountProperties.put(ProtocolProviderFactory.PROXY_ADDRESS,
-                registration.getProxy());
-
-            accountProperties.put(ProtocolProviderFactory.PROXY_PORT,
-                registration.getProxyPort());
-
-            accountProperties.put(ProtocolProviderFactory.PREFERRED_TRANSPORT,
-                registration.getPreferredTransport());
-        }
-
-        accountProperties.put(ProtocolProviderFactory.IS_PRESENCE_ENABLED,
-                Boolean.toString(registration.isEnablePresence()));
-
-        // when we are creating registerless account make sure that
-        // we don't use PA
-        if(serverAddress != null)
-        {
-            accountProperties.put(ProtocolProviderFactory.FORCE_P2P_MODE,
-                Boolean.toString(registration.isForceP2PMode()));
-        }
-        else
-        {
-            accountProperties.put(ProtocolProviderFactory.FORCE_P2P_MODE,
-                Boolean.TRUE.toString());
-        }
-
-        accountProperties.put(ProtocolProviderFactory.DEFAULT_ENCRYPTION,
-                Boolean.toString(registration.isDefaultEncryption()));
-
-        accountProperties.put(ProtocolProviderFactory.DEFAULT_SIPZRTP_ATTRIBUTE,
-                Boolean.toString(registration.isSipZrtpAttribute()));
-
-        accountProperties.put(ProtocolProviderFactory.SAVP_OPTION,
-            Integer.toString(registration.getSavpOption()));
-
-//        accountProperties.put(ProtocolProviderFactory.SDES_ENABLED,
-//            Boolean.toString(registration.isSDesEnabled()));
-
-        accountProperties.put(ProtocolProviderFactory.SDES_CIPHER_SUITES,
-            registration.getSDesCipherSuites());
-
-        accountProperties.put(ProtocolProviderFactory.POLLING_PERIOD,
-                registration.getPollingPeriod());
-
-        accountProperties.put(ProtocolProviderFactory.SUBSCRIPTION_EXPIRATION,
-                registration.getSubscriptionExpiration());
-
-        accountProperties.put(ProtocolProviderFactory.CLIENT_TLS_CERTIFICATE,
-                registration.getTlsClientCertificate());
-
-        if(registration.getKeepAliveMethod() != null)
-            accountProperties.put(ProtocolProviderFactory.KEEP_ALIVE_METHOD,
-                registration.getKeepAliveMethod());
-        else
-            accountProperties.put(ProtocolProviderFactory.KEEP_ALIVE_METHOD,
-                registration.getDefaultKeepAliveMethod());
-
-        accountProperties.put(ProtocolProviderFactory.KEEP_ALIVE_INTERVAL,
-            registration.getKeepAliveInterval());
-
-        accountProperties.put("XIVO_ENABLE",
-                Boolean.toString(registration.isXiVOEnable()));
-        accountProperties.put("XCAP_ENABLE",
-            Boolean.toString(registration.isXCapEnable()));
-
-        if(registration.isXCapEnable())
-        {
-            accountProperties.put("XCAP_USE_SIP_CREDETIALS",
-                Boolean.toString(registration.isClistOptionUseSipCredentials()));
-            if (registration.getClistOptionServerUri() != null)
-            {
-                accountProperties.put(
-                    "XCAP_SERVER_URI",
-                    registration.getClistOptionServerUri());
-            }
-            if (registration.getClistOptionUser() != null)
-            {
-                accountProperties
-                    .put("XCAP_USER", registration.getClistOptionUser());
-            }
-            if (registration.getClistOptionPassword() != null)
-            {
-                accountProperties
-                    .put("XCAP_PASSWORD", registration.getClistOptionPassword());
-            }
-        }
-        else if(registration.isXiVOEnable())
-        {
-            accountProperties.put("XIVO_USE_SIP_CREDETIALS",
-                Boolean.toString(registration.isClistOptionUseSipCredentials()));
-            if (registration.getClistOptionServerUri() != null)
-            {
-                accountProperties.put(
-                    "XIVO_SERVER_URI",
-                    registration.getClistOptionServerUri());
-            }
-            if (registration.getClistOptionUser() != null)
-            {
-                accountProperties
-                    .put("XIVO_USER", registration.getClistOptionUser());
-            }
-            if (registration.getClistOptionPassword() != null)
-            {
-                accountProperties
-                    .put("XIVO_PASSWORD", registration.getClistOptionPassword());
-            }
-        }
-
-        if(!StringUtils.isNullOrEmpty(registration.getVoicemailURI(), true))
-            accountProperties.put(
-                    ProtocolProviderFactory.VOICEMAIL_URI,
-                    registration.getVoicemailURI());
 
         try
         {
@@ -274,27 +116,28 @@ public class AccountRegistrationImpl
                     userName, accountProperties);
 
             ServiceReference serRef = providerFactory
-                .getProviderForAccount(accountID);
+                    .getProviderForAccount(accountID);
 
-            protocolProvider = (ProtocolProviderService)
-                SIPAccountRegistrationActivator.bundleContext
-                    .getService(serRef);
+            protocolProvider
+                = (ProtocolProviderService)
+                    SIPAccountRegistrationActivator.bundleContext
+                            .getService(serRef);
         }
         catch (IllegalStateException exc)
         {
             logger.warn(exc.getMessage());
 
             throw new OperationFailedException(
-                "Account already exists.",
-                OperationFailedException.IDENTIFICATION_CONFLICT);
+                    "Account already exists.",
+                    OperationFailedException.IDENTIFICATION_CONFLICT);
         }
         catch (Exception exc)
         {
             logger.warn(exc.getMessage());
 
             throw new OperationFailedException(
-                exc.getMessage(),
-                OperationFailedException.GENERAL_ERROR);
+                    exc.getMessage(),
+                    OperationFailedException.GENERAL_ERROR);
         }
 
         return protocolProvider;
@@ -344,6 +187,23 @@ public class AccountRegistrationImpl
     @Override
     public void loadAccount(ProtocolProviderService protocolProvider)
     {
+        setModification(true);
+
+        this.protocolProvider = protocolProvider;
+
+        registration = new SIPAccountRegistration();
+
+        AccountID accountID = protocolProvider.getAccountID();
+
+        String password
+                = SIPAccountRegistrationActivator
+                .getSIPProtocolProviderFactory()
+                .loadPassword(accountID);
+
+        // Loads account properties into registration object
+        registration.loadAccount(
+                accountID, password,
+                SIPAccountRegistrationActivator.bundleContext);
     }
 
     @Override
@@ -380,5 +240,28 @@ public class AccountRegistrationImpl
     public Object getSimpleForm(boolean isCreateAccount)
     {
         return null;
+    }
+
+    /**
+     * Returns the protocol icon path.
+     * @return the protocol icon path
+     */
+    public String getProtocolIconPath()
+    {
+        return null;
+    }
+
+    /**
+     * Returns the account icon path.
+     * @return the account icon path
+     */
+    public String getAccountIconPath()
+    {
+        return null;
+    }
+
+    public SIPAccountRegistration getRegistration()
+    {
+        return registration;
     }
 }

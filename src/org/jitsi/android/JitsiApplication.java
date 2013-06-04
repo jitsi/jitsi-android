@@ -8,6 +8,7 @@ package org.jitsi.android;
 
 import android.app.*;
 import android.content.*;
+import android.content.res.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.service.osgi.*;
 
@@ -89,6 +90,15 @@ public class JitsiApplication
     public static Context getGlobalContext()
     {
         return instance.getApplicationContext();
+    }
+
+    /**
+     * Returns application <tt>Resources</tt> object.
+     * @return application <tt>Resources</tt> object.
+     */
+    public static Resources getAppResources()
+    {
+        return instance.getResources();
     }
 
     /**

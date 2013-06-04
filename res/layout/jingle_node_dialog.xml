@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:weightSum="1.0"
+            android:orientation="vertical"
+            android:layout_centerInParent="true">
+    <TableRow>
+        <TextView
+                style="@style/MediumFont"
+                android:text="@string/service_gui_JINGLE_EDIT_JID"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"/>
+        <EditText
+                android:id="@+id/jidAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="text"/>
+    </TableRow>
+    <TableRow>
+        <TextView
+                style="@style/MediumFont"
+                android:text="@string/service_gui_JINGLE_EDIT_SUPPORT_RELAY"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+        <CheckBox
+                android:id="@+id/relaySupportCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp" />
+    </TableRow>
+</TableLayout>

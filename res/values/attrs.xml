@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TouchInterceptor">
+        <attr name="itemHeight" format="dimension" />
+        <attr name="itemExpandedHeight" format="dimension" />
+        <attr name="dragRegionStartX" format="dimension" />
+        <attr name="dragRegionEndX" format="dimension" />
+    </declare-styleable>
+</resources>

@@ -1,0 +1,608 @@
+/*
+ * Jitsi, the OpenSource Java VoIP and Instant Messaging client.
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
+package org.jitsi.android.gui.account.settings;
+
+import android.app.*;
+import android.content.*;
+import android.os.Bundle;
+import android.preference.*;
+import net.java.sip.communicator.service.gui.*;
+import net.java.sip.communicator.service.protocol.*;
+import net.java.sip.communicator.util.*;
+import net.java.sip.communicator.util.account.*;
+import org.jitsi.*;
+import org.jitsi.android.gui.settings.util.*;
+import org.jitsi.impl.neomedia.*;
+import org.jitsi.service.neomedia.*;
+import org.jitsi.service.neomedia.codec.*;
+import org.jitsi.service.osgi.*;
+import org.osgi.framework.*;
+
+import java.util.*;
+
+/**
+ * The fragment shares common parts for all protocols settings.
+ * It handles security and encoding preferences.
+ *
+ * @author Pawel Domas
+ */
+public abstract class AccountPreferenceFragment
+    extends OSGiPreferenceFragment
+        implements SharedPreferences.OnSharedPreferenceChangeListener
+{
+    public static final String EXTRA_ACCOUNT_ID = "accountID";
+
+    private static final String STATE_INIT_FLAG = "initialized";
+
+    /**
+     * The request key for action
+     * {@link android.app.Activity#startActivityForResult(android.content.Intent, int)}
+     */
+    public static final int EDIT_ENCODINGS = 1;
+
+    /**
+     * The request code used in
+     * {@link android.app.Activity#startActivityForResult(android.content.Intent, int)}
+     * (the value itself is not important)
+     */
+    public static final int EDIT_SECURITY =2;
+
+    /**
+     * The logger
+     */
+    Logger logger = Logger.getLogger(AccountPreferenceFragment.class);
+    
+    /**
+     * Edited {@link net.java.sip.communicator.service.protocol.AccountID}
+     */
+    private AccountID accountID;
+
+    /**
+     * The ID of protocol preferences xml file passed in constructor
+     */
+    private final int preferencesResourceId;
+
+    /**
+     * Utility that maps current preference value to summary
+     */
+    private SummaryMapper summaryMapper = new SummaryMapper();
+
+    /**
+     * Flag indicating if there are uncommitted changes
+     */
+    private boolean uncommittedChanges;
+
+    /**
+     * The progress dialog shown when changes are being committed
+     */
+    private ProgressDialog progressDialog;
+
+    private AccountRegistrationWizard wizard;
+    /**
+     * We load values only once into shared preferences to not reset values on
+     * screen rotated event.
+     */
+    private boolean initizalized = false;
+
+    /**
+     * Creates new instance of {@link AccountPreferenceFragment}
+     *
+     * @param preferencesResourceId the ID of preferences xml file
+     *  for current protocol
+     */
+    public AccountPreferenceFragment(int preferencesResourceId)
+    {
+        this.preferencesResourceId = preferencesResourceId;
+    }
+
+    protected abstract EncodingsRegistrationUtil getEncodingsRegistration();
+
+    protected abstract SecurityAccountRegistration getSecurityRegistration();
+
+    protected AccountRegistrationWizard getWizard()
+    {
+        return wizard;
+    }
+
+    /**
+     * Returns currently edited account
+     * @return currently edited {@link net.java.sip.communicator.service.protocol.AccountID}
+     */
+    protected AccountID getAccountID()
+    {
+        return accountID;
+    }
+
+    protected boolean isInitizalized()
+    {
+        return initizalized;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+        if(savedInstanceState != null)
+        {
+            initizalized = savedInstanceState.getBoolean(STATE_INIT_FLAG);
+        }
+
+        // Load the preferences from an XML resource
+        addPreferencesFromResource(preferencesResourceId);
+
+        String audioEncCatKey =
+                getResources().getString(R.string.pref_cat_audio_encoding);
+        Preference audioEncPreference = findPreference(audioEncCatKey);
+        if(audioEncPreference != null)
+        {
+            audioEncPreference.setOnPreferenceClickListener(
+                    new Preference.OnPreferenceClickListener()
+                    {
+                        public boolean onPreferenceClick(Preference preference)
+                        {
+                            startEncodingActivity(MediaType.AUDIO);
+                            return true;
+                        }
+                    });
+        }
+
+        String videoEncCatKey =
+                getResources().getString(R.string.pref_cat_video_encoding);
+        Preference videoEncPreference = findPreference(videoEncCatKey);
+        if(videoEncPreference != null)
+        {
+            videoEncPreference.setOnPreferenceClickListener(
+                    new Preference.OnPreferenceClickListener()
+                    {
+                        public boolean onPreferenceClick(Preference preference)
+                        {
+                            startEncodingActivity(MediaType.VIDEO);
+                            return true;
+                        }
+                    });
+        }
+
+        String encOnOffKey =
+                getResources().getString(R.string.pref_key_enable_encryption);
+        Preference encryptionOnOff = findPreference(encOnOffKey);
+        if(encryptionOnOff != null)
+        {
+            encryptionOnOff.setOnPreferenceClickListener(
+                    new Preference.OnPreferenceClickListener()
+                    {
+                        public boolean onPreferenceClick(Preference preference)
+                        {
+                            startSecurityActivity();
+                            return true;
+                        }
+                    }
+            );
+        }
+
+        mapSummaries(summaryMapper);
+    }
+
+    /**
+     * Method fired when OSGI context is attached, but after the <tt>View</tt>
+     * is created.
+     */
+    @Override
+    protected void onOSGiConnected()
+    {
+        super.onOSGiConnected();
+
+        String accountID = getArguments().getString(EXTRA_ACCOUNT_ID);
+        AccountID account = AccountUtils.getAccountForID(accountID);
+        /**
+         * Workaround for desynchronization problem when account was created for
+         * the first time.
+         * During account creation process another instance was returned by
+         * AccountManager and another from corresponding ProtocolProvider.
+         * We should use that one from the provider.
+         */
+        account = AccountUtils.getRegisteredProviderForAccount(account)
+                        .getAccountID();
+
+        // Loads the account details
+        loadAccount(account, getActivity(), osgiContext);
+
+        if(initizalized)
+        {
+            /**
+             * Skips preferences initialization if were loaded at least once
+             * to not overwrite modified values.
+             */
+            logger.error("Initialized!! skipping");
+            return;
+        }
+        onCreatePreferences();
+        initizalized = true;
+    }
+
+    /**
+     * Fired when OSGI is started and the <tt>bundleContext</tt> is available.
+     *
+     * @param bundleContext the OSGI bundle context.
+     */
+    @Override
+    public void start(BundleContext bundleContext)
+            throws Exception
+    {
+        super.start(bundleContext);
+    }
+
+    /**
+     * Load the <tt>account</tt> and it's encoding and security parts
+     * if they exist
+     *
+     * @param account the {@link net.java.sip.communicator.service.protocol.AccountID} that will be edited
+     * @param context the {@link android.content.Context} of Android application
+     * @param bundleContext the OSGI bundle context
+     */
+    public void loadAccount( AccountID account,
+                             Context context,
+                             BundleContext bundleContext)
+    {
+        this.accountID = account;
+
+        wizard = findRegistrationService(account.getProtocolName());
+        if(wizard == null)
+            throw new NullPointerException();
+
+        if(initizalized)
+        {
+            System.err.println("Initialized not loading account data");
+            return;
+        }
+
+        ProtocolProviderService pps
+                = AccountUtils.getRegisteredProviderForAccount(account);
+
+        wizard.loadAccount(pps);
+    }
+
+    /**
+     * Method is called after preference XML file is loaded.
+     * Subclasses should perform preference views initialization here.
+     */
+    protected void onCreatePreferences()
+    {
+        // Encodings
+        /*EncodingsRegistrationUtil encodingsRegistration
+                = getEncodingsRegistration();
+        if(encodingsRegistration != null)
+        {
+            loadEncodingsSection(accountID, encodingsRegistration);
+        }
+
+        // Security
+        SecurityAccountRegistration securityRegistration
+                = getSecurityRegistration();
+        if(securityRegistration != null)
+        {
+            loadSecuritySection(accountID, securityRegistration);
+        }*/
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean(STATE_INIT_FLAG, initizalized);
+    }
+
+
+
+    /**
+     * Finds the wizard for given protocol name
+     *
+     * @param protocolName the name of the protocol
+     *
+     * @return {@link net.java.sip.communicator.service.gui.AccountRegistrationWizard} for given <tt>protocolName</tt>
+     */
+    AccountRegistrationWizard findRegistrationService(String protocolName)
+    {
+        ServiceReference[] accountWizardRefs = null;
+        try
+        {
+            accountWizardRefs
+                    = osgiContext.getServiceReferences(
+                            AccountRegistrationWizard.class.getName(), null);
+
+            for(int i=0; i < accountWizardRefs.length; i++)
+            {
+                AccountRegistrationWizard wizard = (AccountRegistrationWizard)
+                        osgiContext.getService(accountWizardRefs[i]);
+
+                if(wizard.getProtocolName().equals(protocolName))
+                    return  wizard;
+            }
+        }
+        catch (InvalidSyntaxException ex)
+        {
+            // this shouldn't happen since we're providing no parameter string
+            // but let's log just in case.
+            logger.error(
+                    "Error while retrieving service refs", ex);
+        }
+        throw new RuntimeException(
+                "No wizard found for protocol: " + protocolName);
+    }
+
+    /**
+     * Loads the encodings part of account preferences
+     * and puts them into the {@link EncodingsRegistrationUtil} object
+     *
+     * @param accountID the {@link AccountID} which contains encoding properties
+     * @param encodingsRegistration the {@link EncodingsRegistrationUtil} object
+     *  which will store the encodings properties
+     */
+    private static void loadEncodingsSection(
+            AccountID accountID,
+            EncodingsRegistrationUtil encodingsRegistration)
+    {
+        //TODO: move to some utility class ? this code duplicates from jitsi src
+        String overrideEncodings = accountID.getAccountPropertyString(
+                ProtocolProviderFactory.OVERRIDE_ENCODINGS);
+        boolean isOverrideEncodings = Boolean.parseBoolean(overrideEncodings);
+        encodingsRegistration.setOverrideEncodings(isOverrideEncodings);
+
+        Map<String, String> encodingProperties = new HashMap<String, String>();
+        EncodingConfiguration encodingConfiguration =
+                NeomediaActivator.getMediaServiceImpl()
+                        .createEmptyEncodingConfiguration();
+        encodingConfiguration
+                .loadProperties(
+                        accountID.getAccountProperties(),
+                        ProtocolProviderFactory.ENCODING_PROP_PREFIX);
+        encodingConfiguration
+                .storeProperties(
+                        encodingProperties,
+                        ProtocolProviderFactory.ENCODING_PROP_PREFIX + ".");
+        encodingsRegistration.setEncodingProperties(encodingProperties);
+    }
+
+    /**
+     * Loads the security properties of given <tt>account</tt> and stores
+     * them in <tt>registration</tt> object.
+     *
+     * @param account the {@link AccountID} containing security properties
+     * @param registration the {@link SecurityAccountRegistration}
+     *  that will hold the properties
+     */
+    private static void loadSecuritySection(
+            AccountID account,
+            SecurityAccountRegistration registration)
+    {
+
+    }
+
+    /**
+     * Method called after all preference Views are created and initialized.
+     * Subclasses can use given <tt>summaryMapper</tt> to include
+     * it's preferences in summary mapping
+     *
+     * @param summaryMapper the {@link SummaryMapper} managed by this
+     *  {@link AccountPreferenceFragment} that can be used by subclasses
+     *  to map preference's values into their summaries
+     */
+    protected abstract void mapSummaries(SummaryMapper summaryMapper);
+
+    /**
+     * 
+     * @return the string that should be used as preference summary
+     * when no value has been set
+     */
+    protected String getEmptyPreferenceStr()
+    {
+        return getResources().getString(R.string.service_gui_SETTINGS_NOT_SET);
+    }
+
+    /**
+     * Starts the {@link SecurityActivity} to edit account's security
+     * preferences
+     */
+    private void startSecurityActivity()
+    {
+        Intent intent = new Intent(
+                getActivity(),
+                SecurityActivity.class);
+
+        SecurityAccountRegistration securityRegistration
+                = getSecurityRegistration();
+        if(securityRegistration == null)
+            throw new NullPointerException();
+
+        intent.putExtra(
+                SecurityActivity.EXTR_KEY_SEC_REGISTRATION,
+                securityRegistration);
+
+        startActivityForResult(intent, EDIT_SECURITY);
+    }
+
+    /**
+     * Starts the {@link EncodingActivity} in order to edit encoding properties.
+     * 
+     * @param mediaType indicates if AUDIO or VIDEO encodings will be edited
+     */
+    private void startEncodingActivity(MediaType mediaType)
+    {
+        Intent intent = new Intent(
+                getActivity(), EncodingActivity.class);
+
+        intent.putExtra(EncodingActivity.ENC_MEDIA_TYPE_KEY, mediaType);
+
+        EncodingsRegistrationUtil encodingsRegistration
+                = getEncodingsRegistration();
+        if(encodingsRegistration == null)
+            throw new NullPointerException();
+        intent.putExtra(
+                EncodingActivity.EXTRA_KEY_ENC_REG,
+                encodingsRegistration);
+
+        startActivityForResult(
+                intent, EDIT_ENCODINGS);
+    }
+
+    /**
+     * Handles {@link EncodingActivity} and {@ling SecurityActivity} results 
+     */
+    public void onActivityResult(int requestCode, int resultCode,
+                                 Intent data)
+    {
+        if (requestCode == EDIT_ENCODINGS &&
+                resultCode == Activity.RESULT_OK)
+        {
+            Boolean hasChanges = data.getBooleanExtra(
+                    EncodingActivity.EXTRA_KEY_HAS_CHANGES, false);
+            if(!hasChanges)
+                return;
+
+            EncodingsRegistrationUtil encReg = (EncodingsRegistrationUtil)
+                    data.getSerializableExtra(
+                            EncodingActivity.EXTRA_KEY_ENC_REG);
+
+            EncodingsRegistrationUtil myReg = getEncodingsRegistration();
+            myReg.setOverrideEncodings(encReg.isOverrideEncodings());
+            myReg.setEncodingProperties(encReg.getEncodingProperties());
+
+            uncommittedChanges = true;
+        }
+        else if(requestCode == EDIT_SECURITY &&
+                resultCode == Activity.RESULT_OK)
+        {
+            Boolean hasChanges = data.getBooleanExtra(
+                    SecurityActivity.EXTR_KEY_HAS_CHANGES, false);
+
+            if(!hasChanges)
+                return;
+
+            SecurityAccountRegistration secReg = (SecurityAccountRegistration)
+                    data.getSerializableExtra(
+                            SecurityActivity.EXTR_KEY_SEC_REGISTRATION);
+
+            SecurityAccountRegistration myReg
+                    = getSecurityRegistration();
+            myReg.setDefaultEncryption(
+                    secReg.isDefaultEncryption());
+            myReg.setEncryptionProtocols(
+                    secReg.getEncryptionProtocols());
+            myReg.setEncryptionProtocolStatus(
+                    secReg.getEncryptionProtocolStatus());
+            myReg.setSipZrtpAttribute(secReg.isSipZrtpAttribute());
+            myReg.setSavpOption(secReg.getSavpOption());
+            myReg.setSDesCipherSuites(secReg.getSDesCipherSuites());
+
+            uncommittedChanges = true;
+        }
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        getPreferenceScreen().getSharedPreferences()
+                .registerOnSharedPreferenceChangeListener(this);
+        getPreferenceScreen().getSharedPreferences()
+                .registerOnSharedPreferenceChangeListener(summaryMapper);
+    }
+
+    @Override
+    public void onPause()
+    {
+        getPreferenceScreen().getSharedPreferences()
+                .unregisterOnSharedPreferenceChangeListener(this);
+        getPreferenceScreen().getSharedPreferences()
+                .unregisterOnSharedPreferenceChangeListener(summaryMapper);
+
+        super.onPause();
+    }
+
+    /**
+     * Should be called by subclasses to indicate that some changes has been
+     * made to the account
+     */
+    protected void setUncomittedChanges()
+    {
+        uncommittedChanges = true;
+    }
+
+    public void onSharedPreferenceChanged(SharedPreferences shPrefs, String s)
+    {
+        uncommittedChanges = true;
+    }
+
+    /**
+     * Subclasses should implement account changes commit in this method
+     */
+    protected abstract void doCommitChanges();
+
+    /**
+     * Commits the changes and shows "in progress" dialog
+     */
+    public void commitChanges()
+    {
+        if(!uncommittedChanges)
+            return;
+        try
+        {
+            getActivity().runOnUiThread(new Runnable()
+            {
+                public void run()
+                {
+                    displayOperationInProgressDialog();
+                }
+            });
+
+            doCommitChanges();
+
+            getActivity().runOnUiThread(new Runnable()
+            {
+                public void run()
+                {
+                    hideOperationInProgressToast();
+                }
+            });
+        }
+        catch(Exception e)
+        {
+            logger.error("Error occurred while trying to commit changes", e);
+        }
+    }
+
+    /**
+     * Shows the "in progress" dialog
+     */
+    private void displayOperationInProgressDialog()
+    {
+        Context context = getView().getRootView().getContext();
+        CharSequence title = getResources().getText(
+                R.string.service_gui_COMMIT_PROGRESS_TITLE);
+        CharSequence msg = getResources().getText(
+                R.string.service_gui_COMMIT_PROGRESS_MSG);
+        
+        this.progressDialog = ProgressDialog.show(
+                context, title, msg, true, false);
+        // Display the progress dialog
+        progressDialog.show();
+    }
+
+    /**
+     * Hides the "in progress" dialog
+     */
+    private void hideOperationInProgressToast()
+    {
+        if(progressDialog != null)
+        {
+            progressDialog.dismiss();
+            progressDialog = null;
+        }
+    }
+}
