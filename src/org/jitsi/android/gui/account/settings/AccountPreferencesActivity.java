@@ -44,6 +44,9 @@ public class AccountPreferencesActivity
      */
     private Thread commitThread;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -80,6 +83,15 @@ public class AccountPreferencesActivity
         }
     }
 
+    /**
+     * Creates impl preference fragment based on protocol name.
+     *
+     * @param userUniqueID the account unique ID identifying edited account.
+     * @param protocolName protocol name for which the impl fragment will be
+     *                     created.
+     * @return impl preference fragment for given <tt>userUniqueID</tt> and
+     *         <tt>protocolName</tt>.
+     */
     private AccountPreferenceFragment createPreferencesFragment(
             String userUniqueID,
             String protocolName)
@@ -107,6 +119,10 @@ public class AccountPreferencesActivity
         return preferencesFragment;
     }
 
+    /**
+     * Catches the back key and commits the changes if any.<br/>
+     * {@inheritDoc}
+     */
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) 
     {

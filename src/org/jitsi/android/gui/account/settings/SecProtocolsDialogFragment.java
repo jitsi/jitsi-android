@@ -95,7 +95,8 @@ public class SecProtocolsDialogFragment
 
         // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View contentView = inflater.inflate(R.layout.sec_protocols_dialog, null);
+        View contentView = inflater.inflate( R.layout.sec_protocols_dialog,
+                                             null );
         builder.setView(contentView)
                 .setPositiveButton(
                         R.string.service_gui_SEC_PROTOCOLS_OK,

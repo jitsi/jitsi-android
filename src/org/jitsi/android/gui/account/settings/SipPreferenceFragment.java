@@ -16,7 +16,6 @@ import net.java.sip.communicator.util.*;
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.settings.util.*;
-import org.osgi.framework.*;
 
 import java.util.*;
 
@@ -154,28 +153,45 @@ public class SipPreferenceFragment
         super(R.xml.sip_preferences);
     }
 
+    /**
+     * Returns SIP registration wizard.
+     * @return SIP registration wizard.
+     */
     private AccountRegistrationImpl getSipWizard()
     {
         return (AccountRegistrationImpl)getWizard();
     }
 
+    /**
+     * Returns SIP account registration object.
+     * @return SIP account registration object.
+     */
     private SIPAccountRegistration getAccountRegistration()
     {
         return getSipWizard().getRegistration();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected EncodingsRegistrationUtil getEncodingsRegistration()
     {
         return getAccountRegistration().getEncodingsRegistration();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected SecurityAccountRegistration getSecurityRegistration()
     {
         return getAccountRegistration().getSecurityRegistration();
     }
 
+    /**
+     *{@inheritDoc}
+     */
     protected void onInitPreferences()
     {
         SIPAccountRegistration registration = getSipWizard().getRegistration();
@@ -285,6 +301,9 @@ public class SipPreferenceFragment
         editor.commit();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void onPreferencesCreated()
     {
         super.onPreferencesCreated();
@@ -328,6 +347,9 @@ public class SipPreferenceFragment
             certPreference.setValue(currentCert);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void mapSummaries(SummaryMapper summaryMapper)
     {
         String emptyStr = getEmptyPreferenceStr();
@@ -404,6 +426,9 @@ public class SipPreferenceFragment
                 new SummaryMapper.PasswordMask());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void onSharedPreferenceChanged( SharedPreferences prefs,
                                            String key)
     {
@@ -576,6 +601,9 @@ public class SipPreferenceFragment
         findPreference(PREF_KEY_CLIST_PASSWORD).setEnabled(enable);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void doCommitChanges()
     {
         try

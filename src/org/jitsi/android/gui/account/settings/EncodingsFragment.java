@@ -1,3 +1,9 @@
+/*
+ * Jitsi, the OpenSource Java VoIP and Instant Messaging client.
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package org.jitsi.android.gui.account.settings;
 
 import android.app.*;
@@ -11,6 +17,8 @@ import java.io.*;
 import java.util.*;
 
 /**
+ * The fragments allows user to edit encodings and their priorities.
+ *
  * @author Pawel Domas
  */
 public class EncodingsFragment
@@ -18,12 +26,13 @@ public class EncodingsFragment
     implements TouchInterceptor.DropListener
 {
     /**
-     *
+     * Argument key for list of encodings as strings
+     * (see {@link EncodingActivity} for utility methods.)
      */
     public static final String ARG_ENCODINGS = "arg.encodings";
 
     /**
-     *
+     * Argument key for encodings priorities.
      */
     public static final String ARG_PRIORITIES = "arg.priorities";
 
@@ -48,16 +57,31 @@ public class EncodingsFragment
      */
     private List<Integer> priorities;
 
+    /**
+     * Flag holding enabled status for the fragment. All views will be grayed
+     * out if the fragment is not enabled.
+     */
     private boolean isEnabled=true;
 
+    /**
+     * Flag tells us if there were any changes made.
+     */
     private boolean hasChanges = false;
 
+    /**
+     * Sets enabled status for this fragment.
+     * @param isEnabled <tt>true</tt> to enable the fragment.
+     */
     public void setEnabled(boolean isEnabled)
     {
         this.isEnabled = isEnabled;
         adapter.invalidate();
     }
 
+    /**
+     * Returns <tt>true</tt> if this fragment is holding any uncommitted changes
+     * @return <tt>true</tt> if this fragment is holding any uncommitted changes
+     */
     public boolean hasChanges()
     {
         return hasChanges;
@@ -113,8 +137,6 @@ public class EncodingsFragment
         hasChanges = true;
     }
 
-
-
     /**
      * Function used to calculate priority based on item index
      *
@@ -126,11 +148,25 @@ public class EncodingsFragment
         return encodings.size() - idx;
     }
 
+    /**
+     * Utility method for calculating encodings priorities.
+     * @param idx encoding index in the list
+     * @return the priority value for given encoding index.
+     */
     private int calcPriority(int idx)
     {
         return calcPriority(encodings, idx);
     }
 
+    /**
+     * Creates new <tt>EncodingsFragment</tt> for given list of encodings and
+     * priorities.
+     *
+     * @param encodings list of encodings as strings.
+     * @param priorities list of encodings priorities.
+     *
+     * @return parametrized instance of <tt>EncodingsFragment</tt>.
+     */
     static public EncodingsFragment newInstance( List<String> encodings,
                                                  List<Integer> priorities )
     {
@@ -145,11 +181,19 @@ public class EncodingsFragment
         return fragment;
     }
 
+    /**
+     * Returns encodings strings list.
+     * @return encodings strings list.
+     */
     public List<String> getEncodings()
     {
         return encodings;
     }
 
+    /**
+     * Returns encodings priorities list.
+     * @return encodings priorities list.
+     */
     public List<Integer> getPriorities()
     {
         return priorities;
@@ -176,8 +220,6 @@ public class EncodingsFragment
         {
             this.viewResId = viewResId;
         }
-
-
 
         /**
          * Swaps encodings on the list and changes their priorities

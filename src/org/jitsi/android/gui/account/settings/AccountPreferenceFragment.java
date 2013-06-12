@@ -31,8 +31,14 @@ public abstract class AccountPreferenceFragment
     extends OSGiPreferenceFragment
         implements SharedPreferences.OnSharedPreferenceChangeListener
 {
+    /**
+     * Account unique ID extra key
+     */
     public static final String EXTRA_ACCOUNT_ID = "accountID";
 
+    /**
+     * State key for "initialized" flag
+     */
     private static final String STATE_INIT_FLAG = "initialized";
 
     /**
@@ -51,7 +57,7 @@ public abstract class AccountPreferenceFragment
     Logger logger = Logger.getLogger(AccountPreferenceFragment.class);
     
     /**
-     * Edited {@link net.java.sip.communicator.service.protocol.AccountID}
+     * Edited {@link AccountID}
      */
     private AccountID accountID;
 
@@ -75,6 +81,9 @@ public abstract class AccountPreferenceFragment
      */
     private ProgressDialog progressDialog;
 
+    /**
+     * The wizard used to edit accounts
+     */
     private AccountRegistrationWizard wizard;
     /**
      * We load values only once into shared preferences to not reset values on
@@ -93,29 +102,61 @@ public abstract class AccountPreferenceFragment
         this.preferencesResourceId = preferencesResourceId;
     }
 
+    /**
+     * Method should return <tt>EncodingsRegistrationUtil</tt> if it supported
+     * by impl fragment. Preference categories with keys:
+     * <tt>pref_cat_audio_encoding</tt> and/or <tt>pref_cat_video_encoding</tt>
+     * must be included in preferences xml to trigger encodings activities.
+     *
+     * @return impl fragments should return <tt>EncodingsRegistrationUtil</tt>
+     *         if encodings are supported.
+     */
     protected abstract EncodingsRegistrationUtil getEncodingsRegistration();
 
+    /**
+     * Method should return <tt>SecurityAccountRegistration</tt> if security
+     * details are supported by impl fragment. Preference category with key
+     * <tt>pref_key_enable_encryption</tt> must be present to trigger security
+     * edit activity.
+     *
+     * @return <tt>SecurityAccountRegistration</tt> if security details are
+     *         supported by impl fragment.
+     */
     protected abstract SecurityAccountRegistration getSecurityRegistration();
 
+    /**
+     * Returns currently used <tt>AccountRegistrationWizard</tt>.
+     * @return currently used <tt>AccountRegistrationWizard</tt>.
+     */
     protected AccountRegistrationWizard getWizard()
     {
         return wizard;
     }
 
     /**
-     * Returns currently edited account
-     * @return currently edited {@link net.java.sip.communicator.service.protocol.AccountID}
+     * Returns currently edited {@link AccountID}.
+     * @return currently edited {@link AccountID}.
      */
     protected AccountID getAccountID()
     {
         return accountID;
     }
 
+    /**
+     * Returns <tt>true</tt> if preference views have been initialized with
+     * values from the registration object.
+     *
+     * @return <tt>true</tt> if preference views have been initialized with
+     *         values from the registration object.
+     */
     protected boolean isInitizalized()
     {
         return initizalized;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -142,7 +183,7 @@ public abstract class AccountPreferenceFragment
                 .getAccountID();
 
         // Loads the account details
-        loadAccount(account, getActivity(), AndroidGUIActivator.bundleContext);
+        loadAccount(account);
 
         // Loads preference Views.
         // They will be initialized with values loaded
@@ -182,13 +223,9 @@ public abstract class AccountPreferenceFragment
      * Load the <tt>account</tt> and it's encoding and security parts
      * if they exist
      *
-     * @param account the {@link net.java.sip.communicator.service.protocol.AccountID} that will be edited
-     * @param context the {@link android.content.Context} of Android application
-     * @param bundleContext the OSGI bundle context
+     * @param account the {@link AccountID} that will be edited
      */
-    public void loadAccount( AccountID account,
-                             Context context,
-                             BundleContext bundleContext)
+    public void loadAccount(AccountID account)
     {
         this.accountID = account;
 
@@ -218,6 +255,10 @@ public abstract class AccountPreferenceFragment
      */
     protected abstract void onInitPreferences();
 
+    /**
+     * Method is called after preference views have been created and can be
+     * found by using <tt>this.findPreference</tt> method.
+     */
     protected void onPreferencesCreated()
     {
         // Audio,video and security are optional and should be present
@@ -273,6 +314,9 @@ public abstract class AccountPreferenceFragment
         }
     }
 
+    /**
+     * Stores <tt>initialized</tt> flag.
+     */
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
@@ -280,8 +324,6 @@ public abstract class AccountPreferenceFragment
 
         outState.putBoolean(STATE_INIT_FLAG, initizalized);
     }
-
-
 
     /**
      * Finds the wizard for given protocol name
@@ -332,9 +374,11 @@ public abstract class AccountPreferenceFragment
     protected abstract void mapSummaries(SummaryMapper summaryMapper);
 
     /**
-     * 
+     * Returns the string that should be used as preference summary
+     * when no value has been set.
+     *
      * @return the string that should be used as preference summary
-     * when no value has been set
+     * when no value has been set.
      */
     protected String getEmptyPreferenceStr()
     {
@@ -440,6 +484,9 @@ public abstract class AccountPreferenceFragment
         }
     }
 
+    /**
+     * Registers preference listeners.
+     */
     @Override
     public void onResume()
     {
@@ -451,6 +498,9 @@ public abstract class AccountPreferenceFragment
                 .registerOnSharedPreferenceChangeListener(summaryMapper);
     }
 
+    /**
+     * Unregisters preference listeners.
+     */
     @Override
     public void onPause()
     {
@@ -471,6 +521,9 @@ public abstract class AccountPreferenceFragment
         uncommittedChanges = true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void onSharedPreferenceChanged(SharedPreferences shPrefs, String s)
     {
         uncommittedChanges = true;

@@ -151,28 +151,45 @@ public class JabberPreferenceFragment
         super(R.xml.jabber_preferences);
     }
 
+    /**
+     * Returns jabber registration wizard.
+     * @return jabber registration wizard.
+     */
     private AccountRegistrationImpl getJbrWizard()
     {
         return (AccountRegistrationImpl) getWizard();
     }
 
+    /**
+     * Returns jabber registration object.
+     * @return jabber registration object.
+     */
     private JabberAccountRegistration getAccountRegistration()
     {
         return getJbrWizard().getAccountRegistration();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected EncodingsRegistrationUtil getEncodingsRegistration()
     {
         return getAccountRegistration().getEncodingsRegistration();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected SecurityAccountRegistration getSecurityRegistration()
     {
         return getAccountRegistration().getSecurityRegistration();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void onInitPreferences()
     {
         AccountRegistrationImpl wizard = getJbrWizard();
@@ -241,6 +258,9 @@ public class JabberPreferenceFragment
         editor.commit();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onPreferencesCreated()
     {
@@ -305,6 +325,9 @@ public class JabberPreferenceFragment
         setUncomittedChanges();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected void mapSummaries(SummaryMapper summaryMapper)
     {
         String emptyStr = getEmptyPreferenceStr();
@@ -338,6 +361,11 @@ public class JabberPreferenceFragment
                 findPreference(PREF_KEY_TELE_BYPASS_GTALK_CAPS), emptyStr);
     }
 
+    /**
+     * Stores values changed by STUN or Jingle nodes edit activities.
+     * <br/>
+     * {@inheritDoc}
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -377,6 +405,9 @@ public class JabberPreferenceFragment
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onSharedPreferenceChanged(SharedPreferences shPrefs, String key)
     {
@@ -524,6 +555,9 @@ public class JabberPreferenceFragment
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void doCommitChanges()
     {
@@ -543,7 +577,5 @@ public class JabberPreferenceFragment
                     + e.getLocalizedMessage(), e);
         }
     }
-
-
 
 }

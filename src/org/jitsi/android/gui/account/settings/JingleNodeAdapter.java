@@ -95,7 +95,7 @@ public class JingleNodeAdapter
     /**
      * Adds new Jingle node to the list
      *
-     * @param descriptor the {@link net.java.sip.communicator.service.protocol.JingleNodeDescriptor} that will be included
+     * @param descriptor the {@link JingleNodeDescriptor} that will be included
      *                   in this adapter
      */
     void addJingleNode(JingleNodeDescriptor descriptor)

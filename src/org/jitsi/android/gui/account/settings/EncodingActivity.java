@@ -30,8 +30,8 @@ import java.util.*;
  * which stores encoding properties<br/>
  * <br/>
  * After activity finishes it's job it return in {@link Intent} the
- * {@link EncodingsRegistrationUtil} under it's key and additional <tt>boolean</tt>
- * flag indicating whether any changes has been made under key:
+ * {@link EncodingsRegistrationUtil} under it's key and additional
+ * <tt>boolean</tt> flag indicating whether any changes has been made under key:
  * {@link #EXTRA_KEY_HAS_CHANGES}.
  *
  * @author Pawel Domas
@@ -41,7 +41,7 @@ public class EncodingActivity
 {
 
     /**
-     * The intent's key for {@link org.jitsi.service.neomedia.MediaType}
+     * The intent's key for {@link MediaType}
      */
     public static final String ENC_MEDIA_TYPE_KEY="media_type";
 
@@ -55,8 +55,14 @@ public class EncodingActivity
      */
     public static final String EXTRA_KEY_HAS_CHANGES ="encHasChanges";
 
+    /**
+     * State key for encodings registration object.
+     */
     private static final String STATE_ENC_REG = "state_enc_reg";
 
+    /**
+     * State key for "has changes" flag.
+     */
     private static final String STATE_HAS_CHANGES = "state_has_changes";
 
     /**
@@ -90,6 +96,9 @@ public class EncodingActivity
      */
     private EncodingsFragment encodingsFragment;
 
+    /**
+     * Audio or video media type that is currently used.
+     */
     private MediaType mediaType;
 
     /**
@@ -105,6 +114,9 @@ public class EncodingActivity
 
     /**
      * Loads properties passed by intent's extras and initializes the activity.
+     *
+     * @param savedInstanceState bundle that contains the state or <tt>null</tt>
+     *                           if the <tt>Activity</tt> was just created.
      */
     private void loadEncodings(Bundle savedInstanceState)
     {
@@ -245,6 +257,12 @@ public class EncodingActivity
         return outList;
     }
 
+    /**
+     * Creates string representation for given set of <tt>MediaFormat</tt>s.
+     * @param encodings the iterator with <tt>MediaFormat</tt> to be converted
+     *                  into strings.
+     * @return string representation of given <tt>MediaFormat</tt>s.
+     */
     public static List<String> getEncodingsStr(Iterator<MediaFormat> encodings)
     {
         List<String> outList = new ArrayList<String>();
@@ -255,6 +273,15 @@ public class EncodingActivity
         return outList;
     }
 
+    /**
+     * Select <tt>MediaFormat</tt> by string representation created using
+     * {@link #getEncodingStr(MediaFormat)}.
+     * @param encodings set of <tt>MediaFormat</tt>s from which the one will be
+     *                  selected.
+     * @param str string representation of <tt>MediaFormat</tt>.
+     * @return selected <tt>MediaFormat</tt> from the given set by matching
+     *         string representation.
+     */
     public static MediaFormat getEncodingFromStr(
             Iterator<MediaFormat> encodings,
             String str)
@@ -270,8 +297,16 @@ public class EncodingActivity
         throw new IllegalArgumentException("Invalid format str: " + str);
     }
 
-    public static List<Integer> getPriorities( List<MediaFormat> encodings,
-                                               EncodingConfiguration encodingConfig )
+    /**
+     * Gets the priorities list for given set of encodings and encodings
+     * configuration.
+     *
+     * @param encodings the set of encodings that will be used.
+     * @param encodingConfig encodings configuration that stores priorities.
+     * @return priorities list for given set of encodings.
+     */
+    public static List<Integer> getPriorities(
+            List<MediaFormat> encodings, EncodingConfiguration encodingConfig )
     {
         int count = encodings.size();
         List<Integer> priorities = new ArrayList<Integer>(count);
@@ -286,6 +321,9 @@ public class EncodingActivity
         return priorities;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState)
     {
@@ -297,6 +335,9 @@ public class EncodingActivity
         outState.putBoolean(STATE_HAS_CHANGES, hasChanges);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -327,6 +368,11 @@ public class EncodingActivity
         return true;
     }
 
+    /**
+     * Catches the back key and returns edited state in <tt>Intent</tt> extra.
+     * <br/>
+     * {@inheritDoc}
+     */
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event)
     {
@@ -349,6 +395,14 @@ public class EncodingActivity
         return super.onKeyUp(keyCode, event);
     }
 
+    /**
+     * Commits priorities edited by the <tt>EncodingsFragment</tt> into given
+     * <tt>EncodingConfiguration</tt>.
+     *
+     * @param encodingConf configuration that will store encodings priorities.
+     * @param mediaType audio or video media type that was edited.
+     * @param encFragment the fragment which edited encodings priorities.
+     */
     public static void commitPriorities( EncodingConfiguration encodingConf,
                                          MediaType mediaType,
                                          EncodingsFragment encFragment)
@@ -369,6 +423,9 @@ public class EncodingActivity
         }
     }
 
+    /**
+     * Commits changes.
+     */
     private void commitChanges()
     {
         commitPriorities(encodingConfiguration, mediaType, encodingsFragment);
@@ -379,13 +436,5 @@ public class EncodingActivity
 
         encReg.setOverrideEncodings(isOverrideEncodings);
         encReg.setEncodingProperties(encodingProperties);
-    }
-
-    public static void printProperties(Map<String, String> props)
-    {
-        for(String key: props.keySet())
-        {
-            System.err.println(key+" -> "+props.get(key));
-        }
     }
 }
