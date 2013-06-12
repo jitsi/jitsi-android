@@ -16,7 +16,6 @@ import net.java.sip.communicator.util.*;
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.settings.util.*;
-import org.osgi.framework.*;
 
 /**
  * Preferences fragment for Jabber settings. It maps Jabber specific properties
@@ -33,6 +32,16 @@ public class JabberPreferenceFragment
      */
     private static final Logger logger =
             Logger.getLogger(JabberPreferenceFragment.class);
+
+    /**
+     * The key identifying edit jingle nodes request
+     */
+    private static final int EDIT_JINGLE_NODES = 3;
+
+    /**
+     * The key identifying edit STUN servers list request
+     */
+    private static final int EDIT_STUN_TURN = 4;
 
     private static final String PREF_KEY_USER_ID =
             JitsiApplication.getAppResources()
@@ -135,12 +144,11 @@ public class JabberPreferenceFragment
                     .getString(R.string.pref_key_tele_bypass_gtalk_caps);
 
     /**
-     * Creates new instance of {@link net.java.sip.communicator.plugin.jabberaccregwizz.AccountRegistrationImpl}
+     * Creates new instance of <tt>JabberPreferenceFragment</tt>
      */
     public JabberPreferenceFragment()
     {
         super(R.xml.jabber_preferences);
-        //TODO: base wizards class/interface with modify method
     }
 
     private AccountRegistrationImpl getJbrWizard()
@@ -165,41 +173,8 @@ public class JabberPreferenceFragment
         return getAccountRegistration().getSecurityRegistration();
     }
 
-    @Override
-    public void loadAccount( AccountID account,
-                             Context context,
-                             BundleContext bundleContext)
+    protected void onInitPreferences()
     {
-        super.loadAccount(account, context, bundleContext);
-
-        findPreference(PREF_KEY_STUN_TURN_SERVERS)
-                .setOnPreferenceClickListener(
-                        new Preference.OnPreferenceClickListener()
-                        {
-                            public boolean onPreferenceClick(Preference pref)
-                            {
-                                startStunServerListActivity();
-                                return true;
-                            }
-                        });
-
-        findPreference(PREF_KEY_JINGLE_NODES_LIST)
-                .setOnPreferenceClickListener(
-                        new Preference.OnPreferenceClickListener()
-                        {
-                            public boolean onPreferenceClick(Preference pref)
-                            {
-                                startJingleNodeListActivity();
-                                return true;
-                            }
-                        });
-    }
-
-    protected void onCreatePreferences()
-    {
-
-        super.onCreatePreferences();
-
         AccountRegistrationImpl wizard = getJbrWizard();
 
         JabberAccountRegistration registration =
@@ -266,6 +241,34 @@ public class JabberPreferenceFragment
         editor.commit();
     }
 
+    @Override
+    protected void onPreferencesCreated()
+    {
+        super.onPreferencesCreated();
+
+        findPreference(PREF_KEY_STUN_TURN_SERVERS)
+                .setOnPreferenceClickListener(
+                        new Preference.OnPreferenceClickListener()
+                        {
+                            public boolean onPreferenceClick(Preference pref)
+                            {
+                                startStunServerListActivity();
+                                return true;
+                            }
+                        });
+
+        findPreference(PREF_KEY_JINGLE_NODES_LIST)
+                .setOnPreferenceClickListener(
+                        new Preference.OnPreferenceClickListener()
+                        {
+                            public boolean onPreferenceClick(Preference pref)
+                            {
+                                startJingleNodeListActivity();
+                                return true;
+                            }
+                        });
+    }
+
     /**
      * Starts {@link ServerListActivity} in order to edit STUN servers list 
      */
@@ -280,7 +283,7 @@ public class JabberPreferenceFragment
                 ServerListActivity.REQUEST_EDIT_STUN_TURN);
         startActivityForResult(
                 intent,
-                ServerListActivity.REQUEST_EDIT_STUN_TURN);
+                EDIT_STUN_TURN);
         setUncomittedChanges();
     }
 
@@ -292,13 +295,13 @@ public class JabberPreferenceFragment
         Intent intent = new Intent(getActivity(), ServerListActivity.class);
         intent.putExtra(
                 ServerListActivity.JABBER_REGISTRATION_KEY,
-                (JabberAccountRegistration)getAccountRegistration());
+                getAccountRegistration());
         intent.putExtra(
                 ServerListActivity.REQUEST_CODE_KEY,
                 ServerListActivity.REQUEST_EDIT_JINGLE_NODES);
         startActivityForResult(
                 intent,
-                ServerListActivity.REQUEST_EDIT_JINGLE_NODES);
+                EDIT_JINGLE_NODES);
         setUncomittedChanges();
     }
 
@@ -338,7 +341,7 @@ public class JabberPreferenceFragment
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        if(requestCode == ServerListActivity.REQUEST_EDIT_JINGLE_NODES
+        if(requestCode == EDIT_JINGLE_NODES
                 && resultCode == Activity.RESULT_OK)
         {
             // Gets edited Jingle Nodes list
@@ -347,14 +350,13 @@ public class JabberPreferenceFragment
                             .getSerializableExtra(
                                     ServerListActivity
                                             .JABBER_REGISTRATION_KEY);
-            JabberAccountRegistration current =
-                    (JabberAccountRegistration) getAccountRegistration();
+            JabberAccountRegistration current = getAccountRegistration();
 
             current.getAdditionalJingleNodes().clear();
             current.getAdditionalJingleNodes()
                     .addAll(serialized.getAdditionalJingleNodes());
         }
-        else if(requestCode == ServerListActivity.REQUEST_EDIT_STUN_TURN
+        else if(requestCode == EDIT_STUN_TURN
                 && resultCode == Activity.RESULT_OK)
         {
             // Gets edited STUN servers list
@@ -363,8 +365,7 @@ public class JabberPreferenceFragment
                             .getSerializableExtra(
                                     ServerListActivity
                                             .JABBER_REGISTRATION_KEY);
-            JabberAccountRegistration current =
-                    (JabberAccountRegistration) getAccountRegistration();
+            JabberAccountRegistration current = getAccountRegistration();
 
             current.getAdditionalStunServers().clear();
             current.getAdditionalStunServers()
@@ -532,8 +533,7 @@ public class JabberPreferenceFragment
                     = (AccountRegistrationImpl) getWizard();
             accWizard.setModification(true);
 
-            JabberAccountRegistration jbrReg
-                    = (JabberAccountRegistration) getAccountRegistration();
+            JabberAccountRegistration jbrReg = getAccountRegistration();
 
             accWizard.signin(jbrReg.getUserID(), jbrReg.getPassword());
         }

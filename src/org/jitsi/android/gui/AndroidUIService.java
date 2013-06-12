@@ -11,6 +11,7 @@ import net.java.sip.communicator.service.gui.*;
 import net.java.sip.communicator.service.gui.Container;
 import net.java.sip.communicator.service.gui.event.*;
 import net.java.sip.communicator.service.protocol.*;
+import net.java.sip.communicator.util.account.*;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -586,6 +587,14 @@ public class AndroidUIService
      * @return a collection of all currently in progress calls.
      */
     public Collection<Call> getInProgressCalls()
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public LoginManager getLoginManager()
     {
         return null;
     }

@@ -28,16 +28,6 @@ public class AccountRegistrationImpl
     extends AccountRegistrationWizard
 {
     /**
-     * Account suffix for Google service.
-     */
-    private static final String GOOGLE_USER_SUFFIX = "gmail.com";
-
-    /**
-     * XMPP server for Google service.
-     */
-    private static final String GOOGLE_CONNECT_SRV = "talk.google.com";
-
-    /**
      * The protocol provider.
      */
     private ProtocolProviderService protocolProvider;
@@ -231,7 +221,6 @@ public class AccountRegistrationImpl
     @Override
     public byte[] getIcon()
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -256,6 +245,18 @@ public class AccountRegistrationImpl
     @Override
     public void loadAccount(ProtocolProviderService protocolProvider)
     {
+        setModification(true);
+
+        this.protocolProvider = protocolProvider;
+
+        registration = new JabberAccountRegistration();
+
+        AccountID accountID = protocolProvider.getAccountID();
+
+        // Loads account properties into registration object
+        registration.loadAccount(
+                accountID,
+                JabberAccountRegistrationActivator.bundleContext);
     }
 
     @Override

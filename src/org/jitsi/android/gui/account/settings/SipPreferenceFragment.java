@@ -176,14 +176,7 @@ public class SipPreferenceFragment
         return getAccountRegistration().getSecurityRegistration();
     }
 
-    public void loadAccount( AccountID account,
-                             Context context,
-                             BundleContext bundleContext)
-    {
-        super.loadAccount(account, context, bundleContext);
-    }
-
-    protected void onCreatePreferences()
+    protected void onInitPreferences()
     {
         SIPAccountRegistration registration = getSipWizard().getRegistration();
 
@@ -238,6 +231,12 @@ public class SipPreferenceFragment
         editor.putString(
                 PREF_KEY_KEEP_ALIVE_INTERVAL,
                 registration.getKeepAliveInterval());
+        editor.putBoolean(PREF_KEY_MWI_EN,
+                registration.isMessageWaitingIndicationsEnabled());
+        editor.putString(PREF_KEY_VOICE_MAIL_CHECK_URI,
+                registration.getVoicemailCheckURI());
+        editor.putString(PREF_KEY_VOICE_MAIL_URI,
+                registration.getVoicemailURI());
         // Presence
         editor.putBoolean(
                 PREF_KEY_IS_PRESENCE_EN,
@@ -284,6 +283,14 @@ public class SipPreferenceFragment
                 registration.getClistOptionPassword());
 
         editor.commit();
+    }
+
+    protected void onPreferencesCreated()
+    {
+        super.onPreferencesCreated();
+
+        // Enable/disable contact list items on init
+        updateContactListViews();
 
         List<String> certs = new ArrayList<String>();
         certs.add(getResources().getString(R.string.service_gui_CONN_NO_CERT));
@@ -300,7 +307,7 @@ public class SipPreferenceFragment
 
         String currentCert = accountID.getAccountPropertyString(
                 ProtocolProviderFactory.CLIENT_TLS_CERTIFICATE);
-        if(!certs.contains(currentCert))
+        if(!certs.contains(currentCert) && !isInitizalized())
         {
             // The empty one
             currentCert = certs.get(0);
@@ -316,7 +323,9 @@ public class SipPreferenceFragment
                 (ListPreference) findPreference(PREF_KEY_TLS_CERT_ID);
         certPreference.setEntries(entries);
         certPreference.setEntryValues(entries);
-        certPreference.setValue(currentCert);
+
+        if(!isInitizalized())
+            certPreference.setValue(currentCert);
     }
 
     protected void mapSummaries(SummaryMapper summaryMapper)

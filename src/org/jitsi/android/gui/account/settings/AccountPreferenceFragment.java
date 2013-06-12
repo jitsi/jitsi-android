@@ -15,14 +15,11 @@ import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.account.*;
 import org.jitsi.*;
+import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.settings.util.*;
-import org.jitsi.impl.neomedia.*;
 import org.jitsi.service.neomedia.*;
-import org.jitsi.service.neomedia.codec.*;
 import org.jitsi.service.osgi.*;
 import org.osgi.framework.*;
-
-import java.util.*;
 
 /**
  * The fragment shares common parts for all protocols settings.
@@ -39,17 +36,14 @@ public abstract class AccountPreferenceFragment
     private static final String STATE_INIT_FLAG = "initialized";
 
     /**
-     * The request key for action
-     * {@link android.app.Activity#startActivityForResult(android.content.Intent, int)}
+     * The key identifying edit encodings request
      */
-    public static final int EDIT_ENCODINGS = 1;
+    protected static final int EDIT_ENCODINGS = 1;
 
     /**
-     * The request code used in
-     * {@link android.app.Activity#startActivityForResult(android.content.Intent, int)}
-     * (the value itself is not important)
+     * The key identifying edit security details request
      */
-    public static final int EDIT_SECURITY =2;
+    protected static final int EDIT_SECURITY =2;
 
     /**
      * The logger
@@ -133,7 +127,101 @@ public abstract class AccountPreferenceFragment
         }
 
         // Load the preferences from an XML resource
+        //addPreferencesFromResource(preferencesResourceId);
+
+        String accountID = getArguments().getString(EXTRA_ACCOUNT_ID);
+        AccountID account = AccountUtils.getAccountForID(accountID);
+        /**
+         * Workaround for desynchronization problem when account was created for
+         * the first time.
+         * During account creation process another instance was returned by
+         * AccountManager and another from corresponding ProtocolProvider.
+         * We should use that one from the provider.
+         */
+        account = AccountUtils.getRegisteredProviderForAccount(account)
+                .getAccountID();
+
+        // Loads the account details
+        loadAccount(account, getActivity(), AndroidGUIActivator.bundleContext);
+
+        // Loads preference Views.
+        // They will be initialized with values loaded
+        // into SharedPreferences in loadAccount
         addPreferencesFromResource(preferencesResourceId);
+
+        // Preference View can be manipulated at this point
+        onPreferencesCreated();
+
+        // Preferences summaries mapping
+        mapSummaries(summaryMapper);
+    }
+
+    /**
+     * Method fired when OSGI context is attached, but after the <tt>View</tt>
+     * is created.
+     */
+    @Override
+    protected void onOSGiConnected()
+    {
+        super.onOSGiConnected();
+    }
+
+    /**
+     * Fired when OSGI is started and the <tt>bundleContext</tt> is available.
+     *
+     * @param bundleContext the OSGI bundle context.
+     */
+    @Override
+    public void start(BundleContext bundleContext)
+            throws Exception
+    {
+        super.start(bundleContext);
+    }
+
+    /**
+     * Load the <tt>account</tt> and it's encoding and security parts
+     * if they exist
+     *
+     * @param account the {@link net.java.sip.communicator.service.protocol.AccountID} that will be edited
+     * @param context the {@link android.content.Context} of Android application
+     * @param bundleContext the OSGI bundle context
+     */
+    public void loadAccount( AccountID account,
+                             Context context,
+                             BundleContext bundleContext)
+    {
+        this.accountID = account;
+
+        wizard = findRegistrationService(account.getProtocolName());
+        if(wizard == null)
+            throw new NullPointerException();
+
+        if(initizalized)
+        {
+            System.err.println("Initialized not loading account data");
+            return;
+        }
+
+        ProtocolProviderService pps
+                = AccountUtils.getRegisteredProviderForAccount(account);
+
+        wizard.loadAccount(pps);
+
+        onInitPreferences();
+
+        initizalized = true;
+    }
+
+    /**
+     * Method is called before preference XML file is loaded.
+     * Subclasses should perform preference views initialization here.
+     */
+    protected abstract void onInitPreferences();
+
+    protected void onPreferencesCreated()
+    {
+        // Audio,video and security are optional and should be present
+        // in settings XML to be handled
 
         String audioEncCatKey =
                 getResources().getString(R.string.pref_cat_audio_encoding);
@@ -183,110 +271,6 @@ public abstract class AccountPreferenceFragment
                     }
             );
         }
-
-        mapSummaries(summaryMapper);
-    }
-
-    /**
-     * Method fired when OSGI context is attached, but after the <tt>View</tt>
-     * is created.
-     */
-    @Override
-    protected void onOSGiConnected()
-    {
-        super.onOSGiConnected();
-
-        String accountID = getArguments().getString(EXTRA_ACCOUNT_ID);
-        AccountID account = AccountUtils.getAccountForID(accountID);
-        /**
-         * Workaround for desynchronization problem when account was created for
-         * the first time.
-         * During account creation process another instance was returned by
-         * AccountManager and another from corresponding ProtocolProvider.
-         * We should use that one from the provider.
-         */
-        account = AccountUtils.getRegisteredProviderForAccount(account)
-                        .getAccountID();
-
-        // Loads the account details
-        loadAccount(account, getActivity(), osgiContext);
-
-        if(initizalized)
-        {
-            /**
-             * Skips preferences initialization if were loaded at least once
-             * to not overwrite modified values.
-             */
-            logger.error("Initialized!! skipping");
-            return;
-        }
-        onCreatePreferences();
-        initizalized = true;
-    }
-
-    /**
-     * Fired when OSGI is started and the <tt>bundleContext</tt> is available.
-     *
-     * @param bundleContext the OSGI bundle context.
-     */
-    @Override
-    public void start(BundleContext bundleContext)
-            throws Exception
-    {
-        super.start(bundleContext);
-    }
-
-    /**
-     * Load the <tt>account</tt> and it's encoding and security parts
-     * if they exist
-     *
-     * @param account the {@link net.java.sip.communicator.service.protocol.AccountID} that will be edited
-     * @param context the {@link android.content.Context} of Android application
-     * @param bundleContext the OSGI bundle context
-     */
-    public void loadAccount( AccountID account,
-                             Context context,
-                             BundleContext bundleContext)
-    {
-        this.accountID = account;
-
-        wizard = findRegistrationService(account.getProtocolName());
-        if(wizard == null)
-            throw new NullPointerException();
-
-        if(initizalized)
-        {
-            System.err.println("Initialized not loading account data");
-            return;
-        }
-
-        ProtocolProviderService pps
-                = AccountUtils.getRegisteredProviderForAccount(account);
-
-        wizard.loadAccount(pps);
-    }
-
-    /**
-     * Method is called after preference XML file is loaded.
-     * Subclasses should perform preference views initialization here.
-     */
-    protected void onCreatePreferences()
-    {
-        // Encodings
-        /*EncodingsRegistrationUtil encodingsRegistration
-                = getEncodingsRegistration();
-        if(encodingsRegistration != null)
-        {
-            loadEncodingsSection(accountID, encodingsRegistration);
-        }
-
-        // Security
-        SecurityAccountRegistration securityRegistration
-                = getSecurityRegistration();
-        if(securityRegistration != null)
-        {
-            loadSecuritySection(accountID, securityRegistration);
-        }*/
     }
 
     @Override
@@ -304,21 +288,22 @@ public abstract class AccountPreferenceFragment
      *
      * @param protocolName the name of the protocol
      *
-     * @return {@link net.java.sip.communicator.service.gui.AccountRegistrationWizard} for given <tt>protocolName</tt>
+     * @return {@link AccountRegistrationWizard} for given <tt>protocolName</tt>
      */
     AccountRegistrationWizard findRegistrationService(String protocolName)
     {
         ServiceReference[] accountWizardRefs = null;
         try
         {
+            BundleContext context = AndroidGUIActivator.bundleContext;
             accountWizardRefs
-                    = osgiContext.getServiceReferences(
+                    = context.getServiceReferences(
                             AccountRegistrationWizard.class.getName(), null);
 
             for(int i=0; i < accountWizardRefs.length; i++)
             {
                 AccountRegistrationWizard wizard = (AccountRegistrationWizard)
-                        osgiContext.getService(accountWizardRefs[i]);
+                        context.getService(accountWizardRefs[i]);
 
                 if(wizard.getProtocolName().equals(protocolName))
                     return  wizard;
@@ -333,54 +318,6 @@ public abstract class AccountPreferenceFragment
         }
         throw new RuntimeException(
                 "No wizard found for protocol: " + protocolName);
-    }
-
-    /**
-     * Loads the encodings part of account preferences
-     * and puts them into the {@link EncodingsRegistrationUtil} object
-     *
-     * @param accountID the {@link AccountID} which contains encoding properties
-     * @param encodingsRegistration the {@link EncodingsRegistrationUtil} object
-     *  which will store the encodings properties
-     */
-    private static void loadEncodingsSection(
-            AccountID accountID,
-            EncodingsRegistrationUtil encodingsRegistration)
-    {
-        //TODO: move to some utility class ? this code duplicates from jitsi src
-        String overrideEncodings = accountID.getAccountPropertyString(
-                ProtocolProviderFactory.OVERRIDE_ENCODINGS);
-        boolean isOverrideEncodings = Boolean.parseBoolean(overrideEncodings);
-        encodingsRegistration.setOverrideEncodings(isOverrideEncodings);
-
-        Map<String, String> encodingProperties = new HashMap<String, String>();
-        EncodingConfiguration encodingConfiguration =
-                NeomediaActivator.getMediaServiceImpl()
-                        .createEmptyEncodingConfiguration();
-        encodingConfiguration
-                .loadProperties(
-                        accountID.getAccountProperties(),
-                        ProtocolProviderFactory.ENCODING_PROP_PREFIX);
-        encodingConfiguration
-                .storeProperties(
-                        encodingProperties,
-                        ProtocolProviderFactory.ENCODING_PROP_PREFIX + ".");
-        encodingsRegistration.setEncodingProperties(encodingProperties);
-    }
-
-    /**
-     * Loads the security properties of given <tt>account</tt> and stores
-     * them in <tt>registration</tt> object.
-     *
-     * @param account the {@link AccountID} containing security properties
-     * @param registration the {@link SecurityAccountRegistration}
-     *  that will hold the properties
-     */
-    private static void loadSecuritySection(
-            AccountID account,
-            SecurityAccountRegistration registration)
-    {
-
     }
 
     /**
