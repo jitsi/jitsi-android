@@ -8,6 +8,7 @@ package org.jitsi.android.gui.util;
 
 import java.util.*;
 
+import android.support.v4.app.*;
 import org.jitsi.*;
 
 import android.annotation.*;
@@ -194,8 +195,8 @@ public class AndroidUtils
                                                 Class<?> resultActivityClass,
                                                 Intent resultIntent)
     {
-        Notification.Builder nBuilder
-            = new Notification.Builder(context)
+        NotificationCompat.Builder nBuilder
+            = new NotificationCompat.Builder(context)
             .setContentTitle(title)
             .setContentText(message)
             .setWhen(date)
@@ -203,27 +204,12 @@ public class AndroidUtils
 
         isActivityRunning(context, resultActivityClass);
 
-        // The stack builder object will contain an artificial back stack for
-        // the started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        // Adds the back stack for the Intent (but not the Intent itself)
-        stackBuilder.addParentStack(resultActivityClass);
-        // Adds the Intent that starts the Activity to the top of the stack
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =
-                 stackBuilder.getPendingIntent(
-                     0,
-                     PendingIntent.FLAG_UPDATE_CURRENT
-                 );
-        nBuilder.setContentIntent(resultPendingIntent);
-
+        nBuilder.setContentIntent(JitsiApplication.getHomePendingIntent());
         NotificationManager mNotificationManager
             = (NotificationManager) context.getSystemService(
                 Context.NOTIFICATION_SERVICE);
 
-        Notification notification = nBuilder.getNotification();
+        Notification notification = nBuilder.build();
 
         notification.flags = Notification.FLAG_ONLY_ALERT_ONCE
                                 & Notification.FLAG_FOREGROUND_SERVICE

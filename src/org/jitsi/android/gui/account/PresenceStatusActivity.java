@@ -11,6 +11,7 @@ import android.content.*;
 import android.database.*;
 import android.graphics.*;
 import android.net.*;
+import android.os.*;
 import android.provider.*;
 import android.text.*;
 import android.view.*;
@@ -88,7 +89,8 @@ public class PresenceStatusActivity
     {
         super.onCreate(savedInstanceState);
         // Enable title
-        getActionBar().setDisplayShowTitleEnabled(true);
+        if(Build.VERSION.SDK_INT >= 11)
+            getActionBar().setDisplayShowTitleEnabled(true);
         // Set the main layout
         setContentView(R.layout.presence_status);
     }
@@ -136,8 +138,8 @@ public class PresenceStatusActivity
 
         String title
                 = MessageFormat.format( titlePattern, account.getAccountName());
-
-        getActionBar().setTitle(title);
+        if(Build.VERSION.SDK_INT >= 11)
+            getActionBar().setTitle(title);
 
         // Create spinner with status list
         Spinner statusSpinner = (Spinner) findViewById(

@@ -6,12 +6,13 @@
  */
 package org.jitsi.service.osgi;
 
+import android.app.*;
 import android.content.res.*;
+import android.support.v4.app.*;
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.impl.osgi.*;
 
-import android.app.*;
 import android.content.*;
 import android.os.*;
 
@@ -98,14 +99,14 @@ public class OSGiService
         Resources res = getResources();
         String title = res.getString(R.string.app_name);
 
-        Notification.Builder nBuilder
-                = new Notification.Builder(this)
+        NotificationCompat.Builder nBuilder
+                = new NotificationCompat.Builder(this)
                 .setContentTitle(title)
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.drawable.notificationicon);
         nBuilder.setContentIntent(pendIntent);
 
-        Notification notice = nBuilder.getNotification();
+        Notification notice = nBuilder.build();
         notice.flags |= Notification.FLAG_NO_CLEAR;
 
         this.startForeground(GENERAL_NOTIFICATION_ID, notice);

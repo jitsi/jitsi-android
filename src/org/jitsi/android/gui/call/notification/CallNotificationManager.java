@@ -8,6 +8,7 @@ package org.jitsi.android.gui.call.notification;
 
 import android.app.*;
 import android.content.*;
+import android.support.v4.app.*;
 import android.widget.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.event.*;
@@ -74,8 +75,8 @@ public class CallNotificationManager
                     "There's no call with id: " + callID);
         }
 
-        Notification.Builder nBuilder
-                = new Notification.Builder(ctx)
+        NotificationCompat.Builder nBuilder
+                = new NotificationCompat.Builder(ctx)
                 .setWhen(System.currentTimeMillis())
                 .setSmallIcon(R.drawable.notificationicon);
 
@@ -95,7 +96,7 @@ public class CallNotificationManager
         // Sets the content view
         nBuilder.setContent(contentView);
 
-        Notification notification = nBuilder.getNotification();
+        Notification notification = nBuilder.build();
 
         NotificationManager mNotificationManager
                 = (NotificationManager) ctx.getSystemService(

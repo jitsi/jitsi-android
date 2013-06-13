@@ -112,4 +112,16 @@ public class JitsiApplication
         homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return homeIntent;
     }
+
+    /**
+     * Creates home activity pending <tt>Intent</tt>.
+     * @return new home activity pending <tt>Intent</tt>.
+     */
+    public static PendingIntent getHomePendingIntent()
+    {
+        return PendingIntent.getActivity(
+                getGlobalContext(), 0,
+                getHomeIntent(),
+                PendingIntent.FLAG_UPDATE_CURRENT);
+    }
 }

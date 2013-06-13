@@ -6,11 +6,11 @@
  */
 package org.jitsi.service.osgi;
 
-import android.app.*;
 import android.content.*;
 import android.os.*;
 import android.os.Bundle; // disambiguation
 
+import android.support.v4.app.*;
 import android.view.*;
 import net.java.sip.communicator.util.*;
 import org.jitsi.android.*;
@@ -25,7 +25,7 @@ import java.util.*;
  * @author Pawel Domas
  */
 public class OSGiActivity
-    extends Activity
+    extends FragmentActivity
 {
     /**
      * The logger

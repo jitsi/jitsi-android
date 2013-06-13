@@ -6,8 +6,8 @@
  */
 package org.jitsi.android.gui.login;
 
-import android.app.*;
 import android.os.*;
+import android.support.v4.app.*;
 import android.view.*;
 import org.jitsi.*;
 import org.jitsi.android.gui.util.*;

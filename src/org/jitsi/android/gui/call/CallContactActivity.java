@@ -6,10 +6,10 @@
  */
 package org.jitsi.android.gui.call;
 
-import android.app.*;
 import android.content.*;
 
 import android.os.Bundle;
+import android.support.v4.app.*;
 import android.telephony.*;
 import org.jitsi.service.osgi.*;
 
@@ -47,7 +47,7 @@ public class CallContactActivity
                 phoneNumber = PhoneNumberUtils.getNumberFromIntent( intent,
                                                                     this);
             Fragment ccFragment = CallContactFragment.newInstance(phoneNumber);
-            getFragmentManager()
+            getSupportFragmentManager()
                     .beginTransaction()
                     .add(android.R.id.content, ccFragment)
                     .commit();

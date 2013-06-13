@@ -7,6 +7,7 @@
 package org.jitsi.service.osgi;
 
 import android.app.*;
+import android.support.v4.app.Fragment;
 import org.osgi.framework.*;
 
 /**

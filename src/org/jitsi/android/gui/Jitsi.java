@@ -164,7 +164,7 @@ public class Jitsi
     private void showSplashScreen()
     {
         SplashScreenFragment splashScreen = new SplashScreenFragment();
-        getFragmentManager()
+        getSupportFragmentManager()
                 .beginTransaction()
                 .replace(android.R.id.content, splashScreen)
                 .commit();
@@ -178,7 +178,7 @@ public class Jitsi
         // Currently call contacts serves as a contacts list
         CallContactFragment callContactFragment
                 = CallContactFragment.newInstance(null);
-        getFragmentManager()
+        getSupportFragmentManager()
                 .beginTransaction()
                 .replace(android.R.id.content, callContactFragment)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -191,7 +191,7 @@ public class Jitsi
     private void showLoginFragment()
     {
         // Displays login prompt
-        getFragmentManager()
+        getSupportFragmentManager()
                 .beginTransaction()
                 .replace(android.R.id.content, new AccountLoginFragment())
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)

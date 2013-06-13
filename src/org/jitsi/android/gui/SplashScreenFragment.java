@@ -6,8 +6,8 @@
  */
 package org.jitsi.android.gui;
 
-import android.app.*;
 import android.os.*;
+import android.support.v4.app.*;
 import android.view.*;
 import android.view.animation.*;
 import android.widget.*;

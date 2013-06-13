@@ -6,9 +6,9 @@
  */
 package org.jitsi.android.gui;
 
-import android.app.*;
 import android.content.*;
 import android.os.*;
+import android.support.v4.app.*;
 import android.view.*;
 import org.jitsi.R;
 import org.jitsi.android.gui.util.*;
@@ -29,7 +29,7 @@ import java.util.*;
  * @author Pawel Domas
  */
 public class DialogActivity
-    extends Activity
+    extends FragmentActivity
 {
 
     /**
@@ -122,7 +122,7 @@ public class DialogActivity
                             intent.getBundleExtra(EXTRA_CONTENT_ARGS));
 
                     // Insert the fragment
-                    getFragmentManager()
+                    getSupportFragmentManager()
                             .beginTransaction()
                             .replace(R.id.alertContent, fragment)
                             .commit();

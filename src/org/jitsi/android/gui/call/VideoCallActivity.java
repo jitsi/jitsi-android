@@ -15,6 +15,7 @@ import android.content.*;
 import android.graphics.Color;
 import android.media.*;
 import android.os.*;
+import android.support.v4.app.DialogFragment;
 import android.util.*;
 import android.view.*;
 import android.view.Menu; // Disambiguation
@@ -348,7 +349,8 @@ public class VideoCallActivity
             {
                 DialogFragment newFragment
                         = VolumeControlDialog.createInputVolCtrlDialog();
-                newFragment.show(getFragmentManager(), "vol_ctrl_dialog");
+                newFragment.show( getSupportFragmentManager(),
+                                  "vol_ctrl_dialog" );
                 return true;
             }
         });
@@ -404,7 +406,7 @@ public class VideoCallActivity
         // Create and show the dialog.
         DialogFragment newFragment
                 = VolumeControlDialog.createOutputVolCtrlDialog();
-        newFragment.show(getFragmentManager(), "vol_ctrl_dialog");
+        newFragment.show(getSupportFragmentManager(), "vol_ctrl_dialog");
     }
 
     /**
@@ -878,6 +880,10 @@ public class VideoCallActivity
      */
     public void setPeerName(final String name)
     {
+        // ActionBar is not support prior 3.0
+        if(Build.VERSION.SDK_INT < 11)
+            return;
+
         runOnUiThread(new Runnable()
         {
             public void run()
@@ -1134,7 +1140,7 @@ public class VideoCallActivity
                 getIntent().getStringExtra(
                         CallManager.CALL_IDENTIFIER));
 
-        callInfo.show(getFragmentManager(), "callinfo");
+        callInfo.show(getSupportFragmentManager(), "callinfo");
     }
 
     /**
@@ -1146,7 +1152,7 @@ public class VideoCallActivity
             = ZrtpInfoDialog.newInstance(
                 getIntent().getStringExtra(CallManager.CALL_IDENTIFIER));
 
-        zrtpInfo.show(getFragmentManager(), "zrtpinfo");
+        zrtpInfo.show(getSupportFragmentManager(), "zrtpinfo");
     }
 
     public void propertyChange(PropertyChangeEvent evt)

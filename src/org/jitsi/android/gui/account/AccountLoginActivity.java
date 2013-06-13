@@ -52,7 +52,7 @@ public class AccountLoginActivity
             AccountLoginFragment accountLogin
                     = AccountLoginFragment.createInstance(login, password);
 
-            getFragmentManager()
+            getSupportFragmentManager()
                     .beginTransaction()
                     .add(android.R.id.content, accountLogin)
                     .commit();
