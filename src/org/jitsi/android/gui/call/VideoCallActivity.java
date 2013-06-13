@@ -141,7 +141,7 @@ public class VideoCallActivity
     /**
      * The zrtp SAS verification toast controller.
      */
-    private ClickableToastController sasToastController;
+    private LegacyClickableToastCtrl sasToastController;
 
     /**
      * Called when the activity is starting. Initializes the corresponding
@@ -199,19 +199,29 @@ public class VideoCallActivity
         // Registers as the call state listener
         call.addCallChangeListener(this);
 
-        sasToastController
-            = new ClickableToastController(
-                    findViewById(R.id.clickable_toast),
-                    new View.OnClickListener()
-                    {
-                        public void onClick(View v)
+        View toastView = findViewById(R.id.clickable_toast);
+        View.OnClickListener toastclickHandler
+                = new View.OnClickListener()
                         {
-                            showZrtpInfoDialog();
-                            sasToastController.hideToast(true);
-                        }
-                    },
-                    R.id.toast_msg);
+                            public void onClick(View v)
+                            {
+                                showZrtpInfoDialog();
+                                sasToastController.hideToast(true);
+                            }
+                        };
 
+        if(Build.VERSION.SDK_INT >= 11)
+        {
+            sasToastController
+                    = new ClickableToastController( toastView,
+                                                    toastclickHandler );
+        }
+        else
+        {
+            sasToastController
+                    = new LegacyClickableToastCtrl( toastView,
+                                                    toastclickHandler );
+        }
     }
 
     @Override

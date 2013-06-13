@@ -7,17 +7,17 @@
 package org.jitsi.android.gui.widgets;
 
 import android.animation.*;
-import android.os.*;
-import android.text.*;
 import android.view.*;
-import android.widget.*;
+
 import org.jitsi.*;
 
 /**
- * The controller used for displaying a custom toast that can be clicked.
+ * Animated version of {@link LegacyClickableToastCtrl}
  *
+ * @author Pawel Domas
  */
 public class ClickableToastController
+    extends LegacyClickableToastCtrl
 {
     /**
      * Show animation length
@@ -28,40 +28,11 @@ public class ClickableToastController
      * Hide animation length
      */
     private static final long HIDE_DURATION = 2000;
-    /**
-     * How long the toast will be displayed.
-     */
-    private static final long DISPLAY_DURATION = 10000;
-
-    /**
-     * The toast <tt>View</tt> container.
-     */
-    private View toastView;
-
-    /**
-     * The <tt>TextView</tt> displaying message text.
-     */
-    private TextView messageView;
 
     /**
      * The animator object used to animate toast <tt>View</tt> alpha property.
      */
     private ObjectAnimator toastAnimator;
-
-    /**
-     * Handler object used for hiding the toast if it's not clicked.
-     */
-    private Handler hideHandler = new Handler();
-
-    /**
-     * The listener that will be notified when the toast is clicked.
-     */
-    private View.OnClickListener clickListener;
-
-    /**
-     * State object for message text.
-     */
-    private CharSequence toastMessage;
 
     /**
      * Creates new instance of <tt>ClickableToastController</tt>.
@@ -91,30 +62,12 @@ public class ClickableToastController
                                     View.OnClickListener clickListener,
                                     int toastButtonId)
     {
-        this.toastView = toastView;
+        super(toastView, clickListener, toastButtonId);
 
         // Initialize animator
         toastAnimator = new ObjectAnimator();
         toastAnimator.setPropertyName("alpha");
         toastAnimator.setTarget(toastView);
-
-        this.clickListener = clickListener;
-
-        messageView = (TextView) toastView.findViewById(R.id.toast_msg);
-
-        toastView.findViewById(toastButtonId)
-                .setOnClickListener(new View.OnClickListener()
-                {
-
-                    public void onClick(View view)
-                    {
-                        hideToast(false);
-                        ClickableToastController.this
-                                .clickListener.onClick(view);
-                    }
-                });
-
-        hideToast(true);
     }
 
     /**
@@ -125,18 +78,8 @@ public class ClickableToastController
      */
     public void showToast(boolean immediate, CharSequence message)
     {
-        toastMessage = message;
-        messageView.setText(toastMessage);
-
-        hideHandler.removeCallbacks(hideRunnable);
-        hideHandler.postDelayed(hideRunnable, DISPLAY_DURATION);
-
-        toastView.setVisibility(View.VISIBLE);
-        if (immediate)
-        {
-            toastView.setAlpha(1);
-        }
-        else
+        super.showToast(immediate, message);
+        if (!immediate)
         {
             toastAnimator.cancel();
             toastAnimator.setFloatValues(0, 1);
@@ -152,54 +95,35 @@ public class ClickableToastController
      */
     public void hideToast(boolean immediate)
     {
-        hideHandler.removeCallbacks(hideRunnable);
-        if (immediate)
-        {
-            toastView.setVisibility(View.GONE);
-            toastView.setAlpha(0);
-            toastMessage = null;
-        }
-        else
+        super.hideToast(immediate);
+        if (!immediate)
         {
             toastAnimator.cancel();
             toastAnimator.setFloatValues(1, 0);
             toastAnimator.setDuration(HIDE_DURATION);
             toastAnimator.start();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void onSaveInstanceState(Bundle outState)
-    {
-        outState.putCharSequence("toast_message", toastMessage);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void onRestoreInstanceState(Bundle savedInstanceState)
-    {
-        if (savedInstanceState != null)
-        {
-            toastMessage = savedInstanceState.getCharSequence("toast_message");
-
-            if (!TextUtils.isEmpty(toastMessage))
+            toastAnimator.addListener(new Animator.AnimatorListener()
             {
-                showToast(true, toastMessage);
-            }
+                public void onAnimationStart(Animator animation)
+                {
+
+                }
+
+                public void onAnimationEnd(Animator animation)
+                {
+                    onHide();
+                }
+
+                public void onAnimationCancel(Animator animation)
+                {
+
+                }
+
+                public void onAnimationRepeat(Animator animation)
+                {
+
+                }
+            });
         }
     }
-
-    /**
-     * Hides the toast after delay.
-     */
-    private Runnable hideRunnable = new Runnable()
-    {
-        public void run()
-        {
-            hideToast(false);
-        }
-    };
 }
