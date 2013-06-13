@@ -73,13 +73,6 @@ public class CallContactFragment
 
         //initAndroidAccounts();
 
-        new Thread()
-        {
-            public void run()
-            {
-                initAccounts();
-            }
-        }.start();
     }
 
     /**
@@ -190,57 +183,6 @@ public class CallContactFragment
         for (Account account: androidAccounts)
         {
             System.err.println("ACCOUNT======" + account);
-        }
-    }
-
-    /**
-     * Initializes accounts.
-     */
-    private void initAccounts()
-    {
-        AccountManager accountManager
-                = ServiceUtils.getService(bundleContext, AccountManager.class);
-
-        Iterator<AccountID> storedAccounts
-                = accountManager.getStoredAccounts().iterator();
-
-        while (storedAccounts.hasNext())
-        {
-            AccountID accountID = storedAccounts.next();
-
-            boolean isHidden = accountID.getAccountPropertyBoolean(
-                    ProtocolProviderFactory.IS_PROTOCOL_HIDDEN, false);
-            System.err.println("Trying account "+accountID.getDisplayName()+
-                                       " hidden? "+isHidden);
-            if (isHidden)
-                continue;
-
-            if (accountManager.isAccountLoaded(accountID))
-            {
-                ProtocolProviderService protocolProvider
-                        = AccountUtils.getRegisteredProviderForAccount(accountID);
-
-                if (protocolProvider != null)
-                {
-                    if (!protocolProvider.isRegistered())
-                    {
-                        AndroidGUIActivator.getLoginManager()
-                                .login(protocolProvider);
-                    }
-                    else
-                    {
-                        System.err.print("Acc "+accountID+" is logged in");
-                    }
-                    break;
-                }else
-                {
-                    System.err.println("No provider for "+accountID);
-                }
-            }else
-            {
-                System.err.println("Account not loaded: "+accountID);
-            }
-
         }
     }
 
