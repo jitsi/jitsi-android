@@ -20,7 +20,6 @@ import net.java.sip.communicator.util.wizard.*;
  */
 public class JabberAccountRegistration
     extends SecurityAccountRegistration
-    implements EncodingsRegistration
 {
     /**
      * The default value of server port for jabber accounts.
@@ -911,6 +910,12 @@ public class JabberAccountRegistration
     {
         // SAVP option is not useful for XMPP account.
         // Thereby, do nothing.
+    }
+
+    @Override
+    public int getSavpOption()
+    {
+        return 0;
     }
 
     /**

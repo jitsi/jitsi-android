@@ -272,12 +272,12 @@ public class AccountRegistrationImpl
 
 
         // Sets the ordered list of encryption protocols.
-        registration.addEncryptionProtocolsToProperties(
-                accountProperties);
+        //registration.addEncryptionProtocolsToProperties(
+          //      accountProperties);
 
         // Sets the list of encryption protocol status.
-        registration.addEncryptionProtocolStatusToProperties(
-                accountProperties);
+        //registration.addEncryptionProtocolStatusToProperties(
+          //      accountProperties);
 
         accountProperties.put(ProtocolProviderFactory.DEFAULT_SIPZRTP_ATTRIBUTE,
             Boolean.toString(registration.isSipZrtpAttribute()));

@@ -19,7 +19,6 @@ import net.java.sip.communicator.util.wizard.*;
  */
 public class SIPAccountRegistration
     extends SecurityAccountRegistration
-    implements EncodingsRegistration
 {
     public static String DEFAULT_PORT = "5060";
 
