@@ -134,7 +134,6 @@ public class LegacyClickableToastCtrl
     protected void onHide()
     {
         toastView.setVisibility(View.GONE);
-        toastView.setAlpha(0);
         toastMessage = null;
     }
 

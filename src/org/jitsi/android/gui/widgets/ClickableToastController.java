@@ -126,4 +126,14 @@ public class ClickableToastController
             });
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void onHide()
+    {
+        super.onHide();
+        toastView.setAlpha(0);
+    }
 }
