@@ -591,8 +591,11 @@ public class AndroidUIService
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public LoginManager getLoginManager()
     {
-        return null;
+        return AndroidGUIActivator.getLoginManager();
     }
 }
