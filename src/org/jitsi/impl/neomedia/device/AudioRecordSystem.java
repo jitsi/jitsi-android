@@ -40,7 +40,7 @@ public class AudioRecordSystem
     public AudioRecordSystem()
         throws Exception
     {
-        super(LOCATOR_PROTOCOL);
+        super(LOCATOR_PROTOCOL, FEATURE_NOTIFY_AND_PLAYBACK_DEVICES);
     }
 
     @Override
@@ -77,7 +77,7 @@ public class AudioRecordSystem
 
         CaptureDeviceInfo2 captureDevice
             = new CaptureDeviceInfo2(
-                    "android.media.AudioRecord",
+                    "android.media.AudioRecordCapture",
                     new MediaLocator(LOCATOR_PROTOCOL + ":"),
                     formats.toArray(new Format[formats.size()]),
                     null, null, null);
@@ -86,6 +86,29 @@ public class AudioRecordSystem
 
         captureDevices.add(captureDevice);
         setCaptureDevices(captureDevices);
+
+        CaptureDeviceInfo2 playbackDevice
+                = new CaptureDeviceInfo2(
+                "android.media.AudioRecordPlayback",
+                new MediaLocator(LOCATOR_PROTOCOL + ":playback"),
+                formats.toArray(new Format[formats.size()]),
+                null, null, null);
+        CaptureDeviceInfo2 notificationDevice
+                = new CaptureDeviceInfo2(
+                "android.media.AudioRecordNotification",
+                new MediaLocator(LOCATOR_PROTOCOL + ":notification"),
+                formats.toArray(new Format[formats.size()]),
+                null, null, null);
+
+        List<CaptureDeviceInfo2> playbackDevices
+                = new ArrayList<CaptureDeviceInfo2>(2);
+        playbackDevices.add(playbackDevice);
+        playbackDevices.add(notificationDevice);
+        setPlaybackDevices(playbackDevices);
+
+        setDevice(DataFlow.NOTIFY, notificationDevice, true);
+        setDevice(DataFlow.PLAYBACK, playbackDevice, true);
+
     }
 
     /**
