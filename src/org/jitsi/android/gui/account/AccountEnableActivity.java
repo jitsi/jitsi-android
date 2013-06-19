@@ -6,6 +6,7 @@
  */
 package org.jitsi.android.gui.account;
 
+import android.content.*;
 import android.view.*;
 import android.widget.*;
 
@@ -14,6 +15,7 @@ import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.account.*;
 
 import org.jitsi.*;
+import org.jitsi.android.gui.account.settings.*;
 import org.jitsi.service.osgi.*;
 import org.osgi.framework.*;
 
@@ -62,7 +64,7 @@ public class AccountEnableActivity
 
         this.bundleContext = bundleContext;
         this.accountManager = ServiceUtils.getService(bundleContext,
-                AccountManager.class);
+                                                      AccountManager.class);
 
         accountsInit();
     }
@@ -108,7 +110,7 @@ public class AccountEnableActivity
      * Class creates the view elements for list of accounts
      * with on/off switches. Runs the thread that enable/disable each account
      * on user action.
-     * 
+     *
      */
     class AccountsOnOffAdapter
         extends AccountsListAdapter
@@ -140,10 +142,23 @@ public class AccountEnableActivity
             rowView.setClickable(true);
             rowView.setOnClickListener( new View.OnClickListener()
             {
-                public void onClick(View view) {
+                public void onClick(View view)
+                {
+                    if(account.getProtocolProvider() == null)
+                    {
+                        // Account is not enabled
+                        return;
+                    }
 
-                    logger.error("Clicked on account "+account);
+                    Intent preferences
+                            = new Intent(AccountEnableActivity.this,
+                                         AccountPreferencesActivity.class);
 
+                    preferences.putExtra(
+                            AccountPreferencesActivity.EXTRA_USER_ID,
+                            account.getAccountID().getAccountUniqueID());
+
+                    startActivity(preferences);
                 }
             });
 

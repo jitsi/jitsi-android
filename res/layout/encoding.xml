@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:custom="http://schemas.android.com/apk/res/org.jitsi"
+              android:id="@+id/viewContent"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center_vertical"
+        >
+
+    <org.jitsi.android.gui.widgets.TouchInterceptor
+
+            custom:itemHeight="@dimen/list_item_height"
+            custom:itemExpandedHeight="@dimen/expanded_item_height"
+
+            custom:dragRegionStartX="@dimen/enc_list_drag_s_x"
+            custom:dragRegionEndX="@dimen/enc_list_drag_e_x"
+
+            android:id="@+id/encodingList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:drawSelectorOnTop="false"
+            android:fastScrollEnabled="true" />
+
+
+</LinearLayout>

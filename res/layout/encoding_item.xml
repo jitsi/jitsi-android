@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/list_item_height"
+        >
+    <ImageView
+            android:id="@id/dragHandle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="20dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/drag"/>
+    <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@android:id/checkbox"
+            android:layout_toRightOf="@+id/dragHandle"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="45dp"
+            />
+    <TextView
+            style="@style/MediumFont"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@android:id/text1"
+            android:text="Unknown"
+            android:layout_toRightOf="@android:id/checkbox"
+            android:layout_marginLeft="5dp"
+
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="center_horizontal"/>
+</RelativeLayout>

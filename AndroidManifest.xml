@@ -54,6 +54,30 @@
                 <action android:name="org.jitsi.call.control" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".android.gui.settings.SettingsActivity"
+                  android:label="@string/app_name">
+        </activity>
+        <activity android:name=".android.gui.settings.EncodingSettings"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name=".android.gui.settings.EncodingSettings" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".android.gui.account.settings.AccountPreferencesActivity"
+                  android:label="@string/app_name">
+        </activity>
+        <activity android:name=".android.gui.account.settings.EncodingActivity"
+                  android:label="@string/app_name">
+        </activity>
+        <activity android:name=".android.gui.account.settings.SecurityActivity"
+                  android:label="@string/app_name">
+        </activity>
+        <activity android:name=".android.gui.account.settings.ServerListActivity"
+                  android:label="@string/app_name">
+        </activity>
+
         <!--<activity android:name=".android.gui.account.AccountPreferencesActivity"
             android:configChanges="orientation|keyboardHidden">
             <intent-filter>

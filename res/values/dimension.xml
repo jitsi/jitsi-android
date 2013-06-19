@@ -11,4 +11,9 @@
     <dimen name="status_screen_width" >300dp</dimen>
     <dimen name="status_edit_height" >65dp</dimen>
     <dimen name="avatar_height" >220dp</dimen>
+
+    <dimen name="list_item_height" >75dp</dimen>
+    <dimen name="expanded_item_height" >100dp</dimen>
+    <dimen name="enc_list_drag_s_x" >0dp</dimen>
+    <dimen name="enc_list_drag_e_x" >50dp</dimen>
 </resources>

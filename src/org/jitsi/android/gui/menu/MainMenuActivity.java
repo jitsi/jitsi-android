@@ -14,6 +14,7 @@ import net.java.sip.communicator.util.account.*;
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.account.*;
+import org.jitsi.android.gui.settings.*;
 import org.jitsi.service.osgi.*;
 
 import android.os.*;
@@ -97,7 +98,7 @@ public class MainMenuActivity
             startActivity(AccountEnableActivity.class);
             return true;
         case R.id.main_settings:
-            // do something
+            startActivity(SettingsActivity.class);
             return true;
         case R.id.menu_exit:
             // Shutdown the app 

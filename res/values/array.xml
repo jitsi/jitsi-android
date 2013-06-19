@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_sip_preferred_transport">
+        <item>UDP</item>
+        <item>TCP</item>
+        <item>TLS</item>
+    </string-array>
+    <string-array name="pref_sip_keep_alive_method">
+        <item>NONE</item>
+        <item>OPTIONS</item>
+        <item>REGISTER</item>
+    </string-array>
+    <string-array name="pref_sip_clist_type">
+        <item>Local</item>
+        <item>XCAP</item>
+        <item>XiVO</item>
+    </string-array>
+    <string-array name="pref_sip_dtmf_method">
+        <item>Auto: RTP or Inband (no SIP INFO)</item>
+        <item>RTP ( RFC2833 / RFC 4733 )</item>
+        <item>SIP INFO</item>
+        <item>Inband</item>
+    </string-array>
+    <string-array name="pref_sip_dtmf_method_values">
+        <item>AUTO_DTMF</item>
+        <item>RTP_DTMF</item>
+        <item>SIP_INFO_DTMF</item>
+        <item>INBAND_DTMF</item>
+    </string-array>
+    <string-array name="pref_savp_option_desc">
+        <item>Off (indicate RTP/AVP only)</item>
+        <item>Mandatory (offer and accept only RTP/SAVP)</item>
+        <item>Optional (offer RTP/SAVP first, then RTP/AVP)</item>
+    </string-array>
+    <string-array name="pref_jabber_dtmf_method">
+        <item>Auto: RTP or Inband</item>
+        <item>RTP ( RFC2833 / RFC 4733 )</item>
+        <item>Inband</item>
+    </string-array>
+    <string-array name="pref_jabber_dtmf_method_values">
+        <item>AUTO_DTMF</item>
+        <item>RTP_DTMF</item>        
+        <item>INBAND_DTMF</item>
+    </string-array>
+</resources>

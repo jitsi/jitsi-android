@@ -263,6 +263,8 @@ public class AccountLoginFragment
                 {
                     try
                     {
+                        accReg.setModification(false);
+
                         protocolProvider = accReg.signin(userName, password);
                     }
                     catch (OperationFailedException e)

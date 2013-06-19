@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:custom="http://schemas.android.com/apk/res/org.jitsi"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <TextView
+            style="@style/MediumFont"
+            android:id="@android:id/text1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:text="@string/service_gui_SEC_PROTOCOLS_MSG"/>
+    <org.jitsi.android.gui.widgets.TouchInterceptor
+
+            custom:itemHeight="@dimen/list_item_height"
+            custom:itemExpandedHeight="@dimen/expanded_item_height"
+
+            custom:dragRegionStartX="@dimen/enc_list_drag_s_x"
+            custom:dragRegionEndX="@dimen/enc_list_drag_e_x"
+
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            android:drawSelectorOnTop="false"
+            android:fastScrollEnabled="true" />
+</LinearLayout>
