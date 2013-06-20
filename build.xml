@@ -155,13 +155,25 @@
                   result="org.jitsi.android.util.java.awt.@1"/>
         </jarjar>
 
+        <!-- renaming bouncycastle packages -->
+        <jarjar jarfile="libs/bouncycastle.jar">
+            <zipfileset src="lib/bundles/bouncycastle.jar"/>
+            <rule pattern="org.bouncycastle.**"
+                  result="org.jitsi.bouncycastle.@1"/>
+        </jarjar>
+
         <!-- renaming packages in order to use vanilla smack in android -->
         <jarjar jarfile="libs/smacklib.jar">
             <zipfileset src="lib/bundles/smacklib.jar"/>
             <rule pattern="org.xmlpull.v1.**"
                   result="org.jitsi.org.xmlpull.v1.@1"/>
-            <rule pattern="java.beans.**"
-                  result="org.jitsi.android.util.java.beans.@1"/>
+
+            <!-- Renames missing java.beans classes -->
+            <rule pattern="java.beans.PropertyDescriptor"
+                  result="org.jitsi.android.util.java.beans.PropertyDescriptor"/>
+            <rule pattern="java.beans.PropertyEditor"
+                  result="org.jitsi.android.util.java.beans.PropertyEditor"/>
+
             <rule pattern="javax.security.sasl.**"
                   result="org.apache.harmony.javax.security.sasl.@1"/>
             <rule pattern="javax.security.auth.**"
@@ -172,8 +184,13 @@
             <zipfileset src="lib/bundles/protocol-jabber.jar"/>
             <rule pattern="org.xmlpull.v1.**"
                   result="org.jitsi.org.xmlpull.v1.@1"/>
-            <rule pattern="java.beans.**"
-                  result="org.jitsi.android.util.java.beans.@1"/>
+
+            <!-- Renames missing java.beans classes -->
+            <rule pattern="java.beans.PropertyDescriptor"
+                  result="org.jitsi.android.util.java.beans.PropertyDescriptor"/>
+            <rule pattern="java.beans.PropertyEditor"
+                  result="org.jitsi.android.util.java.beans.PropertyEditor"/>
+
             <rule pattern="javax.security.sasl.**"
                   result="org.apache.harmony.javax.security.sasl.@1"/>
             <rule pattern="javax.security.auth.**"
@@ -203,6 +220,25 @@
                   result="org.jitsi.android.util.javax.swing.@1"/>
             <rule pattern="javax.sound.**"
                   result="org.jitsi.android.util.javax.sound.@1"/>
+            <rule pattern="org.bouncycastle.**"
+                  result="org.jitsi.bouncycastle.@1"/>
+        </jarjar>
+
+        <!-- fix loading some classes -->
+        <jarjar jarfile="libs/bccontrib.jar">
+            <zipfileset src="lib/bundles/bccontrib.jar"/>
+            <rule pattern="org.bouncycastle.**"
+                  result="org.jitsi.bouncycastle.@1"/>
+        </jarjar>
+        <jarjar jarfile="libs/certificate.jar">
+            <zipfileset src="lib/bundles/certificate.jar"/>
+            <rule pattern="org.bouncycastle.**"
+                  result="org.jitsi.bouncycastle.@1"/>
+        </jarjar>
+        <jarjar jarfile="libs/zrtp4j.jar">
+            <zipfileset src="lib/bundles/zrtp4j.jar"/>
+            <rule pattern="org.bouncycastle.**"
+                  result="org.jitsi.bouncycastle.@1"/>
         </jarjar>
 
         <!-- and finally the stubs we use for common java
@@ -213,6 +249,11 @@
             <zipfileset src="lib/java-stubs.jar"/>
             <rule pattern="java.awt.**"
                   result="org.jitsi.android.util.java.awt.@1"/>
+            <!--
+                We have only PropertyDescriptor and PropertyEditor defined
+                (the rest is in Android core), so only those 2 classes are
+                renamed in our bundles(above).
+            -->
             <rule pattern="java.beans.**"
                   result="org.jitsi.android.util.java.beans.@1"/>
             <rule pattern="javax.sound.**"
