@@ -1,49 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:measureWithLargestChild="false"
-              android:focusableInTouchMode="false" android:focusable="false"
-              android:gravity="center_horizontal"
-              android:clickable="true">
+             android:layout_height="@dimen/account_list_row_height"
+             android:descendantFocusability="blocksDescendants">
 
     <ImageView
-                android:id="@+id/accountProtoIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                />
+        android:id="@+id/avatarIcon"
+        android:layout_height="fill_parent"
+        android:layout_width="@dimen/account_list_row_height"
+        android:layout_centerVertical="true"
+        android:src="@drawable/avatar"/>
+
+    <ImageView
+        android:id="@+id/statusIcon"
+        android:layout_width="20dip"
+        android:layout_height="20dip"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="35dip"/>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/avatarIcon"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="8dip">
+
         <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/accountStatus"
-                    android:text="Unknown"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignTop="@+id/accountName"
-                    android:layout_column="2"
-                    android:layout_gravity="right|center_vertical"
-                    android:layout_alignBottom="@+id/accountProtoIcon"
-                    android:gravity="center"
-                    android:layout_marginRight="5dp"/>
+            android:id="@+id/displayName"
+            style="@style/MediumFont"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="left"
+            android:gravity="center_vertical"
+            android:textColor="@color/list_text_selection_color"/>
+
+        <TextView
+            android:id="@+id/statusMessage"
+            style="@style/SmallFont"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="left"
+            android:gravity="center_vertical"
+            android:textColor="@color/list_details_selection_color"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/callButtonLayout"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="@anim/background_fadein"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:clickable="true"
+        android:onClick="onCallContactClicked"
+        android:visibility="invisible">
+
         <ImageView
+            android:id="@+id/buttonSeparatorView"
+            android:src="@drawable/contact_list_separator"
+            android:layout_width="1dip"
+            android:layout_height="30dip"
+            android:layout_marginRight="15dp"
+            android:layout_gravity="center_vertical"/>
+
+        <ImageButton
+            android:id="@+id/contactCallButton"
+            android:src="@drawable/video_call"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/service_gui_CALL"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/accountStatusIcon"
-            android:layout_toLeftOf="@+id/accountStatus"
-            android:layout_alignTop="@+id/accountProtoIcon"
-            android:layout_alignBottom="@+id/accountProtoIcon"
-            android:gravity="center"
-            android:layout_marginRight="5dp"/>
-        <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/accountName"
-                    android:text="AccountName"
-                    android:layout_gravity="right"
-                    android:layout_toRightOf="@+id/accountProtoIcon"
-                    android:layout_alignTop="@+id/accountProtoIcon"
-                    android:layout_alignBottom="@+id/accountProtoIcon"
-                    android:gravity="center"
-                    android:layout_marginLeft="10dp"/>
+            android:paddingRight="15dp"
+            android:layout_gravity="center_vertical"/>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/selectedBackgroundIcon"
+        android:src="@drawable/corner"
+        android:layout_width="18dip"
+        android:layout_height="18dip"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:visibility="invisible"/>
+
 </RelativeLayout>

@@ -17,7 +17,7 @@
         <ImageView
              android:id="@+id/calleeAvatar"
              android:src="@drawable/personphoto"
-             android:contentDescription="@string/call"
+             android:contentDescription="@string/service_gui_CALL"
              android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_gravity="center_horizontal"
@@ -72,7 +72,7 @@
              android:id="@+id/callButton"
              android:src="@drawable/callbutton"
              android:background="@drawable/image_button_background"
-             android:contentDescription="@string/call"
+             android:contentDescription="@string/service_gui_CALL"
              android:layout_width="wrap_content"
              android:layout_height="fill_parent"
              android:layout_weight="1"

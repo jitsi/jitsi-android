@@ -30,7 +30,7 @@ import android.view.*;
  * @author Yana Stamcheva
  */
 public class MainMenuActivity
-    extends OSGiActivity
+    extends OSGiFragmentActivity
 {
     /**
      * Called when the activity is starting. Initializes the corresponding
@@ -73,6 +73,8 @@ public class MainMenuActivity
         // Handle item selection
         switch (item.getItemId())
         {
+        case R.id.search:
+            return true;
         case R.id.add_account:
             startActivity(AccountLoginActivity.class);
             return true;

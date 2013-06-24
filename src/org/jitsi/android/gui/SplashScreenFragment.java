@@ -7,11 +7,11 @@
 package org.jitsi.android.gui;
 
 import android.os.*;
-import android.support.v4.app.*;
 import android.view.*;
 import android.view.animation.*;
 import android.widget.*;
 import org.jitsi.*;
+import org.jitsi.service.osgi.*;
 
 /**
  * The splash screen fragment displays animated Jitsi logo and indeterminate
@@ -20,9 +20,8 @@ import org.jitsi.*;
  * @author Pawel Domas
  */
 public class SplashScreenFragment
-    extends Fragment
+    extends OSGiFragmentV4
 {
-
     /**
      * {@inheritDoc}
      */
@@ -30,7 +29,20 @@ public class SplashScreenFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
-        return inflater.inflate(R.layout.main, container, false);
+        View content = inflater.inflate(R.layout.main,
+                                        container,
+                                        false);
+
+        getActivity().setProgressBarIndeterminateVisibility(true);
+
+        // Starts fade in animation
+        ImageView myImageView
+                = (ImageView) content.findViewById(R.id.loadingImage);
+        Animation myFadeInAnimation
+                = AnimationUtils.loadAnimation(getActivity(), R.anim.fadein);
+        myImageView.startAnimation(myFadeInAnimation);
+
+        return content;
     }
 
     /**
@@ -40,15 +52,6 @@ public class SplashScreenFragment
     public void onStart()
     {
         super.onStart();
-
-        getActivity().setProgressBarIndeterminateVisibility(true);
-
-        // Starts fade in animation
-        ImageView myImageView
-                = (ImageView)getView().findViewById(R.id.loadingImage);
-        Animation myFadeInAnimation
-                = AnimationUtils.loadAnimation(getActivity(), R.anim.fadein);
-        myImageView.startAnimation(myFadeInAnimation);
     }
 
     /**

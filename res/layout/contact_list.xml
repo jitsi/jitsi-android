@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ListView
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/white">
+
+    <ExpandableListView
         android:id="@+id/contactListView"
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:choiceMode="singleChoice"
-        android:background="@drawable/background">
-</ListView>
+        android:childDivider="@color/contact_list_divider"
+        android:dividerHeight="1dip"
+        android:cacheColorHint="@color/white"/>
+</LinearLayout>

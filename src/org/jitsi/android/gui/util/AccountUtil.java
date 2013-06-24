@@ -56,11 +56,9 @@ public class AccountUtil
      * @param context current application {@link Context}
      * @return the default avatar {@link Drawable}
      */
-    static public Drawable getDefaultAvatarIcon(Context context)
+    static public LayerDrawable getDefaultAvatarIcon(Context context)
     {
-        return new BitmapDrawable(
-                BitmapFactory.decodeResource(
-                        context.getResources(),
-                        R.drawable.personphoto));
+        return (LayerDrawable) context.getResources()
+            .getDrawable(R.drawable.avatar_layer_drawable);
     }
 }

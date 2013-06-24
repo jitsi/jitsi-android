@@ -4,7 +4,6 @@
     <string name="ACCOUNT_TYPE">org.jitsi.android.account</string>
     <string name="send_process_signal">Send Process Signal</string>
     <string name="stop_osgi_framework">Stop OSGi Framework</string>
-    <string name="call">Call</string>
     <string name="in_call_with">In call with </string>
     <string name="settings">Settings</string>
     <string name="username">username</string>
@@ -29,6 +28,8 @@
     <string name="low_video_resolution">320x240</string>
     <string name="high_video_resolution">640x480</string>
     <string name="exit_app">Exit</string>
+    <string name="service_gui_UNKNOWN_CONTACT">Unknown</string>
+    <string name="service_gui_ACCOUNT_ME">Me</string>
 
     <!-- Main Menu items -->
     <string name="service_gui_ACCOUNTS_STATUS">Accounts status</string>
@@ -71,6 +72,10 @@
     <string name="service_gui_SEARCH">Search</string>
     <string name="service_gui_ADD_CONTACT">Add contact</string>
     <string name="service_gui_ONLINE">Online</string>
+    <string name="service_gui_OFFLINE">Offline</string>
+    <string name="service_gui_FFC_STATUS">Free for chat</string>
+    <string name="service_gui_AWAY_STATUS">Away</string>
+    <string name="service_gui_DND_STATUS">Do not disturb</string>
     <string name="service_gui_RETRY">Retry</string>
     <string name="service_gui_ERROR">Error</string>
     <string name="service.gui.AUTHENTICATION_FAILED">
@@ -83,6 +88,10 @@
     <string name="service_gui_NEW_ACCOUNT">Add new account</string>
     <string name="service_gui_LOADING">Loading</string>
     <string name="service_gui_ACCOUNTS">Accounts</string>
+    <string name="service_gui_CALL">Call</string>
+    <string name="service_gui_VIDEO_CALL">Video call</string>
+    <string name="service_gui_CONTACTS">Contacts</string>
+    <string name="service_gui_ENTER_NAME_OR_NUMBER">Enter name or number</string>
 
     <!-- Call -->
     <string name="service_gui_VOLUME_CONTROL_TOOL_TIP">Adjust volume</string>
@@ -91,18 +100,15 @@
     <string name="service_gui_MUTE_BUTTON_TOOL_TIP">Adjust microphone sound</string>
     <string name="service_gui_LOCAL_VIDEO_BUTTON_TOOL_TIP">Toggle video</string>
     <string name="service_gui_SEND_MESSAGE">Send a message</string>
+    <string name="service_gui_CALL_WITH">Call with</string>
 
     <!-- From resources.properties -->
     <string name="service_gui_NOT_IN_CONTACT_LIST_GROUP_NAME">NotInContactList</string>
-    <string name="service_gui_AWAY_STATUS">Away</string>
-    <string name="service_gui_BUSY_STATUS">Busy</string>
     <string name="service_gui_CONNECTED_STATUS">Connected</string>
     <string name="service_gui_CONNECTING_STATUS">Connecting</string>
     <string name="service_gui_CONNECTING_EARLY_MEDIA_STATUS">Connecting*</string>
     <string name="service_gui_DISCONNECTED_STATUS">Disconnected</string>
-    <string name="service_gui_DND_STATUS">Do not disturb</string>
     <string name="service_gui_FAILED_STATUS">Call failed</string>
-    <string name="service_gui_FFC_STATUS">Free for chat</string>
     <string name="service_gui_INCOMING_CALL_STATUS">Incoming call</string>
     <string name="service_gui_INITIATING_CALL_STATUS">Initiating call</string>
     <string name="service_gui_LOCALLY_ON_HOLD_STATUS">Locally on hold</string>

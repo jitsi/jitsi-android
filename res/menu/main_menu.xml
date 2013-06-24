@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/search"
+           android:title="@string/service_gui_ENTER_NAME_OR_NUMBER"
+           android:icon="@drawable/search"
+           android:showAsAction="always">
+    </item>
     <item android:id="@+id/add_account"
            android:title="@string/service_gui_NEW_ACCOUNT">
     </item>

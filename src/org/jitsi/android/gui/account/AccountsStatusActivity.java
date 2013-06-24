@@ -56,9 +56,9 @@ public class AccountsStatusActivity
         {
             public void run()
             {
-                accountsInit();        
+                accountsInit();
             }
-        });        
+        });
     }
 
     @Override

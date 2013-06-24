@@ -8,17 +8,22 @@ package org.jitsi.android.gui.util;
 
 import java.util.*;
 
-import android.support.v4.app.*;
+import net.java.sip.communicator.util.Logger;
+
 import org.jitsi.*;
 
 import android.annotation.*;
 import android.app.*;
 import android.content.*;
+import android.graphics.drawable.*;
 import android.os.*;
+import android.support.v4.app.*;
+import android.view.*;
+import android.view.View.OnTouchListener;
+
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.service.osgi.*;
-import org.jitsi.util.*;
 
 /**
  * The <tt>AndroidUtils</tt> class provides a set of utility methods allowing
@@ -251,5 +256,33 @@ public class AndroidUtils
             }
         } 
         return isServiceFound; 
+    }
+
+    public static void setOnTouchBackgroundEffect(  final Context context,
+                                                    View view)
+    {
+        view.setOnTouchListener(new OnTouchListener()
+        {
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (!(v.getBackground() instanceof TransitionDrawable))
+                    return false;
+
+                TransitionDrawable transition
+                    = (TransitionDrawable) v.getBackground();
+
+                switch (event.getAction())
+                {
+                case MotionEvent.ACTION_DOWN:
+                    transition.startTransition(500);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    transition.reverseTransition(500);
+                    break;
+                }
+
+                return false;
+            }
+        });
     }
 }

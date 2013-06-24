@@ -9,9 +9,16 @@ package org.jitsi.android.gui;
 import android.content.*;
 
 import net.java.sip.communicator.service.contactlist.*;
+import net.java.sip.communicator.service.globaldisplaydetails.*;
+
 import net.java.sip.communicator.service.gui.*;
+import net.java.sip.communicator.service.metahistory.*;
 import net.java.sip.communicator.service.protocol.*;
+
 import net.java.sip.communicator.service.systray.*;
+
+import net.java.sip.communicator.service.protocol.globalstatus.*;
+
 import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.account.*;
 
@@ -36,7 +43,6 @@ import org.osgi.framework.*;
 public class AndroidGUIActivator
         implements BundleActivator
 {
-
     /**
      * The {@link LoginManager}
      */
@@ -46,16 +52,6 @@ public class AndroidGUIActivator
      * The OSGI bundle context.
      */
     public static BundleContext bundleContext;
-
-    /**
-     * Returns currently registered <tt>MetaContactListService</tt> instance.
-     * @return currently registered <tt>MetaContactListService</tt> instance.
-     */
-    public static MetaContactListService getContactListService()
-    {
-        return ServiceUtils.getService( bundleContext,
-                                        MetaContactListService.class );
-    }
 
     /**
      * {@inheritDoc}
@@ -85,7 +81,8 @@ public class AndroidGUIActivator
                 null);
 
         // Registers UIService stub
-        AndroidUIService uiService = new AndroidUIService( secuirtyAuthority);
+        AndroidUIServiceImpl uiService
+            = new AndroidUIServiceImpl( secuirtyAuthority);
 
         bundleContext.registerService(
                 UIService.class.getName(),
@@ -127,6 +124,47 @@ public class AndroidGUIActivator
     {
         return ServiceUtils.getService( bundleContext,
                                         ResourceManagementService.class);
+    }
+
+    /**
+     * Returns <tt>MetaContactListService</tt>.
+     *
+     * @return the <tt>MetaContactListService</tt>.
+     */
+    public static MetaContactListService getContactListService()
+    {
+        return ServiceUtils.getService( bundleContext,
+                                        MetaContactListService.class);
+    }
+
+    /**
+     * Returns the <tt>GlobalStatusService</tt> obtained from the bundle
+     * context.
+     * @return the <tt>GlobalStatusService</tt> obtained from the bundle
+     * context
+     */
+    public static GlobalStatusService getGlobalStatusService()
+    {
+        return ServiceUtils.getService( bundleContext,
+                                        GlobalStatusService.class);
+    }
+
+    /**
+     * Returns the <tt>GlobalDisplayDetailsService</tt> obtained from the bundle
+     * context.
+     *
+     * @return the <tt>GlobalDisplayDetailsService</tt> obtained from the bundle
+     * context
+     */
+    public static GlobalDisplayDetailsService getGlobalDisplayDetailsService()
+    {
+        return ServiceUtils.getService( bundleContext,
+                                        GlobalDisplayDetailsService.class);
+    }
+
+    public static MetaHistoryService getMetaHistoryService()
+    {
+        return ServiceUtils.getService(bundleContext, MetaHistoryService.class);
     }
 
     /**

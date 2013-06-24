@@ -6,4 +6,3 @@
                 android:detachWallpaper="true"
                 android:duration="3000"/>
 </set>
-

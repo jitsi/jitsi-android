@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent"
+    android:layout_margin="3dp">
+
+    <TextView
+        android:id="@+id/actionBarText"
+        style="@style/MediumFont"
+        android:textColor="@color/white"
+        android:textStyle="normal|bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:paddingBottom="5dp"
+        android:text="@string/service_gui_ACCOUNT_ME"
+        android:gravity="left"/>
+
+    <TextView
+        android:id="@+id/actionBarStatusText"
+        style="@style/MediumFont"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:gravity="bottom"
+        android:text="@string/service_gui_OFFLINE"
+        android:textColor="@color/white"
+        android:textStyle="normal|bold"
+        android:focusable="true"
+        android:clickable="true"/>
+</RelativeLayout>

@@ -6,11 +6,11 @@
  */
 package org.jitsi.service.osgi;
 
+import android.app.*;
 import android.content.*;
 import android.os.*;
 import android.os.Bundle; // disambiguation
 
-import android.support.v4.app.*;
 import android.view.*;
 import net.java.sip.communicator.util.*;
 import org.jitsi.android.*;
@@ -25,7 +25,7 @@ import java.util.*;
  * @author Pawel Domas
  */
 public class OSGiActivity
-    extends FragmentActivity
+    extends OSGiFragmentActivity
 {
     /**
      * The logger
@@ -143,7 +143,7 @@ public class OSGiActivity
             if (!bindService)
                 this.serviceConnection = null;
         }
-        
+
         // Registers exit action listener
         this.registerReceiver(
                 exitListener,
@@ -158,7 +158,7 @@ public class OSGiActivity
     {
         // Unregisters exit action listener
         unregisterReceiver(exitListener);
-        
+
         ServiceConnection serviceConnection = this.serviceConnection;
 
         this.serviceConnection = null;
@@ -172,7 +172,25 @@ public class OSGiActivity
                 unbindService(serviceConnection);
         }
 
+        // Clear the references to this activity.
+        clearReferences();
+
         super.onDestroy();
+    }
+
+    protected void onPause()
+    {
+        // Clear the references to this activity.
+        clearReferences();
+
+        super.onPause();
+    }
+
+    protected void onResume()
+    {
+        super.onResume();
+
+        JitsiApplication.setCurrentActivity(this);
     }
 
     private void setService(BundleContextHolder service)
@@ -371,5 +389,12 @@ public class OSGiActivity
         {
             finish();
         }
+    }
+
+    private void clearReferences()
+    {
+        Activity currentActivity = JitsiApplication.getCurrentActivity();
+        if (currentActivity != null && currentActivity.equals(this))
+            JitsiApplication.setCurrentActivity(null);
     }
 }

@@ -50,6 +50,9 @@
         <activity android:name=".android.gui.call.ReceivedCallActivity"
                     android:label="@string/app_name">
         </activity>
+        <activity android:name=".android.gui.chat.ChatActivity"
+                    android:label="@string/app_name">
+        </activity>
         <!-- Call control from the status bar notification -->
         <receiver android:name=".android.gui.call.notification.CallControl" >
             <intent-filter>

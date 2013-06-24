@@ -40,6 +40,11 @@ public class JitsiApplication
     private static JitsiApplication instance;
 
     /**
+     * The currently shown activity.
+     */
+    private static Activity currentActivity = null;
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -204,5 +209,15 @@ public class JitsiApplication
                 getGlobalContext(), 0,
                 getHomeIntent(),
                 PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    public static void setCurrentActivity(Activity a)
+    {
+        currentActivity = a;
+    }
+
+    public static Activity getCurrentActivity()
+    {
+        return currentActivity;
     }
 }

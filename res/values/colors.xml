@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 <color name="blue">#2da8ca</color>
+<color name="dark_grey">#545454</color>
+<color name="grey">#989898</color>
+<color name="light_blue">#e4f9ff</color>
 <color name="white">#ffffff</color>
 <color name="black">#000000</color>
 <color name="transparent_black">#50000000</color>
@@ -10,4 +13,6 @@
 <color name="status_bar_icon_bg">#1D3741</color>
 <color name="status_bar_button">#086882</color>
 <color name="status_bar_hangup">#d80005</color>
+<color name="contact_list_divider">#DFDFDF</color>
+<color name="contact_list_group">#3ec7ee</color>
 </resources>

@@ -9,13 +9,17 @@ package org.jitsi.android.gui.account;
 import java.beans.*;
 
 import net.java.sip.communicator.util.*;
+
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.call.*;
 import org.jitsi.android.gui.util.*;
 
+import android.app.*;
 import android.content.*;
+import android.graphics.drawable.*;
+import android.widget.*;
 
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.event.*;
@@ -163,6 +167,8 @@ public class AndroidLoginRenderer
             protocolProvider,
             androidContext.getString(R.string.service_gui_ONLINE),
             date);
+
+        updateGlobalStatus();
     }
 
     /**
@@ -234,10 +240,10 @@ public class AndroidLoginRenderer
         if(notificationID == -1)
         {
             logger.warn("Failed to display status notification because" +
-                    " there's no global notification icon available.");            
+                    " there's no global notification icon available.");
             return;
         }
-        
+
         AndroidUtils.updateGeneralNotification(
             androidContext,
             notificationID,
@@ -262,6 +268,8 @@ public class AndroidLoginRenderer
                 evt.getProvider(),
                 evt.getNewStatus().getStatusName(),
                 System.currentTimeMillis());
+
+            updateGlobalStatus();
         }
 
         public void providerStatusMessageChanged(PropertyChangeEvent evt) {}
@@ -280,5 +288,52 @@ public class AndroidLoginRenderer
         ProtocolProviderService protocolProvider)
     {
         return false;
+    }
+
+    /**
+     * Updates the global status by picking the most connected protocol provider
+     * status.
+     */
+    private void updateGlobalStatus()
+    {
+        System.err.println("GLOBAL PRESENCE STATUS-----------"
+            + AndroidGUIActivator.getGlobalStatusService()
+                .getGlobalPresenceStatus());
+        setGlobalStatus(AndroidGUIActivator.getGlobalStatusService()
+                .getGlobalPresenceStatus());
+    }
+
+    private void setGlobalStatus(final PresenceStatus presenceStatus)
+    {
+        final Activity currentActivity = JitsiApplication.getCurrentActivity();
+        System.err.println("CURRENT ACTIVITY=======" + currentActivity);
+        if (currentActivity == null)
+            return;
+        System.err.println("CURRENT ACTIVITY CLASS=======" + currentActivity.getClass());
+        if (!currentActivity.getClass()
+                .equals(JitsiApplication.getHomeScreenActivityClass()))
+            return;
+
+        currentActivity.runOnUiThread(new Runnable()
+        {
+            public void run()
+            {
+                TextView actionBarText
+                    = (TextView) currentActivity.getActionBar().getCustomView()
+                        .findViewById(R.id.actionBarStatusText);
+
+                actionBarText.setText(presenceStatus.getStatusName());
+
+                LayerDrawable avatarDrawable
+                    = AccountUtil.getDefaultAvatarIcon(currentActivity);
+
+                avatarDrawable
+                    .setDrawableByLayerId(R.id.contactStatusDrawable,
+                        AndroidImageUtil
+                            .drawableFromBytes(
+                                StatusUtil.getContactStatusIcon(presenceStatus)));
+                currentActivity.getActionBar().setLogo(avatarDrawable);
+            }
+        });
     }
 }

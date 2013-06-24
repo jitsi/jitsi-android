@@ -30,7 +30,7 @@
         <ImageView
                 android:id="@+id/calleeAvatar"
                 android:src="@drawable/personphoto"
-                android:contentDescription="@string/call"
+                android:contentDescription="@string/service_gui_CALL"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/avatar_height"
                 android:layout_gravity="center_horizontal"

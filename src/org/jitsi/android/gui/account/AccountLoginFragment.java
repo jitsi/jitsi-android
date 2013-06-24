@@ -37,7 +37,7 @@ import android.widget.*;
  * @author Pawel Domas
  */
 public class AccountLoginFragment
-    extends OSGiFragment
+    extends OSGiFragmentV4
 {
     /**
      * The osgi bundle context.

@@ -4,6 +4,8 @@
         <item name="android:spinnerItemStyle">@style/SpinnerItem</item>
         <item name="android:spinnerDropDownItemStyle">@style/SpinnerItem.DropDownItem</item>
         <item name="android:actionBarStyle">@style/MyActionBar</item>
+        <item name="android:actionBarSize">@dimen/actionbar_height</item>
+        <!-- <item name="android:windowNoTitle">true</item> -->
     </style>
 
     <style name="SpinnerItem" parent="@android:style/Widget.TextView.SpinnerItem">
@@ -24,12 +26,24 @@
 
     <style name="MyActionBar" parent="@android:style/Widget.Holo.ActionBar">
         <item name="android:background">@drawable/actionbar_bg</item>
-        <item name="android:displayOptions">useLogo|showHome|homeAsUp</item>
+        <item name="android:displayOptions">useLogo|showHome|homeAsUp|showCustom</item>
         <item name="android:logo">@drawable/logoblue</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:layout_height">@dimen/actionbar_height</item>
+        <item name="android:customNavigationLayout">@layout/action_bar</item>
+        <item name="android:padding">@dimen/action_bar_padding</item>
+    </style>
+
+    <style name="SmallFont" parent="@android:style/TextAppearance.Small">
+        <item name="android:textSize">12sp</item>
     </style>
 
     <style name="MediumFont" parent="@android:style/TextAppearance.Medium">
         <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="LargeFont" parent="@android:style/TextAppearance.Large">
+        <item name="android:textSize">18sp</item>
     </style>
 
     <!-- Call info section header -->
@@ -69,4 +83,51 @@
         <item name="android:layout_marginRight">20dp</item>
     </style>
 
+    <style name="Animations" />
+
+    <!-- PopDownMenu -->
+    <style name="Animations.PopDownMenu" />
+
+    <style name="Animations.PopDownMenu.Center">
+        <item name="@android:windowEnterAnimation">@anim/grow_from_top</item>
+        <item name="@android:windowExitAnimation">@anim/shrink_from_bottom</item>
+    </style>
+
+    <style name="Animations.PopDownMenu.Left">
+        <item name="@android:windowEnterAnimation">@anim/grow_from_topleft_to_bottomright</item>
+        <item name="@android:windowExitAnimation">@anim/shrink_from_bottomright_to_topleft</item>
+    </style>
+
+    <style name="Animations.PopDownMenu.Right">
+        <item name="@android:windowEnterAnimation">@anim/grow_from_topright_to_bottomleft</item>
+        <item name="@android:windowExitAnimation">@anim/shrink_from_bottomleft_to_topright</item>
+    </style>
+
+    <style name="Animations.PopDownMenu.Reflect">
+        <item name="@android:windowEnterAnimation">@anim/pump_top</item>
+        <item name="@android:windowExitAnimation">@anim/disappear</item>
+    </style>
+
+    <!-- PopUpMenu -->
+    <style name="Animations.PopUpMenu" />
+
+    <style name="Animations.PopUpMenu.Center">
+        <item name="@android:windowEnterAnimation">@anim/grow_from_bottom</item>
+        <item name="@android:windowExitAnimation">@anim/shrink_from_top</item>
+    </style>
+
+    <style name="Animations.PopUpMenu.Left">
+        <item name="@android:windowEnterAnimation">@anim/grow_from_bottomleft_to_topright</item>
+        <item name="@android:windowExitAnimation">@anim/shrink_from_topright_to_bottomleft</item>
+    </style>
+
+    <style name="Animations.PopUpMenu.Right">
+        <item name="@android:windowEnterAnimation">@anim/grow_from_bottomright_to_topleft</item>
+        <item name="@android:windowExitAnimation">@anim/shrink_from_topleft_to_bottomright</item>
+    </style>
+
+    <style name="Animations.PopUpMenu.Reflect">
+        <item name="@android:windowEnterAnimation">@anim/pump_bottom</item>
+        <item name="@android:windowExitAnimation">@anim/disappear</item>
+    </style>
 </resources>

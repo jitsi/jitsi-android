@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item
+        android:drawable="@drawable/avatar"
+        android:id="@+id/avatarDrawable" />
+    <item
+        android:drawable="@drawable/contact_offline"
+        android:id="@+id/contactStatusDrawable"
+        android:top="50dip"
+        android:left="50dip"
+        android:right="0dip"
+        android:bottom="0dip"/>
+</layer-list>
