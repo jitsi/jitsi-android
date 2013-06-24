@@ -90,11 +90,22 @@ public class Jitsi
     {
         super.start(bundleContext);
 
+        selectFragment(bundleContext);
+    }
+
+    /**
+     * Selects contacts or login fragment based on currently stored accounts
+     * count.
+     *
+     * @param osgiContext the OSGI context used to access services.
+     */
+    private void selectFragment(BundleContext osgiContext)
+    {
         if(isEmpty)
         {
             AccountManager accountManager
                     = ServiceUtils.getService(
-                            bundleContext, AccountManager.class);
+                            osgiContext, AccountManager.class);
             final int accountCount = accountManager.getStoredAccounts().size();
 
             runOnUiThread(new Runnable()
@@ -148,8 +159,17 @@ public class Jitsi
         if(action.equals(Intent.ACTION_MAIN))
         {
             // Launcher action
-            showSplashScreen();
-            isEmpty = true;
+            BundleContext osgiCtx = getBundlecontext();
+            if(osgiCtx == null)
+            {
+                // If there is no OSGI yet then, we wait until start is called
+                showSplashScreen();
+                isEmpty = true;
+            }
+            else
+            {
+                selectFragment(osgiCtx);
+            }
         }
         else if(action.equals(ACTION_SHOW_CONTACTS))
         {
