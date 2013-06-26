@@ -16,6 +16,7 @@ import javax.media.control.*;
 import javax.media.format.*;
 import javax.media.protocol.*;
 
+import org.jitsi.android.*;
 import org.jitsi.impl.neomedia.device.*;
 import net.java.sip.communicator.util.*;
 
@@ -174,17 +175,10 @@ public class DataSource
 
     private long nextLocalSocketKey = 0;
 
-    private byte[] pic_parameter_set_rbsp;
-
     /**
      * The <tt>nal_unit_type</tt> of the NAL unit preceding {@link #nal}.
      */
     private int prevNALUnitType = 0;
-
-    /**
-     * The sequence parameter set for video with width of 352 and height of 288. 
-     */
-    private byte[] seq_parameter_set_rbsp;
 
     /**
      * The interval of time in nanoseconds between two consecutive video frames
@@ -197,6 +191,11 @@ public class DataSource
      * Holds the default preview surface provider
      */
     private static PreviewSurfaceProvider surfaceProvider;
+
+    /**
+     * The picture and sequence parameter set for video.
+     */
+    private H264Parameters h264Params;
 
     /**
      * Initializes a new <tt>DataSource</tt> instance.
@@ -343,7 +342,7 @@ public class DataSource
      * <tt>streamIndex</tt> in the list of streams of this
      * <tt>PushBufferDataSource</tt> and which has its <tt>Format</tt>-related
      * information abstracted by the specified <tt>formatControl</tt>
-     * @see org.jitsi.impl.neomedia.jmfext.media.protocol.AbstractPushBufferCaptureDevice#createStream(int, javax.media.control.FormatControl)
+     * @see AbstractPushBufferCaptureDevice#createStream(int, FormatControl)
      */
     protected AbstractPushBufferStream createStream(
             int streamIndex,
@@ -363,9 +362,9 @@ public class DataSource
     /**
      * Starts the transfer of media data from this <tt>DataSource</tt>.
      *
-     * @throws java.io.IOException if anything goes wrong while starting the transfer of
+     * @throws IOException if anything goes wrong while starting the transfer of
      * media data from this <tt>DataSource</tt>
-     * @see org.jitsi.impl.neomedia.jmfext.media.protocol.AbstractPushBufferCaptureDevice#doStart()
+     * @see AbstractPushBufferCaptureDevice#doStart()
      */
     @Override
     protected synchronized void doStart()
@@ -375,12 +374,16 @@ public class DataSource
         {
             MediaRecorder mediaRecorder = new MediaRecorder();
             Camera camera = null;
-            long videoFrameInterval = 0;
             Throwable exception = null;
 
             try
             {
                 camera = getCamera();
+                if(camera == null)
+                {
+                    throw new RuntimeException(
+                        "Unable to select camera for locator: "+getLocator());
+                }
 
                 // Adjust preview display orientation
                 int rotation
@@ -389,119 +392,44 @@ public class DataSource
                 camera.setDisplayOrientation(rotation);
 
                 Format[] streamFormats = getStreamFormats();
-
-                if (camera != null)
-                {
-                    /*
-                     * Reflect the size of the VideoFormat of this DataSource on
-                     * the Camera. It should not be necessary because it is the
-                     * responsibility of MediaRecorder to configure the Camera
-                     * it is provided with. Anyway,
-                     * MediaRecorder.setVideoSize(int,int) is not always
-                     * supported so it may (or may not) turn out that
-                     * Camera.Parameters.setPictureSize(int,int) saves the day
-                     * in some cases.
-                     */
-                    for (Format streamFormat : streamFormats)
-                    {
-                        if (streamFormat instanceof VideoFormat)
-                        {
-                            VideoFormat videoFormat
-                                = (VideoFormat) streamFormat;
-                            Dimension size = videoFormat.getSize();
-
-                            if ((size != null)
-                                    && (size.height > 0)
-                                    && (size.width > 0))
-                            {
-                                Camera.Parameters params
-                                    = camera.getParameters();
-
-                                if (params != null)
-                                {
-                                    params.setPictureSize(
-                                            size.width,
-                                            size.height);
-                                    camera.setParameters(params);
-                                }
-                            }
-                        }
-                    }
-
-                    camera.unlock();
-                    mediaRecorder.setCamera(camera);
-                }
-
-                for (Format streamFormat : streamFormats)
-                {
-                    if (streamFormat instanceof VideoFormat)
-                    {
-                        mediaRecorder.setVideoSource(
-                                MediaRecorder.VideoSource.DEFAULT);
-                    }
-                }
-                mediaRecorder.setOutputFormat(
-                        MediaRecorder.OutputFormat.MPEG_4);
-                for (Format streamFormat : streamFormats)
+                VideoFormat videoFormat = null;
+                // Selects video format
+                for(Format candidate : streamFormats)
                 {
                     if (Constants.H264.equalsIgnoreCase(
-                            streamFormat.getEncoding()))
+                            candidate.getEncoding()))
                     {
-                        VideoFormat videoFormat
-                            = (VideoFormat) streamFormat;
-                        float frameRate = videoFormat.getFrameRate();
-
-                        if (frameRate <= 0)
-                            frameRate = 15;
-                        if (frameRate > 0)
-                        {
-                            mediaRecorder.setVideoFrameRate((int) frameRate);
-                            videoFrameInterval
-                                = Math.round(
-                                        (1000 / frameRate) * 1000 * 1000);
-                            videoFrameInterval /= 2 /* ticks_per_frame */;
-                        }
-
-                        Dimension size = videoFormat.getSize();
-
-                        if ((size != null)
-                                && (size.width > 0)
-                                && (size.height > 0))
-                        {
-                            logger.warn(
-                                    "Will attempt to capture from "
-                                        + getLocator()
-                                        + " in "
-                                        + size.width
-                                        + "x"
-                                        + size.height
-                                        + ". May not be supported.");
-
-                            mediaRecorder.setVideoSize(size.width, size.height);
-
-                            /*
-                             * The video size is reported in the sequence
-                             * parameter set.
-                             */
-                            setParameterSets(size);
-                        }
+                        videoFormat = (VideoFormat) candidate;
+                        break;
                     }
                 }
-                /*
-                 * The parameter sets should've been set with a specific size in
-                 * mind already. Besides, seq_parameter_set_rbsp is
-                 * size-specific.
-                 */
-                if ((pic_parameter_set_rbsp == null)
-                        || (seq_parameter_set_rbsp == null))
-                    setParameterSets(null);
+                if(videoFormat == null)
+                {
+                    throw new RuntimeException("H264 not supported");
+                }
+
+                // Tries to read previously stored parameters
+                this.h264Params = H264Parameters.getStoredParameters();
+                if(this.h264Params == null)
+                {
+                    // Pre-configure media recorder and camera for video format
+                    configure(camera, mediaRecorder, videoFormat);
+                    // Obtain h264 parameters from short sample video
+                    this.h264Params = obtainParameters(camera, mediaRecorder);
+                    // Persists the parameters
+                    H264Parameters.storeParameters(this.h264Params);
+                }
+                // Prints the parameters
+                h264Params.logParamaters();
 
                 /*
-                 * Stack Overflow says that setVideoSize should be called before
-                 * setVideoEncoder.
+                 * The video size is reported in the sequence
+                 * parameter set.
                  */
-                mediaRecorder.setVideoEncoder(
-                        MediaRecorder.VideoEncoder.H264);
+                h264Params.setVideoSize(videoFormat.getSize());
+
+                // Pre-configure media recorder and camera for video format
+                configure(camera, mediaRecorder, videoFormat);
 
                 if (OUTPUT_FILE == null)
                 {
@@ -510,20 +438,16 @@ public class DataSource
                 }
                 else
                     mediaRecorder.setOutputFile(OUTPUT_FILE);
-                
-                Surface previewSurface = surfaceProvider.obtainPreviewSurface();
-                if(previewSurface == null)
-                {
-                    logger.error( 
-                            "Preview surface must not be null",
-                            new NullPointerException());
-                }
-                mediaRecorder.setPreviewDisplay(previewSurface);
+
+                // Reset max duration, as it could be manipulated during
+                // parameters retrieval
+                mediaRecorder.setMaxDuration(-1);
+                mediaRecorder.setMaxFileSize(-1);
+
                 mediaRecorder.prepare();
 
                 this.mediaRecorder = mediaRecorder;
                 this.camera = camera;
-                this.videoFrameInterval = videoFrameInterval;
                 mediaRecorder.start();
             }
             catch (RuntimeException re)
@@ -532,8 +456,9 @@ public class DataSource
             }
             if (exception != null)
             {
-                pic_parameter_set_rbsp = null;
-                seq_parameter_set_rbsp = null;
+                logger.error(
+                    "Error configuring data source: " + exception.getMessage(),
+                    exception );
 
                 mediaRecorder.release();
                 this.mediaRecorder = null;
@@ -558,6 +483,180 @@ public class DataSource
         }
 
         super.doStart();
+    }
+
+    /**
+     * Configures the camera nad media recorder to work with given
+     * <tt>videoFormat</tt>.
+     *
+     * @param camera the camera to be configured.
+     * @param mediaRecorder the media recorder to be configured.
+     * @param videoFormat the video format to be used.
+     */
+    private void configure( Camera camera,
+                            MediaRecorder mediaRecorder,
+                            VideoFormat videoFormat )
+    {
+        /*
+         * Reflect the size of the VideoFormat of this DataSource on
+         * the Camera. It should not be necessary because it is the
+         * responsibility of MediaRecorder to configure the Camera
+         * it is provided with. Anyway,
+         * MediaRecorder.setVideoSize(int,int) is not always
+         * supported so it may (or may not) turn out that
+         * Camera.Parameters.setPictureSize(int,int) saves the day
+         * in some cases.
+         */
+        Dimension videoSize = videoFormat.getSize();
+        if ((videoSize != null)
+                && (videoSize.height > 0)
+                && (videoSize.width > 0))
+        {
+            Camera.Parameters params
+                    = camera.getParameters();
+
+            if (params != null)
+            {
+                params.setPictureSize( videoSize.width,
+                                       videoSize.height );
+                camera.setParameters(params);
+            }
+        }
+
+        camera.unlock();
+        mediaRecorder.setCamera(camera);
+
+        mediaRecorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
+
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+
+        if ((videoSize != null)
+                && (videoSize.height > 0)
+                && (videoSize.width > 0))
+        {
+            logger.warn(
+                    "Will attempt to capture from "
+                            + getLocator()
+                            + " in "
+                            + videoSize.width
+                            + "x"
+                            + videoSize.height
+                            + ". May not be supported.");
+
+            mediaRecorder.setVideoSize( videoSize.width,
+                                        videoSize.height );
+        }
+
+            float frameRate = videoFormat.getFrameRate();
+
+        if (frameRate <= 0)
+            frameRate = 15;
+
+        if (frameRate > 0)
+        {
+            mediaRecorder.setVideoFrameRate((int) frameRate);
+            videoFrameInterval
+                    = Math.round(
+                    (1000 / frameRate) * 1000 * 1000);
+            videoFrameInterval /= 2 /* ticks_per_frame */;
+        }
+
+        /*
+         * Stack Overflow says that setVideoSize should be called before
+         * setVideoEncoder.
+         */
+        mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+
+        Surface previewSurface = surfaceProvider.obtainPreviewSurface();
+        if(previewSurface == null)
+        {
+            logger.error(
+                    "Preview surface must not be null",
+                    new NullPointerException());
+        }
+        mediaRecorder.setPreviewDisplay(previewSurface);
+    }
+
+    /**
+     * Tries to read sequence and picture video parameters by recording sample
+     * video and parsing "avcC" part of "stsd" mp4 box.
+     *
+     * @param camera the camera to be used.
+     * @param mediaRecorder the recorder to be used.
+     * @return <tt>H264Parameters</tt> class containing video parameters.
+     * @throws IOException if we failed to retrieve the parameters.
+     */
+    private H264Parameters obtainParameters( Camera camera,
+                                             MediaRecorder mediaRecorder )
+            throws IOException
+    {
+        final String sampleFile
+                = JitsiApplication.getGlobalContext()
+                        .getCacheDir().getPath() + "/jitsi-test.mpeg4";
+        logger.info("Sample file saved at: " + sampleFile);
+        mediaRecorder.setOutputFile(sampleFile);
+
+        // Limit recording time to 1 sec
+        mediaRecorder.setMaxDuration(1000);
+        // Limit to 1MB
+        mediaRecorder.setMaxFileSize(1024 * 1024);
+
+        final Object limitMonitor = new Object();
+        // Wait until one of limits is reached
+        mediaRecorder.setOnInfoListener(new MediaRecorder.OnInfoListener()
+        {
+            public void onInfo(MediaRecorder mr, int what, int extra)
+            {
+                if ( what == MediaRecorder
+                                    .MEDIA_RECORDER_INFO_MAX_DURATION_REACHED
+                     || what == MediaRecorder
+                                    .MEDIA_RECORDER_INFO_MAX_FILESIZE_REACHED )
+                {
+                    synchronized (limitMonitor)
+                    {
+                        logger.debug("Limit monitor notified");
+                        limitMonitor.notifyAll();
+                    }
+                }
+            }
+        });
+
+        mediaRecorder.prepare();
+        mediaRecorder.start();
+
+        try
+        {
+            synchronized (limitMonitor)
+            {
+                limitMonitor.wait(5000);
+            }
+        }
+        catch(InterruptedException exc)
+        {
+            throw new RuntimeException(exc);
+        }
+
+        // Disable the callback
+        mediaRecorder.setOnInfoListener(null);
+
+        mediaRecorder.stop();
+
+        mediaRecorder.reset();
+
+        camera.reconnect();
+        camera.stopPreview();
+
+        // Retrieve SPS and PPS parameters
+        H264Parameters config = new H264Parameters(sampleFile);
+
+        // Remove sample video
+        File file = new File(sampleFile);
+        if (!file.delete())
+        {
+            logger.error("Sample file could not be removed");
+        }
+
+        return config;
     }
 
     /**
@@ -614,9 +713,6 @@ public class DataSource
                     localSocketKey = null;
                 }
             }
-
-            pic_parameter_set_rbsp = null;
-            seq_parameter_set_rbsp = null;
 
             if (mediaRecorderStopState != null)
             {
@@ -1015,25 +1111,33 @@ public class DataSource
                     {
                         long nalLength = readUnsignedInt32(inputStream);
 
+                        // Some devices write ASCII ???? ???? at this point
+                        // we can retry here
+                        if(nalLength == 1061109567)
+                        {
+                            logger.warn( "Detected ???? ???? NAL length, "
+                                         + "trying to discard..." );
+                            // Currently read only 4(????) need 4 more
+                            discard(inputStream, 4);
+                            // Try to read nal length again
+                            nalLength = readUnsignedInt32(inputStream);
+                        }
+
                         if ((nalLength > 0) && (nalLength <= MAX_NAL_LENGTH))
                         {
                             if (writeParameterSets)
                             {
                                 writeParameterSets = false;
 
+                                byte[] sps = h264Params.getSps();
+                                byte[] pps = h264Params.getPps();
                                 /*
                                  * Android's MPEG4Writer will not write the
                                  * sequence and picture parameter set until the
                                  * associated MediaRecorder is stopped.
                                  */
-                                readNAL(
-                                        localSocketKey,
-                                        seq_parameter_set_rbsp,
-                                        seq_parameter_set_rbsp.length);
-                                readNAL(
-                                        localSocketKey,
-                                        pic_parameter_set_rbsp,
-                                        pic_parameter_set_rbsp.length);
+                                readNAL(localSocketKey, sps, sps.length);
+                                readNAL(localSocketKey, pps, pps.length);
                             }
 
                             readNAL(
@@ -1279,12 +1383,12 @@ public class DataSource
         {
             readNAL(
                     localSocketKey,
-                    seq_parameter_set_rbsp,
-                    seq_parameter_set_rbsp.length);
+                    h264Params.getSps(),
+                    h264Params.getSps().length);
             readNAL(
                     localSocketKey,
-                    pic_parameter_set_rbsp,
-                    pic_parameter_set_rbsp.length);
+                    h264Params.getPps(),
+                    h264Params.getPps().length);
             readNAL(localSocketKey, delayed, delayed.length);
         }
     }
@@ -1500,89 +1604,6 @@ public class DataSource
         }
         else
             return super.setFormat(streamIndex, oldValue, newValue);
-    }
-
-    /**
-     * Sets {@link #pic_parameter_set_rbsp} and {@link #seq_parameter_set_rbsp}.
-     *
-     * @param size a <tt>Dimension</tt> specifying the width and height of to be
-     * reported in the <tt>seq_parameter_set_rbsp</tt>
-     */
-    private void setParameterSets(Dimension size)
-    {
-        if ("samsung".equalsIgnoreCase(Build.BRAND)
-                && "GT-P5110".equalsIgnoreCase(Build.MODEL)
-                && /* ICE_CREAM_SANDWICH */ 14 <= Build.VERSION.SDK_INT)
-        {
-            pic_parameter_set_rbsp
-                = new byte[]
-                        {
-                            (byte) 0x28,
-                            (byte) 0xde,
-                            (byte) 0x09,
-                            (byte) 0x88
-                        };
-            seq_parameter_set_rbsp
-                = new byte[]
-                        {
-                            (byte) 0x27,
-                            (byte) 0x42,
-                            (byte) 0x40,
-                            (byte) 0x29,
-                            (byte) 0x8b,
-                            (byte) 0x95,
-                            (byte) 0x01,
-                            (byte) 0x40,
-                            (byte) 0x7b,
-                            (byte) 0x40,
-                            (byte) 0x50
-                        };
-        }
-        else
-        {
-            pic_parameter_set_rbsp
-                = new byte[]
-                        {
-                            (byte) 0x68,
-                            (byte) 0xce,
-                            (byte) 0x3c,
-                            (byte) 0x80
-                        };
-            seq_parameter_set_rbsp
-                = new byte[]
-                        {
-                            (byte) 0x67,
-                            (byte) 0x42,
-                            (byte) 0x80,
-                            (byte) 0x1e,
-                            (byte) 0x95,
-                            (byte) 0xa0,
-                            (byte) 0x58,
-                            (byte) 0x25,
-                            (byte) 0x10,
-                        };
-            if (size != null)
-            {
-                if ((size.width == 320) && (size.height == 240))
-                {
-                    seq_parameter_set_rbsp[6] = (byte) 0x50;
-                    seq_parameter_set_rbsp[7] = (byte) 0x7C;
-                    seq_parameter_set_rbsp[8] = (byte) 0x40;
-                }
-                else if ((size.width == 352) && (size.height == 288))
-                {
-                    seq_parameter_set_rbsp[6] = (byte) 0x58;
-                    seq_parameter_set_rbsp[7] = (byte) 0x25;
-                    seq_parameter_set_rbsp[8] = (byte) 0x10;
-                }
-                else if ((size.width == 640) && (size.height == 480))
-                {
-                    seq_parameter_set_rbsp[6] = (byte) 0x28;
-                    seq_parameter_set_rbsp[7] = (byte) 0x0f;
-                    seq_parameter_set_rbsp[8] = (byte) 0x44;
-                }
-            }
-        }
     }
 
     /**
