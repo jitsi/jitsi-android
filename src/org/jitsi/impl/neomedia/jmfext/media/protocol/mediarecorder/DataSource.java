@@ -422,12 +422,6 @@ public class DataSource
                 // Prints the parameters
                 h264Params.logParamaters();
 
-                /*
-                 * The video size is reported in the sequence
-                 * parameter set.
-                 */
-                h264Params.setVideoSize(videoFormat.getSize());
-
                 // Pre-configure media recorder and camera for video format
                 configure(camera, mediaRecorder, videoFormat);
 

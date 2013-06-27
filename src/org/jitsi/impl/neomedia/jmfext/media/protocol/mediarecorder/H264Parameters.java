@@ -270,37 +270,6 @@ public class H264Parameters
     }
 
     /**
-     * Adjusts the {@link #seq_parameter_set_rbsp} for given size.
-     *
-     * @param size a <tt>Dimension</tt> specifying the width and height of to be
-     * reported in the <tt>seq_parameter_set_rbsp</tt>
-     */
-    public void setVideoSize(Dimension size)
-    {
-        if (size != null)
-        {
-            if ((size.width == 320) && (size.height == 240))
-            {
-                seq_parameter_set_rbsp[6] = (byte) 0x50;
-                seq_parameter_set_rbsp[7] = (byte) 0x7C;
-                seq_parameter_set_rbsp[8] = (byte) 0x40;
-            }
-            else if ((size.width == 352) && (size.height == 288))
-            {
-                seq_parameter_set_rbsp[6] = (byte) 0x58;
-                seq_parameter_set_rbsp[7] = (byte) 0x25;
-                seq_parameter_set_rbsp[8] = (byte) 0x10;
-            }
-            else if ((size.width == 640) && (size.height == 480))
-            {
-                seq_parameter_set_rbsp[6] = (byte) 0x28;
-                seq_parameter_set_rbsp[7] = (byte) 0x0f;
-                seq_parameter_set_rbsp[8] = (byte) 0x44;
-            }
-        }
-    }
-
-    /**
      * Logs parameters stored by this instance.
      */
     public void logParamaters()
