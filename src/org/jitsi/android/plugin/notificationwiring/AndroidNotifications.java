@@ -53,6 +53,11 @@ public class AndroidNotifications
         notificationService.registerDefaultNotificationForEvent(
                 NotificationManager.INCOMING_CALL,
                 inCallVibrate);
+
+        // Removes popup for incoming call
+        notificationService.removeEventNotificationAction(
+                NotificationManager.INCOMING_CALL,
+                NotificationAction.ACTION_POPUP_MESSAGE);
     }
 
     /**
