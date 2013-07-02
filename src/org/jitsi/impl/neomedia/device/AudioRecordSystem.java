@@ -6,11 +6,14 @@
  */
 package org.jitsi.impl.neomedia.device;
 
+import android.media.audiofx.*;
+import android.os.*;
+
 import java.io.*;
 import java.util.*;
 
 import javax.media.*;
-import javax.media.format.*;
+import javax.media.format.AudioFormat;
 
 import org.jitsi.impl.neomedia.jmfext.media.renderer.audio.*;
 import org.jitsi.service.neomedia.codec.*;
@@ -40,7 +43,28 @@ public class AudioRecordSystem
     public AudioRecordSystem()
         throws Exception
     {
-        super(LOCATOR_PROTOCOL, FEATURE_NOTIFY_AND_PLAYBACK_DEVICES);
+        super(LOCATOR_PROTOCOL, getFeatureSet());
+    }
+
+    /**
+     * Returns feature set for current device.
+     * @return feature set for current device.
+     */
+    public static int getFeatureSet()
+    {
+        int featureSet = FEATURE_NOTIFY_AND_PLAYBACK_DEVICES;
+        if(Build.VERSION.SDK_INT >= 16)
+        {
+            if(AcousticEchoCanceler.isAvailable())
+            {
+                featureSet |= FEATURE_ECHO_CANCELLATION;
+            }
+            if(NoiseSuppressor.isAvailable())
+            {
+                featureSet |= FEATURE_DENOISE;
+            }
+        }
+        return featureSet;
     }
 
     @Override

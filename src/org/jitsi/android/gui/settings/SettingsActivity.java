@@ -373,17 +373,22 @@ public class SettingsActivity
             // Echo cancellation
             CheckBoxPreference echoCancelPRef
                 = (CheckBoxPreference) findPreference(P_KEY_AUDIO_ECHO_CANCEL);
-            echoCancelPRef.setEnabled(
-                    (  AudioSystem.FEATURE_ECHO_CANCELLATION
-                            & audioSystemFeatures) != 0  );
-            echoCancelPRef.setChecked(deviceConfig.isEchoCancel());
+            boolean hasEchoFeature
+                    = (AudioSystem.FEATURE_ECHO_CANCELLATION
+                            & audioSystemFeatures) != 0;
+            echoCancelPRef.setEnabled( hasEchoFeature );
+            echoCancelPRef.setChecked( hasEchoFeature
+                                       &&deviceConfig.isEchoCancel() );
 
             // Denoise
             CheckBoxPreference denoisePref
                     = (CheckBoxPreference) findPreference(P_KEY_AUDIO_DENOISE);
-            denoisePref.setEnabled(
-                    (AudioSystem.FEATURE_DENOISE & audioSystemFeatures) != 0);
-            denoisePref.setChecked(deviceConfig.isDenoise());
+            boolean hasDenoiseFeature
+                    = (AudioSystem.FEATURE_DENOISE
+                            & audioSystemFeatures) != 0;
+            denoisePref.setEnabled( hasDenoiseFeature );
+            denoisePref.setChecked( hasDenoiseFeature
+                                    && deviceConfig.isDenoise() );
         }
 
         /**

@@ -12,8 +12,11 @@ import javax.media.*;
 import javax.media.control.*;
 
 import android.media.*;
-import android.os.Process; // disambiguation
+import android.media.audiofx.*;
+import android.os.*;
 
+import android.os.Process;
+import org.jitsi.impl.neomedia.device.*;
 import org.jitsi.impl.neomedia.jmfext.media.protocol.*;
 import net.java.sip.communicator.util.*;
 import org.jitsi.impl.neomedia.*;
@@ -323,6 +326,9 @@ public class DataSource
                             channelConfig,
                             audioFormat,
                             Math.max(length, minBufferSize));
+
+                // tries to configure audio effects if available
+                configureEffects();
             }
             catch (IllegalArgumentException iae)
             {
@@ -333,6 +339,37 @@ public class DataSource
             }
 
             setThreadPriority = true;
+        }
+
+        /**
+         * Configures echo cancellation and noise suppression effects.
+         */
+        private void configureEffects()
+        {
+            if(Build.VERSION.SDK_INT < 16)
+                return;
+
+            DeviceConfiguration deviceConfig
+                = NeomediaActivator.getMediaServiceImpl()
+                    .getDeviceConfiguration();
+
+            // Creates echo canceler if available
+            if(AcousticEchoCanceler.isAvailable())
+            {
+                AcousticEchoCanceler echoCanceller
+                        = AcousticEchoCanceler.create(
+                        audioRecord.getAudioSessionId());
+                echoCanceller.setEnabled(deviceConfig.isEchoCancel());
+            }
+
+            // Creates noise suppressor if available
+            if(NoiseSuppressor.isAvailable())
+            {
+                NoiseSuppressor noiseSuppressor
+                        = NoiseSuppressor.create(
+                        audioRecord.getAudioSessionId());
+                noiseSuppressor.setEnabled(deviceConfig.isDenoise());
+            }
         }
 
         /**
