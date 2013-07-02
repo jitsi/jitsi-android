@@ -8,6 +8,7 @@ package org.jitsi.android.gui.call;
 
 import android.content.*;
 
+import android.media.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.event.*;
 import net.java.sip.communicator.util.call.*;
@@ -27,6 +28,12 @@ public class AndroidCallListener
      * The application context.
      */
     private final Context appContext;
+
+    /*
+     * Flag stores speakerphone status to be restored to initial value once
+     * the call has ended.
+     */
+    private Boolean speakerPhoneBeforeCall;
 
     /**
      * Creates an instance of <tt>AndroidCallListener</tt>
@@ -77,6 +84,8 @@ public class AndroidCallListener
             AndroidUtils.clearGeneralNotification(appContext);
             // Removes the call from active calls list
             CallManager.removeActiveCall(evt.getSourceCall());
+            // Restores speakerphone status
+            restoreSpeakerPhoneStatus();
             break;
         case CallEvent.CALL_INITIATED:
             startVideoCallActivity(evt);
@@ -89,9 +98,37 @@ public class AndroidCallListener
             }
             else
             {
+                // Stores speakerphone status to be restored after
+                // the call has ended.
+                storeSpeakerPhoneStatus();
+
                 startReceivedCallActivity(evt);
             }
             break;
+        }
+    }
+
+    /**
+     * Stores speakerphone status for the call duration.
+     */
+    private void storeSpeakerPhoneStatus()
+    {
+        AudioManager audioManager = JitsiApplication.getAudioManager();
+
+        this.speakerPhoneBeforeCall
+                = new Boolean(audioManager.isSpeakerphoneOn());
+    }
+
+    /**
+     * Restores speakerphone status.
+     */
+    private void restoreSpeakerPhoneStatus()
+    {
+        if(speakerPhoneBeforeCall != null)
+        {
+            AudioManager audioManager = JitsiApplication.getAudioManager();
+            audioManager.setSpeakerphoneOn(speakerPhoneBeforeCall);
+            speakerPhoneBeforeCall = null;
         }
     }
 

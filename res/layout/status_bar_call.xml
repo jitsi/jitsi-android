@@ -45,7 +45,7 @@
                   android:layout_height="wrap_content"
                   android:layout_toRightOf="@+id/iconContainer"
                   android:orientation="horizontal"
-                  android:weightSum="4"
+                  android:weightSum="5"
                   android:layout_alignParentBottom="true">
     <ImageButton
             android:layout_width="fill_parent"
@@ -54,6 +54,16 @@
             style="@style/NotificationCtrlButton"
             android:background="@color/status_bar_button"
             android:src="@drawable/status_bar_show_call"
+            android:scaleType="centerInside"
+            android:padding="2dp"
+            />
+    <ImageButton
+            android:layout_width="fill_parent"
+            android:layout_weight="1"
+            android:id="@+id/speakerphone"
+            style="@style/NotificationCtrlButton"
+            android:background="@color/status_bar_button"
+            android:src="@drawable/status_bar_speaker"
             android:scaleType="centerInside"
             android:padding="2dp"
             />

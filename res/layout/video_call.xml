@@ -91,7 +91,7 @@
         android:background="#40000000">
 
         <ImageButton
-            android:id="@+id/callVolumeButton"
+            android:id="@+id/speakerphoneButton"
             android:src="@drawable/callvolume"
             android:background="@drawable/image_button_background"
             android:contentDescription="@string/service_gui_VOLUME_CONTROL_TOOL_TIP"
@@ -100,7 +100,7 @@
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
             android:focusable="true"
-            android:onClick="onCallVolumeClicked"/>
+            android:onClick="onSpeakerphoneClicked"/>
 
         <ImageButton
             android:id="@+id/callMicrophoneButton"

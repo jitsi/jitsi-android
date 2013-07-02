@@ -7,9 +7,13 @@
 package org.jitsi.android.gui.call.notification;
 
 import android.content.*;
+import android.media.*;
+
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.call.*;
+
+import org.jitsi.android.*;
 
 /**
  * <tt>BroadcastReceiver</tt> that listens for {@link #CALL_CTRL_ACTION}
@@ -66,6 +70,11 @@ public class CallControl
     public static final int ACTION_TOGGLE_ON_HOLD = 3;
 
     /**
+     * Toggle speakerphone action value.
+     */
+    private static final int ACTION_TOGGLE_SPEAKER = 4;
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -109,6 +118,14 @@ public class CallControl
             boolean isOnHold = CallManager.isLocallyOnHold(call);
             CallManager.putOnHold(call, !isOnHold);
         }
+        else if(action == ACTION_TOGGLE_SPEAKER)
+        {
+            logger.trace("Action TOGGLE SPEAKER");
+            AudioManager audio
+                    = (AudioManager) JitsiApplication.getGlobalContext()
+                            .getSystemService(Context.AUDIO_SERVICE);
+            audio.setSpeakerphoneOn(!audio.isSpeakerphoneOn());
+        }
         else
         {
             logger.warn("No valid action supplied");
@@ -143,6 +160,16 @@ public class CallControl
     public static Intent getToggleOnHoldIntent(String callID)
     {
         return createIntent(callID, ACTION_TOGGLE_ON_HOLD);
+    }
+
+    /**
+     * Creates the <tt>Intent</tt> for {@link #ACTION_TOGGLE_ON_HOLD}.
+     * @param callID the ID of target call.
+     * @return the <tt>Intent</tt> for {@link #ACTION_TOGGLE_ON_HOLD}.
+     */
+    public static Intent getToggleSpeakerIntent(String callID)
+    {
+        return createIntent(callID, ACTION_TOGGLE_SPEAKER);
     }
 
     /**

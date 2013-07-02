@@ -420,6 +420,35 @@ public class VideoCallActivity
     }
 
     /**
+     * Fired when speakerphone button is clicked.
+     * @param v the speakerphone button <tt>View</tt>.
+     */
+    public void onSpeakerphoneClicked(View v)
+    {
+        AudioManager audioManager = JitsiApplication.getAudioManager();
+        audioManager.setSpeakerphoneOn(!audioManager.isSpeakerphoneOn());
+        updateSpeakerphoneStatus();
+    }
+
+    /**
+     * Updates speakerphone button status.
+     */
+    private void updateSpeakerphoneStatus()
+    {
+        final ImageView speakerPhoneButton
+                = (ImageView) findViewById(R.id.speakerphoneButton);
+
+        if (JitsiApplication.getAudioManager().isSpeakerphoneOn())
+        {
+            speakerPhoneButton.setBackgroundColor(0x50000000);
+        }
+        else
+        {
+            speakerPhoneButton.setBackgroundColor(Color.TRANSPARENT);
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -522,6 +551,7 @@ public class VideoCallActivity
         doUpdateHoldStatus();
         doUpdateCallDuration();
         doUpdateMuteStatus();
+        updateSpeakerphoneStatus();
         initSecurityStatus();
     }
 

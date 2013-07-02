@@ -148,15 +148,21 @@ public class CallNotificationManager
                 PendingIntent.FLAG_CANCEL_CURRENT);
         contentView.setOnClickPendingIntent(R.id.hangup_button, pHangup);
 
+        // Speakerphone button
+        PendingIntent pSpeaker = PendingIntent.getBroadcast(
+                ctx, 1, CallControl.getToggleSpeakerIntent(callID),
+                PendingIntent.FLAG_CANCEL_CURRENT);
+        contentView.setOnClickPendingIntent(R.id.speakerphone, pSpeaker);
+
         // Mute button
         PendingIntent pMute = PendingIntent.getBroadcast(
-                ctx, 1, CallControl.getToggleMuteIntent(callID),
+                ctx, 2, CallControl.getToggleMuteIntent(callID),
                 PendingIntent.FLAG_CANCEL_CURRENT);
         contentView.setOnClickPendingIntent(R.id.mute_button, pMute);
 
         // Hold button
         PendingIntent pHold = PendingIntent.getBroadcast(
-                ctx, 2, CallControl.getToggleOnHoldIntent(callID),
+                ctx, 3, CallControl.getToggleOnHoldIntent(callID),
                 PendingIntent.FLAG_CANCEL_CURRENT);
         contentView.setOnClickPendingIntent(R.id.hold_button, pHold);
 
@@ -165,7 +171,7 @@ public class CallNotificationManager
         videoCall.putExtra(CallManager.CALL_IDENTIFIER, callID);
         PendingIntent pVideo
                 = PendingIntent.getActivity(
-                        ctx, 3, videoCall,
+                        ctx, 4, videoCall,
                         PendingIntent.FLAG_CANCEL_CURRENT);
         contentView.setOnClickPendingIntent(R.id.back_to_call, pVideo);
 

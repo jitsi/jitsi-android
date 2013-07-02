@@ -9,6 +9,7 @@ package org.jitsi.android;
 import android.app.*;
 import android.content.*;
 import android.content.res.*;
+import android.media.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.service.osgi.*;
 
@@ -80,6 +81,17 @@ public class JitsiApplication
         Intent exitIntent = new Intent();
         exitIntent.setAction(ACTION_EXIT);
         sendBroadcast(exitIntent);
+    }
+
+    /**
+     * Retrieves <tt>AudioManager</tt> instance using application context.
+     *
+     * @return <tt>AudioManager</tt> service instance.
+     */
+    public static AudioManager getAudioManager()
+    {
+        return (AudioManager) getGlobalContext()
+                .getSystemService(Context.AUDIO_SERVICE);
     }
 
     /**
