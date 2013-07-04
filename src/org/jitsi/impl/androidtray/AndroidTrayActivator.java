@@ -25,6 +25,11 @@ public class AndroidTrayActivator
             = Logger.getLogger(AndroidTrayActivator.class);
 
     /**
+     * OSGI bundle context
+     */
+    public static BundleContext bundleContext;
+
+    /**
      * <tt>SystrayServiceImpl</tt> instance.
      */
     private SystrayServiceImpl systrayService;
@@ -35,6 +40,8 @@ public class AndroidTrayActivator
     public void start(BundleContext bundleContext)
             throws Exception
     {
+        AndroidTrayActivator.bundleContext = bundleContext;
+
         // Create the notification service implementation
         this.systrayService = new SystrayServiceImpl();
 

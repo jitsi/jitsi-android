@@ -7,15 +7,20 @@
 package org.jitsi.android.gui;
 
 import android.content.*;
+
 import net.java.sip.communicator.service.gui.*;
 import net.java.sip.communicator.service.protocol.*;
+import net.java.sip.communicator.service.systray.*;
 import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.account.*;
+
 import org.jitsi.android.*;
 import org.jitsi.android.gui.account.*;
 import org.jitsi.android.gui.login.*;
 import org.jitsi.android.gui.util.*;
+import org.jitsi.service.configuration.*;
 import org.jitsi.service.resources.*;
+
 import org.osgi.framework.*;
 
 /**
@@ -89,6 +94,8 @@ public class AndroidGUIActivator
                 }
             }).start();
         }
+
+        ConfigurationUtils.loadGuiConfigurations();
     }
 
     /**
@@ -118,5 +125,25 @@ public class AndroidGUIActivator
     public static LoginManager getLoginManager()
     {
         return loginManager;
+    }
+
+    /**
+     * Returns the <tt>ConfigurationService</tt>.
+     * @return the <tt>ConfigurationService</tt>.
+     */
+    public static ConfigurationService getConfigurationService()
+    {
+        return ServiceUtils.getService( bundleContext,
+                                        ConfigurationService.class );
+    }
+
+    /**
+     * Returns <tt>SystrayService</tt> instance.
+     * @return <tt>SystrayService</tt> instance.
+     */
+    public static SystrayService getSystrayService()
+    {
+        return ServiceUtils.getService( bundleContext,
+                                        SystrayService.class );
     }
 }

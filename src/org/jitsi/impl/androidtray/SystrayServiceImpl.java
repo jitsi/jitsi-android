@@ -42,9 +42,13 @@ public class SystrayServiceImpl
      */
     public SystrayServiceImpl()
     {
-        addPopupHandler(trayPopupHandler);
+        super(AndroidTrayActivator.bundleContext);
 
-        selectBestPopupMessageHandler();
+        AndroidTrayActivator.bundleContext.registerService(
+                PopupMessageHandler.class,
+                trayPopupHandler, null );
+
+        initHandlers();
 
         this.clickReceiver = new PopupClickReceiver(trayPopupHandler);
     }
