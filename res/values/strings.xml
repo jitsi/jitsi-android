@@ -507,6 +507,52 @@
     <!-- General settings -->
     <string name="pref_cat_settings_general">pref.cat.settings.general</string>
     <string name="service_gui_settings_GENERAL">General</string>
+
+    <string name="service_gui_settings_ENABLED_STR">Enabled</string>
+    <string name="service_gui_settings_DISABLED_STR">Disabled</string>
+
+    <!-- Message settings -->
+    <string name="pref_cat_settings_msg">pref.cat.settings.msg</string>
+    <string name="service_gui_settings_MSG">Message</string>
+    <!-- Group messages in one window -->
+    <string name="pref_key_multichat_window">pref.key.msg.multichat_window</string>
+    <string name="service_gui_settings_MULTICHAT_WINDOW">Multichat window</string>
+    <string name="service_gui_settings_MULTICHAT_ON">Group chat messages in one window</string>
+    <string name="service_gui_settings_MULTICHAT_OFF">Separate window for ech conversation</string>
+    <!-- Log chat history -->
+    <string name="pref_key_history_logging">pref.key.msg.history_logging</string>
+    <string name="service_gui_settings_HISTORY_LOGGING">Chat history logging</string>
+    <string name="service_gui_settings_HISTORY_LOG_ON">Log chat history</string>
+    <string name="service_gui_settings_HISTORY_LOG_OFF">Chat history disabled</string>
+    <!-- Show x recent messages in new chats -->
+    <string name="pref_key_show_history">pref.key.msg.show_history</string>
+    <string name="service_gui_settings_SHOW_HISTORY">Show history</string>
+    <string name="pref_key_chat_history_size">pref.key.msg.chat_history_size</string>
+    <string name="service_gui_settings_CHAT_HISTORY_SIZE">Show recent messages</string>
+    <string name="service_gui_settings_CHAT_HISTORY_SUMMARY">%s recent messages in new chats</string>
+    <string name="service_gui_settings_CHAT_HISTORY_DLG_TITLE">How many recent messages should be displayed ?</string>
+    <!-- Tell others when we are writing to them -->
+    <string name="pref_key_typing_notifications">pref.key.msg.typing_notifications</string>
+    <string name="service_gui_settings_TYPING_NOTIFICATIONS">Tell others when we are writing to them</string>
+    <!-- Bring chat window to front(not sure if this makes sense on Android, so omitted) -->
+    <!-- Use task bar / dock alerts on incoming calls and chats -->
+    <string name="pref_key_chat_alerts">pref.key.msg.chat_alerts</string>
+    <string name="service_gui_settings_CHAT_ALERTS">Show status bar notifications</string>
+    <!-- Leave chat rooms when closing window(ommited on Android for now) -->
+    <!-- ... -->
+
+    <!-- Auto away -->
+    <!-- Not sure how to implement it on android - leave for now -->
+
+    <!-- Notifications -->
+    <string name="pref_cat_settings_notifications">pref.cat.settings.notifications</string>
+    <string name="service_gui_settings_NOTIFICATIONS">Notifications</string>
+    <!-- Popup notifications type -->
+    <string name="pref_key_popup_handler">pref.key.notification.popup_handler</string>
+    <string name="service_gui_settings_POPUP_HANDLER">Popup notifications type</string>
+    <!-- Status bar notifications handler -->
+    <string name="impl_popup_status_bar">Status bar notifications</string>
+
     <!-- Locale -->
     <string name="pref_key_locale">pref.key.locale</string>
     <string name="service_gui_settings_LOCALE">Interface language</string>

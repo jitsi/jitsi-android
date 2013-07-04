@@ -8,6 +8,8 @@ package org.jitsi.android.gui.util;
 
 import android.preference.*;
 
+import net.java.sip.communicator.util.*;
+
 /**
  * Utility class exposing methods to operate on <tt>Preference</tt> subclasses.
  *
@@ -15,6 +17,11 @@ import android.preference.*;
  */
 public class PreferenceUtil
 {
+    /**
+     * The logger
+     */
+    private final static Logger logger = Logger.getLogger(PreferenceUtil.class);
+
     /**
      * Sets the <tt>CheckBoxPreference</tt> "checked" property.
      * @param fragment the <tt>PreferenceFragment</tt> containing the
@@ -30,6 +37,7 @@ public class PreferenceUtil
         CheckBoxPreference cbPref
                 = (CheckBoxPreference) fragment
                         .findPreference(prefKey);
+        logger.debug("Setting "+isChecked+" on "+prefKey);
         cbPref.setChecked(isChecked);
     }
 

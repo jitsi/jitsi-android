@@ -114,6 +114,29 @@ public class JitsiApplication
     }
 
     /**
+     * Returns Android string resource for given <tt>id</tt>.
+     * @param id the string identifier.
+     * @return Android string resource for given <tt>id</tt>.
+     */
+    public static String getResString(int id)
+    {
+        return getAppResources().getString(id);
+    }
+
+    /**
+     * Returns Android string resource for given <tt>id</tt> and format
+     * arguments that will be used for substitution.
+     * @param id the string identifier.
+     * @param arg the format arguments that will be used for substitution.
+     * @return Android string resource for given <tt>id</tt> and format
+     *         arguments.
+     */
+    public static String getResString(int id, Object ... arg)
+    {
+        return getAppResources().getString(id, arg);
+    }
+
+    /**
      * Returns home <tt>Activity</tt> class.
      * @return Returns home <tt>Activity</tt> class.
      */

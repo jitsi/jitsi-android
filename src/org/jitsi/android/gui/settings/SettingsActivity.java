@@ -7,11 +7,19 @@
 package org.jitsi.android.gui.settings;
 
 import android.content.*;
-import android.os.*;
+import android.os.Bundle;
 import android.preference.*;
+
+import java.awt.*;
+import java.util.*;
+import javax.media.*;
+
+import net.java.sip.communicator.service.systray.*;
 import net.java.sip.communicator.util.*;
+
 import org.jitsi.*;
 import org.jitsi.android.*;
+import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.settings.util.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.impl.neomedia.*;
@@ -19,9 +27,7 @@ import org.jitsi.impl.neomedia.device.*;
 import org.jitsi.service.neomedia.*;
 import org.jitsi.service.osgi.*;
 
-import javax.media.*;
-import java.awt.*;
-import java.util.*;
+import org.osgi.framework.*;
 
 /**
  * <tt>Activity</tt> implements Jitsi settings.
@@ -37,42 +43,50 @@ public class SettingsActivity
     private static final Logger logger
             = Logger.getLogger(SettingsActivity.class);
 
-    // Call section
-    static private final String P_KEY_NORMALIZE_PNUMBER =
-            JitsiApplication.getAppResources()
-                    .getString(R.string.pref_key_normalize_pnumber);
+    // Message section
+    static private final String P_KEY_LOG_CHAT_HISTORY
+        = JitsiApplication.getResString(R.string.pref_key_history_logging);
+    static private final String P_KEY_SHOW_HISTORY
+        = JitsiApplication.getResString(R.string.pref_key_show_history);
+    static private final String P_KEY_HISTORY_SIZE
+        = JitsiApplication.getResString(R.string.pref_key_chat_history_size);
+    static private final String P_KEY_TYPING_NOTIFICATIONS
+        = JitsiApplication.getResString(R.string.pref_key_typing_notifications);
+    static private final String P_KEY_CHAT_ALERTS
+        = JitsiApplication.getResString(R.string.pref_key_chat_alerts);
 
-    static private final String P_KEY_ACCEPT_ALPHA_PNUMBERS =
-            JitsiApplication.getAppResources()
-                    .getString(R.string.pref_key_accept_alpha_pnumbers);
+    // Notifications
+    static private final String P_KEY_POPUP_HANDLER
+        = JitsiApplication.getResString(R.string.pref_key_popup_handler);
+
+    // Call section
+    static private final String P_KEY_NORMALIZE_PNUMBER
+        = JitsiApplication.getResString(R.string.pref_key_normalize_pnumber);
+    static private final String P_KEY_ACCEPT_ALPHA_PNUMBERS
+        = JitsiApplication.getResString(
+            R.string.pref_key_accept_alpha_pnumbers);
+
     // Audio settings
-    static private final String P_KEY_AUDIO_ECHO_CANCEL =
-            JitsiApplication.getAppResources()
-                    .getString(R.string.pref_key_audio_echo_cancel);
-    static private final String P_KEY_AUDIO_DENOISE =
-            JitsiApplication.getAppResources()
-                    .getString(R.string.pref_key_audio_denoise);
+    static private final String P_KEY_AUDIO_ECHO_CANCEL
+        = JitsiApplication.getResString(R.string.pref_key_audio_echo_cancel);
+    static private final String P_KEY_AUDIO_DENOISE
+        = JitsiApplication.getResString(R.string.pref_key_audio_denoise);
+
     // Video settings
-    static private final String P_KEY_VIDEO_CAMERA =
-            JitsiApplication.getAppResources()
-                    .getString(R.string.pref_key_video_camera);
+    static private final String P_KEY_VIDEO_CAMERA
+        = JitsiApplication.getResString(R.string.pref_key_video_camera);
     // Video resolutions
-    static private final String P_KEY_VIDEO_RES =
-            JitsiApplication.getAppResources()
-                    .getString(R.string.pref_key_video_resolution);
+    static private final String P_KEY_VIDEO_RES
+        = JitsiApplication.getResString(R.string.pref_key_video_resolution);
     // Video advanced settings
-    static private final String P_KEY_VIDEO_LIMIT_FPS =
-            JitsiApplication.getAppResources()
-                    .getString(R.string.pref_key_video_limit_fps);
-    static private final String P_KEY_VIDEO_TARGET_FPS =
-            JitsiApplication.getAppResources()
-                    .getString(R.string.pref_key_video_target_fps);
-    static private final String P_KEY_VIDEO_MAX_BANDWIDTH =
-            JitsiApplication.getAppResources()
-                    .getString(R.string.pref_key_video_max_bandwidth);
-    static private final String P_KEY_VIDEO_BITRATE =
-            JitsiApplication.getAppResources()
-                    .getString(R.string.pref_key_video_bitrate);
+    static private final String P_KEY_VIDEO_LIMIT_FPS
+        = JitsiApplication.getResString(R.string.pref_key_video_limit_fps);
+    static private final String P_KEY_VIDEO_TARGET_FPS
+        = JitsiApplication.getResString(R.string.pref_key_video_target_fps);
+    static private final String P_KEY_VIDEO_MAX_BANDWIDTH
+        = JitsiApplication.getResString(R.string.pref_key_video_max_bandwidth);
+    static private final String P_KEY_VIDEO_BITRATE
+        = JitsiApplication.getResString(R.string.pref_key_video_bitrate);
 
     /**
      * {@inheritDoc}
@@ -179,25 +193,129 @@ public class SettingsActivity
                     ConfigurationUtils.getCurrentLanguage();
             localePreference.setValue(currLocale.getDisplayLanguage());*/
 
-            // Call section
-            PreferenceUtil.setCheckboxVal(
-                    this,
-                    P_KEY_NORMALIZE_PNUMBER,
-                    ConfigurationUtils.isNormalizePhoneNumber());
-            PreferenceUtil.setCheckboxVal(
-                    this,
-                    P_KEY_ACCEPT_ALPHA_PNUMBERS,
-                    ConfigurationUtils.acceptPhoneNumberWithAlphaChars());
+            // Messages section
+            initMessagesPreferences();
 
-            this.deviceConfig
-                    = NeomediaActivator.getMediaServiceImpl()
-                            .getDeviceConfiguration();
+            // Notifications section
+            initNotificationPreferences();
+
+            // Call section
+            initCallPreferences();
 
             // Audio section
             initAudioPreferences();
 
             // Video section
             initVideoPreferences();
+        }
+
+        /**
+         * Initializes messages section
+         */
+        private void initMessagesPreferences()
+        {
+            PreferenceUtil.setCheckboxVal(
+                    this, P_KEY_LOG_CHAT_HISTORY,
+                    ConfigurationUtils.isHistoryLoggingEnabled());
+
+            PreferenceUtil.setCheckboxVal(
+                    this,P_KEY_SHOW_HISTORY,
+                    ConfigurationUtils.isHistoryShown());
+
+            EditTextPreference historySizePref
+                    = (EditTextPreference) findPreference(P_KEY_HISTORY_SIZE);
+            historySizePref.setText(""+ConfigurationUtils.getChatHistorySize());
+            updateHistorySizeSummary();
+
+            PreferenceUtil.setCheckboxVal(
+                    this, P_KEY_TYPING_NOTIFICATIONS,
+                    ConfigurationUtils.isSendTypingNotifications());
+
+            PreferenceUtil.setCheckboxVal(
+                    this, P_KEY_CHAT_ALERTS,
+                    ConfigurationUtils.isAlerterEnabled());
+        }
+
+        /**
+         * Updates displayed history size summary.
+         */
+        private void updateHistorySizeSummary()
+        {
+            EditTextPreference historySizePref
+                    = (EditTextPreference) findPreference(P_KEY_HISTORY_SIZE);
+            historySizePref.setSummary(
+                    getString(
+                            R.string.service_gui_settings_CHAT_HISTORY_SUMMARY,
+                            ConfigurationUtils.getChatHistorySize()));
+        }
+
+        /**
+         * Initializes notifications section
+         */
+        private void initNotificationPreferences()
+        {
+            BundleContext bc = AndroidGUIActivator.bundleContext;
+
+            ServiceReference[] handlerRefs = ServiceUtils
+                    .getServiceReferences(bc, PopupMessageHandler.class);
+            if (handlerRefs == null)
+            {
+                logger.warn("No popup handlers found");
+                handlerRefs = new ServiceReference[0];
+            }
+
+            String[] names = new String[handlerRefs.length+1]; // +1 Auto
+            String[] values = new String[handlerRefs.length+1];
+            names[0] = "Auto";
+            values[0] = "Auto";
+            int selectedIdx = 0;// Auto by default
+
+            String configuredHandler
+                    = (String) AndroidGUIActivator
+                    .getConfigurationService()
+                    .getProperty("systray.POPUP_HANDLER");
+            int idx=1;
+            for (ServiceReference ref : handlerRefs)
+            {
+                PopupMessageHandler handler =
+                        (PopupMessageHandler) bc.getService(ref);
+
+                names[idx] = handler.toString();
+                values[idx] = handler.getClass().getName();
+
+                if (configuredHandler != null &&
+                        configuredHandler.equals(handler.getClass().getName()))
+                {
+                    selectedIdx = idx;
+                }
+            }
+
+            // Configures ListPreference
+            ListPreference handlerList
+                    = (ListPreference) findPreference(P_KEY_POPUP_HANDLER);
+            handlerList.setEntries(names);
+            handlerList.setEntryValues(values);
+            handlerList.setValueIndex(selectedIdx);
+            // Summaries mapping
+            summaryMapper.includePreference(handlerList, "Auto");
+        }
+
+        /**
+         * Initializes call section
+         */
+        private void initCallPreferences()
+        {
+            PreferenceUtil.setCheckboxVal(
+                    this, P_KEY_NORMALIZE_PNUMBER,
+                    ConfigurationUtils.isNormalizePhoneNumber());
+
+            PreferenceUtil.setCheckboxVal(
+                    this, P_KEY_ACCEPT_ALPHA_PNUMBERS,
+                    ConfigurationUtils.acceptPhoneNumberWithAlphaChars());
+
+            this.deviceConfig
+                    = NeomediaActivator.getMediaServiceImpl()
+                    .getDeviceConfiguration();
         }
 
         /**
@@ -392,12 +510,97 @@ public class SettingsActivity
         }
 
         /**
+         * Retrieves currently registered <tt>PopupMessageHandler</tt> for given
+         * <tt>clazz</tt> name.
+         * @param clazz the class name of <tt>PopupMessageHandler</tt>
+         *              implementation.
+         * @return implementation of <tt>PopupMessageHandler</tt> for given
+         *         class name registered in OSGI context.
+         */
+        private PopupMessageHandler getHandlerForClassName(String clazz)
+        {
+            BundleContext bc = AndroidGUIActivator.bundleContext;
+            ServiceReference[] handlerRefs = ServiceUtils
+                    .getServiceReferences(bc, PopupMessageHandler.class);
+
+            if (handlerRefs == null)
+                return null;
+
+            for(ServiceReference sRef : handlerRefs)
+            {
+                PopupMessageHandler handler
+                        = (PopupMessageHandler) bc.getService(sRef);
+                if(handler.getClass().getName().equals(clazz))
+                    return handler;
+            }
+            return null;
+        }
+
+        /**
          * {@inheritDoc}
          */
         public void onSharedPreferenceChanged( SharedPreferences shPreferences,
                                                String            key )
         {
-            if(key.equals(P_KEY_NORMALIZE_PNUMBER))
+            if(key.equals(P_KEY_LOG_CHAT_HISTORY))
+            {
+                ConfigurationUtils.setHistoryLoggingEnabled(
+                        shPreferences.getBoolean(
+                                P_KEY_LOG_CHAT_HISTORY,
+                                ConfigurationUtils.isHistoryLoggingEnabled()));
+            }
+            else if(key.equals(P_KEY_SHOW_HISTORY))
+            {
+                ConfigurationUtils.setHistoryShown(
+                        shPreferences.getBoolean(
+                                P_KEY_SHOW_HISTORY,
+                                ConfigurationUtils.isHistoryShown()));
+            }
+            else if(key.equals(P_KEY_HISTORY_SIZE))
+            {
+                String intStr = shPreferences.getString(
+                        P_KEY_HISTORY_SIZE,
+                        ""+ConfigurationUtils.getChatHistorySize());
+                ConfigurationUtils.setChatHistorySize(Integer.parseInt(intStr));
+                updateHistorySizeSummary();
+            }
+            else if(key.equals(P_KEY_TYPING_NOTIFICATIONS))
+            {
+                ConfigurationUtils.setSendTypingNotifications(
+                        shPreferences.getBoolean(
+                                P_KEY_TYPING_NOTIFICATIONS,
+                                ConfigurationUtils.isSendTypingNotifications())
+                );
+            }
+            else if(key.equals(P_KEY_POPUP_HANDLER))
+            {
+                String handler = shPreferences.getString( P_KEY_POPUP_HANDLER,
+                                                          "Auto" );
+                SystrayService systray
+                        = AndroidGUIActivator.getSystrayService();
+                if(handler.equals("Auto"))
+                {
+                    // "Auto" selected. Delete the user's preference and
+                    // select the best available handler.
+                    ConfigurationUtils.setPopupHandlerConfig(null);
+                    systray.selectBestPopupMessageHandler();
+                }
+                else
+                {
+                    ConfigurationUtils.setPopupHandlerConfig(handler);
+                    PopupMessageHandler handlerInstance
+                            = getHandlerForClassName(handler);
+                    if(handlerInstance == null)
+                    {
+                        logger.warn("No handler found for name: "+handler);
+                    }
+                    else
+                    {
+                        systray.setActivePopupMessageHandler(handlerInstance);
+                    }
+                }
+            }
+            else if(key.equals(P_KEY_NORMALIZE_PNUMBER))
             {
                 // Normalize phone number
                 ConfigurationUtils.setNormalizePhoneNumber(

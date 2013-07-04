@@ -132,4 +132,10 @@ public class NotificationPopupHandler
     {
         return 3;
     }
+
+    @Override
+    public String toString()
+    {
+        return JitsiApplication.getResString(R.string.impl_popup_status_bar);
+    }
 }
