@@ -165,8 +165,7 @@ public class BundleImpl
 
     public ServiceReference<?>[] getRegisteredServices()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return framework.getRegisteredServices();
     }
 
     public URL getResource(String name)

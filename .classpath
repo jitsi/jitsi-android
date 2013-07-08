@@ -29,6 +29,7 @@
 	<classpathentry kind="lib" path="lib/bundles/googlecontacts-service.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/libjitsi.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/msghistory.jar"/>
+	<classpathentry kind="lib" path="lib/bundles/meta-cl.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/netaddr.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/notification-handlers.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/notification-service.jar"/>

@@ -8,6 +8,7 @@ package org.jitsi.android.gui;
 
 import android.content.*;
 
+import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.gui.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.systray.*;
@@ -45,6 +46,16 @@ public class AndroidGUIActivator
      * The OSGI bundle context.
      */
     public static BundleContext bundleContext;
+
+    /**
+     * Returns currently registered <tt>MetaContactListService</tt> instance.
+     * @return currently registered <tt>MetaContactListService</tt> instance.
+     */
+    public static MetaContactListService getContactListService()
+    {
+        return ServiceUtils.getService( bundleContext,
+                                        MetaContactListService.class );
+    }
 
     /**
      * {@inheritDoc}
