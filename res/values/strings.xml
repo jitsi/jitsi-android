@@ -115,6 +115,33 @@
     <string name="service_gui_PROACTIVE_NOTIFICATION">is writing a message</string>
     <string name="service_gui_MSG_RECEIVED">{0} wrote</string>
 
+    <!-- Add contact -->
+    <string name="service_gui_ADD">Add</string>
+    <string name="service_gui_ADD_CONTACT_TO">Add contact to</string>
+    <string name="service_gui_ADD_CONTACT_ERROR_TITLE">Add contact Error</string>
+    <string name="service_gui_ADD_CONTACT_NOT_CONNECTED">
+        You need to be connected in in order to add a contact.
+        Please sign in to the selected provider and try again.
+    </string>
+    <string name="service_gui_ADD_CONTACT_ERROR" >
+        Failed to add contact with id: %s
+    </string>
+    <string name="service_gui_ADD_CONTACT_EXIST_ERROR" >
+        The contact %s already exists in your contact list.
+    </string>
+    <string name="service_gui_ADD_CONTACT_NETWORK_ERROR" >
+        Server did not respond to our request adding contact with id: %s.
+    </string>
+    <string name="service_gui_ADD_CONTACT_NOT_SUPPORTED" >
+        Failed to add contact with id: %s. Operation not supported.
+    </string>
+    <string name="service_gui_CONTACT_NAME">ID or Number</string>
+    <string name="service_gui_CREATE_GROUP">Create group...</string>
+    <string name="service_gui_DISPLAY_NAME">Display name</string>
+    <string name="service_gui_SELECT_ACCOUNT">Select account</string>
+    <string name="service_gui_SELECT_GROUP">Select group</string>
+    <string name="service_gui_SELECT_NO_GROUP">No group</string>
+
     <!-- Presence status -->
     <string name="service_gui_EDIT_STATUS_MSG_TIP">Set status message</string>
     <string name="service_gui_SET_STATUS">Change status</string>

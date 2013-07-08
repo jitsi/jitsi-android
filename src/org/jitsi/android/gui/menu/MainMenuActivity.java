@@ -14,6 +14,7 @@ import net.java.sip.communicator.util.account.*;
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.account.*;
+import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.settings.*;
 import org.jitsi.service.osgi.*;
 
@@ -74,6 +75,9 @@ public class MainMenuActivity
         {
         case R.id.add_account:
             startActivity(AccountLoginActivity.class);
+            return true;
+        case R.id.add_contact:
+            startActivity(AddContactActivity.class);
             return true;
         case R.id.sign_out:
             Collection<AccountID> accounts

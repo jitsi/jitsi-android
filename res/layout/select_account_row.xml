@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/status_spin_height"
+                android:gravity="center_horizontal"
+                android:background="@color/white">
+
+    <ImageView
+            android:id="@+id/accountProtoIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:src="@drawable/jabber_logo"
+            android:layout_centerVertical="true"
+            />
+    <TextView
+            style="@style/MediumFont"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/accountName"
+            android:text="AccountName"
+            android:textColor="@color/black"
+            android:layout_toRightOf="@+id/accountProtoIcon"
+            android:layout_centerVertical="true"/>
+</RelativeLayout>
