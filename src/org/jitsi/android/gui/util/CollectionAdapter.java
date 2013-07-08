@@ -23,10 +23,6 @@ public abstract class CollectionAdapter<T>
         extends BaseAdapter
 {
     /**
-     * The {@link LayoutInflater} used to create the views
-     */
-    private final LayoutInflater layoutInflater;
-    /**
      * List of elements handled by this adapter
      */
     private List<T> items;
@@ -39,29 +35,22 @@ public abstract class CollectionAdapter<T>
      * Creates a new instance of {@link CollectionAdapter}
      *
      * @param parent the parent {@link Activity}
-     * @param layoutInflater the {@link LayoutInflater} for current context
      */
-    public CollectionAdapter( Activity parent,
-                              LayoutInflater layoutInflater )
+    public CollectionAdapter( Activity parent )
     {
         this.parentActivity = parent;
-        this.layoutInflater = layoutInflater;
     }
 
     /**
      * Creates new instance of {@link CollectionAdapter}
      *
      * @param parent the parent {@link Activity}
-     * @param layoutInflater the {@link LayoutInflater} that will be used
-     *  to create new {@link View}s
      * @param items iterator of {@link T} items
      */
     public CollectionAdapter( Activity parent,
-                              LayoutInflater layoutInflater,
                               Iterator<T> items )
     {
         this.parentActivity = parent;
-        this.layoutInflater = layoutInflater;
 
         setIterator(items);
     }
@@ -166,7 +155,9 @@ public abstract class CollectionAdapter<T>
 
     public View getView(int i, View view, ViewGroup viewGroup)
     {
-        return getView(items.get(i), viewGroup, layoutInflater);
+        return getView( items.get(i),
+                        viewGroup,
+                        parentActivity.getLayoutInflater() );
     }
 
     /**

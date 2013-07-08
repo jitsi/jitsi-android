@@ -33,7 +33,7 @@ import java.beans.*;
  * 
  * @author Pawel Domas
  */
-class Account
+public class Account
     implements ProviderPresenceStatusListener,
         RegistrationStateChangeListener,
         ServiceListener,

@@ -437,7 +437,7 @@ public class PresenceStatusActivity
          */
         public StatusListAdapter( Iterator<PresenceStatus> objects)
         {
-            super(PresenceStatusActivity.this, getLayoutInflater(), objects);
+            super(PresenceStatusActivity.this, objects);
         }
 
         @Override

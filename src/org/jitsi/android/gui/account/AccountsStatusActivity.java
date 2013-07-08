@@ -34,11 +34,6 @@ public class AccountsStatusActivity
     private static final Logger logger =
             Logger.getLogger(AccountsStatusActivity.class);
     /**
-     * The current {@link BundleContext}
-     */
-    private BundleContext bundleContext;
-
-    /**
      * The list adapter for accounts
      */
     private AccountStatusListAdapter listAdapter;
@@ -56,8 +51,6 @@ public class AccountsStatusActivity
                     "net.java.sip.communicator.slick.runner.TEST_LIST")
                 != null)
             return;
-
-        this.bundleContext = bundleContext;
 
         runOnUiThread(new Runnable()
         {
@@ -144,9 +137,7 @@ public class AccountsStatusActivity
          */
         AccountStatusListAdapter(Collection<AccountID> accounts)
         {
-           super( bundleContext,
-                  AccountsStatusActivity.this,
-                  getLayoutInflater(),
+           super( AccountsStatusActivity.this,
                   R.layout.account_list_row,
                   accounts,
                   true);

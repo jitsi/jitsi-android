@@ -123,9 +123,7 @@ public class AccountEnableActivity
          */
         public AccountsOnOffAdapter(Collection<AccountID> accounts)
         {
-            super( bundleContext,
-                   AccountEnableActivity.this,
-                   getLayoutInflater(),
+            super( AccountEnableActivity.this,
                    R.layout.account_enable_row,
                    accounts,
                    false);

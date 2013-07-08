@@ -13,6 +13,7 @@ import android.widget.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.*;
 import org.jitsi.*;
+import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.android.gui.util.event.EventListener;
 import org.osgi.framework.*;
@@ -24,7 +25,7 @@ import java.util.*;
  * to put the list of {@link Account}s into Android widgets.
  *
  * The {@link View}s for each row are created from the layout resource id
- * given in constructor. This view must contain:
+ * given in constructor. This view should contain:
  * <br/>
  *  - <tt>R.id.accountName</tt> for the account name text ({@link TextView})
  * <br/>
@@ -71,33 +72,27 @@ public class AccountsListAdapter
     /**
      * Creates new instance of {@link AccountsListAdapter}
      *
-     * @param context the {@link BundleContext} of parent
-     *  {@link org.jitsi.service.osgi.OSGiActivity}
      * @param parent the {@link Activity} running this adapter
      * @param accounts collection of accounts that will be displayed
-     * @param inflater the {@link LayoutInflater} which
-     *  will be used to create new {@link View}s
      * @param listRowResourceID the layout resource ID see
      *  {@link AccountsListAdapter} for detailed description
      * @param filterDisabledAccounts flag indicates if disabled accounts
      *  should be filtered out from the list
      */
     public AccountsListAdapter(
-            BundleContext context,
             Activity parent,
-            LayoutInflater inflater,
             int listRowResourceID,
             Collection<AccountID> accounts,
             boolean filterDisabledAccounts)
     {
-        super(parent, inflater);
+        super(parent);
 
         this.filterDisabledAccounts = filterDisabledAccounts;
 
         this.listRowResourceID = listRowResourceID;
 
-        this.bundleContext = context;
-        context.addServiceListener(this);
+        this.bundleContext = AndroidGUIActivator.bundleContext;
+        bundleContext.addServiceListener(this);
 
         initAccounts(accounts);
     }
@@ -118,6 +113,10 @@ public class AccountsListAdapter
                                            getParentActivity());
             if( filterDisabledAccounts
                 && !account.isEnabled() )
+                continue;
+
+            // Skip hidden accounts
+            if(acc.isHidden())
                 continue;
 
             account.addAccountEventListener(this);
@@ -208,20 +207,28 @@ public class AccountsListAdapter
                 (TextView) statusItem.findViewById(R.id.accountStatus);
 
         // Sets account's properties
-        accountName.setText(account.getAccountName());
+        if(accountName != null)
+            accountName.setText(account.getAccountName());
 
-        Drawable protoIcon = account.getProtocolIcon();
-        if(protoIcon != null)
+        if(accountProtocol != null)
         {
-            accountProtocol.setImageDrawable(protoIcon);
+            Drawable protoIcon = account.getProtocolIcon();
+            if(protoIcon != null)
+            {
+                accountProtocol.setImageDrawable(protoIcon);
+            }
         }
 
-        accountStatus.setText(account.getStatusName());
+        if(accountStatus != null)
+            accountStatus.setText(account.getStatusName());
 
-        Drawable statusIcon = account.getStatusIcon();
-        if(statusIcon != null)
+        if(statusIconView != null)
         {
-            statusIconView.setImageDrawable(statusIcon);
+            Drawable statusIcon = account.getStatusIcon();
+            if(statusIcon != null)
+            {
+                statusIconView.setImageDrawable(statusIcon);
+            }
         }
 
         return statusItem;
@@ -254,6 +261,9 @@ public class AccountsListAdapter
     {
         if(filterDisabledAccounts &&
            !account.isEnabled())
+            return;
+
+        if(account.getAccountID().isHidden())
             return;
 
         logger.debug("Account added: " + account.getAccountName());
