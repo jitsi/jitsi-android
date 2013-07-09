@@ -119,6 +119,18 @@ public class JitsiApplication
     }
 
     /**
+     * Retrieves <tt>NotificationManager</tt> instance using application
+     * context.
+     *
+     * @return <tt>NotificationManager</tt> service instance.
+     */
+    public static NotificationManager getNotificationManager()
+    {
+        return (NotificationManager) getGlobalContext()
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+    }
+
+    /**
      * Returns global application context.
      *
      * @return Returns global application <tt>Context</tt>.

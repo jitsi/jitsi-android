@@ -9,6 +9,8 @@ package org.jitsi.impl.androidtray;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.systray.*;
 import net.java.sip.communicator.service.systray.event.*;
+import org.jitsi.android.*;
+import org.jitsi.android.gui.*;
 
 /**
  * Android system tray implementation. Makes use of status bar notifications to
@@ -86,6 +88,7 @@ public class SystrayServiceImpl
     public void stop()
     {
         clickReceiver.unregisterReceiver();
+        trayPopupHandler.dispose();
     }
 
     /**
@@ -139,6 +142,18 @@ public class SystrayServiceImpl
                 //TODO: start chat activity here
                 System.err.println("Should start chat activity for contact: "
                                            + contact);
+                return;
+            }
+
+            // Displays popup message details when the notification is clicked
+            Object src = evt.getSource();
+            if(src instanceof PopupMessage)
+            {
+                PopupMessage message = (PopupMessage) evt.getSource();
+                DialogActivity.showDialog(
+                        JitsiApplication.getGlobalContext(),
+                        message.getMessageTitle(),
+                        message.getMessage());
             }
         }
     }

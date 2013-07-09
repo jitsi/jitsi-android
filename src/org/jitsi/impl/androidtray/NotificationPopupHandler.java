@@ -120,6 +120,20 @@ public class NotificationPopupHandler
     }
 
     /**
+     * Removes all currently registered notifications from the status bar.
+     */
+    void dispose()
+    {
+        NotificationManager notifyManager
+                = JitsiApplication.getNotificationManager();
+
+        for(int notificationId : notificationMap.keySet())
+            notifyManager.cancel(notificationId);
+
+        notificationMap.clear();
+    }
+
+    /**
      * {@inheritDoc}
      * <br/>
      * This implementations scores 3: <br/>
