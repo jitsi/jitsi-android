@@ -10,7 +10,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:choiceMode="singleChoice"
-        android:childDivider="@color/contact_list_divider"
-        android:dividerHeight="1dip"
+        android:dividerHeight="0dip"
+        android:divider="@null"
         android:cacheColorHint="@color/white"/>
 </LinearLayout>

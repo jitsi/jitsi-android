@@ -11,6 +11,8 @@ import android.view.*;
 public class MainViewFragment
     extends OSGiFragmentV4
 {
+    private ContactListFragment contactListFragment;
+
     /**
      * {@inheritDoc}
      */
@@ -33,11 +35,19 @@ public class MainViewFragment
      */
     private void showContactsFragment()
     {
-        ContactListFragment contactListFragment = new ContactListFragment();
+        contactListFragment = new ContactListFragment();
         getChildFragmentManager()
                 .beginTransaction()
                 .replace(R.id.contactListFragment, contactListFragment)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
+    }
+
+    public void filterContactList(String query)
+    {
+        if (contactListFragment == null)
+            return;
+
+        contactListFragment.filterContactList(query);
     }
 }

@@ -1,3 +1,9 @@
+/*
+ * Jitsi, the OpenSource Java VoIP and Instant Messaging client.
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package org.jitsi.android.gui.chat;
 
 import java.util.*;
@@ -6,6 +12,8 @@ import net.java.sip.communicator.service.globaldisplaydetails.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.Message;
 import net.java.sip.communicator.service.protocol.event.*;
+import net.java.sip.communicator.service.protocol.globalstatus.*;
+import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.Logger;
 
 import org.jitsi.*;
@@ -22,6 +30,11 @@ import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
 
+/**
+ * The <tt>ChatFragment</tt> is responsible for chat interface.
+ * 
+ * @author Yana Stamcheva
+ */
 public class ChatFragment
     extends OSGiFragmentV4
 {
@@ -155,7 +168,9 @@ public class ChatFragment
      */
     public static ChatFragment newInstance(String chatId)
     {
-        System.err.println("CHAT FRAGMENT NEW INSTANCE===" + chatId);
+        if (logger.isDebugEnabled())
+            logger.debug("CHAT FRAGMENT NEW INSTANCE: " + chatId);
+
         ChatFragment chatFragment = new ChatFragment();
 
         Bundle args = new Bundle();
@@ -166,15 +181,24 @@ public class ChatFragment
         return chatFragment;
     }
 
+    /**
+     * 
+     */
     public void onDetach()
     {
+        if (logger.isDebugEnabled())
+            logger.debug("DETACH CHAT FRAGMENT: " + this);
+
         super.onDetach();
 
-        System.err.println("ON DETACH============" + this);
         chatSession.removeMessageListener(chatSessionAdapter);
         chatSessionAdapter = null;
-        loadHistoryTask.cancel(true);
-        loadHistoryTask = null;
+
+        if (loadHistoryTask != null)
+        {
+            loadHistoryTask.cancel(true);
+            loadHistoryTask = null;
+        }
     }
 
     /**
@@ -376,7 +400,7 @@ public class ChatFragment
                 Drawable avatar = null;
                 if (messageViewHolder.viewType == INCOMING_MESSAGE_VIEW)
                 {
-                    avatar = ContactListFragment.getAvatarDrawable(
+                    avatar = ContactListAdapter.getAvatarDrawable(
                         chatSession.getMetaContact());
                 }
                 else if (messageViewHolder.viewType == OUTGOING_MESSAGE_VIEW)
@@ -384,11 +408,10 @@ public class ChatFragment
                     avatar = getLocalAvatarDrawable();
                 }
 
-                if (avatar != null)
-                    messageViewHolder.avatarView.setImageDrawable(avatar);
-                else
-                    messageViewHolder.avatarView
-                        .setImageResource(R.drawable.avatar);
+                if (avatar == null)
+                        avatar = AccountUtil.getDefaultAvatarIcon(getActivity());
+
+                setAvatar(messageViewHolder.avatarView, avatar);
 
                 messageViewHolder.messageView.setText(message.getMessage());
             }
@@ -588,6 +611,7 @@ public class ChatFragment
             loadHistory((Collection<Object>) result, false);
         }
     }
+
     /**
      * Process history messages.
      *
@@ -623,8 +647,7 @@ public class ChatFragment
             chatSessionAdapter.dataChanged();
     }
 
-
-    public static Drawable getLocalAvatarDrawable()
+    private static Drawable getLocalAvatarDrawable()
     {
         GlobalDisplayDetailsService displayDetailsService
             = AndroidGUIActivator.getGlobalDisplayDetailsService();
@@ -635,5 +658,34 @@ public class ChatFragment
             return AndroidImageUtil.drawableFromBytes(avatarImage);
 
         return null;
+    }
+
+    /**
+     * Sets the avatar icon of the action bar.
+     *
+     * @param avatarView the avatar image view
+     * @param avatar the avatar to set
+     */
+    public void setAvatar(ImageView avatarView, Drawable avatar)
+    {
+        if (avatar == null)
+            avatar = AccountUtil.getDefaultAvatarIcon(getActivity());
+
+        GlobalStatusService globalStatusService
+            = AndroidGUIActivator.getGlobalStatusService();
+
+        if (globalStatusService == null)
+            return;
+
+        byte[] statusImage
+            = StatusUtil.getContactStatusIcon(
+                globalStatusService.getGlobalPresenceStatus());
+
+        LayerDrawable avatarDrawable
+            = new LayerDrawable(new Drawable[]{avatar,
+                AndroidImageUtil.drawableFromBytes(statusImage)});
+
+        avatarDrawable.setLayerInset(1, 50, 50, 0, 0);
+        avatarView.setImageDrawable(avatarDrawable);
     }
 }

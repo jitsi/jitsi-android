@@ -1,3 +1,9 @@
+/*
+ * Jitsi, the OpenSource Java VoIP and Instant Messaging client.
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package org.jitsi.android.gui.chat;
 
 import java.util.*;
@@ -11,12 +17,25 @@ import net.java.sip.communicator.service.filehistory.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.event.*;
 
+/**
+ * 
+ * @author Yana Stamcheva
+ */
 public class ChatSession
 {
+    /**
+     * The chat identifier.
+     */
     private String chatId;
 
+    /**
+     * The underlying <tt>MetaContact</tt>, we're chatting with.
+     */
     private final MetaContact metaContact;
 
+    /**
+     * The current chat transport.
+     */
     private final Contact currentChatTransport;
 
     /**
@@ -26,6 +45,11 @@ public class ChatSession
         = new String[]{ MessageHistoryService.class.getName(),
                         FileHistoryService.class.getName()};
 
+    /**
+     * Creates a chat session with the given <tt>MetaContact</tt>.
+     *
+     * @param metaContact the <tt>MetaContact</tt> we're chatting with
+     */
     public ChatSession(MetaContact metaContact)
     {
         this.metaContact = metaContact;
@@ -33,21 +57,41 @@ public class ChatSession
             OperationSetBasicInstantMessaging.class);
     }
 
+    /**
+     * Sets the chat identifier.
+     *
+     * @param chatId the identifier of the chat
+     */
     public void setChatId(String chatId)
     {
         this.chatId = chatId;
     }
 
+    /**
+     * Returns the chat identifier.
+     *
+     * @return the chat identifier
+     */
     public String getChatId()
     {
         return chatId;
     }
 
+    /**
+     * Returns the underlying <tt>MetaContact</tt>, we're chatting with.
+     *
+     * @return the underlying <tt>MetaContact</tt>, we're chatting with
+     */
     public MetaContact getMetaContact()
     {
         return metaContact;
     }
 
+    /**
+     * Sens the given message through the current chat transport.
+     *
+     * @param message the message to send
+     */
     public void sendMessage(String message)
     {
         OperationSetBasicInstantMessaging imOpSet
@@ -64,6 +108,12 @@ public class ChatSession
                                     msg);
     }
 
+    /**
+     * Adds the given <tt>MessageListener</tt> to listen for message events in
+     * this chat session.
+     *
+     * @param l the <tt>MessageListener</tt> to add
+     */
     public void addMessageListener(MessageListener l)
     {
         Iterator<Contact> protoContacts = metaContact.getContacts();
@@ -83,6 +133,11 @@ public class ChatSession
         }
     }
 
+    /**
+     * Removes the given <tt>MessageListener</tt> from this chat session.
+     *
+     * @param l the <tt>MessageListener</tt> to remove
+     */
     public void removeMessageListener(MessageListener l)
     {
         Iterator<Contact> protoContacts = metaContact.getContacts();

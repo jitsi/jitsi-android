@@ -9,6 +9,7 @@ package org.jitsi.impl.androidtray;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.systray.*;
 import net.java.sip.communicator.service.systray.event.*;
+
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 
@@ -88,6 +89,7 @@ public class SystrayServiceImpl
     public void stop()
     {
         clickReceiver.unregisterReceiver();
+
         trayPopupHandler.dispose();
     }
 
@@ -142,6 +144,7 @@ public class SystrayServiceImpl
                 //TODO: start chat activity here
                 System.err.println("Should start chat activity for contact: "
                                            + contact);
+
                 return;
             }
 

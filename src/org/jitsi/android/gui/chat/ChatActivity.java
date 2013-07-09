@@ -1,4 +1,9 @@
-
+/*
+ * Jitsi, the OpenSource Java VoIP and Instant Messaging client.
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package org.jitsi.android.gui.chat;
 
 import org.jitsi.*;
@@ -10,6 +15,11 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.*;
 import android.widget.*;
 
+/**
+ * The <tt>ChatActivity</tt> containing chat related interface.
+ *
+ * @author Yana Stamcheva
+ */
 public class ChatActivity
     extends OSGiFragmentActivity
     implements OnPageChangeListener
@@ -46,7 +56,7 @@ public class ChatActivity
             // Instantiate a ViewPager and a PagerAdapter.
             chatPager = (ViewPager) findViewById(R.id.chatPager);
             chatPagerAdapter
-                = new ChatPagerAdapter(this, getSupportFragmentManager());
+                = new ChatPagerAdapter(getSupportFragmentManager());
             chatPager.setAdapter(chatPagerAdapter);
             chatPager.setOffscreenPageLimit(4);
 
@@ -57,6 +67,10 @@ public class ChatActivity
         }
     }
 
+    /**
+     * Indicates the back button has been pressed. Sets the chat pager current
+     * item.
+     */
     @Override
     public void onBackPressed()
     {
@@ -74,6 +88,11 @@ public class ChatActivity
         }
     }
 
+    /**
+     * Indicates the send message button has been clicked.
+     *
+     * @param v the button view
+     */
     public void onSendMessageClick(View v)
     {
         TextView writeMessageView = (TextView) findViewById(R.id.chatWriteText);
@@ -101,11 +120,16 @@ public class ChatActivity
     }
 
     @Override
-    public void onPageScrollStateChanged(int state)
-    {
-        
-    }
+    public void onPageScrollStateChanged(int state) {}
 
+    /**
+     * Indicates a page has been scrolled. Sets the current chat.
+     *
+     * @param pos the new selected position
+     * @param posOffset the offset of the newly selected position
+     * @param posOffsetPixels the offset of the newly selected position in
+     * pixels
+     */
     @Override
     public void onPageScrolled(int pos, float posOffset, int posOffsetPixels)
     {
@@ -120,6 +144,9 @@ public class ChatActivity
     @Override
     public void onPageSelected(int pos) {}
 
+    /**
+     * Sets the selected chat.
+     */
     private void setSelectedChat()
     {
         TextView actionBarText

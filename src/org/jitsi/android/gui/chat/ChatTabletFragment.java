@@ -1,3 +1,9 @@
+/*
+ * Jitsi, the OpenSource Java VoIP and Instant Messaging client.
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
 package org.jitsi.android.gui.chat;
 
 import org.jitsi.*;
@@ -8,6 +14,9 @@ import android.app.*;
 import android.os.Bundle;
 import android.view.*;
 
+/**
+ * @author Yana Stamcheva
+ */
 public class ChatTabletFragment
     extends OSGiFragmentV4
 {
@@ -69,6 +78,11 @@ public class ChatTabletFragment
         super.start(bundleContext);
     }
 
+    /**
+     * Sends the given message.
+     *
+     * @param message the message to send
+     */
     public void sendMessage(String message)
     {
         chatFragment.sendMessage(message);

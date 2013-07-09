@@ -14,7 +14,6 @@ import net.java.sip.communicator.service.globaldisplaydetails.*;
 import net.java.sip.communicator.service.gui.*;
 import net.java.sip.communicator.service.metahistory.*;
 import net.java.sip.communicator.service.protocol.*;
-
 import net.java.sip.communicator.service.systray.*;
 
 import net.java.sip.communicator.service.protocol.globalstatus.*;

@@ -40,5 +40,4 @@ public class PreferenceUtil
         logger.debug("Setting "+isChecked+" on "+prefKey);
         cbPref.setChecked(isChecked);
     }
-
 }

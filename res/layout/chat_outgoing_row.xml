@@ -6,11 +6,11 @@
 
     <ImageView
         android:id="@+id/outgoingAvatarView"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginRight="5dp"
+        android:layout_width="60dip"
+        android:layout_height="60dip"
+        android:layout_marginRight="5dip"
         android:layout_alignParentRight="true"
-        android:src="@drawable/avatar"/>
+        android:src="@drawable/avatar_layer_drawable"/>
 
     <TextView
         android:id="@+id/outgoingMessageView"
@@ -19,6 +19,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/outgoingAvatarView"
-        android:layout_marginRight="5dp"
-        android:gravity="right"/>
+        android:layout_marginRight="6dip"
+        android:gravity="right"
+        android:padding="10dip"
+        android:background="@drawable/messageholder"/>
+
+    <ImageView
+        android:id="@+id/messageArrowView"
+        android:layout_width="wrap_content"
+        android:layout_height="30dip"
+        android:layout_marginRight="55dip"
+        android:layout_marginTop="10dip"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/messagearrowout"/>
+
 </RelativeLayout>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="account_list_row_height" >50dp</dimen>
+    <dimen name="chat_row_height" >40dp</dimen>
+    <dimen name="actionbar_height" >55dp</dimen>
+</resources>

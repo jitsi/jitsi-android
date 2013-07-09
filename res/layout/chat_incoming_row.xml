@@ -6,11 +6,11 @@
 
     <ImageView
         android:id="@+id/incomingAvatarView"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginLeft="5dp"
+        android:layout_width="60dip"
+        android:layout_height="60dip"
+        android:layout_marginLeft="5dip"
         android:layout_alignParentLeft="true"
-        android:src="@drawable/avatar"/>
+        android:src="@drawable/avatar_layer_drawable"/>
 
     <TextView
         android:id="@+id/incomingMessageView"
@@ -20,5 +20,16 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/incomingAvatarView"
         android:gravity="left"
-        android:layout_marginLeft="5dp"/>
+        android:layout_marginLeft="6dip"
+        android:padding="10dip"
+        android:background="@drawable/messageholder"/>
+
+    <ImageView
+        android:id="@+id/messageArrowView"
+        android:layout_width="wrap_content"
+        android:layout_height="30dip"
+        android:layout_marginLeft="55dip"
+        android:layout_marginTop="10dip"
+        android:src="@drawable/messagearrowin"/>
+
 </RelativeLayout>

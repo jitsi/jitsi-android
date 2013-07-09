@@ -3,14 +3,15 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@color/white">
+    android:background="@color/chat_background">
 
     <FrameLayout
             android:id="@+id/chatFragment"
             android:layout_width="fill_parent"
             android:layout_height="0dip"
             android:layout_weight=".9"
-            android:paddingBottom="1dip"/>
+            android:paddingBottom="1dip"
+            android:background="@color/chat_background"/>
 
     <LinearLayout
         android:orientation="horizontal"

@@ -13,11 +13,6 @@
             android:layout_height="fill_parent"
             android:layout_weight=".1"/>
 
-        <View
-            android:layout_height="fill_parent"
-            android:layout_width="1dip"
-            android:background="@drawable/background_with_shadow"/>
-
         <FrameLayout
             android:id="@+id/chatView"
             android:layout_width="0dip"

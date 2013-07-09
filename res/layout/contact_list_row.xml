@@ -9,14 +9,7 @@
         android:layout_height="fill_parent"
         android:layout_width="@dimen/account_list_row_height"
         android:layout_centerVertical="true"
-        android:src="@drawable/avatar"/>
-
-    <ImageView
-        android:id="@+id/statusIcon"
-        android:layout_width="20dip"
-        android:layout_height="20dip"
-        android:layout_alignParentBottom="true"
-        android:layout_marginLeft="35dip"/>
+        android:src="@drawable/avatar_layer_drawable"/>
 
     <LinearLayout
         android:orientation="vertical"
@@ -43,7 +36,6 @@
             android:layout_gravity="left"
             android:gravity="center_vertical"
             android:textColor="@color/list_details_selection_color"/>
-
     </LinearLayout>
 
     <LinearLayout
@@ -79,13 +71,33 @@
             android:layout_gravity="center_vertical"/>
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_alignParentBottom="true"
+        android:background="@color/contact_list_divider"/>
+
     <ImageView
         android:id="@+id/selectedBackgroundIcon"
-        android:src="@drawable/corner"
-        android:layout_width="18dip"
-        android:layout_height="18dip"
-        android:layout_alignParentBottom="true"
+        android:src="@drawable/chatarrow"
+        android:layout_width="wrap_content"
+        android:layout_height="0dip"
+        android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:visibility="invisible"/>
+
+    <LinearLayout
+        android:layout_width="7dip"
+        android:layout_height="fill_parent"
+        android:layout_above="@id/selectedBackgroundIcon"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/chatseparator"/>
+
+    <LinearLayout
+        android:layout_width="7dip"
+        android:layout_height="fill_parent"
+        android:layout_below="@id/selectedBackgroundIcon"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/chatseparator"/>
 
 </RelativeLayout>

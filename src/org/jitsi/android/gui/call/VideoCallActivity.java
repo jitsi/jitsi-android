@@ -191,10 +191,10 @@ public class VideoCallActivity
         previewDisplay = (SurfaceView) findViewById(R.id.previewDisplay);
         
         // Creates and registers surface handler for events
-        this.previewSurfaceHandler = new CameraPreviewSurfaceHandler();            
+        this.previewSurfaceHandler = new CameraPreviewSurfaceHandler();
         org.jitsi.impl.neomedia.jmfext.media
                 .protocol.mediarecorder.DataSource
-                .setPreviewSurfaceProvider(previewSurfaceHandler);            
+                .setPreviewSurfaceProvider(previewSurfaceHandler);
         previewDisplay.getHolder().addCallback(previewSurfaceHandler);
 
         // Preview display will be displayed on top of remote video

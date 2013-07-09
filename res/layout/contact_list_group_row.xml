@@ -14,4 +14,17 @@
         android:layout_marginLeft="30dp"
         android:textColor="@color/white"
         android:layout_centerVertical="true"/>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="1dip"
+        android:layout_alignParentBottom="true"
+        android:background="@color/contact_list_divider"/>
+
+    <LinearLayout
+        android:layout_width="7dip"
+        android:layout_height="fill_parent"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/chatseparator"/>
+
 </RelativeLayout>

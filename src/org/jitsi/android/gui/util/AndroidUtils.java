@@ -68,11 +68,12 @@ public class AndroidUtils
      * @param listener the <tt>DialogInterface.DialogListener</tt> to attach to
      * the confirm button
      */
-    public static void showAlertConfirmDialog(  Context context,
-                                                final String title,
-                                                final String message,
-                                                final String button,
-                                                final DialogActivity.DialogListener listener)
+    public static void showAlertConfirmDialog(
+            Context context,
+            final String title,
+            final String message,
+            final String button,
+            final DialogActivity.DialogListener listener)
     {
         DialogActivity.showConfirmDialog(
                 context,

@@ -10,10 +10,11 @@ import java.util.*;
 
 import android.app.*;
 import android.content.*;
-import android.graphics.drawable.*;
 import android.os.Bundle; // disambiguation
 import android.view.*;
+import android.view.MenuItem.OnActionExpandListener;
 import android.widget.*;
+import android.widget.SearchView.*;
 
 import net.java.sip.communicator.service.globaldisplaydetails.*;
 import net.java.sip.communicator.service.globaldisplaydetails.event.*;
@@ -46,7 +47,9 @@ import android.view.View.OnClickListener;
  */
 public class Jitsi
     extends MainMenuActivity
-    implements GlobalDisplayDetailsListener
+    implements  GlobalDisplayDetailsListener,
+                OnQueryTextListener,
+                OnCloseListener
 {
     /**
      * The logger
@@ -64,6 +67,11 @@ public class Jitsi
      */
     public static final int OBTAIN_CREDENTIALS = 1;
 
+    /**
+     * The main view fragment containing the contact list and also the chat in
+     * the case of a tablet interface.
+     */
+    private MainViewFragment mainViewFragment;
 
     /**
      * Flag indicating that there was no action supplied with <tt>Intent</tt>
@@ -72,14 +80,29 @@ public class Jitsi
      */
     private boolean isEmpty=false;
 
+    /**
+     * The online status.
+     */
     private static final int ONLINE = 1;
 
+    /**
+     * The offline status.
+     */
     private static final int OFFLINE = 2;
 
+    /**
+     * The free for chat status.
+     */
     private static final int FFC = 3;
 
+    /**
+     * The away status.
+     */
     private static final int AWAY = 4;
 
+    /**
+     * The do not disturb status.
+     */
     private static final int DND = 5;
 
     /**
@@ -109,6 +132,52 @@ public class Jitsi
         super.onCreate(savedInstanceState);
 
         handleIntent(getIntent(), savedInstanceState);
+    }
+
+    /**
+     * Invoked when the options menu is created. Creates our own options menu
+     * from the corresponding xml.
+     *
+     * @param menu the options menu
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        boolean optionsMenu = super.onCreateOptionsMenu(menu);
+
+        // Get the SearchView and set the searchable configuration
+        SearchManager searchManager
+            = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+
+        MenuItem searchItem = menu.findItem(R.id.search);
+
+        searchItem.setOnActionExpandListener(new OnActionExpandListener()
+        {
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item)
+            {
+                mainViewFragment.filterContactList("");
+
+                return true; // Return true to collapse action view
+            }
+            public boolean onMenuItemActionExpand(MenuItem item)
+            {
+                return true; // Return true to expand action view
+            }
+        });
+
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setSearchableInfo(
+            searchManager.getSearchableInfo(getComponentName()));
+        int id = searchView.getContext().getResources()
+                .getIdentifier("android:id/search_src_text", null, null);
+        TextView textView = (TextView) searchView.findViewById(id);
+        textView.setTextColor(getResources().getColor(R.color.white));
+        textView.setHintTextColor(getResources().getColor(R.color.white));
+        searchView.setOnQueryTextListener(this);
+        searchView.setOnCloseListener(this);
+
+        return optionsMenu;
     }
 
     /**
@@ -202,6 +271,13 @@ public class Jitsi
                 selectFragment(osgiCtx);
             }
         }
+        else if (Intent.ACTION_SEARCH.equals(intent.getAction()))
+        {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+
+            System.err.println("QUERYYYYYYYYYYYY=========" + query);
+//            doMySearch(query);
+        }
         else if(action.equals(ACTION_SHOW_CONTACTS))
         {
             showAccountInfo();
@@ -228,7 +304,7 @@ public class Jitsi
      */
     private void showMainViewFragment()
     {
-        MainViewFragment mainViewFragment = new MainViewFragment();
+        mainViewFragment = new MainViewFragment();
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(android.R.id.content, mainViewFragment)
@@ -367,18 +443,10 @@ public class Jitsi
         {
             public void run()
             {
-                LayerDrawable avatarDrawable
-                    = AccountUtil.getDefaultAvatarIcon(
-                        getApplicationContext());
-
                 if (avatar != null && avatar.length > 0)
                 {
-                    avatarDrawable
-                        .setDrawableByLayerId(R.id.avatarDrawable,
-                            AndroidImageUtil.drawableFromBytes(avatar));
+                    ActionBarUtil.setAvatar(getApplicationContext(), avatar);
                 }
-
-                getActionBar().setLogo(avatarDrawable);
             }
         });
     }
@@ -506,5 +574,26 @@ public class Jitsi
 
         chatFragment.sendMessage(writeMessageView.getText().toString());
         writeMessageView.setText("");
+    }
+
+    @Override
+    public boolean onClose()
+    {
+        mainViewFragment.filterContactList("");
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String query)
+    {
+        mainViewFragment.filterContactList(query);
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query)
+    {
+        mainViewFragment.filterContactList(query);
+        return false;
     }
 }

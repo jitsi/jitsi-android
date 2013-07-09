@@ -9,9 +9,11 @@ package org.jitsi.android;
 import android.app.*;
 import android.content.*;
 import android.content.res.*;
+
 import android.hardware.*;
 import android.media.*;
 import android.os.*;
+
 import org.jitsi.android.gui.*;
 import org.jitsi.service.osgi.*;
 
@@ -211,11 +213,21 @@ public class JitsiApplication
                 PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
+    /**
+     * Sets the current activity.
+     * 
+     * @param a the current activity to set
+     */
     public static void setCurrentActivity(Activity a)
     {
         currentActivity = a;
     }
 
+    /**
+     * Returns the current activity.
+     *
+     * @return the current activity
+     */
     public static Activity getCurrentActivity()
     {
         return currentActivity;

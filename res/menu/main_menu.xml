@@ -4,13 +4,16 @@
     <item android:id="@+id/search"
            android:title="@string/service_gui_ENTER_NAME_OR_NUMBER"
            android:icon="@drawable/search"
-           android:showAsAction="always">
+           android:showAsAction="always|collapseActionView"
+           android:actionViewClass="android.widget.SearchView">
+    </item>
+    <item android:id="@+id/add_contact"
+          android:title="@string/service_gui_ADD_CONTACT"
+          android:icon="@drawable/addcontact"
+          android:showAsAction="ifRoom">
     </item>
     <item android:id="@+id/add_account"
            android:title="@string/service_gui_NEW_ACCOUNT">
-    </item>
-    <item android:id="@+id/add_contact"
-          android:title="@string/service_gui_ADD_CONTACT">
     </item>
     <item android:id="@+id/sign_out"
            android:title="@string/service_gui_SIGN_OUT">

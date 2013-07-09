@@ -50,5 +50,6 @@
 	<classpathentry kind="lib" path="lib/bundles/version-impl.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/zrtp4j.jar"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

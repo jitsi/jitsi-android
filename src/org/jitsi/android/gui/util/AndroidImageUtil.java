@@ -48,4 +48,26 @@ public class AndroidImageUtil
 
         return new BitmapDrawable(bmp);
     }
+
+    /**
+     * Creates a <tt>Drawable</tt> from the given image byte array and scales
+     * it to the given <tt>width</tt> and <tt>height</tt>.
+     *
+     * @param imageBytes the raw image data
+     * @param width the width to which to scale the image
+     * @param height the height to which to scale the image
+     * @return the newly created <tt>Drawable</tt>
+     */
+    static public Drawable scaledDrawableFromBytes( byte[] imageBytes,
+                                                    int width,
+                                                    int height)
+    {
+        Bitmap bmp = bitmapFromBytes(imageBytes);
+
+        if(bmp == null)
+            return null;
+
+        return new BitmapDrawable(
+            Bitmap.createScaledBitmap(bmp, width, height, true));
+    }
 }

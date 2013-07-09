@@ -18,7 +18,6 @@ import org.jitsi.android.gui.util.*;
 
 import android.app.*;
 import android.content.*;
-import android.graphics.drawable.*;
 import android.widget.*;
 
 import net.java.sip.communicator.service.protocol.*;
@@ -324,15 +323,8 @@ public class AndroidLoginRenderer
 
                 actionBarText.setText(presenceStatus.getStatusName());
 
-                LayerDrawable avatarDrawable
-                    = AccountUtil.getDefaultAvatarIcon(currentActivity);
-
-                avatarDrawable
-                    .setDrawableByLayerId(R.id.contactStatusDrawable,
-                        AndroidImageUtil
-                            .drawableFromBytes(
-                                StatusUtil.getContactStatusIcon(presenceStatus)));
-                currentActivity.getActionBar().setLogo(avatarDrawable);
+                ActionBarUtil.setStatus(currentActivity,
+                    StatusUtil.getContactStatusIcon(presenceStatus));
             }
         });
     }
