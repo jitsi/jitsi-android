@@ -153,24 +153,40 @@ public abstract class CollectionAdapter<T>
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public View getView(int i, View view, ViewGroup viewGroup)
     {
-        return getView( items.get(i),
-                        viewGroup,
-                        parentActivity.getLayoutInflater() );
+        return getView( false, items.get(i),
+                        viewGroup, parentActivity.getLayoutInflater());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public View getDropDownView(int position, View convertView,
+                                ViewGroup parent)
+    {
+        return getView( true, items.get(position),
+                        parent, parentActivity.getLayoutInflater());
     }
 
     /**
      * Convenience method for creating new {@link View}s for each
      * adapter's object
      *
+     * @param isDropDown <tt>true</tt> if the <tt>View</tt> should be created
+     *                   for drop down spinner item
      * @param item the item for which a new View shall be created
      * @param parent {@link ViewGroup} parent View
      * @param inflater the {@link LayoutInflater} for creating new Views
      *
      * @return a {@link View} for given <tt>item</tt>
      */
-    protected abstract View getView( T item,
+    protected abstract View getView( boolean isDropDown,
+                                     T item,
                                      ViewGroup parent,
                                      LayoutInflater inflater);
 

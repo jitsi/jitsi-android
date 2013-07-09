@@ -124,18 +124,19 @@ public class AccountEnableActivity
         public AccountsOnOffAdapter(Collection<AccountID> accounts)
         {
             super( AccountEnableActivity.this,
-                   R.layout.account_enable_row,
+                   R.layout.account_enable_row, -1,
                    accounts,
                    false);
         }
 
         @Override
-        protected View getView( final Account account,
+        protected View getView( boolean isDropDown,
+                                final Account account,
                                 ViewGroup parent,
                                 LayoutInflater inflater)
         {
             // Creates the list view
-            View rowView = super.getView(account, parent, inflater);
+            View rowView = super.getView(isDropDown, account, parent, inflater);
 
             rowView.setClickable(true);
             rowView.setOnClickListener( new View.OnClickListener()

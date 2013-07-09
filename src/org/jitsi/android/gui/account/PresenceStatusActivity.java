@@ -441,7 +441,8 @@ public class PresenceStatusActivity
         }
 
         @Override
-        protected View getView( PresenceStatus item,
+        protected View getView( boolean isDropDown,
+                                PresenceStatus item,
                                 ViewGroup parent,
                                 LayoutInflater inflater)
         {

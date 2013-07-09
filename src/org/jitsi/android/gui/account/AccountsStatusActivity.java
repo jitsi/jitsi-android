@@ -138,7 +138,7 @@ public class AccountsStatusActivity
         AccountStatusListAdapter(Collection<AccountID> accounts)
         {
            super( AccountsStatusActivity.this,
-                  R.layout.account_list_row,
+                  R.layout.account_list_row, -1,
                   accounts,
                   true);
         }

@@ -58,6 +58,12 @@ public class AccountsListAdapter
      * The {@link View} resources ID describing list's row
      */
     private final int listRowResourceID;
+
+    /**
+     * The {@link View} resources ID describing list's row
+     */
+    private final int dropDownRowResourceID;
+
     /**
      * The {@link BundleContext} of parent
      * {@link org.jitsi.service.osgi.OSGiActivity}
@@ -82,6 +88,7 @@ public class AccountsListAdapter
     public AccountsListAdapter(
             Activity parent,
             int listRowResourceID,
+            int dropDownRowResourceID,
             Collection<AccountID> accounts,
             boolean filterDisabledAccounts)
     {
@@ -90,6 +97,7 @@ public class AccountsListAdapter
         this.filterDisabledAccounts = filterDisabledAccounts;
 
         this.listRowResourceID = listRowResourceID;
+        this.dropDownRowResourceID = dropDownRowResourceID;
 
         this.bundleContext = AndroidGUIActivator.bundleContext;
         bundleContext.addServiceListener(this);
@@ -179,23 +187,23 @@ public class AccountsListAdapter
     }
 
     /**
-     * Convenience method for creating new {@link View}s for each
-     * adapter's object
-     *
-     * @param account the account for which a new View shall be created
-     * @param parent {@link ViewGroup} parent View
-     * @param inflater the {@link LayoutInflater} for creating new Views
-     *
-     * @return a {@link View} for given <tt>item</tt>
+     * {@inheritDoc}
      */
     @Override
-    protected View getView( Account account,
+    protected View getView( boolean isDropDown,
+                            Account account,
                             ViewGroup parent,
                             LayoutInflater inflater )
     {
 
-        View statusItem = inflater.inflate(
-                listRowResourceID, parent, false);
+        int rowResID = listRowResourceID;
+
+        if(isDropDown && dropDownRowResourceID != -1)
+        {
+            rowResID = dropDownRowResourceID;
+        }
+
+        View statusItem = inflater.inflate(rowResID, parent, false);
 
         TextView accountName =
                 (TextView) statusItem.findViewById(R.id.accountName);

@@ -103,8 +103,10 @@ public class AddContactActivity
         }
 
         this.accountsAdapter
-                = new AccountsListAdapter(this, R.layout.select_account_row,
-                                          accounts, true);
+                = new AccountsListAdapter( this,
+                                           R.layout.select_account_row,
+                                           R.layout.select_account_dropdown,
+                                           accounts, true);
         accountsSpiner.setAdapter(accountsAdapter);
 
         // if we have only select account option and only one account
@@ -269,12 +271,17 @@ public class AddContactActivity
          * {@inheritDoc}
          */
         @Override
-        protected View getView(MetaContactGroup item, ViewGroup parent,
+        protected View getView(boolean isDropDown,
+                               MetaContactGroup item, ViewGroup parent,
                                LayoutInflater inflater)
         {
-            View rowView = inflater.inflate( R.layout.contact_group_row,
-                                             parent, false );
-            TextView tv = (TextView) rowView.findViewById(R.id.groupNameView);
+            int rowResId = isDropDown
+                    ? android.R.layout.simple_spinner_dropdown_item
+                    : android.R.layout.simple_spinner_item;
+
+            View rowView = inflater.inflate(rowResId, parent, false);
+
+            TextView tv = (TextView) rowView.findViewById(android.R.id.text1);
 
             if(item.equals(
                     AndroidGUIActivator.getContactListService().getRoot()))
