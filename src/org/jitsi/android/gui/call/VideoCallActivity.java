@@ -26,6 +26,7 @@ import org.jitsi.R;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.call.notification.*;
 import org.jitsi.android.gui.controller.*;
+import org.jitsi.android.gui.fragment.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.android.gui.widgets.*;
 import org.jitsi.impl.neomedia.jmfext.media.protocol.mediarecorder.*;
@@ -60,6 +61,12 @@ public class VideoCallActivity
      */
     private static final Logger logger =
             Logger.getLogger(VideoCallActivity.class);
+
+    /**
+     * Tag name for fragment that handles proximity sensor in order to turn
+     * the screen on and off.
+     */
+    private static final String PROXIMITY_FRAGMENT_TAG="proximity";
 
     /**
      * The remote video container.
@@ -222,6 +229,15 @@ public class VideoCallActivity
                     = new LegacyClickableToastCtrl( toastView,
                                                     toastclickHandler );
         }
+
+        /**
+         * Adds fragment that turns on and off the screen when proximity sensor
+         * detects FAR/NEAR distance.
+         */
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(new ProximitySensorFragment(), PROXIMITY_FRAGMENT_TAG)
+                .commit();
     }
 
     @Override
@@ -598,6 +614,13 @@ public class VideoCallActivity
      */
     private void leaveNotification()
     {
+        if(Build.VERSION.SDK_INT < 11)
+        {
+            // TODO: fix in call notifications for sdk < 11
+            logger.warn("In call notifications not supported prior SDK 11");
+            return;
+        }
+
         String inCallStr = getString(R.string.in_call_with);
 
         Iterator<? extends CallPeer> callPeers = call.getCallPeers();

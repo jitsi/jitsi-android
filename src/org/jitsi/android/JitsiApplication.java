@@ -9,7 +9,9 @@ package org.jitsi.android;
 import android.app.*;
 import android.content.*;
 import android.content.res.*;
+import android.hardware.*;
 import android.media.*;
+import android.os.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.service.osgi.*;
 
@@ -92,6 +94,28 @@ public class JitsiApplication
     {
         return (AudioManager) getGlobalContext()
                 .getSystemService(Context.AUDIO_SERVICE);
+    }
+
+    /**
+     * Retrieves <tt>PowerManager</tt> instance using application context.
+     *
+     * @return <tt>PowerManager</tt> service instance.
+     */
+    public static PowerManager getPowerManager()
+    {
+        return (PowerManager) getGlobalContext()
+                .getSystemService(Context.POWER_SERVICE);
+    }
+
+    /**
+     * Retrieves <tt>SensorManager</tt> instance using application context.
+     *
+     * @return <tt>SensorManager</tt> service instance.
+     */
+    public static SensorManager getSensorManager()
+    {
+        return (SensorManager) getGlobalContext()
+                .getSystemService(Context.SENSOR_SERVICE);
     }
 
     /**
