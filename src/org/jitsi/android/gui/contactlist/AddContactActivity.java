@@ -252,8 +252,7 @@ public class AddContactActivity
     }
 
     /**
-     * This adapter displays <tt>MetaContactGroup</tt> items using
-     * {@link R.layout.contact_group_row} layout.
+     * This adapter displays <tt>MetaContactGroup</tt> items.
      */
     public static class MContactGroupAdapter
             extends CollectionAdapter<MetaContactGroup>

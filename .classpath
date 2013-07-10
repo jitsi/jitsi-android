@@ -22,6 +22,7 @@
 	<classpathentry kind="lib" path="lib/bundles/dns.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/dnsservice.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/fileaccess.jar"/>
+	<classpathentry kind="lib" path="lib/bundles/filehistory.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/httputil.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/hid-service.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/history.jar"/>

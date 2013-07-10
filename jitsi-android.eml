@@ -60,6 +60,9 @@
 	<lib name="fileaccess.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/fileaccess.jar!/"/>
 	</lib>
+	<lib name="filehistory.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/filehistory.jar!/"/>
+	</lib>
 	<lib name="httputil.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/httputil.jar!/"/>
 	</lib>
@@ -72,11 +75,20 @@
 	<lib name="json.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/json.jar!/"/>
 	</lib>
+	<lib name="globaldisplaydetails.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/globaldisplaydetails.jar!/"/>
+	</lib>
 	<lib name="googlecontacts-service.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/googlecontacts-service.jar!/"/>
 	</lib>
 	<lib name="libjitsi.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/libjitsi.jar!/"/>
+	</lib>
+	<lib name="meta-cl.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/meta-cl.jar!/"/>
+	</lib>
+	<lib name="metahistory.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/metahistory.jar!/"/>
 	</lib>
 	<lib name="msghistory.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/msghistory.jar!/"/>

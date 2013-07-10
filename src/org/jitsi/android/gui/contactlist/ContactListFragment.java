@@ -125,6 +125,7 @@ public class ContactListFragment
     /**
      * 
      */
+    @Override
     public boolean onChildClick(ExpandableListView listView,
                                 View v,
                                 int groupPosition,
