@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/callContact"
+    <item android:id="@+id/call_contact"
            android:title="@string/service_gui_CALL"
            android:icon="@drawable/chatvideocall"
-           android:showAsAction="always">
+           android:showAsAction="ifRoom">
+    </item>
+    <item android:id="@+id/close_chat"
+          android:title="@string/service_gui_CLOSE_CHAT">
+    </item>
+    <item android:id="@+id/close_all_chats"
+          android:title="@string/service_gui_CLOSE_ALL_CHATS">
     </item>
 </menu>

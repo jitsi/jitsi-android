@@ -295,9 +295,6 @@ public class AndroidLoginRenderer
      */
     private void updateGlobalStatus()
     {
-        System.err.println("GLOBAL PRESENCE STATUS-----------"
-            + AndroidGUIActivator.getGlobalStatusService()
-                .getGlobalPresenceStatus());
         setGlobalStatus(AndroidGUIActivator.getGlobalStatusService()
                 .getGlobalPresenceStatus());
     }
@@ -305,10 +302,10 @@ public class AndroidLoginRenderer
     private void setGlobalStatus(final PresenceStatus presenceStatus)
     {
         final Activity currentActivity = JitsiApplication.getCurrentActivity();
-        System.err.println("CURRENT ACTIVITY=======" + currentActivity);
+
         if (currentActivity == null)
             return;
-        System.err.println("CURRENT ACTIVITY CLASS=======" + currentActivity.getClass());
+
         if (!currentActivity.getClass()
                 .equals(JitsiApplication.getHomeScreenActivityClass()))
             return;
@@ -317,11 +314,8 @@ public class AndroidLoginRenderer
         {
             public void run()
             {
-                TextView actionBarText
-                    = (TextView) currentActivity.getActionBar().getCustomView()
-                        .findViewById(R.id.actionBarStatusText);
-
-                actionBarText.setText(presenceStatus.getStatusName());
+                ActionBarUtil.setSubtitle(  currentActivity,
+                                            presenceStatus.getStatusName());
 
                 ActionBarUtil.setStatus(currentActivity,
                     StatusUtil.getContactStatusIcon(presenceStatus));

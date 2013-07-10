@@ -6,9 +6,21 @@
  */
 package org.jitsi.android.gui.chat;
 
+import java.util.*;
+
+import net.java.sip.communicator.service.protocol.*;
+import net.java.sip.communicator.util.account.*;
+import net.java.sip.communicator.util.call.*;
+
 import org.jitsi.*;
+import org.jitsi.android.*;
+import org.jitsi.android.gui.account.*;
+import org.jitsi.android.gui.contactlist.*;
+import org.jitsi.android.gui.settings.*;
+import org.jitsi.android.gui.util.*;
 import org.jitsi.service.osgi.*;
 
+import android.content.*;
 import android.os.*;
 import android.support.v4.view.*;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -119,6 +131,49 @@ public class ChatActivity
         return true;
     }
 
+    /**
+     * Invoked when an options item has been selected.
+     *
+     * @param item the item that has been selected
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        ChatFragment selectedChat
+            = chatPagerAdapter.getChatFragment(chatPager.getCurrentItem());
+
+        // Handle item selection
+        switch (item.getItemId())
+        {
+        case R.id.call_contact:
+
+            AndroidCallUtil.createAndroidCall(
+                this,
+                item.getActionView(),
+                selectedChat.getChatSession()
+                    .getMetaContact().getDefaultContact().getAddress());
+            return true;
+
+        case R.id.close_chat:
+
+            ChatSessionManager.removeActiveChat(selectedChat.getChatSession());
+            chatPagerAdapter.removeChatFragment(selectedChat);
+            if (chatPagerAdapter.getCount() <= 0)
+            {
+                startActivity(JitsiApplication.getHomeIntent());
+            }
+            return true;
+
+        case R.id.close_all_chats:
+
+            ChatSessionManager.removeAllActiveChats();
+            chatPagerAdapter.removeAllChatFragments();
+            startActivity(JitsiApplication.getHomeIntent());
+
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
     @Override
     public void onPageScrollStateChanged(int state) {}
 
@@ -149,12 +204,9 @@ public class ChatActivity
      */
     private void setSelectedChat()
     {
-        TextView actionBarText
-            = (TextView) getActionBar().getCustomView()
-                .findViewById(R.id.actionBarText);
-
-        actionBarText.setText(ChatSessionManager.getActiveChat(
+        ActionBarUtil.setTitle(this, ChatSessionManager.getActiveChat(
             ChatSessionManager.getCurrentChatSession())
                 .getMetaContact().getDisplayName());
+        ActionBarUtil.setSubtitle(this, "");
     }
 }

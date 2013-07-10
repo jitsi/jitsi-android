@@ -661,7 +661,7 @@ public class ChatFragment
     }
 
     /**
-     * Sets the avatar icon of the action bar.
+     * Sets the avatar icon for the given avatar view.
      *
      * @param avatarView the avatar image view
      * @param avatar the avatar to set
