@@ -6,10 +6,13 @@
  */
 package org.jitsi.impl.androidtray;
 
+import android.content.*;
+import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.systray.*;
 import net.java.sip.communicator.service.systray.event.*;
 
+import net.java.sip.communicator.util.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 
@@ -22,6 +25,11 @@ import org.jitsi.android.gui.*;
 public class SystrayServiceImpl
     extends AbstractSystrayService
 {
+    /**
+     *  The logger
+     */
+    private static final Logger logger
+            = Logger.getLogger(SystrayServiceImpl.class);
 
     /**
      * Popup message handler.
@@ -141,9 +149,18 @@ public class SystrayServiceImpl
             if(tag instanceof Contact)
             {
                 Contact contact = (Contact) tag;
-                //TODO: start chat activity here
-                System.err.println("Should start chat activity for contact: "
-                                           + contact);
+                MetaContact metaContact
+                    = AndroidGUIActivator.getMetaContactListService()
+                        .findMetaContactByContact(contact);
+                if(metaContact == null)
+                {
+                    logger.error("Meta contact not found for "+contact);
+                    return;
+                }
+
+                Context ctx = JitsiApplication.getGlobalContext();
+                Intent chat = Jitsi.getChatIntent(ctx,metaContact.getMetaUID());
+                ctx.startActivity(chat);
 
                 return;
             }

@@ -13,6 +13,7 @@ import android.support.v4.app.*;
 
 import java.util.*;
 
+import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.systray.*;
 import net.java.sip.communicator.service.systray.event.*;
 import net.java.sip.communicator.util.*;
@@ -43,6 +44,12 @@ public class NotificationPopupHandler
             = new HashMap<Integer, PopupMessage>();
 
     /**
+     * Maps <tt>Contact</tt>s from <tt>PopupMessage</tt> tags
+     * to notification ids.
+     */
+    private Map<Contact, Integer> contactToNotificationMap
+            = new HashMap<Contact, Integer>();
+    /**
      * {@inheritDoc}
      */
     public void showPopupMessage(PopupMessage popupMessage)
@@ -60,6 +67,29 @@ public class NotificationPopupHandler
 
         int nId = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
 
+        Object tag = popupMessage.getTag();
+        // Check if it's message notification
+        if(tag instanceof Contact)
+        {
+            if(JitsiApplication.isHomeActivityActive())
+            {
+                //TODO: temporary fix until Chat interface is not implemented
+                logger.info("Not showing message notification," +
+                                    " as main activity is started");
+                return;
+            }
+
+            Integer prevId = contactToNotificationMap.get(tag);
+            if(prevId != null)
+            {
+                nId = prevId;
+            }
+            else
+            {
+                contactToNotificationMap.put((Contact)tag, nId);
+            }
+        }
+
         // Registers click intent
         builder.setContentIntent(
                 PendingIntent.getBroadcast(
@@ -69,7 +99,7 @@ public class NotificationPopupHandler
                               * the notification id as the request code
                               */
                         PopupClickReceiver.createIntent(nId),
-                        PendingIntent.FLAG_ONE_SHOT));
+                        PendingIntent.FLAG_UPDATE_CURRENT));
 
         // Registers delete intent
         builder.setDeleteIntent(
@@ -105,7 +135,7 @@ public class NotificationPopupHandler
         firePopupMessageClicked(
                 new SystrayPopupMessageEvent(msg, msg.getTag()) );
 
-        notificationMap.remove(notificationId);
+        removeNotification(notificationId);
     }
 
     /**
@@ -115,8 +145,50 @@ public class NotificationPopupHandler
      */
     void notificationDiscarded(int notificationId)
     {
+        removeNotification(notificationId);
+    }
+
+    /**
+     * Removes notification for given <tt>notificationId</tt> and performs
+     * necessary cleanup.
+     *
+     * @param notificationId the id of notification to remove.
+     */
+    private void removeNotification(int notificationId)
+    {
+        PopupMessage msg = notificationMap.get(notificationId);
+        if(msg == null)
+        {
+            logger.debug("Notification for id: "
+                                 + notificationId + " already removed");
+            return;
+        }
+
         logger.debug("Removing notification: " + notificationId);
+
         notificationMap.remove(notificationId);
+
+        Object tag = msg.getTag();
+        if(!(tag instanceof Contact))
+        {
+            return;
+        }
+
+        Contact msgContact = (Contact) tag;
+        Contact toBeRemovedKey = null;
+        for(Contact c : contactToNotificationMap.keySet())
+        {
+            if(c.equals(msgContact))
+            {
+                toBeRemovedKey = c;
+                break;
+            }
+        }
+
+        if(toBeRemovedKey != null)
+        {
+            contactToNotificationMap.remove(toBeRemovedKey);
+        }
     }
 
     /**
@@ -131,6 +203,7 @@ public class NotificationPopupHandler
             notifyManager.cancel(notificationId);
 
         notificationMap.clear();
+        contactToNotificationMap.clear();
     }
 
     /**

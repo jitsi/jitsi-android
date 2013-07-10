@@ -187,7 +187,8 @@ public class ChatFragment
 
         super.onDetach();
 
-        chatSession.removeMessageListener(chatSessionAdapter);
+        if(chatSession != null)
+            chatSession.removeMessageListener(chatSessionAdapter);
         chatSessionAdapter = null;
 
         if (loadHistoryTask != null)

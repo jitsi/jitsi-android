@@ -57,10 +57,21 @@ public class Jitsi
     private static final Logger logger = Logger.getLogger(Jitsi.class);
 
     /**
-     * The action that will show contacts
-     * (currently <tt>CallContactFragment</tt>).
+     * The action that will show contacts.
      */
     public static final String ACTION_SHOW_CONTACTS ="org.jitsi.show_contacts";
+
+    /**
+     * The action that will show chat with contact given
+     * in <tt>CONTACT_EXTRA</tt>.
+     */
+    public static final String ACTION_SHOW_CHAT ="org.jitsi.show_chat";
+
+    /**
+     * Contact argument used to show the chat.
+     * It must be the <tt>MetaContact</tt> UID string.
+     */
+    public static final String CONTACT_EXTRA = "org.jitsi.chat.contact";
 
     /**
      * A call back parameter.
@@ -279,7 +290,8 @@ public class Jitsi
             System.err.println("QUERYYYYYYYYYYYY=========" + query);
 //            doMySearch(query);
         }
-        else if(action.equals(ACTION_SHOW_CONTACTS))
+        else if(action.equals(ACTION_SHOW_CONTACTS)
+                || action.equals(ACTION_SHOW_CHAT))
         {
             showAccountInfo();
 
@@ -521,30 +533,7 @@ public class Jitsi
             {
                 ActionMenuItem actionItem = globalStatusMenu.getActionItem(pos);
 
-                GlobalStatusService globalStatusService
-                    = AndroidGUIActivator.getGlobalStatusService();
-
-                switch (actionId)
-                {
-                case ONLINE:
-                    globalStatusService.publishStatus(GlobalStatusEnum.ONLINE);
-                    break;
-                case OFFLINE:
-                    globalStatusService.publishStatus(GlobalStatusEnum.OFFLINE);
-                    break;
-                case FFC:
-                    globalStatusService
-                        .publishStatus(GlobalStatusEnum.FREE_FOR_CHAT);
-                    break;
-                case AWAY:
-                    globalStatusService
-                        .publishStatus(GlobalStatusEnum.AWAY);
-                    break;
-                case DND:
-                    globalStatusService
-                        .publishStatus(GlobalStatusEnum.DO_NOT_DISTURB);
-                    break;
-                }
+                publishGlobalStatus(actionId);
             }
         });
 
@@ -558,6 +547,53 @@ public class Jitsi
         });
 
         return globalStatusMenu;
+    }
+
+    /**
+     * Publishes global status on separate thread to prevent
+     * <tt>NetworkOnMainThreadException</tt>.
+     *
+     * @param newStatus new global status to set.
+     */
+    private void publishGlobalStatus(final int newStatus)
+    {
+        /**
+         * Runs publish status on separate thread to prevent
+         * NetworkOnMainThreadException
+         */
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                GlobalStatusService globalStatusService
+                        = AndroidGUIActivator.getGlobalStatusService();
+
+                switch (newStatus)
+                {
+                    case ONLINE:
+                        globalStatusService
+                                .publishStatus(GlobalStatusEnum.ONLINE);
+                        break;
+                    case OFFLINE:
+                        globalStatusService
+                                .publishStatus(GlobalStatusEnum.OFFLINE);
+                        break;
+                    case FFC:
+                        globalStatusService
+                                .publishStatus(GlobalStatusEnum.FREE_FOR_CHAT);
+                        break;
+                    case AWAY:
+                        globalStatusService
+                                .publishStatus(GlobalStatusEnum.AWAY);
+                        break;
+                    case DND:
+                        globalStatusService
+                                .publishStatus(GlobalStatusEnum.DO_NOT_DISTURB);
+                        break;
+                }
+            }
+        }).start();
     }
 
 
@@ -598,5 +634,20 @@ public class Jitsi
             mainViewFragment.filterContactList(query);
 
         return false;
+    }
+
+    /**
+     * Creates new start chat <tt>Intent</tt> fro given <tt>MetaContact</tt> UID
+     * @param metaUID UID of the <tt>MetaContact</tt> to start chat with.
+     * @return new chat <tt>Intent</tt> for given <tt>MetaContact</tt> UID.
+     */
+    public static Intent getChatIntent(Context context, String metaUID)
+    {
+        Intent chatIntent = new Intent(context, Jitsi.class);
+        chatIntent.setAction(ACTION_SHOW_CHAT);
+        chatIntent.putExtra(CONTACT_EXTRA, metaUID);
+        chatIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        return chatIntent;
     }
 }

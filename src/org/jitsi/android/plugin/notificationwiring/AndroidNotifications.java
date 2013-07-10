@@ -58,6 +58,11 @@ public class AndroidNotifications
         notificationService.removeEventNotificationAction(
                 NotificationManager.INCOMING_CALL,
                 NotificationAction.ACTION_POPUP_MESSAGE);
+        // Removes proactive notifications
+        //TODO: fix once chat will implement "is typing..." notification
+        notificationService.removeEventNotificationAction(
+                NotificationManager.PROACTIVE_NOTIFICATION,
+                NotificationAction.ACTION_POPUP_MESSAGE);
     }
 
     /**

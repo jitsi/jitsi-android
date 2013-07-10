@@ -14,6 +14,8 @@ import android.hardware.*;
 import android.media.*;
 import android.os.*;
 
+import net.java.sip.communicator.util.*;
+
 import org.jitsi.android.gui.*;
 import org.jitsi.service.osgi.*;
 
@@ -26,6 +28,12 @@ import org.jitsi.service.osgi.*;
 public class JitsiApplication
     extends Application
 {
+    /**
+     * The logger
+     */
+    private static final Logger logger
+            = Logger.getLogger(JitsiApplication.class);
+
     /**
      * The EXIT action name that is broadcasted to all OSGiActivities
      */
@@ -220,6 +228,7 @@ public class JitsiApplication
      */
     public static void setCurrentActivity(Activity a)
     {
+        logger.info("Current activity set to "+a);
         currentActivity = a;
     }
 
@@ -231,5 +240,17 @@ public class JitsiApplication
     public static Activity getCurrentActivity()
     {
         return currentActivity;
+    }
+
+    /**
+     * Checks if current <tt>Activity</tt> is the home one.
+     * @return <tt>true</tt> if the home <tt>Activity</tt> is currently active.
+     */
+    public static boolean isHomeActivityActive()
+    {
+        if(currentActivity == null)
+            return false;
+
+        return currentActivity.getClass().equals(getHomeScreenActivityClass());
     }
 }

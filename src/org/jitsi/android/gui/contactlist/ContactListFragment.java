@@ -10,6 +10,7 @@ import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.util.*;
 
 import org.jitsi.*;
+import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.chat.*;
 import org.jitsi.service.osgi.*;
 import org.osgi.framework.*;
@@ -30,6 +31,12 @@ public class ContactListFragment
     implements  OnChildClickListener,
                 OnGroupClickListener
 {
+    /**
+     * The logger.
+     */
+    private final static Logger logger
+            = Logger.getLogger(ContactListFragment.class);
+
     /**
      * The <tt>MetaContactListService</tt> giving access to the contact list
      * content.
@@ -65,34 +72,13 @@ public class ContactListFragment
      * {@inheritDoc}
      */
     @Override
-    public void start(BundleContext bundleContext)
-            throws Exception
+    public void onStart()
     {
-        super.start(bundleContext);
+        super.onStart();
 
         this.contactListService
-                = ServiceUtils.getService( bundleContext,
+                = ServiceUtils.getService( AndroidGUIActivator.bundleContext,
                                            MetaContactListService.class);
-
-        // If the contact list adapter has been already created we need to
-        // initialize it.
-        if (contactListAdapter != null && !contactListAdapter.isInitialized())
-        {
-            contactListAdapter.initAdapterData(contactListService);
-        }
-    }
-
-    /**
-     * Called when the fragment is visible to the user and actively running.
-     * This is generally
-     * tied to {@link android.app.Activity#onResume() Activity.onResume} of the
-     * containing
-     * Activity's lifecycle.
-     */
-    @Override
-    public void onResume()
-    {
-        super.onResume();
 
         contactListView
             = (ExpandableListView) getView().findViewById(R.id.contactListView);
@@ -110,6 +96,23 @@ public class ContactListFragment
         {
             contactListAdapter.initAdapterData(contactListService);
         }
+
+        // Check if we have contact intent to start chat
+        Intent intent = getActivity().getIntent();
+        String metaUID = intent.getStringExtra(Jitsi.CONTACT_EXTRA);
+        if(metaUID == null)
+            return;
+        MetaContact metaContact
+                = contactListService.findMetaContactByMetaUID(metaUID);
+        if(metaContact == null)
+        {
+            if(intent.getAction().equals(Jitsi.ACTION_SHOW_CHAT))
+            {
+                logger.error("Meta contact not found for UID: "+metaUID);
+            }
+            return;
+        }
+        startChatActivity(metaContact);
     }
 
     /**
