@@ -191,6 +191,13 @@ public class OSGiActivity
         JitsiApplication.setCurrentActivity(this);
     }
 
+    protected void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+
+        JitsiApplication.setCurrentActivity(this);
+    }
+
     private void setService(BundleContextHolder service)
     {
         if (this.service != service)
