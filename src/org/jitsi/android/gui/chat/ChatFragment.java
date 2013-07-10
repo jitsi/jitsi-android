@@ -109,7 +109,6 @@ public class ChatFragment
 
         if (chatSessionAdapter == null)
         {
-            System.err.println("ON CREATE=======" + this);
             chatSessionAdapter = new ChatSessionAdapter();
             chatListView
                 = (ListView) content.findViewById(R.id.chatListView);
@@ -151,9 +150,6 @@ public class ChatFragment
 
     private void initAdapter()
     {
-        System.err.println("INIT ADAPTER=======" + this);
-        System.err.println("CHAT SESSSION ADD MESSAGE LISTENER=======" + chatSession);
-        System.err.println("CHAT SESSSION ADAPTER=======" + chatSessionAdapter);
         chatSession.addMessageListener(chatSessionAdapter);
 
         loadHistoryTask = new LoadHistoryTask();
@@ -245,9 +241,6 @@ public class ChatFragment
                                 final String messageUID,
                                 final String correctedMessageUID)
         {
-            System.err.println("ACTIVITY=======" + chatSession.getChatId() 
-                + "==========" + ChatFragment.this
-                + "============================" + getActivity());
             getActivity().runOnUiThread(new Runnable()
             {
                 public void run()
@@ -433,8 +426,6 @@ public class ChatFragment
         @Override
         public void messageDelivered(MessageDeliveredEvent evt)
         {
-            System.err.println("MESSAGE DELIVERED FOR FRAGMENT======" + ChatFragment.this);
-            System.err.println("CHAT SESSION======" + chatSession);
             Contact contact = evt.getDestinationContact();
             MetaContact metaContact
                 = AndroidGUIActivator.getContactListService()
@@ -607,7 +598,6 @@ public class ChatFragment
         {
             super.onPostExecute(result);
 
-            System.err.println("RESULT==========" + result.size());
             loadHistory((Collection<Object>) result, false);
         }
     }
@@ -622,8 +612,6 @@ public class ChatFragment
     private void loadHistory( Collection<Object> historyList,
                               boolean dataChanged)
     {
-        System.err.println("LOAD HISTORY FRAGMENT=====================" + this);
-        System.err.println("LOAD HISTORY=====================" + chatSessionAdapter);
         if (chatSessionAdapter == null)
             return;
 
@@ -666,7 +654,8 @@ public class ChatFragment
      * @param avatarView the avatar image view
      * @param avatar the avatar to set
      */
-    public void setAvatar(ImageView avatarView, Drawable avatar)
+    public void setAvatar(  ImageView avatarView,
+                            Drawable avatar)
     {
         if (avatar == null)
             avatar = AccountUtil.getDefaultAvatarIcon(getActivity());

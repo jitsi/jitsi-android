@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
-            android:layout_margin="5dp"
+            android:layout_margin="2dp"
             android:padding="5dp"
             android:background="@color/white"
             android:textColor="@color/black"
@@ -36,7 +36,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:background="@android:color/transparent"
-            android:layout_margin="5dp"
+            android:layout_margin="2dp"
+            android:padding="3dp"
             android:onClick="onSendMessageClick"/>
     </LinearLayout>
 </LinearLayout>

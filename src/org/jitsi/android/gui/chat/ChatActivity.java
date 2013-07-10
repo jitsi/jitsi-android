@@ -6,21 +6,14 @@
  */
 package org.jitsi.android.gui.chat;
 
-import java.util.*;
-
+import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.protocol.*;
-import net.java.sip.communicator.util.account.*;
-import net.java.sip.communicator.util.call.*;
 
 import org.jitsi.*;
 import org.jitsi.android.*;
-import org.jitsi.android.gui.account.*;
-import org.jitsi.android.gui.contactlist.*;
-import org.jitsi.android.gui.settings.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.service.osgi.*;
 
-import android.content.*;
 import android.os.*;
 import android.support.v4.view.*;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
@@ -72,11 +65,24 @@ public class ChatActivity
             chatPager.setAdapter(chatPagerAdapter);
             chatPager.setOffscreenPageLimit(4);
 
-            chatPager.setCurrentItem(chatPagerAdapter.getSelectedIndex());
-            setSelectedChat();
-
             chatPager.setOnPageChangeListener(this);
         }
+    }
+
+    /**
+     * Called when the fragment is visible to the user and actively running.
+     * This is generally
+     * tied to {@link android.app.Activity#onResume() Activity.onResume} of the
+     * containing
+     * Activity's lifecycle.
+     */
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        chatPager.setCurrentItem(chatPagerAdapter.getSelectedIndex());
+        setSelectedChat();
     }
 
     /**
@@ -204,9 +210,22 @@ public class ChatActivity
      */
     private void setSelectedChat()
     {
-        ActionBarUtil.setTitle(this, ChatSessionManager.getActiveChat(
-            ChatSessionManager.getCurrentChatSession())
-                .getMetaContact().getDisplayName());
-        ActionBarUtil.setSubtitle(this, "");
+        MetaContact metaContact = ChatSessionManager.getActiveChat(
+            ChatSessionManager.getCurrentChatSession()).getMetaContact();
+
+        ActionBarUtil.setTitle(this, metaContact.getDisplayName());
+
+        PresenceStatus status
+            = metaContact.getDefaultContact().getPresenceStatus();
+
+        ActionBarUtil.setSubtitle(this, status.getStatusName());
+
+//        byte[] avatarImage = metaContact.getAvatar();
+//
+//        if (avatarImage != null)
+//        {
+//            ActionBarUtil.setAvatar(this, avatarImage);
+//            ActionBarUtil.setStatus(this, status.getStatusIcon());
+//        }
     }
 }

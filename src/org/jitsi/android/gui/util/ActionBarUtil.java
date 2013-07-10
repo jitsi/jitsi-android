@@ -7,7 +7,6 @@
 package org.jitsi.android.gui.util;
 
 import org.jitsi.*;
-import org.jitsi.android.*;
 
 import android.app.*;
 import android.content.*;
@@ -60,49 +59,37 @@ public class ActionBarUtil
     /**
      * Sets the avatar icon of the action bar.
      *
-     * @param context the android context
+     * @param a the current activity where the status should be displayed
      * @param avatar the avatar to set
      */
-    public static void setAvatar(Context context, byte[] avatar)
+    public static void setAvatar(Activity a, byte[] avatar)
     {
         if (avatarDrawable == null)
-            avatarDrawable = getDefaultAvatarIcon(context);
+            avatarDrawable = getDefaultAvatarIcon(a);
 
         avatarDrawable
             .setDrawableByLayerId(R.id.avatarDrawable,
                 AndroidImageUtil.drawableFromBytes(avatar));
 
-        Activity currentActivity = JitsiApplication.getCurrentActivity();
-
-        if (currentActivity.getClass()
-                .equals(JitsiApplication.getHomeScreenActivityClass()))
-        {
-            currentActivity.getActionBar().setLogo(avatarDrawable);
-        }
+        a.getActionBar().setLogo(avatarDrawable);
     }
 
     /**
      * Sets the status icon of the action bar avatar.
      *
-     * @param context the android context
+     * @param a the current activity where the status should be displayed
      * @param statusIcon the status icon to set
      */
-    public static void setStatus(Context context, byte[] statusIcon)
+    public static void setStatus(Activity a, byte[] statusIcon)
     {
         if (avatarDrawable == null)
-            avatarDrawable = getDefaultAvatarIcon(context);
+            avatarDrawable = getDefaultAvatarIcon(a);
 
         avatarDrawable
             .setDrawableByLayerId(R.id.contactStatusDrawable,
                 AndroidImageUtil.drawableFromBytes(statusIcon));
 
-        Activity currentActivity = JitsiApplication.getCurrentActivity();
-
-        if (currentActivity.getClass()
-                .equals(JitsiApplication.getHomeScreenActivityClass()))
-        {
-            currentActivity.getActionBar().setLogo(avatarDrawable);
-        }
+        a.getActionBar().setLogo(avatarDrawable);
     }
 
     /**

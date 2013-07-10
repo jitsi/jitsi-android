@@ -1313,9 +1313,17 @@ public class ContactListAdapter
     {
         Drawable avatarImage = getAvatarDrawable(metaContact);
 
+        int leftOffset = 50;
+        int topOffset = 50;
+        // TODO: This is a workaround, because it seems that the resolution of
+        // the default avatar is smaller.
         if (avatarImage == null)
+        {
             avatarImage = AccountUtil.getDefaultAvatarIcon(
                 contactListFragment.getActivity());
+            leftOffset = 80;
+            topOffset = 80;
+        }
 
         byte[] statusImage = getStatusImage(metaContact);
 
@@ -1323,7 +1331,7 @@ public class ContactListAdapter
             = new LayerDrawable(new Drawable[]{avatarImage,
                 AndroidImageUtil.drawableFromBytes(statusImage)});
 
-        avatarDrawable.setLayerInset(1, 50, 50, 0, 0);
+        avatarDrawable.setLayerInset(1, leftOffset, topOffset, 0, 0);
         avatarView.setImageDrawable(avatarDrawable);
     }
 

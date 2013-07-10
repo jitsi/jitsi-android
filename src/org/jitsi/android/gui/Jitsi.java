@@ -446,7 +446,7 @@ public class Jitsi
             {
                 if (avatar != null && avatar.length > 0)
                 {
-                    ActionBarUtil.setAvatar(getApplicationContext(), avatar);
+                    ActionBarUtil.setAvatar(Jitsi.this, avatar);
                 }
             }
         });

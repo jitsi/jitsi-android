@@ -299,6 +299,11 @@ public class AndroidLoginRenderer
                 .getGlobalPresenceStatus());
     }
 
+    /**
+     * Sets the global status.
+     *
+     * @param presenceStatus the global <tt>PresenceStatus</tt> to set.
+     */
     private void setGlobalStatus(final PresenceStatus presenceStatus)
     {
         final Activity currentActivity = JitsiApplication.getCurrentActivity();
@@ -314,10 +319,12 @@ public class AndroidLoginRenderer
         {
             public void run()
             {
-                ActionBarUtil.setSubtitle(  currentActivity,
-                                            presenceStatus.getStatusName());
+                ActionBarUtil.setSubtitle(
+                    currentActivity,
+                    presenceStatus.getStatusName());
 
-                ActionBarUtil.setStatus(currentActivity,
+                ActionBarUtil.setStatus(
+                    currentActivity,
                     StatusUtil.getContactStatusIcon(presenceStatus));
             }
         });

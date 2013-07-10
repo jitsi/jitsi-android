@@ -56,7 +56,7 @@
             android:id="@+id/buttonSeparatorView"
             android:src="@drawable/contact_list_separator"
             android:layout_width="1dip"
-            android:layout_height="30dip"
+            android:layout_height="40dip"
             android:layout_marginRight="15dp"
             android:layout_gravity="center_vertical"/>
 
