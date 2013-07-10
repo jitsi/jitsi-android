@@ -36,7 +36,7 @@ import android.widget.*;
  * @author Yana Stamcheva
  */
 public class ChatFragment
-    extends OSGiFragmentV4
+    extends OSGiFragment
 {
     /**
      * The logger
@@ -430,7 +430,6 @@ public class ChatFragment
             });
         }
 
-        @Override
         public void messageDelivered(MessageDeliveredEvent evt)
         {
             System.err.println("MESSAGE DELIVERED FOR FRAGMENT======" + ChatFragment.this);
@@ -471,14 +470,12 @@ public class ChatFragment
             }
         }
 
-        @Override
         public void messageDeliveryFailed(MessageDeliveryFailedEvent arg0)
         {
             // TODO Auto-generated method stub
             
         }
 
-        @Override
         public void messageReceived(MessageReceivedEvent evt)
         {
             if (logger.isTraceEnabled())

@@ -18,7 +18,7 @@ import android.view.*;
  * @author Yana Stamcheva
  */
 public class ChatTabletFragment
-    extends OSGiFragmentV4
+    extends OSGiFragment
 {
     private ChatFragment chatFragment;
 

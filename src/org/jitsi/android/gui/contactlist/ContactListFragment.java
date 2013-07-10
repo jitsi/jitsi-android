@@ -26,7 +26,7 @@ import android.widget.ExpandableListView.OnGroupClickListener;
  *
  */
 public class ContactListFragment
-    extends OSGiFragmentV4
+    extends OSGiFragment
     implements  OnChildClickListener,
                 OnGroupClickListener
 {
@@ -125,7 +125,6 @@ public class ContactListFragment
     /**
      * 
      */
-    @Override
     public boolean onChildClick(ExpandableListView listView,
                                 View v,
                                 int groupPosition,
@@ -188,7 +187,7 @@ public class ContactListFragment
         {
             ChatTabletFragment chatTabletFragment
                 = ChatTabletFragment.newInstance(chatSession.getChatId());
-            ((OSGiFragmentActivity) getActivity()).getSupportFragmentManager()
+                    getActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.chatView, chatTabletFragment)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)

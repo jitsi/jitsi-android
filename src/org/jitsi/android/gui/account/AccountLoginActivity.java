@@ -17,7 +17,7 @@ import org.jitsi.service.osgi.*;
  * @author Pawel Domas
  */
 public class AccountLoginActivity
-    extends OSGiFragmentActivity
+    extends OSGiActivity
 {
     /**
      * The username property name.

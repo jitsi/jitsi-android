@@ -9,7 +9,7 @@ import android.os.*;
 import android.view.*;
 
 public class MainViewFragment
-    extends OSGiFragmentV4
+    extends OSGiFragment
 {
     private ContactListFragment contactListFragment;
 

@@ -11,6 +11,7 @@ import android.content.*;
 import android.os.*;
 import android.os.Bundle; // disambiguation
 
+import android.support.v4.app.*;
 import android.view.*;
 import net.java.sip.communicator.util.*;
 import org.jitsi.android.*;
@@ -25,7 +26,7 @@ import java.util.*;
  * @author Pawel Domas
  */
 public class OSGiActivity
-    extends OSGiFragmentActivity
+    extends FragmentActivity
 {
     /**
      * The logger
@@ -171,9 +172,6 @@ public class OSGiActivity
             if (serviceConnection != null)
                 unbindService(serviceConnection);
         }
-
-        // Clear the references to this activity.
-        clearReferences();
 
         super.onDestroy();
     }

@@ -18,11 +18,8 @@ import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.settings.*;
 import org.jitsi.service.osgi.*;
 
-import android.app.*;
-import android.content.*;
 import android.os.*;
 import android.view.*;
-import android.widget.*;
 
 /**
  * The main options menu. Every <tt>Activity</tt> that desires to have the
@@ -33,7 +30,7 @@ import android.widget.*;
  * @author Yana Stamcheva
  */
 public class MainMenuActivity
-    extends OSGiFragmentActivity
+    extends OSGiActivity
 {
     /**
      * Called when the activity is starting. Initializes the corresponding

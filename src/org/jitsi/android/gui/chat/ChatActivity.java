@@ -33,7 +33,7 @@ import android.widget.*;
  * @author Yana Stamcheva
  */
 public class ChatActivity
-    extends OSGiFragmentActivity
+    extends OSGiActivity
     implements OnPageChangeListener
 {
     /**
@@ -174,7 +174,7 @@ public class ChatActivity
             return super.onOptionsItemSelected(item);
         }
     }
-    @Override
+
     public void onPageScrollStateChanged(int state) {}
 
     /**
@@ -185,7 +185,6 @@ public class ChatActivity
      * @param posOffsetPixels the offset of the newly selected position in
      * pixels
      */
-    @Override
     public void onPageScrolled(int pos, float posOffset, int posOffsetPixels)
     {
         chatPagerAdapter.setSelectedIndex(pos);
@@ -196,7 +195,6 @@ public class ChatActivity
         setSelectedChat();
     }
 
-    @Override
     public void onPageSelected(int pos) {}
 
     /**

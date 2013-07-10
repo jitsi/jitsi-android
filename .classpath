@@ -26,10 +26,12 @@
 	<classpathentry kind="lib" path="lib/bundles/hid-service.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/history.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/json.jar"/>
+	<classpathentry kind="lib" path="lib/bundles/globaldisplaydetails.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/googlecontacts-service.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/libjitsi.jar"/>
-	<classpathentry kind="lib" path="lib/bundles/msghistory.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/meta-cl.jar"/>
+	<classpathentry kind="lib" path="lib/bundles/metahistory.jar"/>
+	<classpathentry kind="lib" path="lib/bundles/msghistory.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/netaddr.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/notification-handlers.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/notification-service.jar"/>

@@ -20,7 +20,7 @@ import org.jitsi.service.osgi.*;
  * @author Pawel Domas
  */
 public class SplashScreenFragment
-    extends OSGiFragmentV4
+    extends OSGiFragment
 {
     /**
      * {@inheritDoc}
