@@ -57,6 +57,7 @@ public class ContactListFragment
         View content = inflater.inflate( R.layout.contact_list,
                                          container,
                                          false);
+
         return content;
     }
 
@@ -97,6 +98,7 @@ public class ContactListFragment
             = (ExpandableListView) getView().findViewById(R.id.contactListView);
 
         this.contactListAdapter = new ContactListAdapter(this);
+
         contactListView.setAdapter(contactListAdapter);
         contactListView.setSelector(R.drawable.contact_list_selector);
         contactListView.setOnChildClickListener(this);

@@ -147,6 +147,32 @@ public class ChatPagerAdapter
     }
 
     /**
+     * Removes the given <tt>ChatFragment</tt> from this pager.
+     *
+     * @param chatFragment the <tt>ChatFragment</tt> to remove from this pager
+     */
+    public void removeChatFragment(ChatFragment chatFragment)
+    {
+        synchronized (chatFragments)
+        {
+            chatFragments.remove(chatFragment);
+        }
+        notifyDataSetChanged();
+    }
+
+    /**
+     * Removes all <tt>ChatFragment</tt>s from this pager.
+     */
+    public void removeAllChatFragments()
+    {
+        synchronized (chatFragments)
+        {
+            chatFragments.clear();
+        }
+        notifyDataSetChanged();
+    }
+
+    /**
      * Returns the position of the given <tt>object</tt> in this pager.
      *
      * @return the position of the given <tt>object</tt> in this pager

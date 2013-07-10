@@ -169,6 +169,7 @@ public class Jitsi
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setSearchableInfo(
             searchManager.getSearchableInfo(getComponentName()));
+
         int id = searchView.getContext().getResources()
                 .getIdentifier("android:id/search_src_text", null, null);
         TextView textView = (TextView) searchView.findViewById(id);
@@ -474,11 +475,7 @@ public class Jitsi
                          .getAccountID().getUserID();
                 }
 
-                TextView actionBarText
-                    = (TextView) getActionBar().getCustomView()
-                        .findViewById(R.id.actionBarText);
-
-                actionBarText.setText(displayName);
+                ActionBarUtil.setTitle(Jitsi.this, displayName);
             }
         });
     }
@@ -579,21 +576,27 @@ public class Jitsi
     @Override
     public boolean onClose()
     {
-        mainViewFragment.filterContactList("");
+        if (mainViewFragment != null)
+            mainViewFragment.filterContactList("");
+
         return false;
     }
 
     @Override
     public boolean onQueryTextChange(String query)
     {
-        mainViewFragment.filterContactList(query);
+        if (mainViewFragment != null)
+            mainViewFragment.filterContactList(query);
+
         return false;
     }
 
     @Override
     public boolean onQueryTextSubmit(String query)
     {
-        mainViewFragment.filterContactList(query);
+        if (mainViewFragment != null)
+            mainViewFragment.filterContactList(query);
+
         return false;
     }
 }

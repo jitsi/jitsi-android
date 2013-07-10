@@ -951,9 +951,10 @@ public class VideoCallActivity
         {
             public void run()
             {
-                ActionBar ab = getActionBar();
-                ab.setDisplayShowTitleEnabled(true);
-                ab.setTitle(name);
+                ActionBarUtil.setTitle(VideoCallActivity.this,
+                    getResources().getString(
+                        R.string.service_gui_CALL_WITH) + ": ");
+                ActionBarUtil.setSubtitle(VideoCallActivity.this, name);
             }
         });
     }

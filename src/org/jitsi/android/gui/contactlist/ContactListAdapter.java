@@ -89,6 +89,12 @@ public class ContactListAdapter
     private String currentQuery;
 
     /**
+     * Indicates if we're in an extended chat interface where the chat is shown
+     * on the right of the contact list.
+     */
+    private boolean isExtendedChat;
+
+    /**
      * Creates the contact list adapter.
      *
      * @param clFragment the parent <tt>ContactListFragment</tt>
@@ -132,8 +138,10 @@ public class ContactListAdapter
         View chatExtendedView
             = contactListFragment.getActivity().findViewById(R.id.chatView);
 
+        isExtendedChat = (chatExtendedView != null);
+
         // In extended/tablet view we pre-select the first contact.
-        if (firstMetaContact != null && chatExtendedView != null)
+        if (firstMetaContact != null && isExtendedChat)
             contactListFragment.startChatActivity(firstMetaContact);
     }
 
@@ -377,6 +385,10 @@ public class ContactListAdapter
      */
     private void dataChanged()
     {
+        if (contactListFragment == null
+            || contactListFragment.getActivity() == null)
+            return;
+
         contactListFragment.getActivity().runOnUiThread(new Runnable()
         {
             public void run()
@@ -955,18 +967,27 @@ public class ContactListAdapter
             {
                 convertView.setBackgroundResource(
                     R.drawable.list_selection_gradient);
-                contactViewHolder.selectedBgView
-                    .setVisibility(View.VISIBLE);
-                contactViewHolder.selectedBgView.getLayoutParams().height=30;
+
+                if (isExtendedChat)
+                {
+                    contactViewHolder.selectedBgView
+                        .setVisibility(View.VISIBLE);
+                    contactViewHolder.selectedBgView
+                        .getLayoutParams().height = 30;
+                }
             }
             else
             {
                 convertView.setBackgroundResource(
                     R.drawable.contact_list_selector);
 
-                contactViewHolder.selectedBgView
-                    .setVisibility(View.INVISIBLE);
-                contactViewHolder.selectedBgView.getLayoutParams().height=0;
+                if (isExtendedChat)
+                {
+                    contactViewHolder.selectedBgView
+                        .setVisibility(View.INVISIBLE);
+                    contactViewHolder.selectedBgView
+                        .getLayoutParams().height = 0;
+                }
             }
 
             // Set display name value.

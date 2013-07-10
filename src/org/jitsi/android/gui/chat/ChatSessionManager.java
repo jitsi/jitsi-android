@@ -55,6 +55,33 @@ public class ChatSessionManager
     }
 
     /**
+     * Removes an active chat.
+     *
+     * @param chatSession the <tt>ChatSession</tt> corresponding to the active
+     * chat to remove
+     */
+    public synchronized static void removeActiveChat(ChatSession chatSession)
+    {
+        synchronized (activeChats)
+        {
+            activeChats.remove(chatSession.getChatId());
+
+            chatSession = null;
+        }
+    }
+
+    /**
+     * Removes all active chats.
+     */
+    public synchronized static void removeAllActiveChats()
+    {
+        synchronized (activeChats)
+        {
+            activeChats.clear();
+        }
+    }
+
+    /**
      * Returns the <tt>ChatSession</tt> corresponding to the given chat
      * identifier.
      *

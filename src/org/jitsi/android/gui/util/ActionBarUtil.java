@@ -12,6 +12,7 @@ import org.jitsi.android.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.drawable.*;
+import android.widget.*;
 
 /**
  * The <tt>ActionBarUtil</tt> provides utility methods for setting action bar
@@ -25,6 +26,36 @@ public class ActionBarUtil
      * The avatar drawable.
      */
     private static LayerDrawable avatarDrawable;
+
+    /**
+     * Sets the action bar title for the given acitivity.
+     *
+     * @param a the <tt>Activity</tt>, for which we set the action bar title
+     * @param title the title string to set
+     */
+    public static void setTitle(Activity a, String title)
+    {
+        TextView actionBarText
+            = (TextView) a.getActionBar().getCustomView()
+                .findViewById(R.id.actionBarText);
+
+        actionBarText.setText(title);
+    }
+
+    /**
+     * Sets the action bar subtitle for the given acitivity.
+     *
+     * @param a the <tt>Activity</tt>, for which we set the action bar subtitle
+     * @param subtitle the subtitle string to set
+     */
+    public static void setSubtitle(Activity a, String subtitle)
+    {
+        TextView actionBarText
+            = (TextView) a.getActionBar().getCustomView()
+                .findViewById(R.id.actionBarStatusText);
+
+        actionBarText.setText(subtitle);
+    }
 
     /**
      * Sets the avatar icon of the action bar.
