@@ -392,20 +392,24 @@ public class ChatFragment
             if (message != null)
             {
                 Drawable avatar = null;
+                Drawable status = null;
                 if (messageViewHolder.viewType == INCOMING_MESSAGE_VIEW)
                 {
                     avatar = ContactListAdapter.getAvatarDrawable(
+                        chatSession.getMetaContact());
+                    status = ContactListAdapter.getStatusDrawable(
                         chatSession.getMetaContact());
                 }
                 else if (messageViewHolder.viewType == OUTGOING_MESSAGE_VIEW)
                 {
                     avatar = getLocalAvatarDrawable();
+                    status = getLocalStatusDrawable();
                 }
 
                 if (avatar == null)
                         avatar = AccountUtil.getDefaultAvatarIcon(getActivity());
 
-                setAvatar(messageViewHolder.avatarView, avatar);
+                setAvatar(messageViewHolder.avatarView, avatar, status);
 
                 messageViewHolder.messageView.setText(message.getMessage());
             }
@@ -636,6 +640,11 @@ public class ChatFragment
             chatSessionAdapter.dataChanged();
     }
 
+    /**
+     * Returns the local user avatar drawable.
+     *
+     * @return the local user avatar drawable
+     */
     private static Drawable getLocalAvatarDrawable()
     {
         GlobalDisplayDetailsService displayDetailsService
@@ -650,30 +659,37 @@ public class ChatFragment
     }
 
     /**
+     * Returns the local user status drawable.
+     *
+     * @return the local user status drawable
+     */
+    private static Drawable getLocalStatusDrawable()
+    {
+        GlobalStatusService globalStatusService
+            = AndroidGUIActivator.getGlobalStatusService();
+
+        byte[] statusImage
+            = StatusUtil.getContactStatusIcon(
+                globalStatusService.getGlobalPresenceStatus());
+
+        return AndroidImageUtil.drawableFromBytes(statusImage);
+    }
+
+    /**
      * Sets the avatar icon for the given avatar view.
      *
      * @param avatarView the avatar image view
      * @param avatar the avatar to set
      */
     public void setAvatar(  ImageView avatarView,
-                            Drawable avatar)
+                            Drawable avatar,
+                            Drawable status)
     {
         if (avatar == null)
             avatar = AccountUtil.getDefaultAvatarIcon(getActivity());
 
-        GlobalStatusService globalStatusService
-            = AndroidGUIActivator.getGlobalStatusService();
-
-        if (globalStatusService == null)
-            return;
-
-        byte[] statusImage
-            = StatusUtil.getContactStatusIcon(
-                globalStatusService.getGlobalPresenceStatus());
-
         LayerDrawable avatarDrawable
-            = new LayerDrawable(new Drawable[]{avatar,
-                AndroidImageUtil.drawableFromBytes(statusImage)});
+            = new LayerDrawable(new Drawable[]{avatar, status});
 
         avatarDrawable.setLayerInset(1, 50, 50, 0, 0);
         avatarView.setImageDrawable(avatarDrawable);

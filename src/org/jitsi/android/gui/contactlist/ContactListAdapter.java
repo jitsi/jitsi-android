@@ -1343,7 +1343,7 @@ public class ContactListAdapter
      * @return a <tt>Drawable</tt> object representing the status of the given
      * <tt>MetaContact</tt>
      */
-    private static Drawable getStatusDrawable(MetaContact metaContact)
+    public static Drawable getStatusDrawable(MetaContact metaContact)
     {
         byte[] statusImage = getStatusImage(metaContact);
 
@@ -1373,7 +1373,11 @@ public class ContactListAdapter
     }
 
     /**
-     * 
+     * Returns the array of bytes representing the status image of the given
+     * <tt>MetaContact</tt>.
+     *
+     * @return the array of bytes representing the status image of the given
+     * <tt>MetaContact</tt>
      */
     private static byte[] getStatusImage(MetaContact metaContact)
     {
