@@ -13,7 +13,6 @@ import org.jitsi.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.chat.*;
 import org.jitsi.service.osgi.*;
-import org.osgi.framework.*;
 
 import android.content.*;
 import android.os.Bundle;

@@ -158,6 +158,104 @@ public class ChatSession
     }
 
     /**
+     * Adds the given <tt>MessageListener</tt> to listen for message events in
+     * this chat session.
+     *
+     * @param l the <tt>MessageListener</tt> to add
+     */
+    public void addTypingListener(TypingNotificationsListener l)
+    {
+        Iterator<Contact> protoContacts = metaContact.getContacts();
+
+        while (protoContacts.hasNext())
+        {
+            Contact protoContact = protoContacts.next();
+
+            OperationSetTypingNotifications typingOpSet
+                = protoContact.getProtocolProvider().getOperationSet(
+                    OperationSetTypingNotifications.class);
+
+            if (typingOpSet != null)
+            {
+                typingOpSet.addTypingNotificationsListener(l);
+            }
+        }
+    }
+
+    /**
+     * Removes the given <tt>MessageListener</tt> from this chat session.
+     *
+     * @param l the <tt>MessageListener</tt> to remove
+     */
+    public void removeTypingListener(TypingNotificationsListener l)
+    {
+        Iterator<Contact> protoContacts = metaContact.getContacts();
+
+        while (protoContacts.hasNext())
+        {
+            Contact protoContact = protoContacts.next();
+
+            OperationSetTypingNotifications typingOpSet
+                = protoContact.getProtocolProvider().getOperationSet(
+                    OperationSetTypingNotifications.class);
+
+            if (typingOpSet != null)
+            {
+                typingOpSet.removeTypingNotificationsListener(l);
+            }
+        }
+    }
+
+    /**
+     * Adds the given <tt>MessageListener</tt> to listen for message events in
+     * this chat session.
+     *
+     * @param l the <tt>MessageListener</tt> to add
+     */
+    public void addContactStatusListener(ContactPresenceStatusListener l)
+    {
+        Iterator<Contact> protoContacts = metaContact.getContacts();
+
+        while (protoContacts.hasNext())
+        {
+            Contact protoContact = protoContacts.next();
+
+            OperationSetPresence presenceOpSet
+                = protoContact.getProtocolProvider().getOperationSet(
+                    OperationSetPresence.class);
+
+            if (presenceOpSet != null)
+            {
+                presenceOpSet.addContactPresenceStatusListener(l);
+            }
+        }
+    }
+
+    /**
+     * Removes the given <tt>MessageListener</tt> from this chat session.
+     *
+     * @param l the <tt>MessageListener</tt> to remove
+     */
+    public void removeContactStatusListener(ContactPresenceStatusListener l)
+    {
+        Iterator<Contact> protoContacts = metaContact.getContacts();
+
+        while (protoContacts.hasNext())
+        {
+            Contact protoContact = protoContacts.next();
+
+            OperationSetPresence presenceOpSet
+            = protoContact.getProtocolProvider().getOperationSet(
+                OperationSetPresence.class);
+
+            if (presenceOpSet != null)
+            {
+                presenceOpSet.removeContactPresenceStatusListener(l);
+            }
+        }
+    }
+
+    /**
      * Returns a collection of the last N number of messages given by count.
      *
      * @param count The number of messages from history to return.

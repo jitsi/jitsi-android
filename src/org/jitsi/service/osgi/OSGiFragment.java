@@ -8,6 +8,7 @@ package org.jitsi.service.osgi;
 
 import android.app.*;
 import android.support.v4.app.Fragment;
+
 import org.osgi.framework.*;
 
 /**
@@ -38,7 +39,7 @@ public class OSGiFragment
     @Override
     public void onDetach()
     {
-        ((OSGiActivity)getActivity()).unregisterOSGiFragment(this);
+        ((OSGiActivity) getActivity()).unregisterOSGiFragment(this);
         super.onDetach();
     }
 

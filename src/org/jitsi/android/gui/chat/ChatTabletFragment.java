@@ -39,11 +39,19 @@ public class ChatTabletFragment
         String chatId
             = arguments.getString(ChatSessionManager.CHAT_IDENTIFIER);
 
-        chatFragment = ChatFragment.newInstance(chatId);
+        if (savedInstanceState != null)
+        {
+            chatFragment = (ChatFragment) getChildFragmentManager()
+                .findFragmentByTag("chatFragment");
+        }
+        else
+        {
+            chatFragment = ChatFragment.newInstance(chatId);
+        }
 
         getChildFragmentManager()
             .beginTransaction()
-            .replace(R.id.chatFragment, chatFragment)
+            .replace(R.id.chatFragment, chatFragment, "chatFragment")
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit();
 

@@ -505,7 +505,8 @@ public class ContactListAdapter
                 = (ImageView) contactView
                     .findViewById(R.id.avatarIcon);
 
-            setAvatar(avatarView, metaContact);
+            if (avatarView != null)
+                setAvatar(avatarView, metaContact);
         }
     }
 
@@ -1382,9 +1383,10 @@ public class ContactListAdapter
     private static byte[] getStatusImage(MetaContact metaContact)
     {
         PresenceStatus status = null;
-        Iterator<Contact> i = metaContact.getContacts();
-        while (i.hasNext()) {
-            Contact protoContact = i.next();
+        Iterator<Contact> contactsIter = metaContact.getContacts();
+        while (contactsIter.hasNext())
+        {
+            Contact protoContact = contactsIter.next();
             PresenceStatus contactStatus = protoContact.getPresenceStatus();
 
             if (status == null)
@@ -1395,10 +1397,7 @@ public class ContactListAdapter
                         : status;
         }
 
-        if (status != null)
-            return StatusUtil.getContactStatusIcon(status);
-
-        return null;
+        return StatusUtil.getContactStatusIcon(status);
     }
 
     private static class ContactViewHolder

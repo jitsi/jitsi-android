@@ -151,8 +151,11 @@ public class ChatFragment
     private void initAdapter()
     {
         chatSession.addMessageListener(chatSessionAdapter);
+        chatSession.addContactStatusListener(chatSessionAdapter);
+        chatSession.addTypingListener(chatSessionAdapter);
 
         loadHistoryTask = new LoadHistoryTask();
+
         loadHistoryTask.execute();
     }
 
@@ -211,13 +214,24 @@ public class ChatFragment
 
     private class ChatSessionAdapter
         extends BaseAdapter
-        implements MessageListener
+        implements  MessageListener,
+                    ContactPresenceStatusListener,
+                    TypingNotificationsListener
     {
+        /**
+         * The list of chat messages.
+         */
         private final List<ChatMessage> messages
             = new LinkedList<ChatMessage>();
 
+        /**
+         * The type of the incoming message view.
+         */
         private final int INCOMING_MESSAGE_VIEW = 0;
 
+        /**
+         * The type of the outgoing message view.
+         */
         private final int OUTGOING_MESSAGE_VIEW = 1;
 
         /**
@@ -351,7 +365,7 @@ public class ChatFragment
 
                 messageViewHolder.viewType = viewType;
 
-                if (viewType == 0)
+                if (viewType == INCOMING_MESSAGE_VIEW)
                 {
                     convertView = inflater.inflate( R.layout.chat_incoming_row,
                                                     parent,
@@ -364,6 +378,10 @@ public class ChatFragment
                     messageViewHolder.messageView
                         = (TextView) convertView.findViewById(
                             R.id.incomingMessageView);
+
+                    messageViewHolder.timeView
+                        = (TextView) convertView.findViewById(
+                            R.id.incomingTimeView);
                 }
                 else
                 {
@@ -378,6 +396,10 @@ public class ChatFragment
                     messageViewHolder.messageView
                         = (TextView) convertView.findViewById(
                             R.id.outgoingMessageView);
+
+                    messageViewHolder.timeView
+                        = (TextView) convertView.findViewById(
+                            R.id.outgoingTimeView);
                 }
 
                 convertView.setTag(messageViewHolder);
@@ -397,6 +419,7 @@ public class ChatFragment
                 {
                     avatar = ContactListAdapter.getAvatarDrawable(
                         chatSession.getMetaContact());
+
                     status = ContactListAdapter.getStatusDrawable(
                         chatSession.getMetaContact());
                 }
@@ -412,8 +435,10 @@ public class ChatFragment
                 setAvatar(messageViewHolder.avatarView, avatar, status);
 
                 messageViewHolder.messageView.setText(message.getMessage());
+                messageViewHolder.timeView.setText(
+                    GuiUtils.formatTime(message.getDate()));
             }
-    
+
             return convertView;
         }
 
@@ -471,7 +496,6 @@ public class ChatFragment
         public void messageDeliveryFailed(MessageDeliveryFailedEvent arg0)
         {
             // TODO Auto-generated method stub
-            
         }
 
         @Override
@@ -508,6 +532,38 @@ public class ChatFragment
                         + protocolContact + ".");
             }
         }
+
+        /**
+         * Indicates a contact has changed its status.
+         */
+        @Override
+        public void contactPresenceStatusChanged(
+            ContactPresenceStatusChangeEvent evt)
+        {
+            Contact sourceContact = evt.getSourceContact();
+
+            if (logger.isInfoEnabled())
+                logger.info("Contact presence status changed: "
+                    + sourceContact.getAddress());
+
+            if (!chatSession.getMetaContact().containsContact(sourceContact))
+                return;
+
+            new UpdateStatusTask().execute();
+        }
+
+        @Override
+        public void typingNotificationDeliveryFailed(
+            TypingNotificationEvent evt)
+        {
+            
+        }
+
+        @Override
+        public void typingNotificationReceived(TypingNotificationEvent evt)
+        {
+            
+        }
     }
 
     static class MessageViewHolder
@@ -515,6 +571,7 @@ public class ChatFragment
         ImageView avatarView;
         ImageView typeIndicator;
         TextView messageView;
+        TextView timeView;
         int viewType;
         int position;
     }
@@ -604,6 +661,47 @@ public class ChatFragment
             super.onPostExecute(result);
 
             loadHistory((Collection<Object>) result, false);
+        }
+    }
+
+    private class UpdateStatusTask
+        extends AsyncTask<Void, Void, Void>
+    {
+        protected Void doInBackground(Void... params)
+        {
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result)
+        {
+            super.onPostExecute(result);
+
+            for (int i = 0;
+                i <= chatListView.getLastVisiblePosition(); i++)
+            {
+                RelativeLayout chatRowView
+                    = (RelativeLayout) chatListView.getChildAt(
+                        i - chatListView.getFirstVisiblePosition());
+
+                if (chatRowView != null
+                    && chatSessionAdapter.getItemViewType(i)
+                        == chatSessionAdapter.INCOMING_MESSAGE_VIEW)
+                {
+                    Drawable avatar = ContactListAdapter
+                        .getAvatarDrawable(
+                            chatSession.getMetaContact());
+
+                    Drawable status = ContactListAdapter
+                        .getStatusDrawable(
+                            chatSession.getMetaContact());
+
+                    ImageView avatarView
+                        = (ImageView) chatRowView.getChildAt(0);
+
+                    setAvatar(avatarView, avatar, status);
+                }
+            }
         }
     }
 

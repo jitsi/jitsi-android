@@ -12,17 +12,33 @@
         android:layout_alignParentLeft="true"
         android:src="@drawable/avatar_layer_drawable"/>
 
-    <TextView
-        android:id="@+id/incomingMessageView"
-        style="@style/MediumFont"
-        android:textColor="@color/black"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_toRightOf="@+id/incomingAvatarView"
-        android:gravity="left"
-        android:layout_marginLeft="@dimen/chat_text_margin"
-        android:padding="10dip"
-        android:background="@drawable/messageholder"/>
+        android:background="@drawable/messageholder">
+        <TextView
+            android:id="@+id/incomingMessageView"
+            style="@style/MediumFont"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:gravity="left"
+            android:layout_marginLeft="@dimen/chat_text_margin"
+            android:padding="10dip"/>
+        <TextView
+            android:id="@+id/incomingTimeView"
+            style="@style/SmallFont"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/grey"
+            android:gravity="left"
+            android:layout_marginLeft="@dimen/chat_text_margin"
+            android:paddingLeft="10dip"
+            android:paddingBottom="10dip"
+            android:paddingRight="10dip"/>
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/messageArrowView"
