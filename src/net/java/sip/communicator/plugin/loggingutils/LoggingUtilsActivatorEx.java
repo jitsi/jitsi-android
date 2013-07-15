@@ -22,6 +22,11 @@ public class LoggingUtilsActivatorEx
     private ServiceRegistration logUploadServReg = null;
 
     /**
+     * <tt>LogUploadService</tt> impl instance.
+     */
+    private LogUploadServiceImpl logUploadImpl;
+
+    /**
      * Creates and register logging configuration.
      *
      * @param bundleContext  OSGI bundle context
@@ -37,9 +42,10 @@ public class LoggingUtilsActivatorEx
 
         super.start(bundleContext);
 
+        logUploadImpl = new LogUploadServiceImpl();
         logUploadServReg =  bundleContext.registerService(
             LogUploadService.class.getName(),
-            new LogUploadServiceImpl(),
+            logUploadImpl,
             null);
     }
 
@@ -55,5 +61,6 @@ public class LoggingUtilsActivatorEx
         super.stop(bundleContext);
 
         logUploadServReg.unregister();
+        logUploadImpl.dispose();
     }
 }

@@ -27,6 +27,9 @@
     <item android:id="@+id/main_settings"
            android:title="@string/settings">
     </item>
+    <item android:id="@+id/send_logs"
+          android:title="@string/service_gui_SEND_LOGS">
+    </item>
     <item android:id="@+id/menu_exit"
           android:title="@string/exit_app">
     </item>

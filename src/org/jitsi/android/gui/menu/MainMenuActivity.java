@@ -9,13 +9,16 @@ package org.jitsi.android.gui.menu;
 import java.util.*;
 
 import net.java.sip.communicator.service.protocol.*;
+import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.account.*;
 
 import org.jitsi.*;
 import org.jitsi.android.*;
+import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.account.*;
 import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.settings.*;
+import org.jitsi.service.log.*;
 import org.jitsi.service.osgi.*;
 
 import android.os.*;
@@ -105,6 +108,16 @@ public class MainMenuActivity
             return true;
         case R.id.main_settings:
             startActivity(SettingsActivity.class);
+            return true;
+        case R.id.send_logs:
+            LogUploadService logUpload
+                    = ServiceUtils.getService(
+                            AndroidGUIActivator.bundleContext,
+                            LogUploadService.class);
+            logUpload.sendLogs(
+                    null,
+                    getString(R.string.service_gui_SEND_LOGS_SUBJECT),
+                    getString(R.string.service_gui_SEND_LOGS_TITLE));
             return true;
         case R.id.menu_exit:
             // Shutdown the app 

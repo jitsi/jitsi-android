@@ -94,6 +94,10 @@
     <string name="service_gui_VIDEO_CALL">Video call</string>
     <string name="service_gui_CONTACTS">Contacts</string>
     <string name="service_gui_ENTER_NAME_OR_NUMBER">Enter name or number</string>
+    <!-- Logs -->
+    <string name="service_gui_SEND_LOGS_SUBJECT">Jitsi logs</string>
+    <string name="service_gui_SEND_LOGS_TITLE">Send Jitsi logs</string>
+    <string name="service_gui_SEND_LOGS">Send logs</string>
 
     <!-- Call -->
     <string name="service_gui_VOLUME_CONTROL_TOOL_TIP">Adjust volume</string>
