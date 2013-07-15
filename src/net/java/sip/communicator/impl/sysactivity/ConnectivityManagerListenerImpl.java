@@ -7,6 +7,7 @@
     package net.java.sip.communicator.impl.sysactivity;
 
 import android.content.*;
+import org.jitsi.android.*;
 import org.jitsi.service.osgi.*;
 import net.java.sip.communicator.service.sysactivity.event.*;
 import net.java.sip.communicator.util.*;
@@ -56,9 +57,7 @@ public class ConnectivityManagerListenerImpl
      */
     public void start()
     {
-        Context context = ServiceUtils.getService(
-            SysActivityActivator.getBundleContext(),
-            OSGiService.class);
+        Context context = JitsiApplication.getGlobalContext();
         context.registerReceiver(this,
             new IntentFilter(CONNECTIVITY_CHANGE_ACTION));
 
