@@ -324,7 +324,7 @@ public class Jitsi
     private void showMainViewFragment(Intent intent)
     {
         mainViewFragment = new MainViewFragment();
-        if(intent.getAction().equals(ACTION_SHOW_CHAT))
+        if(ACTION_SHOW_CHAT.equals(intent.getAction()))
         {
             Bundle args = new Bundle();
             args.putString(ContactListFragment.META_CONTACT_UID_ARG,
