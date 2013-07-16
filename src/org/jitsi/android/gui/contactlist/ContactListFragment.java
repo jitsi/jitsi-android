@@ -37,6 +37,12 @@ public class ContactListFragment
             = Logger.getLogger(ContactListFragment.class);
 
     /**
+     * If this argument is present fragment will start new chat with
+     * <tt>MetaContact</tt> identified by UID carried by this arg.
+     */
+    public static final String META_CONTACT_UID_ARG="arg.meta_uid";
+
+    /**
      * The <tt>MetaContactListService</tt> giving access to the contact list
      * content.
      */
@@ -96,21 +102,21 @@ public class ContactListFragment
             contactListAdapter.initAdapterData(contactListService);
         }
 
-        // Check if we have contact intent to start chat
-        Intent intent = getActivity().getIntent();
-        String metaUID = intent.getStringExtra(Jitsi.CONTACT_EXTRA);
+        // Check if we have contact UID argument to start new chat
+        Bundle args = getArguments();
+        if(args == null)
+            return;
+        String metaUID = args.getString(META_CONTACT_UID_ARG);
         if(metaUID == null)
             return;
         MetaContact metaContact
                 = contactListService.findMetaContactByMetaUID(metaUID);
         if(metaContact == null)
         {
-            if(intent.getAction().equals(Jitsi.ACTION_SHOW_CHAT))
-            {
-                logger.error("Meta contact not found for UID: "+metaUID);
-            }
+            logger.error("Meta contact not found for UID: "+metaUID);
             return;
         }
+        logger.info("Start chat with contact: "+metaContact);
         startChatActivity(metaContact);
     }
 

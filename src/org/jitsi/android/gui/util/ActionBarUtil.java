@@ -6,6 +6,7 @@
  */
 package org.jitsi.android.gui.util;
 
+import android.os.*;
 import org.jitsi.*;
 
 import android.app.*;
@@ -71,7 +72,11 @@ public class ActionBarUtil
             .setDrawableByLayerId(R.id.avatarDrawable,
                 AndroidImageUtil.drawableFromBytes(avatar));
 
-        a.getActionBar().setLogo(avatarDrawable);
+        // setLogo not supported prior API 14
+        if(Build.VERSION.SDK_INT >= 14)
+        {
+            a.getActionBar().setLogo(avatarDrawable);
+        }
     }
 
     /**
@@ -89,7 +94,11 @@ public class ActionBarUtil
             .setDrawableByLayerId(R.id.contactStatusDrawable,
                 AndroidImageUtil.drawableFromBytes(statusIcon));
 
-        a.getActionBar().setLogo(avatarDrawable);
+        // setLogo not supported prior API 14
+        if(Build.VERSION.SDK_INT >= 14)
+        {
+            a.getActionBar().setLogo(avatarDrawable);
+        }
     }
 
     /**

@@ -11,6 +11,7 @@ import java.util.*;
 import android.app.*;
 import android.content.*;
 import android.os.Bundle; // disambiguation
+import android.os.*;
 import android.view.*;
 import android.view.MenuItem.OnActionExpandListener;
 import android.widget.*;
@@ -27,6 +28,7 @@ import net.java.sip.communicator.util.account.*;
 import org.jitsi.*;
 import org.jitsi.android.gui.account.*;
 import org.jitsi.android.gui.chat.*;
+import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.menu.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.android.gui.widgets.*;
@@ -162,20 +164,24 @@ public class Jitsi
 
         MenuItem searchItem = menu.findItem(R.id.search);
 
-        searchItem.setOnActionExpandListener(new OnActionExpandListener()
+        // OnActionExpandListener not supported prior API 14
+        if(Build.VERSION.SDK_INT >= 14)
         {
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item)
+            searchItem.setOnActionExpandListener(new OnActionExpandListener()
             {
-                mainViewFragment.filterContactList("");
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem item)
+                {
+                    mainViewFragment.filterContactList("");
 
-                return true; // Return true to collapse action view
-            }
-            public boolean onMenuItemActionExpand(MenuItem item)
-            {
-                return true; // Return true to expand action view
-            }
-        });
+                    return true; // Return true to collapse action view
+                }
+                public boolean onMenuItemActionExpand(MenuItem item)
+                {
+                    return true; // Return true to expand action view
+                }
+            });
+        }
 
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setSearchableInfo(
@@ -230,7 +236,7 @@ public class Jitsi
                     else
                     {
                         showAccountInfo();
-                        showMainViewFragment();
+                        showMainViewFragment(getIntent());
                     }
                 }
             });
@@ -296,7 +302,7 @@ public class Jitsi
             showAccountInfo();
 
             // Show contacts request
-            showMainViewFragment();
+            showMainViewFragment(intent);
         }
     }
 
@@ -315,9 +321,16 @@ public class Jitsi
     /**
      * Displays contacts fragment(currently <tt>CallContactFragment</tt>.
      */
-    private void showMainViewFragment()
+    private void showMainViewFragment(Intent intent)
     {
         mainViewFragment = new MainViewFragment();
+        if(intent.getAction().equals(ACTION_SHOW_CHAT))
+        {
+            Bundle args = new Bundle();
+            args.putString(ContactListFragment.META_CONTACT_UID_ARG,
+                           intent.getStringExtra(CONTACT_EXTRA));
+            mainViewFragment.setArguments(args);
+        }
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(android.R.id.content, mainViewFragment)

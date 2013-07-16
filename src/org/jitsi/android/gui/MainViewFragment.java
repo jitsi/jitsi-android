@@ -36,6 +36,16 @@ public class MainViewFragment
     private void showContactsFragment()
     {
         contactListFragment = new ContactListFragment();
+        /**
+         * TODO: Extract splash screen to separate activity from Jitsi
+         * and merge this fragment
+         *
+         * Here we pass chat contact arguments to ContactListFragment.
+         * Once the splash screen will be extracted from Jitsi Activity
+         * this fragment could be merged with it and arguments will be passed
+         * directly.
+         */
+        contactListFragment.setArguments(getArguments());
         getChildFragmentManager()
                 .beginTransaction()
                 .replace(R.id.contactListFragment, contactListFragment)
