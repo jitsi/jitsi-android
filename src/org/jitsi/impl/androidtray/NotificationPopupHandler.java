@@ -44,6 +44,11 @@ public class NotificationPopupHandler
             = new HashMap<Integer, PopupMessage>();
 
     /**
+     * Map of popup timeout handlers.
+     */
+    private Map<Integer, Timer> timeoutHandlers = new HashMap<Integer, Timer>();
+
+    /**
      * Maps <tt>Contact</tt>s from <tt>PopupMessage</tt> tags
      * to notification ids.
      */
@@ -110,7 +115,7 @@ public class NotificationPopupHandler
                               * as request code
                               */
                         PopupClickReceiver.createDeleteIntent(nId),
-                        PendingIntent.FLAG_ONE_SHOT));
+                        PendingIntent.FLAG_UPDATE_CURRENT));
 
         NotificationManager mNotificationManager
             = (NotificationManager) ctx
@@ -118,6 +123,34 @@ public class NotificationPopupHandler
 
         // post the notification
         mNotificationManager.notify(nId, builder.build());
+
+        // handle discard timeout
+        if(timeoutHandlers.containsKey(nId))
+        {
+            logger.debug("Removing timeout from notification: "+nId);
+
+            timeoutHandlers.get(nId).cancel();
+            timeoutHandlers.remove(nId);
+        }
+        long timeout = popupMessage.getTimeout();
+        if(timeout > 0)
+        {
+            logger.debug("Setting timeout "+timeout+" on notification: "+nId);
+
+            final int finalId = nId;
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask()
+            {
+                @Override
+                public void run()
+                {
+                    // Cancels and removes the notification
+                    JitsiApplication.getNotificationManager().cancel(finalId);
+                    removeNotification(finalId);
+                }
+            }, timeout);
+            timeoutHandlers.put(nId, timer);
+        }
 
         // caches the notification until clicked or cleared
         notificationMap.put(nId, popupMessage);
@@ -166,6 +199,13 @@ public class NotificationPopupHandler
 
         logger.debug("Removing notification: " + notificationId);
 
+        // Remove timeout handler
+        Timer timeoutHandler = timeoutHandlers.get(notificationId);
+        if(timeoutHandler != null)
+        {
+            timeoutHandler.cancel();
+        }
+
         notificationMap.remove(notificationId);
 
         Object tag = msg.getTag();
@@ -204,6 +244,13 @@ public class NotificationPopupHandler
 
         notificationMap.clear();
         contactToNotificationMap.clear();
+
+        // Cancels timeout handlers
+        for(Timer t : timeoutHandlers.values())
+        {
+            t.cancel();
+        }
+        timeoutHandlers.clear();
     }
 
     /**
