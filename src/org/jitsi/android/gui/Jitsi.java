@@ -21,12 +21,10 @@ import net.java.sip.communicator.service.globaldisplaydetails.*;
 import net.java.sip.communicator.service.globaldisplaydetails.event.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.globalstatus.*;
-import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.Logger;
 import net.java.sip.communicator.util.account.*;
 
 import org.jitsi.*;
-import org.jitsi.android.gui.account.*;
 import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.menu.*;
@@ -37,10 +35,7 @@ import org.osgi.framework.*;
 import android.view.View.OnClickListener;
 
 /**
- * The home <tt>Activity</tt> for Jitsi application. It displays
- * {@link SplashScreenFragment} if the app is just starting. After
- * initialization it shows <tt>CallContactFragment</tt> in case we have
- * registered accounts or <tt>AccountLoginFragment</tt> otherwise.
+ * The main <tt>Activity</tt> for Jitsi application.
  *
  * @author Damian Minkov
  * @author Lyubomir Marinov
@@ -84,14 +79,7 @@ public class Jitsi
      * The main view fragment containing the contact list and also the chat in
      * the case of a tablet interface.
      */
-    private MainViewFragment mainViewFragment;
-
-    /**
-     * Flag indicating that there was no action supplied with <tt>Intent</tt>
-     * and we have to decide whether display contacts or login prompt.
-     * It's done after OSGI startup.
-     */
-    private boolean isEmpty=false;
+    private ContactListFragment contactListFragment;
 
     /**
      * The online status.
@@ -135,14 +123,9 @@ public class Jitsi
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        String action = getIntent().getAction();
-        if(action != null && action.equals(Intent.ACTION_MAIN))
-        {
-            // Request indeterminate progress for splash screen
-            requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        }
-
         super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.main_view);
 
         handleIntent(getIntent(), savedInstanceState);
     }
@@ -172,7 +155,7 @@ public class Jitsi
                 @Override
                 public boolean onMenuItemActionCollapse(MenuItem item)
                 {
-                    mainViewFragment.filterContactList("");
+                    filterContactList("");
 
                     return true; // Return true to collapse action view
                 }
@@ -199,49 +182,16 @@ public class Jitsi
     }
 
     /**
-     * {@inheritDoc}
+     * Called when new <tt>Intent</tt> is received(this <tt>Activity</tt> is
+     * launched in <tt>singleTask</tt> mode.
+     * @param intent new <tt>Intent</tt> data.
      */
     @Override
-    protected void start(BundleContext bundleContext)
-            throws Exception
+    protected void onNewIntent(Intent intent)
     {
-        super.start(bundleContext);
+        super.onNewIntent(intent);
 
-        selectFragment(bundleContext);
-    }
-
-    /**
-     * Selects contacts or login fragment based on currently stored accounts
-     * count.
-     *
-     * @param osgiContext the OSGI context used to access services.
-     */
-    private void selectFragment(BundleContext osgiContext)
-    {
-        if(isEmpty)
-        {
-            AccountManager accountManager
-                    = ServiceUtils.getService(
-                            osgiContext, AccountManager.class);
-            final int accountCount = accountManager.getStoredAccounts().size();
-
-            runOnUiThread(new Runnable()
-            {
-                public void run()
-                {
-                    if (accountCount == 0)
-                    {
-                        showLoginFragment();
-                    }
-                    else
-                    {
-                        showAccountInfo();
-                        showMainViewFragment(getIntent());
-                    }
-                }
-            });
-            isEmpty = false;
-        }
+        handleIntent(intent, null);
     }
 
     /**
@@ -255,18 +205,6 @@ public class Jitsi
     {
         String action = intent.getAction();
 
-        if(action == null)
-        {
-            //Default behaviour
-            if(savedInstanceState == null)
-            {
-                // We have no action and no state, we need to delay
-                // the decision upon OSGi startup
-                isEmpty = true;
-            }
-            return;
-        }
-
         if(savedInstanceState != null)
         {
             // The Activity is being restored so fragments have been already
@@ -274,81 +212,51 @@ public class Jitsi
             return;
         }
 
-        if(action.equals(Intent.ACTION_MAIN))
-        {
-            // Launcher action
-            BundleContext osgiCtx = getBundlecontext();
-            if(osgiCtx == null)
-            {
-                // If there is no OSGI yet then, we wait until start is called
-                showSplashScreen();
-                isEmpty = true;
-            }
-            else
-            {
-                selectFragment(osgiCtx);
-            }
-        }
-        else if (Intent.ACTION_SEARCH.equals(intent.getAction()))
+        if (Intent.ACTION_SEARCH.equals(action))
         {
             String query = intent.getStringExtra(SearchManager.QUERY);
 
             System.err.println("QUERYYYYYYYYYYYY=========" + query);
 //            doMySearch(query);
         }
-        else if(action.equals(ACTION_SHOW_CONTACTS)
-                || action.equals(ACTION_SHOW_CHAT))
+        else
+        // Both show contact and show chat actions are handled here
+        // else if(ACTION_SHOW_CONTACTS.equals(action)
+        //        || ACTION_SHOW_CHAT.equals(action))
         {
             showAccountInfo();
 
             // Show contacts request
-            showMainViewFragment(intent);
+            showContactsFragment(intent);
         }
-    }
-
-    /**
-     * Displays splash screen fragment.
-     */
-    private void showSplashScreen()
-    {
-        SplashScreenFragment splashScreen = new SplashScreenFragment();
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(android.R.id.content, splashScreen)
-                .commit();
     }
 
     /**
      * Displays contacts fragment(currently <tt>CallContactFragment</tt>.
      */
-    private void showMainViewFragment(Intent intent)
+    private void showContactsFragment(Intent intent)
     {
-        mainViewFragment = new MainViewFragment();
+        contactListFragment = new ContactListFragment();
         if(ACTION_SHOW_CHAT.equals(intent.getAction()))
         {
             Bundle args = new Bundle();
             args.putString(ContactListFragment.META_CONTACT_UID_ARG,
                            intent.getStringExtra(CONTACT_EXTRA));
-            mainViewFragment.setArguments(args);
+            contactListFragment.setArguments(args);
         }
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(android.R.id.content, mainViewFragment)
+                .replace(R.id.contactListFragment, contactListFragment)
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
                 .commit();
     }
 
-    /**
-     * Shows login prompt.
-     */
-    private void showLoginFragment()
+    public void filterContactList(String query)
     {
-        // Displays login prompt
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(android.R.id.content, new AccountLoginFragment())
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                .commit();
+        if (contactListFragment == null)
+            return;
+
+        contactListFragment.filterContactList(query);
     }
 
     /**
@@ -377,19 +285,6 @@ public class Jitsi
                 globalStatusMenu.setAnimStyle(GlobalStatusMenu.ANIM_REFLECT);
             }
         });
-    }
-
-    /**
-     * Called when new <tt>Intent</tt> is received(this <tt>Activity</tt> is
-     * launched in <tt>singleTask</tt> mode.
-     * @param intent new <tt>Intent</tt> data.
-     */
-    @Override
-    protected void onNewIntent(Intent intent)
-    {
-        super.onNewIntent(intent);
-
-        handleIntent(intent, null);
     }
 
     /**
@@ -625,8 +520,7 @@ public class Jitsi
     @Override
     public boolean onClose()
     {
-        if (mainViewFragment != null)
-            mainViewFragment.filterContactList("");
+        filterContactList("");
 
         return false;
     }
@@ -634,8 +528,7 @@ public class Jitsi
     @Override
     public boolean onQueryTextChange(String query)
     {
-        if (mainViewFragment != null)
-            mainViewFragment.filterContactList(query);
+        filterContactList(query);
 
         return false;
     }
@@ -643,8 +536,7 @@ public class Jitsi
     @Override
     public boolean onQueryTextSubmit(String query)
     {
-        if (mainViewFragment != null)
-            mainViewFragment.filterContactList(query);
+        filterContactList(query);
 
         return false;
     }

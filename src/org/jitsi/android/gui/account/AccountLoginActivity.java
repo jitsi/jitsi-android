@@ -6,8 +6,19 @@
  */
 package org.jitsi.android.gui.account;
 
+import android.content.*;
 import android.os.Bundle;
-import org.jitsi.service.osgi.*;
+
+import net.java.sip.communicator.service.gui.*;
+import net.java.sip.communicator.service.protocol.*;
+import net.java.sip.communicator.util.*;
+
+import org.jitsi.*;
+import org.jitsi.android.gui.*;
+import org.jitsi.android.gui.menu.*;
+import org.jitsi.android.gui.util.*;
+
+import org.osgi.framework.*;
 
 /**
  * The <tt>AccountLoginActivity</tt> is the activity responsible for creating
@@ -17,7 +28,8 @@ import org.jitsi.service.osgi.*;
  * @author Pawel Domas
  */
 public class AccountLoginActivity
-    extends OSGiActivity
+    extends ExitMenuActivity
+    implements AccountLoginFragment.AccountLoginListener
 {
     /**
      * The username property name.
@@ -57,5 +69,139 @@ public class AccountLoginActivity
                     .add(android.R.id.content, accountLogin)
                     .commit();
         }
+    }
+
+    /**
+     * Sign in the account with the given <tt>userName</tt>, <tt>password</tt>
+     * and <tt>protocolName</tt>.
+     *
+     * @param userName the username of the account
+     * @param password the password of the account
+     * @param protocolName the name of the protocol
+     * @return the <tt>ProtocolProviderService</tt> corresponding to the newly
+     * signed in account
+     */
+    private ProtocolProviderService signIn( String userName,
+                                            String password,
+                                            String protocolName)
+    {
+        BundleContext bundleContext = getBundlecontext();
+
+        Logger logger = Logger.getLogger(Jitsi.class);
+
+        ServiceReference<?>[] accountWizardRefs = null;
+        try
+        {
+            accountWizardRefs = bundleContext.getServiceReferences(
+                    AccountRegistrationWizard.class.getName(),
+                    null);
+        }
+        catch (InvalidSyntaxException ex)
+        {
+            // this shouldn't happen since we're providing no parameter string
+            // but let's log just in case.
+            logger.error(
+                    "Error while retrieving service refs", ex);
+        }
+
+        // in case we found any, add them in this container.
+        if (accountWizardRefs == null)
+        {
+            logger.error("No registered registration wizards found");
+            return null;
+        }
+
+        if (logger.isDebugEnabled())
+            logger.debug("Found " + accountWizardRefs.length
+                                  + " already installed providers.");
+
+        AccountRegistrationWizard selectedWizard = null;
+
+        for (int i = 0; i < accountWizardRefs.length; i++)
+        {
+            AccountRegistrationWizard accReg
+                    = (AccountRegistrationWizard) bundleContext
+                    .getService(accountWizardRefs[i]);
+            if (accReg.getProtocolName().equals(protocolName))
+            {
+                selectedWizard = accReg;
+                break;
+            }
+        }
+        if(selectedWizard == null)
+        {
+            logger.warn("No wizard found for protocol name: "+protocolName);
+            return null;
+        }
+        try
+        {
+            selectedWizard.setModification(false);
+
+            return selectedWizard.signin(userName, password);
+        }
+        catch (OperationFailedException e)
+        {
+            logger.error("Sign in operation failed.", e);
+
+            if (e.getErrorCode() == OperationFailedException.ILLEGAL_ARGUMENT)
+            {
+                AndroidUtils.showAlertDialog(
+                        this,
+                        R.string.service_gui_LOGIN_FAILED,
+                        R.string.service_gui_USERNAME_NULL);
+            }
+            else if (e.getErrorCode()
+                            == OperationFailedException.IDENTIFICATION_CONFLICT)
+            {
+                AndroidUtils.showAlertDialog(
+                        this,
+                        R.string.service_gui_LOGIN_FAILED,
+                        R.string.service_gui_USER_EXISTS_ERROR);
+            }
+            else if (e.getErrorCode()
+                            == OperationFailedException.SERVER_NOT_SPECIFIED)
+            {
+                AndroidUtils.showAlertDialog(
+                        this,
+                        R.string.service_gui_LOGIN_FAILED,
+                        R.string.service_gui_SPECIFY_SERVER);
+            }
+            else
+            {
+                AndroidUtils.showAlertDialog(
+                        this,
+                        R.string.service_gui_LOGIN_FAILED,
+                        R.string.service_gui_ACCOUNT_CREATION_FAILED);
+            }
+        }
+        catch (Exception e)
+        {
+            logger.error("Exception while adding account: "+e.getMessage(), e);
+            AndroidUtils.showAlertDialog(
+                    this,
+                    R.string.service_gui_ERROR,
+                    R.string.service_gui_ACCOUNT_CREATION_FAILED);
+        }
+        return null;
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void onLoginPerformed(String login, String password, String network)
+    {
+        ProtocolProviderService protocolProvider
+                = signIn( login, password, network );
+
+        if (protocolProvider != null)
+        {
+            //addAndroidAccount(protocolProvider);
+
+            Intent showContactsIntent = new Intent(Jitsi.ACTION_SHOW_CONTACTS);
+            startActivity(showContactsIntent);
+            finish();
+        }
+
     }
 }

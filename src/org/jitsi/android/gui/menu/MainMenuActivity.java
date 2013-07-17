@@ -33,7 +33,7 @@ import android.view.*;
  * @author Yana Stamcheva
  */
 public class MainMenuActivity
-    extends OSGiActivity
+    extends ExitMenuActivity
 {
     /**
      * Called when the activity is starting. Initializes the corresponding
@@ -61,6 +61,9 @@ public class MainMenuActivity
     {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
+
+        // Adds exit option from super class
+        super.onCreateOptionsMenu(menu);
 
         return true;
     }
@@ -118,10 +121,6 @@ public class MainMenuActivity
                     null,
                     getString(R.string.service_gui_SEND_LOGS_SUBJECT),
                     getString(R.string.service_gui_SEND_LOGS_TITLE));
-            return true;
-        case R.id.menu_exit:
-            // Shutdown the app 
-            JitsiApplication.shutdownApplication();
             return true;
         default:
             return super.onOptionsItemSelected(item);

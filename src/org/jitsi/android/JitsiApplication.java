@@ -14,10 +14,14 @@ import android.hardware.*;
 import android.media.*;
 import android.os.*;
 
+import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.*;
 
 import org.jitsi.android.gui.*;
+import org.jitsi.android.gui.LauncherActivity;
+import org.jitsi.android.gui.account.*;
 import org.jitsi.service.osgi.*;
+import org.osgi.framework.*;
 
 /**
  * <tt>JitsiApplication</tt> is used, as a global context and utility class for
@@ -38,11 +42,6 @@ public class JitsiApplication
      * The EXIT action name that is broadcasted to all OSGiActivities
      */
     public static final String ACTION_EXIT = "org.jitsi.android.exit";
-
-    /**
-     * The home activity class.
-     */
-    private static final Class<?> HOME_SCREEN_CLASS = Jitsi.class;
 
     /**
      * Static instance holder.
@@ -193,7 +192,27 @@ public class JitsiApplication
      */
     public static Class<?> getHomeScreenActivityClass()
     {
-        return HOME_SCREEN_CLASS;
+        BundleContext osgiContext = AndroidGUIActivator.bundleContext;
+        if(osgiContext == null)
+        {
+            // If OSGI has not started show splash screen as home
+            return LauncherActivity.class;
+        }
+
+        AccountManager accountManager
+                = ServiceUtils.getService(osgiContext, AccountManager.class);
+        final int accountCount = accountManager.getStoredAccounts().size();
+
+        if (accountCount == 0)
+        {
+            // Start new account Activity
+            return AccountLoginActivity.class;
+        }
+        else
+        {
+            // Start main view
+            return Jitsi.class;
+        }
     }
 
     /**
@@ -202,7 +221,7 @@ public class JitsiApplication
      */
     public static Intent getHomeIntent()
     {
-        Intent homeIntent = new Intent(instance, HOME_SCREEN_CLASS);
+        Intent homeIntent = new Intent(instance, getHomeScreenActivityClass());
         // Home is singleTask anyway, but this way it can be started from
         // non Activity context.
         homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

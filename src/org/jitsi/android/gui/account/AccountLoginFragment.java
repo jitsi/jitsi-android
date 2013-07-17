@@ -61,7 +61,7 @@ public class AccountLoginFragment
 
     /**
      * The listener parent Activity that will be notified when user enters
-     * login and password. By default {@link SignInLoginListener} is used.
+     * login and password.
      */
     private AccountLoginListener loginListener;
 
@@ -101,7 +101,7 @@ public class AccountLoginFragment
         }
         else
         {
-            this.loginListener = new SignInLoginListener();
+            throw new RuntimeException("Account login listener unspecified");
         }
     }
 
@@ -213,118 +213,6 @@ public class AccountLoginFragment
     }
 
     /**
-     * Sign in the account with the given <tt>userName</tt>, <tt>password</tt>
-     * and <tt>protocolName</tt>.
-     *
-     * @param userName the username of the account
-     * @param password the password of the account
-     * @param protocolName the name of the protocol
-     * @return the <tt>ProtocolProviderService</tt> corresponding to the newly
-     * signed in account
-     */
-    private ProtocolProviderService signIn( String userName,
-                                            String password,
-                                            String protocolName)
-    {
-        ProtocolProviderService protocolProvider = null;
-
-        Logger logger = Logger.getLogger(Jitsi.class);
-
-        ServiceReference<?>[] accountWizardRefs = null;
-        try
-        {
-            accountWizardRefs = bundleContext.getServiceReferences(
-                AccountRegistrationWizard.class.getName(),
-                null);
-        }
-        catch (InvalidSyntaxException ex)
-        {
-            // this shouldn't happen since we're providing no parameter string
-            // but let's log just in case.
-            logger.error(
-                "Error while retrieving service refs", ex);
-        }
-
-        // in case we found any, add them in this container.
-        if (accountWizardRefs != null)
-        {
-            if (logger.isDebugEnabled())
-                logger.debug("Found "
-                    + accountWizardRefs.length
-                    + " already installed providers.");
-
-            for (int i = 0; i < accountWizardRefs.length; i++)
-            {
-                AccountRegistrationWizard accReg
-                    = (AccountRegistrationWizard) bundleContext
-                        .getService(accountWizardRefs[i]);
-
-                if (accReg.getProtocolName().equals(protocolName))
-                {
-                    try
-                    {
-                        accReg.setModification(false);
-
-                        protocolProvider = accReg.signin(userName, password);
-                    }
-                    catch (OperationFailedException e)
-                    {
-                        e.printStackTrace(System.err);
-
-                        if (logger.isDebugEnabled())
-                            logger.debug("The sign in operation has failed.");
-
-                        if (e.getErrorCode()
-                                == OperationFailedException.ILLEGAL_ARGUMENT)
-                        {
-                            AndroidUtils.showAlertDialog(
-                                getActivity(),
-                                R.string.service_gui_LOGIN_FAILED,
-                                R.string.service_gui_USERNAME_NULL);
-                        }
-                        else if (e.getErrorCode()
-                                == OperationFailedException
-                                    .IDENTIFICATION_CONFLICT)
-                        {
-                            AndroidUtils.showAlertDialog(
-                                getActivity(),
-                                R.string.service_gui_LOGIN_FAILED,
-                                R.string.service_gui_USER_EXISTS_ERROR);
-                        }
-                        else if (e.getErrorCode()
-                                == OperationFailedException
-                                    .SERVER_NOT_SPECIFIED)
-                        {
-                            AndroidUtils.showAlertDialog(
-                                getActivity(),
-                                R.string.service_gui_LOGIN_FAILED,
-                                R.string.service_gui_SPECIFY_SERVER);
-                        }
-                        else
-                        {
-                            AndroidUtils.showAlertDialog(
-                                getActivity(),
-                                R.string.service_gui_LOGIN_FAILED,
-                                R.string.service_gui_ACCOUNT_CREATION_FAILED);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace(System.err);
-                        new AlertDialog.Builder(getActivity())
-                            .setIcon(R.drawable.icon)
-                            .setTitle("Warning")
-                            .setMessage(getResourceService().getI18NString(
-                            "service.gui.ACCOUNT_CREATION_FAILED"))
-                                .setNeutralButton("Close", null).show();
-                    }
-                }
-            }
-        }
-        return protocolProvider;
-    }
-
-    /**
      * Stores the given <tt>protocolProvider</tt> data in the android system
      * accounts.
      *
@@ -415,36 +303,5 @@ public class AccountLoginFragment
         public void onLoginPerformed( String login,
                                       String password,
                                       String network);
-    }
-
-    /**
-     * Default implementation of {@link AccountLoginListener}. It creates new
-     * account for given credentials and redirects to contacts list.
-     */
-    private class SignInLoginListener
-            implements AccountLoginListener
-    {
-        /**
-         * {@inheritDoc}
-         */
-        public void onLoginPerformed( String login,
-                                      String password,
-                                      String network)
-        {
-            ProtocolProviderService protocolProvider
-                    = signIn( login, password, network );
-
-            if (protocolProvider != null)
-            {
-                //addAndroidAccount(protocolProvider);
-
-                Intent showContactsIntent
-                        = new Intent(   getActivity(),
-                                        Jitsi.class);
-                showContactsIntent.setAction(Jitsi.ACTION_SHOW_CONTACTS);
-
-                getActivity().startActivity(showContactsIntent);
-            }
-        }
     }
 }
