@@ -9,6 +9,8 @@ package org.jitsi.impl.osgi.framework.launch;
 import java.util.*;
 import java.util.concurrent.*;
 
+import net.java.sip.communicator.util.*;
+
 import org.jitsi.impl.osgi.framework.*;
 
 import org.osgi.framework.*;
@@ -19,6 +21,9 @@ import org.osgi.framework.*;
  */
 public class EventDispatcher
 {
+    private static final Logger logger
+            = Logger.getLogger(EventDispatcher.class);
+
     private final AsyncExecutor<Command> executor
         = new AsyncExecutor<Command>();
 
@@ -114,6 +119,7 @@ public class EventDispatcher
                 }
                 catch (Throwable t)
                 {
+                    logger.error("Error dispatching event", t);
                     if (FrameworkListener.class.equals(clazz)
                             && ((FrameworkEvent) event).getType()
                                     != FrameworkEvent.ERROR)

@@ -580,6 +580,19 @@ public class FrameworkImpl
             throw new IllegalStateException("serviceRegistrations");
     }
 
+    public ServiceReference<?>[] getRegisteredServices()
+    {
+        ServiceReference<?>[] references
+                = new ServiceReference[serviceRegistrations.size()];
+
+        for(int i=0; i<serviceRegistrations.size(); i++)
+        {
+            references[i] = serviceRegistrations.get(i).getReference();
+        }
+
+        return references;
+    }
+
     public FrameworkEvent waitForStop(long timeout)
         throws InterruptedException
     {

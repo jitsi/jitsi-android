@@ -97,7 +97,7 @@ public class ContactListFragment
 
         // If the MetaContactListService is already available we need to
         // initialize the adapter.
-        if (contactListService != null && !contactListAdapter.isInitialized())
+        if (!contactListAdapter.isInitialized())
         {
             contactListAdapter.initAdapterData(contactListService);
         }

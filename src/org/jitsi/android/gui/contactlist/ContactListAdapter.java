@@ -121,15 +121,11 @@ public class ContactListAdapter
         System.err.println("INIT ADAPTER DATA=======" + currentQuery);
         contactListService = clService;
 
-        if (contactListService != null)
-        {
-            addContacts(contactListService.getRoot());
+        addContacts(contactListService.getRoot());
 
-            contactListService
-                .addMetaContactListListener(this);
+        contactListService.addMetaContactListListener(this);
 
-            isInitialized = true;
-        }
+        isInitialized = true;
 
         expandAllGroups();
 
