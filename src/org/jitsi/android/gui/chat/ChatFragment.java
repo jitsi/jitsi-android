@@ -61,8 +61,6 @@ public class ChatFragment
 
     private int position;
 
-    private boolean isViewCreated;
-
     private LoadHistoryTask loadHistoryTask;
 
     /**
@@ -107,56 +105,52 @@ public class ChatFragment
                                          container,
                                          false);
 
-        if (chatSessionAdapter == null)
-        {
-            chatSessionAdapter = new ChatSessionAdapter();
-            chatListView
-                = (ListView) content.findViewById(R.id.chatListView);
-            chatListView.setAdapter(chatSessionAdapter);
+        chatSessionAdapter = new ChatSessionAdapter();
+        chatListView = (ListView) content.findViewById(R.id.chatListView);
+        chatListView.setAdapter(chatSessionAdapter);
 
-            chatListView.setSelector(R.drawable.contact_list_selector);
-        }
-
-        if (chatSession != null)
-            initAdapter();
-
-        isViewCreated = true;
-
-        return content;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void start(BundleContext bundleContext)
-            throws Exception
-    {
-        super.start(bundleContext);
+        chatListView.setSelector(R.drawable.contact_list_selector);
 
         // Chat intent handling
         Bundle arguments = getArguments();
         String chatId
-            = arguments.getString(ChatSessionManager.CHAT_IDENTIFIER);
+                = arguments.getString(ChatSessionManager.CHAT_IDENTIFIER);
         if (chatId != null && chatId.length() > 0)
         {
             chatSession = ChatSessionManager.getActiveChat(chatId);
 
-            // If the chat session is initialized after the view is created.
-            if (isViewCreated)
-                initAdapter();
+            initAdapter();
         }
+
+        return content;
     }
+
 
     private void initAdapter()
     {
-        chatSession.addMessageListener(chatSessionAdapter);
-        chatSession.addContactStatusListener(chatSessionAdapter);
-        chatSession.addTypingListener(chatSessionAdapter);
-
         loadHistoryTask = new LoadHistoryTask();
 
         loadHistoryTask.execute();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        chatSession.addMessageListener(chatSessionAdapter);
+        chatSession.addContactStatusListener(chatSessionAdapter);
+        chatSession.addTypingListener(chatSessionAdapter);
+    }
+
+    @Override
+    public void onPause()
+    {
+        chatSession.removeMessageListener(chatSessionAdapter);
+        chatSession.removeContactStatusListener(chatSessionAdapter);
+        chatSession.removeTypingListener(chatSessionAdapter);
+
+        super.onPause();
     }
 
     /**
@@ -190,8 +184,6 @@ public class ChatFragment
 
         super.onDetach();
 
-        if(chatSession != null)
-            chatSession.removeMessageListener(chatSessionAdapter);
         chatSessionAdapter = null;
 
         if (loadHistoryTask != null)
@@ -715,9 +707,6 @@ public class ChatFragment
     private void loadHistory( Collection<Object> historyList,
                               boolean dataChanged)
     {
-        if (chatSessionAdapter == null)
-            return;
-
         Iterator<Object> iterator = historyList.iterator();
 
         while (iterator.hasNext())
