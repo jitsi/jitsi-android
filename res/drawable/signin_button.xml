@@ -15,4 +15,3 @@
         android:state_enabled="true"
         android:drawable="@drawable/loginbutton" />
     </selector>
-

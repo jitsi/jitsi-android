@@ -34,7 +34,7 @@
     <!-- Main Menu items -->
     <string name="service_gui_ACCOUNTS_STATUS">Accounts status</string>
     <string name="service_gui_ACCOUNTS_SETTINGS">Accounts settings</string>
-    
+
     <!-- Sign in -->
     <string name="service_gui_SIGN_IN">Sign in</string>
     <string name="service_gui_SIGN_OUT">Sign out</string>
@@ -94,6 +94,7 @@
     <string name="service_gui_VIDEO_CALL">Video call</string>
     <string name="service_gui_CONTACTS">Contacts</string>
     <string name="service_gui_ENTER_NAME_OR_NUMBER">Enter name or number</string>
+
     <!-- Logs -->
     <string name="service_gui_SEND_LOGS_SUBJECT">Jitsi logs</string>
     <string name="service_gui_SEND_LOGS_TITLE">Send Jitsi logs</string>

@@ -26,7 +26,7 @@
             android:textColor="@color/black"
             android:gravity="right"
             android:layout_marginRight="@dimen/chat_text_margin"
-            android:padding="10dip"/>
+            android:padding="7dip"/>
         <TextView
             android:id="@+id/outgoingTimeView"
             style="@style/SmallFont"
@@ -35,9 +35,9 @@
             android:textColor="@color/grey"
             android:gravity="right"
             android:layout_marginRight="@dimen/chat_text_margin"
-            android:paddingLeft="10dip"
-            android:paddingBottom="10dip"
-            android:paddingRight="10dip"/>
+            android:paddingLeft="7dip"
+            android:paddingBottom="7dip"
+            android:paddingRight="7dip"/>
     </LinearLayout>
 
     <ImageView

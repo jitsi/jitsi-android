@@ -26,7 +26,15 @@
             android:textColor="@color/black"
             android:gravity="left"
             android:layout_marginLeft="@dimen/chat_text_margin"
-            android:padding="10dip"/>
+            android:padding="7dip"/>
+        <ImageView
+            android:id="@+id/typingImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="0dip"
+            android:gravity="left"
+            android:layout_marginLeft="@dimen/chat_text_margin"
+            android:src="@drawable/typing_drawable"
+            android:visibility="invisible"/>
         <TextView
             android:id="@+id/incomingTimeView"
             style="@style/SmallFont"
@@ -35,9 +43,9 @@
             android:textColor="@color/grey"
             android:gravity="left"
             android:layout_marginLeft="@dimen/chat_text_margin"
-            android:paddingLeft="10dip"
-            android:paddingBottom="10dip"
-            android:paddingRight="10dip"/>
+            android:paddingLeft="7dip"
+            android:paddingBottom="7dip"
+            android:paddingRight="7dip"/>
     </LinearLayout>
 
     <ImageView
@@ -47,5 +55,4 @@
         android:layout_marginLeft="@dimen/chat_arrow_margin"
         android:layout_marginTop="@dimen/chat_arrow_top"
         android:src="@drawable/messagearrowin"/>
-
 </RelativeLayout>

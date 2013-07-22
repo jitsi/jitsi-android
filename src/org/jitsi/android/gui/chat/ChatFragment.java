@@ -22,13 +22,13 @@ import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.service.osgi.*;
 import org.jitsi.util.*;
-import org.osgi.framework.*;
 
 import android.graphics.drawable.*;
 import android.os.*;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
+import android.widget.LinearLayout.*;
 
 /**
  * The <tt>ChatFragment</tt> is responsible for chat interface.
@@ -47,7 +47,7 @@ public class ChatFragment
     /**
      * The session adapter for the contained <tt>ChatSession</tt>.
      */
-    private ChatSessionAdapter chatSessionAdapter;
+    private ChatListAdapter chatListAdapter;
 
     /**
      * The corresponding <tt>ChatSession</tt>.
@@ -59,8 +59,14 @@ public class ChatFragment
      */
     private ListView chatListView;
 
+    /**
+     * The current position of this chat in the chat pager.
+     */
     private int position;
 
+    /**
+     * The task that loads history.
+     */
     private LoadHistoryTask loadHistoryTask;
 
     /**
@@ -94,6 +100,26 @@ public class ChatFragment
     }
 
     /**
+     * Returns the underlying chat list view.
+     *
+     * @return the underlying chat list view
+     */
+    public ListView getChatListView()
+    {
+        return chatListView;
+    }
+
+    /**
+     * Returns the underlying chat list view.
+     *
+     * @return the underlying chat list view
+     */
+    public ChatListAdapter getChatListAdapter()
+    {
+        return chatListAdapter;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -105,9 +131,9 @@ public class ChatFragment
                                          container,
                                          false);
 
-        chatSessionAdapter = new ChatSessionAdapter();
+        chatListAdapter = new ChatListAdapter();
         chatListView = (ListView) content.findViewById(R.id.chatListView);
-        chatListView.setAdapter(chatSessionAdapter);
+        chatListView.setAdapter(chatListAdapter);
 
         chatListView.setSelector(R.drawable.contact_list_selector);
 
@@ -125,7 +151,9 @@ public class ChatFragment
         return content;
     }
 
-
+    /**
+     * Initializes the chat list adapter.
+     */
     private void initAdapter()
     {
         loadHistoryTask = new LoadHistoryTask();
@@ -138,17 +166,17 @@ public class ChatFragment
     {
         super.onResume();
 
-        chatSession.addMessageListener(chatSessionAdapter);
-        chatSession.addContactStatusListener(chatSessionAdapter);
-        chatSession.addTypingListener(chatSessionAdapter);
+        chatSession.addMessageListener(chatListAdapter);
+        chatSession.addContactStatusListener(chatListAdapter);
+        chatSession.addTypingListener(chatListAdapter);
     }
 
     @Override
     public void onPause()
     {
-        chatSession.removeMessageListener(chatSessionAdapter);
-        chatSession.removeContactStatusListener(chatSessionAdapter);
-        chatSession.removeTypingListener(chatSessionAdapter);
+        chatSession.removeMessageListener(chatListAdapter);
+        chatSession.removeContactStatusListener(chatListAdapter);
+        chatSession.removeTypingListener(chatListAdapter);
 
         super.onPause();
     }
@@ -184,7 +212,7 @@ public class ChatFragment
 
         super.onDetach();
 
-        chatSessionAdapter = null;
+        chatListAdapter = null;
 
         if (loadHistoryTask != null)
         {
@@ -204,7 +232,7 @@ public class ChatFragment
             chatSession.sendMessage(message);
     }
 
-    private class ChatSessionAdapter
+    class ChatListAdapter
         extends BaseAdapter
         implements  MessageListener,
                     ContactPresenceStatusListener,
@@ -219,12 +247,12 @@ public class ChatFragment
         /**
          * The type of the incoming message view.
          */
-        private final int INCOMING_MESSAGE_VIEW = 0;
+        final int INCOMING_MESSAGE_VIEW = 0;
 
         /**
          * The type of the outgoing message view.
          */
-        private final int OUTGOING_MESSAGE_VIEW = 1;
+        final int OUTGOING_MESSAGE_VIEW = 1;
 
         /**
          * Passes the message to the contained <code>ChatConversationPanel</code>
@@ -248,42 +276,130 @@ public class ChatFragment
                                 final String messageUID,
                                 final String correctedMessageUID)
         {
-            getActivity().runOnUiThread(new Runnable()
+            ChatMessage chatMessage = null;
+
+            synchronized (messages)
             {
-                public void run()
+                if (!isConsecutiveMessage(  contactName,
+                                            messageType,
+                                            date.getTime()))
                 {
-                    ChatMessage chatMessage = null;
+                     chatMessage
+                         = new ChatMessage(contactName, displayName,
+                            date, messageType, null, message,
+                            contentType, messageUID,
+                            correctedMessageUID);
 
-                    synchronized (messages)
-                    {
-                        if (!isConsecutiveMessage(  contactName,
-                                                    messageType,
-                                                    date.getTime()))
-                        {
-                             chatMessage
-                                 = new ChatMessage(contactName, displayName,
-                                    date, messageType, null, message,
-                                    contentType, messageUID,
-                                    correctedMessageUID);
+                     // If there's a typing notification message currently
+                     // remove it.
+                     if (messages.size() > 0
+                         && messages.get(messages.size() - 1).getMessageType()
+                             == ChatMessage.INCOMING_TYPING_NOTIFICATION)
+                         messages.add(messages.size() - 1, chatMessage);
+                     else
+                         messages.add(chatMessage);
+                }
+            }
 
-                             messages.add(chatMessage);
-                        }
-                    }
+            // A consecutive message.
+            if (chatMessage == null)
+            {
+                // Return the last message.
+                chatMessage = getMessage(getCount() - 1);
 
-                    // A consecutive message.
-                    if (chatMessage == null)
-                    {
-                        // Return the last message.
-                        chatMessage = getMessage(getCount() - 1);
+                if (chatMessage.getMessageType()
+                        == ChatMessage.INCOMING_TYPING_NOTIFICATION)
+                {
+                    chatMessage.setMessageType(messageType);
+                }
 
-                        chatMessage.setMessage(
-                            chatMessage.getMessage() + " \n"
-                            + message);
-                    }
+                chatMessage.setMessage(
+                    chatMessage.getMessage() + " \n"
+                    + message);
+            }
+
+            dataChanged();
+        }
+
+        /**
+         * Passes the message to the contained <code>ChatConversationPanel</code>
+         * for processing and appends it at the end of the conversationPanel
+         * document.
+         *
+         * @param contactName the name of the contact sending the message
+         * @param displayName the display name of the contact
+         * @param date the time at which the message is sent or received
+         * @param typingState the typing state of the typing message to add
+         */
+        public void addTypingMessage(   final String contactName,
+                                        final String displayName,
+                                        final Date date,
+                                        final int typingState)
+        {
+            ChatMessage typingMessage = null;
+
+            synchronized (messages)
+            {
+                if (messages.size() <= 0
+                    || messages.get(messages.size() - 1).getMessageType()
+                        != ChatMessage.INCOMING_TYPING_NOTIFICATION)
+                {
+                    typingMessage
+                        = new ChatTypingMessage(contactName,
+                                                displayName,
+                                                date,
+                                                typingState);
+
+                    messages.add(typingMessage);
 
                     dataChanged();
                 }
-            });
+            }
+        }
+
+        /**
+         * Removes the typing message.
+         */
+        public void removeTypingMessage()
+        {
+            synchronized (messages)
+            {
+                if (messages.size() <= 0)
+                    return;
+
+                ChatMessage typingMessage
+                    = messages.get(messages.size() - 1);
+
+                if (typingMessage.getMessageType()
+                        == ChatMessage.INCOMING_TYPING_NOTIFICATION)
+                {
+                    messages.remove(typingMessage);
+                    dataChanged();
+                }
+                else
+                {
+                    int firstPosition = chatListView.getFirstVisiblePosition();
+                    int lastPosition = chatListView.getLastVisiblePosition();
+
+                    RelativeLayout chatRowView
+                        = (RelativeLayout) chatListView
+                            .getChildAt(lastPosition - firstPosition);
+
+                    if (chatRowView == null)
+                        return;
+
+                    ImageView typingImgView
+                        = (ImageView) chatRowView
+                            .findViewById(R.id.typingImageView);
+
+                    if (typingImgView == null)
+                        return;
+
+                    typingImgView.getLayoutParams().height = 0;
+                    typingImgView.setPadding(0, 0, 0, 0);
+                    typingImgView.setVisibility(View.INVISIBLE);
+                }
+            }
         }
 
         /**
@@ -304,6 +420,8 @@ public class ChatFragment
         {
             synchronized (messages)
             {
+                if (logger.isInfoEnabled())
+                    logger.info("OBTAIN CHAT ITEM ON POSITION: " + position);
                 return messages.get(position);
             }
         }
@@ -331,7 +449,8 @@ public class ChatFragment
             ChatMessage message = getMessage(position);
             int messageType = message.getMessageType();
 
-            if (messageType == ChatMessage.INCOMING_MESSAGE)
+            if (messageType == ChatMessage.INCOMING_MESSAGE
+                || messageType == ChatMessage.INCOMING_TYPING_NOTIFICATION)
                 return INCOMING_MESSAGE_VIEW;
             else if (messageType == ChatMessage.OUTGOING_MESSAGE)
                 return OUTGOING_MESSAGE_VIEW;
@@ -374,6 +493,10 @@ public class ChatFragment
                     messageViewHolder.timeView
                         = (TextView) convertView.findViewById(
                             R.id.incomingTimeView);
+
+                    messageViewHolder.typingView
+                        = (ImageView) convertView.findViewById(
+                            R.id.typingImageView);
                 }
                 else
                 {
@@ -426,9 +549,21 @@ public class ChatFragment
 
                 setAvatar(messageViewHolder.avatarView, avatar, status);
 
-                messageViewHolder.messageView.setText(message.getMessage());
-                messageViewHolder.timeView.setText(
-                    GuiUtils.formatTime(message.getDate()));
+                if (message.getMessageType()
+                        == ChatMessage.INCOMING_TYPING_NOTIFICATION)
+                {
+                    setTypingState(
+                        messageViewHolder.typingView,
+                        ((ChatTypingMessage) message).getTypingState());
+                    messageViewHolder.messageView.setText("");
+                    messageViewHolder.timeView.setText("");
+                }
+                else
+                {
+                    messageViewHolder.messageView.setText(message.getMessage());
+                    messageViewHolder.timeView.setText(
+                        GuiUtils.formatTime(message.getDate()));
+                }
             }
 
             return convertView;
@@ -446,10 +581,10 @@ public class ChatFragment
         }
 
         @Override
-        public void messageDelivered(MessageDeliveredEvent evt)
+        public void messageDelivered(final MessageDeliveredEvent evt)
         {
-            Contact contact = evt.getDestinationContact();
-            MetaContact metaContact
+            final Contact contact = evt.getDestinationContact();
+            final MetaContact metaContact
                 = AndroidGUIActivator.getContactListService()
                     .findMetaContactByContact(contact);
 
@@ -460,9 +595,7 @@ public class ChatFragment
             if (metaContact != null
                 && chatSession.getMetaContact().equals(metaContact))
             {
-                Message msg = evt.getSourceMessage();
-                ProtocolProviderService protocolProvider
-                    = contact.getProtocolProvider();
+                final Message msg = evt.getSourceMessage();
 
                 if (logger.isTraceEnabled())
                     logger.trace(
@@ -470,17 +603,23 @@ public class ChatFragment
                     + contact.getAddress()
                     + " MESSAGE: " + msg.getContent());
 
-                addMessage(
-                    contact.getProtocolProvider().getAccountID()
-                        .getAccountAddress(),
-                    getAccountDisplayName(
-                        contact.getProtocolProvider()),
-                    evt.getTimestamp(),
-                    ChatMessage.OUTGOING_MESSAGE,
-                    msg.getContent(),
-                    msg.getContentType(),
-                    msg.getMessageUID(),
-                    evt.getCorrectedMessageUID());
+                getActivity().runOnUiThread(new Runnable()
+                {
+                    public void run()
+                    {
+                        addMessage(
+                            contact.getProtocolProvider().getAccountID()
+                                .getAccountAddress(),
+                            getAccountDisplayName(
+                                contact.getProtocolProvider()),
+                            evt.getTimestamp(),
+                            ChatMessage.OUTGOING_MESSAGE,
+                            msg.getContent(),
+                            msg.getContentType(),
+                            msg.getMessageUID(),
+                            evt.getCorrectedMessageUID());
+                    }
+                });
             }
         }
 
@@ -491,31 +630,37 @@ public class ChatFragment
         }
 
         @Override
-        public void messageReceived(MessageReceivedEvent evt)
+        public void messageReceived(final MessageReceivedEvent evt)
         {
             if (logger.isTraceEnabled())
                 logger.trace("MESSAGE RECEIVED from contact: "
                 + evt.getSourceContact().getAddress());
 
-            Contact protocolContact = evt.getSourceContact();
-            ContactResource contactResource = evt.getContactResource();
-            Message message = evt.getSourceMessage();
-            int eventType = evt.getEventType();
-            MetaContact metaContact
+            final Contact protocolContact = evt.getSourceContact();
+            final ContactResource contactResource = evt.getContactResource();
+            final Message message = evt.getSourceMessage();
+            final int eventType = evt.getEventType();
+            final MetaContact metaContact
                 = AndroidGUIActivator.getContactListService()
                     .findMetaContactByContact(protocolContact);
 
             if(metaContact != null
                 && chatSession.getMetaContact().equals(metaContact))
             {
-                addMessage( protocolContact.getAddress(),
-                            metaContact.getDisplayName(),
-                            evt.getTimestamp(),
-                            ChatMessage.getMessageType(evt),
-                            message.getContent(),
-                            message.getContentType(),
-                            message.getMessageUID(),
-                            evt.getCorrectedMessageUID());
+                getActivity().runOnUiThread(new Runnable()
+                {
+                    public void run()
+                    {
+                        addMessage( protocolContact.getAddress(),
+                                    metaContact.getDisplayName(),
+                                    evt.getTimestamp(),
+                                    ChatMessage.getMessageType(evt),
+                                    message.getContent(),
+                                    message.getContentType(),
+                                    message.getMessageUID(),
+                                    evt.getCorrectedMessageUID());
+                    }
+                });
             }
             else
             {
@@ -554,7 +699,13 @@ public class ChatFragment
         @Override
         public void typingNotificationReceived(TypingNotificationEvent evt)
         {
-            
+            System.err.println("TYPING RECEIVEDDDDDDD");
+            if (logger.isInfoEnabled())
+                logger.info("Typing notification received: "
+                    + evt.getSourceContact().getAddress());
+
+            TypingNotificationHandler
+                .handleTypingNotificationReceived(evt, ChatFragment.this);
         }
     }
 
@@ -564,6 +715,7 @@ public class ChatFragment
         ImageView typeIndicator;
         TextView messageView;
         TextView timeView;
+        ImageView typingView;
         int viewType;
         int position;
     }
@@ -602,7 +754,11 @@ public class ChatFragment
     /**
      * Indicates if this is a consecutive message.
      *
-     * @param chatMessage the message to verify
+     * @param messageContactAddress the address of the contact associated with
+     * the message
+     * @param messageType the type of the message. One of the message types
+     * defined in the <tt>ChatMessage</tt> class
+     * @param messageTime the time at which the message was received/sent
      * @return <tt>true</tt> if the given message is a consecutive message,
      * <tt>false</tt> - otherwise
      */
@@ -611,9 +767,9 @@ public class ChatFragment
                                             long messageTime)
     {
         ChatMessage lastMessage = null;
-        int messageCount = chatSessionAdapter.getCount();
+        int messageCount = chatListAdapter.getCount();
         if (messageCount > 0)
-            lastMessage = chatSessionAdapter.getMessage(messageCount - 1);
+            lastMessage = chatListAdapter.getMessage(messageCount - 1);
 
         if (lastMessage == null)
             return false;
@@ -622,6 +778,7 @@ public class ChatFragment
 
         if (contactAddress != null
                 && (messageType == ChatMessage.INCOMING_MESSAGE
+                    || messageType == ChatMessage.INCOMING_TYPING_NOTIFICATION
                     || messageType == ChatMessage.OUTGOING_MESSAGE)
                 && contactAddress.equals(messageContactAddress)
                 // And if the new message is within a minute from the last one.
@@ -633,11 +790,10 @@ public class ChatFragment
         return false;
     }
 
-    public void update()
-    {
-        chatSessionAdapter.dataChanged();
-    }
-
+    /**
+     * Loads the history in an asynchronous thread and then adds the history
+     * messages to the user interface.
+     */
     private class LoadHistoryTask
         extends AsyncTask<Void, Void, Collection<Object>>
     {
@@ -656,6 +812,9 @@ public class ChatFragment
         }
     }
 
+    /**
+     * Updates the status user interface.
+     */
     private class UpdateStatusTask
         extends AsyncTask<Void, Void, Void>
     {
@@ -677,8 +836,8 @@ public class ChatFragment
                         i - chatListView.getFirstVisiblePosition());
 
                 if (chatRowView != null
-                    && chatSessionAdapter.getItemViewType(i)
-                        == chatSessionAdapter.INCOMING_MESSAGE_VIEW)
+                    && chatListAdapter.getItemViewType(i)
+                        == chatListAdapter.INCOMING_MESSAGE_VIEW)
                 {
                     Drawable avatar = ContactListAdapter
                         .getAvatarDrawable(
@@ -700,8 +859,8 @@ public class ChatFragment
     /**
      * Process history messages.
      *
-     * @param historyList The collection of messages coming from history.
-     * @param escapedMessageID The incoming message needed to be ignored if
+     * @param historyList the collection of messages coming from history
+     * @param dataChanged The incoming message needed to be ignored if
      * contained in history.
      */
     private void loadHistory( Collection<Object> historyList,
@@ -715,16 +874,16 @@ public class ChatFragment
 
             if(o instanceof MessageDeliveredEvent)
             {
-                chatSessionAdapter.messageDelivered((MessageDeliveredEvent) o);
+                chatListAdapter.messageDelivered((MessageDeliveredEvent) o);
             }
             else if(o instanceof MessageReceivedEvent)
             {
-                chatSessionAdapter.messageReceived((MessageReceivedEvent) o);
+                chatListAdapter.messageReceived((MessageReceivedEvent) o);
             }
         }
 
         if(dataChanged)
-            chatSessionAdapter.dataChanged();
+            chatListAdapter.dataChanged();
     }
 
     /**
@@ -766,7 +925,8 @@ public class ChatFragment
      * Sets the avatar icon for the given avatar view.
      *
      * @param avatarView the avatar image view
-     * @param avatar the avatar to set
+     * @param avatar the avatar drawable to set
+     * @param status the presence status drawable to set
      */
     public void setAvatar(  ImageView avatarView,
                             Drawable avatar,
@@ -780,5 +940,46 @@ public class ChatFragment
 
         avatarDrawable.setLayerInset(1, 50, 50, 0, 0);
         avatarView.setImageDrawable(avatarDrawable);
+    }
+
+    /**
+     * Sets the appropriate typing notification interface.
+     *
+     * @param typingImgView the typing image view
+     * @param typingState the typing state that should be represented in the
+     * view
+     */
+    public static void setTypingState(   ImageView typingImgView,
+                                                int typingState)
+    {
+        if (typingState == OperationSetTypingNotifications.STATE_TYPING)
+        {
+            Drawable typingDrawable = typingImgView.getDrawable();
+            if (!(typingDrawable instanceof AnimationDrawable))
+            {
+                typingImgView
+                    .setImageResource(R.drawable.typing_drawable);
+                typingDrawable = typingImgView.getDrawable();
+            }
+
+            if(!((AnimationDrawable) typingDrawable).isRunning())
+            {
+                AnimationDrawable animatedDrawable
+                    = (AnimationDrawable) typingDrawable;
+                animatedDrawable.setOneShot(false);
+                animatedDrawable.start();
+            }
+        }
+        else if (typingState
+                == OperationSetTypingNotifications.STATE_PAUSED)
+        {
+            typingImgView.setImageResource(R.drawable.typing1);
+        }
+
+        typingImgView.getLayoutParams().height
+            = LayoutParams.WRAP_CONTENT;
+        typingImgView.setPadding(7, 0, 7, 7);
+
+        typingImgView.setVisibility(View.VISIBLE);
     }
 }

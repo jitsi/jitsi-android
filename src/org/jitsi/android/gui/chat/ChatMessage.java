@@ -65,6 +65,11 @@ public class ChatMessage
     public static final int HISTORY_OUTGOING_MESSAGE = 8;
 
     /**
+     * The message type representing incoming typing notification.
+     */
+    public static final int INCOMING_TYPING_NOTIFICATION = 9;
+
+    /**
      * The name of the contact sending the message.
      */
     private final String contactName;
@@ -82,7 +87,7 @@ public class ChatMessage
     /**
      * The type of the message.
      */
-    private final int messageType;
+    private int messageType;
 
     /**
      * The title of the message. This property is optional and could be used
@@ -134,9 +139,9 @@ public class ChatMessage
      * Creates a <tt>ChatMessage</tt> by specifying all parameters of the
      * message.
      * @param contactName the name of the contact
-     * @param contactDisplayName the contact display name
      * @param date the date and time
      * @param messageType the type (INCOMING or OUTGOING)
+     * @param messageTitle the title of the message
      * @param message the content
      * @param contentType the content type (e.g. "text", "text/html", etc.)
      */
@@ -179,6 +184,7 @@ public class ChatMessage
      * @param contactDisplayName the contact display name
      * @param date the date and time
      * @param messageType the type (INCOMING or OUTGOING)
+     * @param messageTitle the title of the message
      * @param message the content
      * @param contentType the content type (e.g. "text", "text/html", etc.)
      * @param messageUID The ID of the message.
@@ -307,6 +313,25 @@ public class ChatMessage
         return correctedMessageUID;
     }
 
+    /**
+     * Sets the message type.
+     *
+     * @param msgType the type of the message
+     */
+    public void setMessageType(int msgType)
+    {
+        this.messageType = msgType;
+    }
+
+    /**
+     * Returns the message type corresponding to the given
+     * <tt>MessageReceivedEvent</tt>.
+     *
+     * @param evt the <tt>MessageReceivedEvent</tt>, that gives us information
+     * of the message type
+     * @return the message type corresponding to the given
+     * <tt>MessageReceivedEvent</tt>
+     */
     public static int getMessageType(MessageReceivedEvent evt)
     {
         int eventType = evt.getEventType();
