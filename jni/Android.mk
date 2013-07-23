@@ -60,6 +60,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/include $(LOCAL_PATH)/celt $(LOCAL_PATH)/silk 
 LOCAL_SRC_FILES		:= celt/bands.c								celt/celt.c \
 					   celt/cwrs.c								celt/entcode.c \
 					   celt/entdec.c							celt/entenc.c \
+					   celt/celt_decoder.c                      celt/celt_encoder.c \
 					   celt/kiss_fft.c							celt/laplace.c \
 					   celt/mathops.c							celt/mdct.c \
 					   celt/modes.c								celt/pitch.c \
