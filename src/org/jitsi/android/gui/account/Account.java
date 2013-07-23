@@ -8,18 +8,23 @@ package org.jitsi.android.gui.account;
 
 import android.content.*;
 import android.graphics.drawable.*;
-import net.java.sip.communicator.impl.protocol.sip.*;
+
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.event.*;
 import net.java.sip.communicator.service.protocol.globalstatus.*;
 import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.account.*;
+
+import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.android.gui.util.event.*;
 import org.jitsi.android.gui.util.event.EventListenerList;
+import org.jitsi.service.resources.*;
+
 import org.osgi.framework.*;
 
 import java.beans.*;
+import java.io.*;
 
 /**
  * Class exposes account information for specified {@link AccountID}
@@ -127,12 +132,44 @@ public class Account
 
         if (iconPath != null)
         {
-            blob = ProtocolIconSipImpl.loadIcon(iconPath);
+            blob = loadIcon(iconPath);
             if(blob != null)
                 return AndroidImageUtil.drawableFromBytes(blob);
         }
 
         return null;
+    }
+
+    /**
+     * Loads an image from a given image path.
+     *
+     * @param imagePath The identifier of the image.
+     * @return The image for the given identifier.
+     */
+    public static byte[] loadIcon(String imagePath)
+    {
+        ResourceManagementService resources
+                = AndroidGUIActivator.getResourcesService();
+        byte[] icon = null;
+
+        if (resources != null)
+        {
+            InputStream is = resources.getImageInputStreamForPath(imagePath);
+
+            if(is == null)
+                return null;
+
+            try
+            {
+                icon = new byte[is.available()];
+                is.read(icon);
+            }
+            catch (IOException ioex)
+            {
+                logger.error("Failed to load protocol icon: "+imagePath, ioex);
+            }
+        }
+        return icon;
     }
 
     /**
