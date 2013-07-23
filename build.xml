@@ -45,6 +45,9 @@
             unless="sdk.dir"
     />
 
+    <!-- version-tag: custom -->
+    <import file="${sdk.dir}/tools/ant/build.xml" />
+
     <!--target name="-pre-build">
     </target-->
 
@@ -54,6 +57,14 @@
                  classpath="lib/installer-exclude/jarjar.jar"/>
     </target>
 
+    <target name="clean" depends="android_rules.clean">
+        <!-- Clears libs folder -->
+        <delete dir="libs" />
+    </target>
+
+    <!-- This target should be called after updating Jitsi bundles
+         inside lib/asset-bundles
+        -->
     <target name="create-asset-dex" depends="define-jarjar">
 
 
@@ -237,6 +248,8 @@
         </jarjar>
 
         <!-- fix loading some classes -->
+        <!-- Added delete as jarjar is not always renaming libjitsi.jar -->
+        <delete file="libs/libjitsi.jar" />
         <jarjar jarfile="libs/libjitsi.jar">
             <zipfileset src="lib/bundles/libjitsi.jar"/>
             <rule pattern="java.awt.**"
@@ -250,6 +263,11 @@
         </jarjar>
 
         <!-- fix loading some classes -->
+        <jarjar jarfile="libs/bouncycastle.jar">
+            <zipfileset src="lib/bundles/bouncycastle.jar"/>
+            <rule pattern="org.bouncycastle.**"
+                  result="org.jitsi.bouncycastle.@1"/>
+        </jarjar>
         <jarjar jarfile="libs/bccontrib.jar">
             <zipfileset src="lib/bundles/bccontrib.jar"/>
             <rule pattern="org.bouncycastle.**"
@@ -295,9 +313,6 @@
         </jarjar>
     </target>
 
-    <!-- version-tag: custom -->
-    <import file="${sdk.dir}/tools/ant/build.xml" />
-
     <target name="compile" depends="setup-libs,-compile"/>
 
     <target name="debug-install" depends="debug">
@@ -314,7 +329,7 @@
     <!-- install and starts jitsi apk -->
     <target name="adb-install-and-run" depends="adb-install">
         <exec executable="${sdk.dir}/platform-tools/adb" >
-            <arg line=" shell am start -n org.jitsi/org.jitsi.android.gui.Jitsi"/>
+            <arg line=" shell am start -n org.jitsi/org.jitsi.android.gui.LauncherActivity"/>
         </exec>
     </target>
 
