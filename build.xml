@@ -48,6 +48,106 @@
     <!--target name="-pre-build">
     </target-->
 
+    <target name="define-jarjar">
+        <!-- task to rename packages in jar files -->
+        <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
+                 classpath="lib/installer-exclude/jarjar.jar"/>
+    </target>
+
+    <target name="create-asset-dex" depends="define-jarjar">
+
+
+        <!-- Copies lib bundles to temp dir -->
+        <property name="asset.libs.dir"
+                  value="${out.absolute.dir}/asset-libs" />
+        <delete dir="${asset.libs.dir}" />
+        <copy todir="${asset.libs.dir}" >
+            <fileset dir="lib/asset-bundles" />
+        </copy>
+
+        <!-- renames packages as different versions are used in devices -->
+        <jarjar jarfile="${asset.libs.dir}/protocol-sip.jar">
+            <zipfileset src="lib/asset-bundles/protocol-sip.jar"/>
+
+            <!-- Reported by Pawel Domas
+                renaming this strings leads to Exception -
+                ClassNotFoundException: org.jitsi.gov.nist.org.jitsi.javax.sip.header.HeaderFactoryImpl
+                The cause is javax.sip.SipFactory constructing the header
+                factories by name and renaming causes wrong classnames.
+            -->
+            <rule pattern="javax.sip.header.HeaderFactoryImpl"
+                  result="javax.sip.header.HeaderFactoryImpl"/>
+            <rule pattern="javax.sip.message.MessageFactoryImpl"
+                  result="javax.sip.message.MessageFactoryImpl"/>
+            <rule pattern="javax.sip.address.AddressFactoryImpl"
+                  result="javax.sip.address.AddressFactoryImpl"/>
+
+            <rule pattern="javax.sip.**"
+                  result="org.jitsi.javax.sip.@1"/>
+            <rule pattern="gov.nist.core.**"
+                  result="org.jitsi.gov.nist.core.@1"/>
+            <rule pattern="gov.nist.javax.sip.**"
+                  result="org.jitsi.gov.nist.javax.sip.@1"/>
+
+            <rule pattern="java.awt.**"
+                  result="org.jitsi.android.util.java.awt.@1"/>
+        </jarjar>
+
+
+        <!-- renaming packages in order to use vanilla smack in android -->
+        <jarjar jarfile="${asset.libs.dir}/smacklib.jar">
+            <zipfileset src="lib/asset-bundles/smacklib.jar"/>
+            <rule pattern="org.xmlpull.v1.**"
+                  result="org.jitsi.org.xmlpull.v1.@1"/>
+
+            <!-- Renames missing java.beans classes -->
+            <rule pattern="java.beans.PropertyDescriptor"
+                  result="org.jitsi.android.util.java.beans.PropertyDescriptor"/>
+            <rule pattern="java.beans.PropertyEditor"
+                  result="org.jitsi.android.util.java.beans.PropertyEditor"/>
+
+            <rule pattern="javax.security.sasl.**"
+                  result="org.apache.harmony.javax.security.sasl.@1"/>
+            <rule pattern="javax.security.auth.**"
+                  result="org.apache.harmony.javax.security.auth.@1"/>
+        </jarjar>
+        <!-- renaming packages in order to use vanilla smack in android -->
+        <jarjar jarfile="${asset.libs.dir}/protocol-jabber.jar">
+            <zipfileset src="lib/asset-bundles/protocol-jabber.jar"/>
+            <rule pattern="org.xmlpull.v1.**"
+                  result="org.jitsi.org.xmlpull.v1.@1"/>
+
+            <!-- Renames missing java.beans classes -->
+            <rule pattern="java.beans.PropertyDescriptor"
+                  result="org.jitsi.android.util.java.beans.PropertyDescriptor"/>
+            <rule pattern="java.beans.PropertyEditor"
+                  result="org.jitsi.android.util.java.beans.PropertyEditor"/>
+
+            <rule pattern="javax.security.sasl.**"
+                  result="org.apache.harmony.javax.security.sasl.@1"/>
+            <rule pattern="javax.security.auth.**"
+                  result="org.apache.harmony.javax.security.auth.@1"/>
+
+            <rule pattern="java.awt.**"
+                  result="org.jitsi.android.util.java.awt.@1"/>
+        </jarjar>
+
+        <!-- Create dex file for library bundles -->
+        <mkdir dir="${out.absolute.dir}/jitsi_bundles_dex_dir" />
+        <dex executable="${dx}"
+             output="${out.absolute.dir}/jitsi_bundles_dex_dir/classes.dex"
+             verbose="${verbose}" >
+            <path path="${asset.libs.dir}"/>
+        </dex>
+        <!-- Jar asset dex file so it can be consumed by the DexClassLoader. -->
+        <!-- Package the output in the assets directory of the apk. -->
+        <jar destfile="${asset.absolute.dir}/jitsi-bundles-dex.jar"
+             basedir="${out.absolute.dir}/jitsi_bundles_dex_dir" includes="classes.dex" />
+
+        <delete dir="${asset.libs.dir}" />
+
+    </target>
+
     <!-- before compilation clears libs folder and populated
      with all the libraries and binaries we use -->
     <target name="setup-libs">
@@ -59,12 +159,12 @@
             -->
         <delete>
             <fileset dir="libs">
+                <include name="bccontrib.jar"/>
+                <include name="bouncycastle.jar"/>
                 <include name="protocol.jar"/>
-                <include name="smacklib.jar"/>
-                <include name="protocol-sip.jar"/>
-                <include name="protocol-jabber.jar"/>
                 <include name="libjitsi.jar"/>
                 <include name="java-stubs.jar"/>
+                <include name="certificate.jar"/>
                 <include name="resourcemanager.jar"/>
             </fileset>
         </delete>
@@ -100,7 +200,7 @@
      jabber protocol, libjitsi, to use libs from desktop version
      without modifications
      -->
-    <target name="-post-compile">
+    <target name="-post-compile" depends="define-jarjar">
 
         <!--delete dir="${out.classes.absolute.dir}/java"/>
         <delete dir="${out.classes.absolute.dir}/javax"/-->
@@ -120,85 +220,10 @@
                   result="org.jitsi.android.util.java.awt.@1"/>
             <rule pattern="javax.swing.**"
                   result="org.jitsi.android.util.javax.swing.@1"/>
+            <rule pattern="javax.sound.**"
+                  result="org.jitsi.android.util.javax.sound.@1"/>
 
         </package-rename>
-
-        <!-- task to rename packages in jar files -->
-        <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask"
-            classpath="lib/installer-exclude/jarjar.jar"/>
-
-        <!-- renames packages as different versions are used in devices -->
-        <jarjar jarfile="libs/protocol-sip.jar">
-            <zipfileset src="lib/bundles/protocol-sip.jar"/>
-
-            <!-- Reported by Pawel Domas
-                renaming this strings leads to Exception -
-                ClassNotFoundException: org.jitsi.gov.nist.org.jitsi.javax.sip.header.HeaderFactoryImpl
-                The cause is javax.sip.SipFactory constructing the header
-                factories by name and renaming causes wrong classnames.
-            -->
-            <rule pattern="javax.sip.header.HeaderFactoryImpl"
-                  result="javax.sip.header.HeaderFactoryImpl"/>
-            <rule pattern="javax.sip.message.MessageFactoryImpl"
-                  result="javax.sip.message.MessageFactoryImpl"/>
-            <rule pattern="javax.sip.address.AddressFactoryImpl"
-                  result="javax.sip.address.AddressFactoryImpl"/>
-
-            <rule pattern="javax.sip.**"
-                  result="org.jitsi.javax.sip.@1"/>
-            <rule pattern="gov.nist.core.**"
-                  result="org.jitsi.gov.nist.core.@1"/>
-            <rule pattern="gov.nist.javax.sip.**"
-                  result="org.jitsi.gov.nist.javax.sip.@1"/>
-
-            <rule pattern="java.awt.**"
-                  result="org.jitsi.android.util.java.awt.@1"/>
-        </jarjar>
-
-        <!-- renaming bouncycastle packages -->
-        <jarjar jarfile="libs/bouncycastle.jar">
-            <zipfileset src="lib/bundles/bouncycastle.jar"/>
-            <rule pattern="org.bouncycastle.**"
-                  result="org.jitsi.bouncycastle.@1"/>
-        </jarjar>
-
-        <!-- renaming packages in order to use vanilla smack in android -->
-        <jarjar jarfile="libs/smacklib.jar">
-            <zipfileset src="lib/bundles/smacklib.jar"/>
-            <rule pattern="org.xmlpull.v1.**"
-                  result="org.jitsi.org.xmlpull.v1.@1"/>
-
-            <!-- Renames missing java.beans classes -->
-            <rule pattern="java.beans.PropertyDescriptor"
-                  result="org.jitsi.android.util.java.beans.PropertyDescriptor"/>
-            <rule pattern="java.beans.PropertyEditor"
-                  result="org.jitsi.android.util.java.beans.PropertyEditor"/>
-
-            <rule pattern="javax.security.sasl.**"
-                  result="org.apache.harmony.javax.security.sasl.@1"/>
-            <rule pattern="javax.security.auth.**"
-                  result="org.apache.harmony.javax.security.auth.@1"/>
-        </jarjar>
-        <!-- renaming packages in order to use vanilla smack in android -->
-        <jarjar jarfile="libs/protocol-jabber.jar">
-            <zipfileset src="lib/bundles/protocol-jabber.jar"/>
-            <rule pattern="org.xmlpull.v1.**"
-                  result="org.jitsi.org.xmlpull.v1.@1"/>
-
-            <!-- Renames missing java.beans classes -->
-            <rule pattern="java.beans.PropertyDescriptor"
-                  result="org.jitsi.android.util.java.beans.PropertyDescriptor"/>
-            <rule pattern="java.beans.PropertyEditor"
-                  result="org.jitsi.android.util.java.beans.PropertyEditor"/>
-
-            <rule pattern="javax.security.sasl.**"
-                  result="org.apache.harmony.javax.security.sasl.@1"/>
-            <rule pattern="javax.security.auth.**"
-                  result="org.apache.harmony.javax.security.auth.@1"/>
-
-            <rule pattern="java.awt.**"
-                  result="org.jitsi.android.util.java.awt.@1"/>
-        </jarjar>
 
         <!-- fix loading some classes -->
         <jarjar jarfile="libs/protocol.jar">

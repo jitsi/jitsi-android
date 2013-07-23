@@ -11,46 +11,30 @@
 	<classpathentry kind="lib" path="lib/installer-exclude/jarjar.jar"/>
 	<classpathentry kind="lib" path="lib/installer-exclude/asm-4.1.jar"/>
 	<classpathentry kind="lib" path="lib/installer-exclude/asm-commons-4.1.jar"/>
-	<classpathentry kind="lib" path="lib/bundles/argdelegation-service.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/bccontrib.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/bouncycastle.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/certificate.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/contactlist.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/contactsource.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/credentialsstorage.jar"/>
-	<classpathentry kind="lib" path="lib/bundles/customcontactactions.jar"/>
-	<classpathentry kind="lib" path="lib/bundles/dns.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/dnsservice.jar"/>
-	<classpathentry kind="lib" path="lib/bundles/fileaccess.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/filehistory.jar"/>
-	<classpathentry kind="lib" path="lib/bundles/httputil.jar"/>
-	<classpathentry kind="lib" path="lib/bundles/hid-service.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/history.jar"/>
-	<classpathentry kind="lib" path="lib/bundles/json.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/globaldisplaydetails.jar"/>
-	<classpathentry kind="lib" path="lib/bundles/googlecontacts-service.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/libjitsi.jar"/>
-	<classpathentry kind="lib" path="lib/bundles/meta-cl.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/metahistory.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/msghistory.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/netaddr.jar"/>
-	<classpathentry kind="lib" path="lib/bundles/notification-handlers.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/notification-service.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/notification-wiring.jar"/>
-	<classpathentry kind="lib" path="lib/bundles/packetlogging.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/plugin-loggingutils.jar"/>
-	<classpathentry kind="lib" path="lib/bundles/protocol-jabber.jar"/>
-	<classpathentry kind="lib" path="lib/bundles/protocol-sip.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/protocol.jar"/>
-	<classpathentry kind="lib" path="lib/bundles/reconnectplugin.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/resourcemanager.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/sdes4j.jar"/>
-	<classpathentry kind="lib" path="lib/bundles/smacklib.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/sysactivitynotifications.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/systray-service.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/ui-service.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/util.jar"/>
-	<classpathentry kind="lib" path="lib/bundles/version-impl.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/zrtp4j.jar"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>

@@ -220,7 +220,15 @@ public class BundleImpl
     public Class<?> loadClass(String name)
         throws ClassNotFoundException
     {
-        return Class.forName(name);
+        try
+        {
+            return Class.forName(name);
+        }
+        catch(ClassNotFoundException e)
+        {
+            // Tries to load class from library dex file
+            return LibDexLoader.instance.loadClass(name);
+        }
     }
 
     protected void setBundleContext(BundleContext bundleContext)
