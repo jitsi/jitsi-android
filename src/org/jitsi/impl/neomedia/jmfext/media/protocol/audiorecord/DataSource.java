@@ -349,9 +349,9 @@ public class DataSource
             if(Build.VERSION.SDK_INT < 16)
                 return;
 
-            DeviceConfiguration deviceConfig
-                = NeomediaActivator.getMediaServiceImpl()
-                    .getDeviceConfiguration();
+            AudioSystem audioSystem
+                    = AudioSystem.getAudioSystem(
+                            AudioSystem.LOCATOR_PROTOCOL_AUDIORECORD);
 
             // Creates echo canceler if available
             if(AcousticEchoCanceler.isAvailable())
@@ -359,7 +359,7 @@ public class DataSource
                 AcousticEchoCanceler echoCanceller
                         = AcousticEchoCanceler.create(
                         audioRecord.getAudioSessionId());
-                echoCanceller.setEnabled(deviceConfig.isEchoCancel());
+                echoCanceller.setEnabled(audioSystem.isEchoCancel());
             }
 
             // Creates noise suppressor if available
@@ -368,7 +368,7 @@ public class DataSource
                 NoiseSuppressor noiseSuppressor
                         = NoiseSuppressor.create(
                         audioRecord.getAudioSessionId());
-                noiseSuppressor.setEnabled(deviceConfig.isDenoise());
+                noiseSuppressor.setEnabled(audioSystem.isDenoise());
             }
         }
 

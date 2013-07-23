@@ -116,6 +116,8 @@ public class SettingsActivity
          */
         private DeviceConfiguration deviceConfig;
 
+        private AudioSystem audioSystem;
+
         /**
          * Summary mapper used to display preferences values as summaries.
          */
@@ -316,6 +318,8 @@ public class SettingsActivity
             this.deviceConfig
                     = NeomediaActivator.getMediaServiceImpl()
                     .getDeviceConfiguration();
+
+            this.audioSystem = deviceConfig.getAudioSystem();
         }
 
         /**
@@ -496,7 +500,7 @@ public class SettingsActivity
                             & audioSystemFeatures) != 0;
             echoCancelPRef.setEnabled( hasEchoFeature );
             echoCancelPRef.setChecked( hasEchoFeature
-                                       &&deviceConfig.isEchoCancel() );
+                                       &&audioSystem.isEchoCancel() );
 
             // Denoise
             CheckBoxPreference denoisePref
@@ -506,7 +510,7 @@ public class SettingsActivity
                             & audioSystemFeatures) != 0;
             denoisePref.setEnabled( hasDenoiseFeature );
             denoisePref.setChecked( hasDenoiseFeature
-                                    && deviceConfig.isDenoise() );
+                                    && audioSystem.isDenoise() );
         }
 
         /**
@@ -617,14 +621,14 @@ public class SettingsActivity
             else if(key.equals(P_KEY_AUDIO_ECHO_CANCEL))
             {
                 // Echo cancellation
-                deviceConfig.setEchoCancel(
+                audioSystem.setEchoCancel(
                         shPreferences.getBoolean(
                                 P_KEY_AUDIO_ECHO_CANCEL, true));
             }
             else if(key.equals(P_KEY_AUDIO_DENOISE))
             {
                 // Noise reduction
-                deviceConfig.setDenoise(
+                audioSystem.setDenoise(
                         shPreferences.getBoolean(
                                 P_KEY_AUDIO_DENOISE, true));
             }
