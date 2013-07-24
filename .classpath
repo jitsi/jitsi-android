@@ -13,6 +13,7 @@
 	<classpathentry kind="lib" path="lib/installer-exclude/asm-commons-4.1.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/bccontrib.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/bouncycastle.jar"/>
+	<classpathentry kind="lib" path="lib/bundles/browserlauncher.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/certificate.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/contactlist.jar"/>
 	<classpathentry kind="lib" path="lib/bundles/contactsource.jar"/>

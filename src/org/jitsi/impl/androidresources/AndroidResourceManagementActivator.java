@@ -6,10 +6,10 @@
  */
 package org.jitsi.impl.androidresources;
 
-import net.java.sip.communicator.impl.resources.*;
-import net.java.sip.communicator.service.resources.*;
 import net.java.sip.communicator.util.*;
+
 import org.jitsi.service.resources.*;
+
 import org.osgi.framework.*;
 
 /**
@@ -18,23 +18,17 @@ import org.osgi.framework.*;
  * @author Pawel Domas
  */
 public class AndroidResourceManagementActivator
-    extends ResourceManagementActivator
+    extends SimpleServiceActivator<AndroidResourceServiceImpl>
 {
-    /**
-     * The logger
-     */
-    private Logger logger =
-            Logger.getLogger(AndroidResourceManagementActivator.class);
-
     /**
      * The osgi bundle context.
      */
     static BundleContext bundleContext;
 
-    /**
-     * The Android resource service implementation.
-     */
-    private AbstractResourcesService resPackImpl = null;
+    public AndroidResourceManagementActivator()
+    {
+        super(ResourceManagementService.class, "Android Resource Manager");
+    }
 
     /**
      * Starts this bundle.
@@ -46,14 +40,7 @@ public class AndroidResourceManagementActivator
     {
         bundleContext = bc;
 
-        resPackImpl = new AndroidResourceServiceImpl();
-
-        bundleContext.registerService(
-                ResourceManagementService.class.getName(),
-                resPackImpl,
-                null);
-
-        logger.info("Android resource manager ... [REGISTERED]");
+        super.start(bc);
     }
 
     /**
@@ -64,6 +51,15 @@ public class AndroidResourceManagementActivator
      */
     public void stop(BundleContext bc) throws Exception
     {
-        bc.removeServiceListener(resPackImpl);
+        bc.removeServiceListener(serviceImpl);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected AndroidResourceServiceImpl createServiceImpl()
+    {
+        return new AndroidResourceServiceImpl();
     }
 }

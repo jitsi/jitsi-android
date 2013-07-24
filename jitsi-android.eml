@@ -33,6 +33,9 @@
 	<lib name="bouncycastle.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/bouncycastle.jar!/"/>
 	</lib>
+	<lib name="browserlauncher.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/browserlauncher.jar!/"/>
+	</lib>
 	<lib name="certificate.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/lib/bundles/certificate.jar!/"/>
 	</lib>
