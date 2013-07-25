@@ -10,7 +10,6 @@ import android.content.*;
 import android.os.Bundle;
 import android.preference.*;
 
-import java.awt.*;
 import java.util.*;
 import javax.media.*;
 
@@ -22,6 +21,7 @@ import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.settings.util.*;
 import org.jitsi.android.gui.util.*;
+import org.jitsi.android.util.java.awt.*;
 import org.jitsi.impl.neomedia.*;
 import org.jitsi.impl.neomedia.device.*;
 import org.jitsi.service.neomedia.*;
@@ -454,9 +454,9 @@ public class SettingsActivity
         /**
          * Selects resolution from supported resolutions list for given string.
          * @param resStr resolution string created with method
-         *        {@link #resToStr(java.awt.Dimension)}.
+         *        {@link #resToStr(Dimension)}.
          * @return resolution <tt>Dimension</tt> for given string representation
-         *         created with method {@link #resToStr(java.awt.Dimension)}
+         *         created with method {@link #resToStr(Dimension)}
          */
         private static Dimension resoultionForStr(String resStr)
         {

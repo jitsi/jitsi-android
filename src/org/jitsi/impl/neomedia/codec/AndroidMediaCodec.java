@@ -6,13 +6,13 @@
  */
 package org.jitsi.impl.neomedia.codec;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List; // Disambiguation
 
 import javax.media.*;
 import javax.media.format.*;
 
+import org.jitsi.android.util.java.awt.*;
 import org.jitsi.impl.neomedia.codec.video.*;
 import org.jitsi.impl.neomedia.jmfext.media.protocol.*;
 import org.jitsi.service.neomedia.codec.*;

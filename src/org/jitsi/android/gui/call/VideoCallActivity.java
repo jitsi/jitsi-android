@@ -6,11 +6,9 @@
  */
 package org.jitsi.android.gui.call;
 
-import java.awt.*;
 import java.beans.*;
 import java.util.*;
 
-import android.app.*;
 import android.content.*;
 import android.graphics.Color;
 import android.media.*;
@@ -29,6 +27,7 @@ import org.jitsi.android.gui.controller.*;
 import org.jitsi.android.gui.fragment.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.android.gui.widgets.*;
+import org.jitsi.android.util.java.awt.*;
 import org.jitsi.impl.neomedia.jmfext.media.protocol.mediarecorder.*;
 import org.jitsi.service.neomedia.*;
 import org.jitsi.service.osgi.*;

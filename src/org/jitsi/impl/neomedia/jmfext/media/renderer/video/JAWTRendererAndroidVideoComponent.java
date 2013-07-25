@@ -10,12 +10,11 @@ import android.content.*;
 import android.opengl.*;
 import android.view.*;
 
-import java.awt.*;
-
 import javax.microedition.khronos.opengles.*;
 
 import net.java.sip.communicator.util.*;
 
+import org.jitsi.android.util.java.awt.*;
 import org.jitsi.service.neomedia.*;
 
 /**

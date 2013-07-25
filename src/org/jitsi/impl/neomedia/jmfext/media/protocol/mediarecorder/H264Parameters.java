@@ -11,7 +11,6 @@ import android.util.*;
 import org.jitsi.android.*;
 import org.jitsi.util.*;
 
-import java.awt.*;
 import java.io.*;
 
 /**

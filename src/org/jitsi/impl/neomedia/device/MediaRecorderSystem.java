@@ -6,7 +6,6 @@
  */
 package org.jitsi.impl.neomedia.device;
 
-import java.awt.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
@@ -15,6 +14,7 @@ import javax.media.*;
 
 import net.java.sip.communicator.util.*;
 import android.hardware.*;
+import org.jitsi.android.util.java.awt.*;
 import org.jitsi.impl.neomedia.codec.video.h264.*;
 import org.jitsi.impl.neomedia.format.*;
 import org.jitsi.service.neomedia.*;

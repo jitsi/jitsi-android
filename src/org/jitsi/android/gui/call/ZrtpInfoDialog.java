@@ -18,11 +18,11 @@ import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.call.*;
 import org.jitsi.*;
 import org.jitsi.android.gui.util.*;
+import org.jitsi.android.util.java.awt.*;
 import org.jitsi.service.neomedia.*;
 import org.jitsi.service.protocol.event.*;
 import org.jitsi.util.event.*;
 
-import java.awt.*;
 import java.text.*;
 import java.util.*;
 import java.util.List; // Disambiguation

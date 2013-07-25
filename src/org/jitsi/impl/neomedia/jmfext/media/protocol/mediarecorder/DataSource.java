@@ -6,7 +6,6 @@
  */
 package org.jitsi.impl.neomedia.jmfext.media.protocol.mediarecorder;
 
-import java.awt.*;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
@@ -17,6 +16,7 @@ import javax.media.format.*;
 import javax.media.protocol.*;
 
 import org.jitsi.android.*;
+import org.jitsi.android.util.java.awt.*;
 import org.jitsi.impl.neomedia.device.*;
 import net.java.sip.communicator.util.*;
 

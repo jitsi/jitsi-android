@@ -12,9 +12,9 @@ import net.java.sip.communicator.service.gui.Container;
 import net.java.sip.communicator.service.gui.event.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.account.*;
+import org.jitsi.android.util.java.awt.*;
+import org.jitsi.android.util.java.awt.event.*;
 
-import java.awt.*;
-import java.awt.event.*;
 import java.util.*;
 
 /**

@@ -67,7 +67,6 @@
         -->
     <target name="create-asset-dex" depends="define-jarjar">
 
-
         <!-- Copies lib bundles to temp dir -->
         <property name="asset.libs.dir"
                   value="${out.absolute.dir}/asset-libs" />
@@ -161,80 +160,19 @@
 
     <!-- before compilation clears libs folder and populated
      with all the libraries and binaries we use -->
-    <target name="setup-libs">
+    <target name="setup-libs" depends="create-asset-dex">
         <mkdir dir="libs"/>
 
-        <!-- always include the jars we will manipulate
-            or we can manipulate the already modified one
-            and also we need the orig files during compilation
-            -->
-        <delete>
-            <fileset dir="libs">
-                <include name="bccontrib.jar"/>
-                <include name="bouncycastle.jar"/>
-                <include name="protocol.jar"/>
-                <include name="libjitsi.jar"/>
-                <include name="java-stubs.jar"/>
-                <include name="certificate.jar"/>
-                <include name="resourcemanager.jar"/>
-            </fileset>
-        </delete>
-
-        <copy todir="libs" verbose="true">
-            <fileset dir="lib">
-                <include name="*.jar"/>
-                <or>
-                    <modified/>
-                    <present present="srconly" targetdir="libs"/>
-                </or>
-            </fileset>
-            <fileset dir="lib/bundles">
-                <include name="*.jar"/>
-                <or>
-                    <modified/>
-                    <present present="srconly" targetdir="libs"/>
-                </or>
-            </fileset>
-            <fileset dir="lib/native">
-                <include name="**/*"/>
-                <or>
-                    <modified/>
-                    <present present="srconly" targetdir="libs"/>
-                </or>
-            </fileset>
-        </copy>
-    </target>
-
-    <!-- after compilation has finished
-     rename some package names.
-     sip protocol, to use our lib version not the one bundled into android
-     jabber protocol, libjitsi, to use libs from desktop version
-     without modifications
-     -->
-    <target name="-post-compile" depends="define-jarjar">
-
-        <!--delete dir="${out.classes.absolute.dir}/java"/>
-        <delete dir="${out.classes.absolute.dir}/javax"/-->
-        <!--delete file="libs/java-stubs.jar"/-->
-
-        <!-- target to rename packages in class files outside jar file -->
-        <taskdef name="package-rename"
-            classname="org.jitsi.util.asm.PackageRenamer"
-            classpath="lib/installer-exclude/package-renamer.jar:lib/installer-exclude/asm-commons-4.1.jar:lib/installer-exclude/asm-4.1.jar"/>
-        <!-- rename class that were just compiled -->
-        <package-rename>
-            <fileset dir="${out.classes.absolute.dir}">
-                <include name="**/*"/>
-                <modified/>
-            </fileset>
+        <!-- fix loading some classes -->
+        <jarjar jarfile="libs/ui-service.jar">
+            <zipfileset src="lib/bundles/ui-service.jar"/>
             <rule pattern="java.awt.**"
                   result="org.jitsi.android.util.java.awt.@1"/>
             <rule pattern="javax.swing.**"
                   result="org.jitsi.android.util.javax.swing.@1"/>
             <rule pattern="javax.sound.**"
                   result="org.jitsi.android.util.javax.sound.@1"/>
-
-        </package-rename>
+        </jarjar>
 
         <!-- fix loading some classes -->
         <jarjar jarfile="libs/protocol.jar">
@@ -249,7 +187,6 @@
 
         <!-- fix loading some classes -->
         <!-- Added delete as jarjar is not always renaming libjitsi.jar -->
-        <delete file="libs/libjitsi.jar" />
         <jarjar jarfile="libs/libjitsi.jar">
             <zipfileset src="lib/bundles/libjitsi.jar"/>
             <rule pattern="java.awt.**"
@@ -311,9 +248,33 @@
             <rule pattern="javax.swing.**"
                   result="org.jitsi.android.util.javax.swing.@1"/>
         </jarjar>
+
+        <copy todir="libs" verbose="true">
+            <fileset dir="lib">
+                <include name="*.jar"/>
+                <or>
+                    <modified/>
+                    <present present="srconly" targetdir="libs"/>
+                </or>
+            </fileset>
+            <fileset dir="lib/bundles">
+                <include name="*.jar"/>
+                <or>
+                    <modified/>
+                    <present present="srconly" targetdir="libs"/>
+                </or>
+            </fileset>
+            <fileset dir="lib/native">
+                <include name="**/*"/>
+                <or>
+                    <modified/>
+                    <present present="srconly" targetdir="libs"/>
+                </or>
+            </fileset>
+        </copy>
     </target>
 
-    <target name="compile" depends="setup-libs,-compile"/>
+    <target name="compile" depends="-compile"/>
 
     <target name="debug-install" depends="debug">
         <copy file="./bin/jitsi-android-debug.apk"
@@ -334,7 +295,7 @@
     </target>
 
     <target name="rebuild-and-deploy"
-        depends="setup-libs,-pre-compile,compile,-post-compile,debug-install,adb-install"
+        depends="compile,debug-install,adb-install"
         />
 
     <!-- Copies/Updates jitsi bundles from the jitsi project path to the
@@ -349,6 +310,14 @@
                 <include name="*.jar"/>
                 <not>
                     <present present="srconly" targetdir="lib/bundles"/>
+                </not>
+            </fileset>
+        </copy>
+        <copy todir="lib/asset-bundles" verbose="true" overwrite="true">
+            <fileset dir="./${jitsi.path}/sc-bundles">
+                <include name="*.jar"/>
+                <not>
+                    <present present="srconly" targetdir="lib/asset-bundles"/>
                 </not>
             </fileset>
         </copy>
@@ -370,7 +339,7 @@
     </target>
 
     <!-- makes the project and creates debug apk -->
-    <target name="make" depends="setup-libs,debug"/>
+    <target name="make" depends="debug"/>
 
     <!-- cleans and makes project -->
     <target name="rebuild" depends="clean,make"/>
