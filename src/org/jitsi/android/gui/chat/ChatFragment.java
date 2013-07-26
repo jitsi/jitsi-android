@@ -60,6 +60,11 @@ public class ChatFragment
     private ListView chatListView;
 
     /**
+     * The chat typing view.
+     */
+    private LinearLayout typingView;
+
+    /**
      * The current position of this chat in the chat pager.
      */
     private int position;
@@ -133,6 +138,9 @@ public class ChatFragment
 
         chatListAdapter = new ChatListAdapter();
         chatListView = (ListView) content.findViewById(R.id.chatListView);
+
+        typingView = (LinearLayout) content.findViewById(R.id.typingView);
+
         chatListView.setAdapter(chatListAdapter);
 
         chatListView.setSelector(R.drawable.contact_list_selector);
@@ -290,14 +298,7 @@ public class ChatFragment
                             contentType, messageUID,
                             correctedMessageUID);
 
-                     // If there's a typing notification message currently
-                     // remove it.
-                     if (messages.size() > 0
-                         && messages.get(messages.size() - 1).getMessageType()
-                             == ChatMessage.INCOMING_TYPING_NOTIFICATION)
-                         messages.add(messages.size() - 1, chatMessage);
-                     else
-                         messages.add(chatMessage);
+                     messages.add(chatMessage);
                 }
             }
 
@@ -307,99 +308,12 @@ public class ChatFragment
                 // Return the last message.
                 chatMessage = getMessage(getCount() - 1);
 
-                if (chatMessage.getMessageType()
-                        == ChatMessage.INCOMING_TYPING_NOTIFICATION)
-                {
-                    chatMessage.setMessageType(messageType);
-                }
-
                 chatMessage.setMessage(
                     chatMessage.getMessage() + " \n"
                     + message);
             }
 
             dataChanged();
-        }
-
-        /**
-         * Passes the message to the contained <code>ChatConversationPanel</code>
-         * for processing and appends it at the end of the conversationPanel
-         * document.
-         *
-         * @param contactName the name of the contact sending the message
-         * @param displayName the display name of the contact
-         * @param date the time at which the message is sent or received
-         * @param typingState the typing state of the typing message to add
-         */
-        public void addTypingMessage(   final String contactName,
-                                        final String displayName,
-                                        final Date date,
-                                        final int typingState)
-        {
-            ChatMessage typingMessage = null;
-
-            synchronized (messages)
-            {
-                if (messages.size() <= 0
-                    || messages.get(messages.size() - 1).getMessageType()
-                        != ChatMessage.INCOMING_TYPING_NOTIFICATION)
-                {
-                    typingMessage
-                        = new ChatTypingMessage(contactName,
-                                                displayName,
-                                                date,
-                                                typingState);
-
-                    messages.add(typingMessage);
-
-                    dataChanged();
-                }
-            }
-        }
-
-        /**
-         * Removes the typing message.
-         */
-        public void removeTypingMessage()
-        {
-            synchronized (messages)
-            {
-                if (messages.size() <= 0)
-                    return;
-
-                ChatMessage typingMessage
-                    = messages.get(messages.size() - 1);
-
-                if (typingMessage.getMessageType()
-                        == ChatMessage.INCOMING_TYPING_NOTIFICATION)
-                {
-                    messages.remove(typingMessage);
-                    dataChanged();
-                }
-                else
-                {
-                    int firstPosition = chatListView.getFirstVisiblePosition();
-                    int lastPosition = chatListView.getLastVisiblePosition();
-
-                    RelativeLayout chatRowView
-                        = (RelativeLayout) chatListView
-                            .getChildAt(lastPosition - firstPosition);
-
-                    if (chatRowView == null)
-                        return;
-
-                    ImageView typingImgView
-                        = (ImageView) chatRowView
-                            .findViewById(R.id.typingImageView);
-
-                    if (typingImgView == null)
-                        return;
-
-                    typingImgView.getLayoutParams().height = 0;
-                    typingImgView.setPadding(0, 0, 0, 0);
-                    typingImgView.setVisibility(View.INVISIBLE);
-                }
-            }
         }
 
         /**
@@ -449,8 +363,7 @@ public class ChatFragment
             ChatMessage message = getMessage(position);
             int messageType = message.getMessageType();
 
-            if (messageType == ChatMessage.INCOMING_MESSAGE
-                || messageType == ChatMessage.INCOMING_TYPING_NOTIFICATION)
+            if (messageType == ChatMessage.INCOMING_MESSAGE)
                 return INCOMING_MESSAGE_VIEW;
             else if (messageType == ChatMessage.OUTGOING_MESSAGE)
                 return OUTGOING_MESSAGE_VIEW;
@@ -549,21 +462,9 @@ public class ChatFragment
 
                 setAvatar(messageViewHolder.avatarView, avatar, status);
 
-                if (message.getMessageType()
-                        == ChatMessage.INCOMING_TYPING_NOTIFICATION)
-                {
-                    setTypingState(
-                        messageViewHolder.typingView,
-                        ((ChatTypingMessage) message).getTypingState());
-                    messageViewHolder.messageView.setText("");
-                    messageViewHolder.timeView.setText("");
-                }
-                else
-                {
-                    messageViewHolder.messageView.setText(message.getMessage());
-                    messageViewHolder.timeView.setText(
-                        GuiUtils.formatTime(message.getDate()));
-                }
+                messageViewHolder.messageView.setText(message.getMessage());
+                messageViewHolder.timeView.setText(
+                    GuiUtils.formatTime(message.getDate()));
             }
 
             return convertView;
@@ -778,7 +679,6 @@ public class ChatFragment
 
         if (contactAddress != null
                 && (messageType == ChatMessage.INCOMING_MESSAGE
-                    || messageType == ChatMessage.INCOMING_TYPING_NOTIFICATION
                     || messageType == ChatMessage.OUTGOING_MESSAGE)
                 && contactAddress.equals(messageContactAddress)
                 // And if the new message is within a minute from the last one.
@@ -945,20 +845,26 @@ public class ChatFragment
     /**
      * Sets the appropriate typing notification interface.
      *
-     * @param typingImgView the typing image view
      * @param typingState the typing state that should be represented in the
      * view
      */
-    public static void setTypingState(   ImageView typingImgView,
-                                                int typingState)
+    public void setTypingState(int typingState)
     {
+        if (typingView == null)
+            return;
+
+        TextView typingTextView
+            = (TextView) typingView.findViewById(R.id.typingTextView);
+        ImageView typingImgView
+            = (ImageView) typingView.findViewById(R.id.typingImageView);
+
+        boolean setVisible = false;
         if (typingState == OperationSetTypingNotifications.STATE_TYPING)
         {
             Drawable typingDrawable = typingImgView.getDrawable();
             if (!(typingDrawable instanceof AnimationDrawable))
             {
-                typingImgView
-                    .setImageResource(R.drawable.typing_drawable);
+                typingImgView.setImageResource(R.drawable.typing_drawable);
                 typingDrawable = typingImgView.getDrawable();
             }
 
@@ -969,17 +875,34 @@ public class ChatFragment
                 animatedDrawable.setOneShot(false);
                 animatedDrawable.start();
             }
+
+            typingTextView.setText(chatSession.getShortDisplayName()
+                + " "
+                + getResources()
+                    .getString(R.string.service_gui_CONTACT_TYPING));
+            setVisible = true;
         }
         else if (typingState
                 == OperationSetTypingNotifications.STATE_PAUSED)
         {
             typingImgView.setImageResource(R.drawable.typing1);
+            typingTextView.setText(
+                chatSession.getShortDisplayName()
+                + " "
+                + getResources()
+                    .getString(R.string.service_gui_CONTACT_PAUSED_TYPING));
+            setVisible = true;
         }
 
-        typingImgView.getLayoutParams().height
-            = LayoutParams.WRAP_CONTENT;
-        typingImgView.setPadding(7, 0, 7, 7);
+        if (setVisible)
+        {
+            typingImgView.getLayoutParams().height
+                = LayoutParams.WRAP_CONTENT;
+            typingImgView.setPadding(7, 0, 7, 7);
 
-        typingImgView.setVisibility(View.VISIBLE);
+            typingView.setVisibility(View.VISIBLE);
+        }
+        else
+            typingView.setVisibility(View.INVISIBLE);
     }
 }

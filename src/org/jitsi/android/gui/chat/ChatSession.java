@@ -245,8 +245,8 @@ public class ChatSession
             Contact protoContact = protoContacts.next();
 
             OperationSetPresence presenceOpSet
-            = protoContact.getProtocolProvider().getOperationSet(
-                OperationSetPresence.class);
+                = protoContact.getProtocolProvider().getOperationSet(
+                    OperationSetPresence.class);
 
             if (presenceOpSet != null)
             {
@@ -276,5 +276,26 @@ public class ChatSession
             chatHistoryFilter,
             metaContact,
             20);
+    }
+
+    /**
+     * Returns the shortened display name of this chat.
+     *
+     * @return the shortened display name of this chat
+     */
+    public String getShortDisplayName()
+    {
+        String contactDisplayName = metaContact.getDisplayName().trim();
+
+        int atIndex = contactDisplayName.indexOf("@");
+        int spaceIndex = contactDisplayName.indexOf(" ");
+
+        if (atIndex > -1)
+            contactDisplayName = contactDisplayName.substring(0, atIndex);
+
+        if (spaceIndex > -1)
+            contactDisplayName = contactDisplayName.substring(0, spaceIndex);
+
+        return contactDisplayName;
     }
 }

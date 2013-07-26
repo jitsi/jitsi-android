@@ -11,4 +11,31 @@
         android:stackFromBottom="true"
         android:transcriptMode="alwaysScroll"
         android:layout_weight="1"/>
+
+    <LinearLayout
+        android:id="@+id/typingView"
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="30dip"
+        android:layout_margin="0dp"
+        android:layout_gravity="center"
+        android:visibility="invisible">
+
+        <TextView
+            android:id="@+id/typingTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            style="@style/MediumFont"
+            android:textColor="@color/blue"/>
+
+        <ImageView
+            android:id="@+id/typingImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="0dip"
+            android:layout_gravity="bottom"
+            android:layout_marginLeft="@dimen/chat_text_margin"
+            android:src="@drawable/typing_drawable"/>
+    </LinearLayout>
 </LinearLayout>

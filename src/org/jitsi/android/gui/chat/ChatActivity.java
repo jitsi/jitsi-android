@@ -56,17 +56,14 @@ public class ChatActivity
 
         setContentView(R.layout.chat);
 
-        if (savedInstanceState == null)
-        {
-            // Instantiate a ViewPager and a PagerAdapter.
-            chatPager = (ViewPager) findViewById(R.id.chatPager);
-            chatPagerAdapter
-                = new ChatPagerAdapter(getSupportFragmentManager());
-            chatPager.setAdapter(chatPagerAdapter);
-            chatPager.setOffscreenPageLimit(4);
+        // Instantiate a ViewPager and a PagerAdapter.
+        chatPager = (ViewPager) findViewById(R.id.chatPager);
+        chatPagerAdapter
+            = new ChatPagerAdapter(getSupportFragmentManager());
+        chatPager.setAdapter(chatPagerAdapter);
+        chatPager.setOffscreenPageLimit(4);
 
-            chatPager.setOnPageChangeListener(this);
-        }
+        chatPager.setOnPageChangeListener(this);
     }
 
     /**

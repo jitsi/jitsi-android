@@ -12,7 +12,6 @@ import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.event.*;
 
-import org.jitsi.*;
 import org.jitsi.android.gui.chat.ChatFragment.ChatListAdapter;
 
 import android.os.*;
@@ -70,19 +69,15 @@ public class TypingNotificationHandler
         if (typingState == OperationSetTypingNotifications.STATE_TYPING
             || typingState == OperationSetTypingNotifications.STATE_PAUSED)
         {
-            new UpdateTypingTask(   metaContact,
-                                    evt.getSourceContact(),
-                                    chatListView,
-                                    chatListAdapter,
-                                    typingState)
+            new UpdateTypingTask(chatFragment, typingState)
                 .execute();
 
             typingTimer.schedule(
-                new TypingTimerTask(chatListView, chatListAdapter), 5000);
+                new TypingTimerTask(chatFragment), 5000);
         }
         else
         {
-            new RemoveTypingTask(chatListView, chatListAdapter).execute();
+            new RemoveTypingTask(chatFragment).execute();
         }
     }
 
@@ -94,21 +89,17 @@ public class TypingNotificationHandler
     private static class TypingTimerTask
         extends TimerTask
     {
-        private final ListView chatListView;
+        private final ChatFragment chatFragment;
 
-        private final ChatListAdapter chatListAdapter;
-
-        public TypingTimerTask(ListView listView,
-            ChatListAdapter listAdapter)
+        public TypingTimerTask(ChatFragment chatFragment)
         {
-            this.chatListView = listView;
-            this.chatListAdapter = listAdapter;
+            this.chatFragment = chatFragment;
         }
 
         @Override
         public void run()
         {
-            new RemoveTypingTask(chatListView, chatListAdapter).execute();
+            new RemoveTypingTask(chatFragment).execute();
         }
     }
 
@@ -118,26 +109,14 @@ public class TypingNotificationHandler
     private static class UpdateTypingTask
         extends AsyncTask<Void, Void, Void>
     {
-        private final MetaContact metaContact;
-
-        private final Contact protoContact;
-
-        private final ListView chatListView;
-
-        private final ChatListAdapter chatListAdapter;
+        private final ChatFragment chatFragment;
 
         private final int typingState;
 
-        public UpdateTypingTask(MetaContact metaContact,
-                                Contact protoContact,
-                                ListView listView,
-                                ChatListAdapter listAdapter,
+        public UpdateTypingTask(ChatFragment chatFragment,
                                 int typingState)
         {
-            this.metaContact = metaContact;
-            this.protoContact = protoContact;
-            this.chatListView = listView;
-            this.chatListAdapter = listAdapter;
+            this.chatFragment = chatFragment;
             this.typingState = typingState;
         }
 
@@ -154,32 +133,7 @@ public class TypingNotificationHandler
         {
             super.onPostExecute(result);
 
-            int firstPosition = chatListView.getFirstVisiblePosition();
-            int lastPosition = chatListView.getLastVisiblePosition();
-
-            if(chatListAdapter.getItemViewType(lastPosition)
-                    != chatListAdapter.INCOMING_MESSAGE_VIEW)
-            {
-                chatListAdapter.addTypingMessage(
-                    protoContact.getAddress(),
-                    metaContact.getDisplayName(),
-                    new Date(System.currentTimeMillis()),
-                    typingState);
-
-                return;
-            }
-
-            RelativeLayout chatRowView = (RelativeLayout) chatListView
-                    .getChildAt(lastPosition - firstPosition);
-
-            if (chatRowView == null)
-                return;
-
-            ImageView typingImgView
-                = (ImageView) chatRowView
-                    .findViewById(R.id.typingImageView);
-
-            ChatFragment.setTypingState(typingImgView, typingState);
+            chatFragment.setTypingState(typingState);
         }
     }
 
@@ -189,15 +143,11 @@ public class TypingNotificationHandler
     private static class RemoveTypingTask
         extends AsyncTask<Void, Void, Void>
     {
-        private final ListView chatListView;
+        private final ChatFragment chatFragment;
 
-        private final ChatListAdapter chatListAdapter;
-
-        public RemoveTypingTask(ListView listView,
-                                ChatListAdapter listAdapter)
+        public RemoveTypingTask(ChatFragment chatFragment)
         {
-            this.chatListView = listView;
-            this.chatListAdapter = listAdapter;
+            this.chatFragment = chatFragment;
         }
 
         /**
@@ -216,15 +166,8 @@ public class TypingNotificationHandler
         {
             super.onPostExecute(result);
 
-            int lastPosition = chatListView.getLastVisiblePosition();
-
-            if (chatListAdapter.getItemViewType(lastPosition)
-                    == chatListAdapter.INCOMING_MESSAGE_VIEW)
-            {
-                System.err.println("REMOVED");
-
-                chatListAdapter.removeTypingMessage();
-            }
+            chatFragment.setTypingState(
+                OperationSetTypingNotifications.STATE_STOPPED);
         }
     }
 }

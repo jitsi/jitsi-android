@@ -18,6 +18,7 @@
         android:orientation="vertical"
         android:layout_toRightOf="@+id/incomingAvatarView"
         android:background="@drawable/messageholder">
+
         <TextView
             android:id="@+id/incomingMessageView"
             style="@style/MediumFont"
@@ -27,14 +28,7 @@
             android:gravity="left"
             android:layout_marginLeft="@dimen/chat_text_margin"
             android:padding="7dip"/>
-        <ImageView
-            android:id="@+id/typingImageView"
-            android:layout_width="wrap_content"
-            android:layout_height="0dip"
-            android:gravity="left"
-            android:layout_marginLeft="@dimen/chat_text_margin"
-            android:src="@drawable/typing_drawable"
-            android:visibility="invisible"/>
+
         <TextView
             android:id="@+id/incomingTimeView"
             style="@style/SmallFont"

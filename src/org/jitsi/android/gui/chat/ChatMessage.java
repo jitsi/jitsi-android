@@ -65,11 +65,6 @@ public class ChatMessage
     public static final int HISTORY_OUTGOING_MESSAGE = 8;
 
     /**
-     * The message type representing incoming typing notification.
-     */
-    public static final int INCOMING_TYPING_NOTIFICATION = 9;
-
-    /**
      * The name of the contact sending the message.
      */
     private final String contactName;

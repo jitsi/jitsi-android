@@ -30,6 +30,8 @@
     <string name="exit_app">Exit</string>
     <string name="service_gui_UNKNOWN_CONTACT">Unknown</string>
     <string name="service_gui_ACCOUNT_ME">Me</string>
+    <string name="service_gui_CONTACT_PAUSED_TYPING">paused typing</string>
+    <string name="service_gui_CONTACT_TYPING">is typing</string>
 
     <!-- Main Menu items -->
     <string name="service_gui_ACCOUNTS_STATUS">Accounts status</string>
