@@ -65,7 +65,7 @@
     <!-- This target should be called after updating Jitsi bundles
          inside lib/asset-bundles
         -->
-    <target name="create-asset-dex" depends="define-jarjar">
+    <target name="create-asset-dex" depends="define-jarjar,-build-setup">
 
         <!-- Copies lib bundles to temp dir -->
         <property name="asset.libs.dir"
@@ -342,7 +342,7 @@
     <target name="make" depends="debug"/>
 
     <!-- cleans and makes project -->
-    <target name="rebuild" depends="clean,make"/>
+    <target name="rebuild" depends="clean,setup-libs,make"/>
 
     <!-- makes, install and runs the project on the default device -->
     <target name="run" depends="debug-install,adb-install-and-run"/>

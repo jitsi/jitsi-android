@@ -3,6 +3,8 @@ Jitsi for Android is an Android port of the Jitsi project: The most feature-rich
 Usage
 -----------
 
+After updating library bundles, when building for the first time or after clean
+    ant setup-libs
 To make the project
     ant make
 To rebuild (clean and make)
