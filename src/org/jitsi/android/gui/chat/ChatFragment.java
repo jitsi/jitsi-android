@@ -334,8 +334,8 @@ public class ChatFragment
         {
             synchronized (messages)
             {
-                if (logger.isInfoEnabled())
-                    logger.info("OBTAIN CHAT ITEM ON POSITION: " + position);
+                if (logger.isDebugEnabled())
+                    logger.debug("OBTAIN CHAT ITEM ON POSITION: " + position);
                 return messages.get(position);
             }
         }
@@ -580,8 +580,8 @@ public class ChatFragment
         {
             Contact sourceContact = evt.getSourceContact();
 
-            if (logger.isInfoEnabled())
-                logger.info("Contact presence status changed: "
+            if (logger.isDebugEnabled())
+                logger.debug("Contact presence status changed: "
                     + sourceContact.getAddress());
 
             if (!chatSession.getMetaContact().containsContact(sourceContact))
@@ -600,9 +600,8 @@ public class ChatFragment
         @Override
         public void typingNotificationReceived(TypingNotificationEvent evt)
         {
-            System.err.println("TYPING RECEIVEDDDDDDD");
-            if (logger.isInfoEnabled())
-                logger.info("Typing notification received: "
+            if (logger.isDebugEnabled())
+                logger.debug("Typing notification received: "
                     + evt.getSourceContact().getAddress());
 
             TypingNotificationHandler
