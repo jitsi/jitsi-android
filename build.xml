@@ -65,7 +65,10 @@
     <!-- This target should be called after updating Jitsi bundles
          inside lib/asset-bundles
         -->
-    <target name="create-asset-dex" depends="define-jarjar,-build-setup">
+    <target name="create-asset-dex" depends="define-jarjar">
+
+        <getbuildtools name="android.build.tools.dir" />
+        <property name="dx" location="${android.build.tools.dir}/dx${bat}" />
 
         <!-- Copies lib bundles to temp dir -->
         <property name="asset.libs.dir"
@@ -294,9 +297,7 @@
         </exec>
     </target>
 
-    <target name="rebuild-and-deploy"
-        depends="compile,debug-install,adb-install"
-        />
+    <target name="make-and-deploy" depends="make,adb-install" />
 
     <!-- Copies/Updates jitsi bundles from the jitsi project path to the
         current libs folder. Copies only the bundles that are already present
@@ -339,7 +340,7 @@
     </target>
 
     <!-- makes the project and creates debug apk -->
-    <target name="make" depends="debug"/>
+    <target name="make" depends="compile,debug-install"/>
 
     <!-- cleans and makes project -->
     <target name="rebuild" depends="clean,setup-libs,make"/>
