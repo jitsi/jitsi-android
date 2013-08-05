@@ -142,6 +142,15 @@ public class ContactListAdapter
     }
 
     /**
+     * Releases all resources used by this instance.
+     */
+    public void dispose()
+    {
+        if(contactListService != null)
+            contactListService.removeMetaContactListListener(this);
+    }
+
+    /**
      * Indicates if the adapter has been already initialized.
      * @return
      */
@@ -263,6 +272,9 @@ public class ContactListAdapter
                         || (isMatchingQuery && groupIndex < 0))
                     {
                         addGroup(metaGroup, true);
+
+                        // Update -1 index to new value, after group is added
+                        groupIndex = groups.indexOf(metaGroup);
                     }
 
                     TreeSet<MetaContact> origContactList
@@ -345,11 +357,7 @@ public class ContactListAdapter
                         TreeSet<MetaContact> origContactList
                             = originalContacts.get(origGroupIndex);
 
-                        int contactIndex
-                            = getChildIndex(origContactList, metaContact);
-
-                        if (contactIndex >= 0)
-                            origContactList.remove(contactIndex);
+                        origContactList.remove(metaContact);
 
                         if (origContactList.size() <= 0)
                             removeGroup(metaGroup, true);
@@ -362,11 +370,7 @@ public class ContactListAdapter
                         TreeSet<MetaContact> contactList
                             = contacts.get(origGroupIndex);
 
-                        int contactIndex
-                            = getChildIndex(contactList, metaContact);
-
-                        if (contactIndex >= 0)
-                            contactList.remove(contactIndex);
+                        contactList.remove(metaContact);
 
                         if (contactList.size() <= 0)
                             removeGroup(metaGroup, true);
@@ -828,7 +832,8 @@ public class ContactListAdapter
             logger.debug("META CONTACT AVATAR UPDATED: "
                 + evt.getSourceMetaContact());
 
-        updateAvatar(evt.getSourceMetaContact());
+        if(contactListFragment.getActivity() != null)
+            updateAvatar(evt.getSourceMetaContact());
     }
 
     /**

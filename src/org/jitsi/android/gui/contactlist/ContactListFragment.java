@@ -120,6 +120,17 @@ public class ContactListFragment
         startChatActivity(metaContact);
     }
 
+    @Override
+    public void onDestroy()
+    {
+        if(contactListAdapter != null)
+        {
+            contactListAdapter.dispose();
+        }
+
+        super.onDestroy();
+    }
+
     /**
      * Returns 
      *
