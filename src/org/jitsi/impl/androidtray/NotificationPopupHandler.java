@@ -49,11 +49,9 @@ public class NotificationPopupHandler
     private Map<Integer, Timer> timeoutHandlers = new HashMap<Integer, Timer>();
 
     /**
-     * Maps <tt>Contact</tt>s from <tt>PopupMessage</tt> tags
-     * to notification ids.
+     * Maps <tt>PopupMessage</tt> tags to notification ids.
      */
-    private Map<Contact, Integer> contactToNotificationMap
-            = new HashMap<Contact, Integer>();
+    private Map<Object, Integer> tagToNotificationMap = new HashMap<Object, Integer>();
     /**
      * {@inheritDoc}
      */
@@ -74,9 +72,10 @@ public class NotificationPopupHandler
 
         Object tag = popupMessage.getTag();
         // Check if it's message notification
-        if(tag instanceof Contact)
+        if(tag != null)
         {
-            if(JitsiApplication.isHomeActivityActive())
+            if(tag instanceof Contact
+                    && JitsiApplication.isHomeActivityActive())
             {
                 //TODO: temporary fix until Chat interface is not implemented
                 logger.info("Not showing message notification," +
@@ -84,14 +83,14 @@ public class NotificationPopupHandler
                 return;
             }
 
-            Integer prevId = contactToNotificationMap.get(tag);
+            Integer prevId = tagToNotificationMap.get(tag);
             if(prevId != null)
             {
                 nId = prevId;
             }
             else
             {
-                contactToNotificationMap.put((Contact)tag, nId);
+                tagToNotificationMap.put(tag, nId);
             }
         }
 
@@ -209,25 +208,19 @@ public class NotificationPopupHandler
         notificationMap.remove(notificationId);
 
         Object tag = msg.getTag();
-        if(!(tag instanceof Contact))
+        Object toBeRemovedKey = null;
+        for(Object key : tagToNotificationMap.keySet())
         {
-            return;
-        }
-
-        Contact msgContact = (Contact) tag;
-        Contact toBeRemovedKey = null;
-        for(Contact c : contactToNotificationMap.keySet())
-        {
-            if(c.equals(msgContact))
+            if(key.equals(tag))
             {
-                toBeRemovedKey = c;
+                toBeRemovedKey = key;
                 break;
             }
         }
 
         if(toBeRemovedKey != null)
         {
-            contactToNotificationMap.remove(toBeRemovedKey);
+            tagToNotificationMap.remove(toBeRemovedKey);
         }
     }
 
@@ -243,7 +236,7 @@ public class NotificationPopupHandler
             notifyManager.cancel(notificationId);
 
         notificationMap.clear();
-        contactToNotificationMap.clear();
+        tagToNotificationMap.clear();
 
         // Cancels timeout handlers
         for(Timer t : timeoutHandlers.values())
