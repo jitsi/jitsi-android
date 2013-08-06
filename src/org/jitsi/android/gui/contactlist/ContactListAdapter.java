@@ -24,6 +24,7 @@ import org.jitsi.util.Logger;
 import android.graphics.*;
 import android.graphics.drawable.*;
 import android.view.*;
+import android.view.View.OnClickListener;
 import android.widget.*;
 
 /**
@@ -118,7 +119,6 @@ public class ContactListAdapter
      */
     void initAdapterData(MetaContactListService clService)
     {
-        System.err.println("INIT ADAPTER DATA=======" + currentQuery);
         contactListService = clService;
 
         addContacts(contactListService.getRoot());
@@ -1425,21 +1425,61 @@ public class ContactListAdapter
      *
      * @param query the query we'd like to match
      */
-    public void filterData(String query)
+    public void filterData(final String query)
     {
         currentQuery = query.toLowerCase();
 
         groups.clear();
         contacts.clear();
 
+        RelativeLayout callSearchLayout
+            = (RelativeLayout) contactListFragment.getView()
+                .findViewById(R.id.callSearchLayout);
+
         if (query.isEmpty())
         {
+            if (callSearchLayout != null)
+            {
+                callSearchLayout.setVisibility(View.INVISIBLE);
+                callSearchLayout.getLayoutParams().height = 0;
+            }
+
             groups.addAll(originalGroups);
             contacts.addAll(originalContacts);
         }
         else
         {
-            for(MetaContactGroup metaGroup: originalGroups)
+            if (callSearchLayout != null)
+            {
+                TextView searchContactView
+                    = (TextView) callSearchLayout
+                        .findViewById(R.id.callSearchContact);
+
+                searchContactView.setText(query);
+                callSearchLayout.getLayoutParams().height
+                    = searchContactView.getResources()
+                        .getDimensionPixelSize(R.dimen.account_list_row_height);
+
+                callSearchLayout.setVisibility(View.VISIBLE);
+
+                final ImageButton callButton
+                    = (ImageButton) callSearchLayout
+                        .findViewById(R.id.contactCallButton);
+                callButton.setOnClickListener(new OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        AndroidCallUtil
+                            .createAndroidCall(
+                                contactListFragment.getActivity(),
+                                callButton,
+                                query);
+                    }
+                });
+            }
+
+            for (MetaContactGroup metaGroup: originalGroups)
             {
                 int groupIndex = originalGroups.indexOf(metaGroup);
 

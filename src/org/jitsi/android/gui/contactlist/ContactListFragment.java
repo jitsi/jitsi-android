@@ -113,10 +113,10 @@ public class ContactListFragment
                 = contactListService.findMetaContactByMetaUID(metaUID);
         if(metaContact == null)
         {
-            logger.error("Meta contact not found for UID: "+metaUID);
+            logger.error("Meta contact not found for UID: " + metaUID);
             return;
         }
-        logger.info("Start chat with contact: "+metaContact);
+        logger.info("Start chat with contact: " + metaContact);
         startChatActivity(metaContact);
     }
 
