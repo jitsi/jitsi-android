@@ -20,6 +20,7 @@
 
     <style name="JitsiLoginTextView" parent="@android:style/Widget.Holo.EditText">
         <item name="android:textColor">@color/black</item>
+        <item name="android:textCursorDrawable">@null</item>
         <item name="android:background">@drawable/whitefield</item>
         <item name="android:height">40dp</item>
     </style>
