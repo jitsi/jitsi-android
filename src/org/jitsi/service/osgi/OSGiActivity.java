@@ -107,6 +107,18 @@ public class OSGiActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        if(Build.VERSION.SDK_INT >= 11)
+        {
+            // Disable up arrow on home activity
+            Class<?> homeActivity
+                    = JitsiApplication.getHomeScreenActivityClass();
+            if(this.getClass().equals(homeActivity))
+            {
+                getActionBar().setDisplayHomeAsUpEnabled(false);
+                getActionBar().setHomeButtonEnabled(false);
+            }
+        }
+
         super.onCreate(savedInstanceState);
 
         ServiceConnection serviceConnection

@@ -201,6 +201,11 @@ public class JitsiApplication
 
         AccountManager accountManager
                 = ServiceUtils.getService(osgiContext, AccountManager.class);
+
+        // If account manager is null it means that OSGI has not started yet
+        if(accountManager == null)
+            return LauncherActivity.class;
+
         final int accountCount = accountManager.getStoredAccounts().size();
 
         if (accountCount == 0)
