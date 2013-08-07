@@ -227,6 +227,71 @@
     <string name="service_gui_security_CLEAR_SAS">Clear</string>
     <string name="service_gui_security_CONFIRM_SAS">Confirm</string>
 
+    <!-- Security certificates -->
+    <string name="service_gui_ALWAYS_TRUST">Always trust this certificate</string>
+    <string name="service_gui_CERT_DIALOG_TITLE">Verify Certificate</string>
+    <string name="service_gui_CERT_DIALOG_DESCRIPTION_TXT">
+    &lt;html>{0} can\'\'t verify the identity
+    of the server when connecting to&lt;br/>
+        &lt;b>{1}&lt;/b>.&lt;br/>&lt;br/>
+    The certificate is not trusted, which means that the server\'\'s
+    identity cannot be automatically verified.&lt;br/>&lt;br/>
+    Do you want to continue connecting?&lt;br/>
+    For more information, click "Show Certificate".&lt;/html>
+    </string>
+    <string name="service_gui_CERT_DIALOG_DESCRIPTION_TXT_NOHOST">
+    &lt;html>{0} can\'\'t verify the
+    identity of the server\'\'s certificate.&lt;br/>&lt;br/>
+    The certificate is not trusted, which means that the server\'\'s
+    identity cannot&lt;br/> be automatically verified.
+    Do you want to continue connecting?&lt;br/>&lt;br/>
+    For more information, click "Show Certificate".&lt;/html>
+    </string>
+    <string name="service_gui_CERT_DIALOG_CLIENT_DESCRIPTION_TXT">
+    &lt;html>{0} can\'\'t verify the identity
+    of the connecting client.&lt;br/>&lt;br/>
+    The certificate is not trusted, which means that the client\'\'s
+    identity cannot<br/> be automatically verified.
+    Do you want to accept the connection?&lt;br/>&lt;br/>
+    For more information, click "Show Certificate".&lt;/html>
+    </string>
+    <string name="service_gui_CERT_DIALOG_PEER_DESCRIPTION_TXT">
+    &lt;html>{0} can\'\'t verify the identity
+    of the peer {1}.&lt;br/>&lt;br/>
+    The certificate is not trusted, which means that the peer\'\'s
+    identity cannot&lt;br/> be automatically verified.
+    Do you want to continue connecting?&lt;br/>&lt;br/>
+    For more information, click "Show Certificate".&lt;/html>
+    </string>
+    <string name="service_gui_CONTINUE_ANYWAY">Continue anyway</string>
+    <string name="service_gui_CERT_INFO_ISSUED_TO">&lt;html>&lt;b>Issued To&lt;/b>&lt;/html></string>
+    <string name="service_gui_CERT_INFO_CN">Common Name:</string>
+    <string name="service_gui_CERT_INFO_O">Organization:</string>
+    <string name="service_gui_CERT_INFO_C">Country Name:</string>
+    <string name="service_gui_CERT_INFO_ST">State or Province Name:</string>
+    <string name="service_gui_CERT_INFO_L">Locality Name:</string>
+    <string name="service_gui_CERT_INFO_ISSUED_BY">&lt;html>&lt;b>Issued By&lt;/b>&lt;/html></string>
+    <string name="service_gui_CERT_INFO_OU">Organizational Unit:</string>
+    <string name="service_gui_CERT_INFO_VALIDITY">&lt;html>&lt;b>Validity&lt;/b>&lt;/html></string>
+    <string name="service_gui_CERT_INFO_ISSUED_ON">Issued On:</string>
+    <string name="service_gui_CERT_INFO_EXPIRES_ON">Expires On:</string>
+    <string name="service_gui_CERT_INFO_FINGERPRINTS">&lt;html>&lt;b>Fingerprints&lt;/b>&lt;/html></string>
+    <string name="service_gui_CERT_INFO_CERT_DETAILS">&lt;html>&lt;b>Certificate Info&lt;/b>&lt;/html></string>
+    <string name="service_gui_CERT_INFO_SER_NUM">Serial Number:</string>
+    <string name="service_gui_CERT_INFO_VER">Version:</string>
+    <string name="service_gui_CERT_INFO_SIGN_ALG">Signature Algorithm:</string>
+    <string name="service_gui_CERT_INFO_PUB_KEY_INFO">&lt;html>&lt;b>Public Key Info&lt;/b>&lt;/html></string>
+    <string name="service_gui_CERT_INFO_ALG">Algorithm:</string>
+    <string name="service_gui_CERT_INFO_PUB_KEY">Public Key:</string>
+    <string name="service_gui_CERT_INFO_KEY_BYTES_PRINT">%1$s bytes: %2$s</string>
+    <string name="service_gui_CERT_INFO_KEY_BITS_PRINT">%s bits</string>
+    <string name="service_gui_CERT_INFO_EXP">Exponent:</string>
+    <string name="service_gui_CERT_INFO_KEY_SIZE">Key Size:</string>
+    <string name="service_gui_CERT_INFO_SIGN">Signature:</string>
+    <string name="service_gui_CONTINUE">Continue</string>
+    <string name="service_gui_SHOW_CERT">Show Certificate</string>
+    <string name="service_gui_HIDE_CERT">Hide Certificate</string>
+
     <!-- Settings -->
     <string name="service_gui_SETTINGS_NOT_SET">(Not set)</string>
     <string name="service_gui_COMMIT_PROGRESS_TITLE">"Committing..."</string>

@@ -44,6 +44,9 @@
         <!-- Dialog Activity -->
         <activity android:name=".android.gui.DialogActivity"
                   android:theme="@android:style/Theme.Holo.Dialog.MinWidth"/>
+        <!-- Verify Certificate Activity -->
+        <activity android:name=".impl.androidcertdialog.VerifyCertificateActivity"
+                  android:theme="@android:style/Theme.Holo.Dialog.MinWidth"/>
         <activity android:name=".android.gui.call.CallContactActivity"
                     android:label="@string/app_name"
                     android:icon="@drawable/icon"

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              >
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="{message ... }"
+            android:id="@+id/message" android:layout_gravity="center"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:padding="10dp"/>
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="3"
+            android:layout_alignLeft="@+id/showCert"
+            android:layout_below="@+id/message">
+        <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/service_gui_SHOW_CERT"
+                android:id="@+id/showCert"
+                style="?android:attr/buttonBarButtonStyle"
+                android:onClick="onShowCertClicked"
+                />
+        <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/service_gui_CONTINUE_ANYWAY"
+                android:id="@+id/continueButton"
+                style="?android:attr/buttonBarButtonStyle"
+                android:onClick="onContinueClicked"
+                />
+        <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/service_gui_CANCEL"
+                android:id="@+id/cancelButton"
+                style="?android:attr/buttonBarButtonStyle"
+                android:onClick="onCancelClicked"
+                />
+    </LinearLayout>
+</RelativeLayout>
