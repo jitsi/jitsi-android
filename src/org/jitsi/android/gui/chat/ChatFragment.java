@@ -234,10 +234,15 @@ public class ChatFragment
      *
      * @param message the message to send
      */
-    public void sendMessage(String message)
+    public void sendMessage(final String message)
     {
         if (!StringUtils.isNullOrEmpty(message))
-            chatSession.sendMessage(message);
+            new Thread(){
+                public void run()
+                {
+                    chatSession.sendMessage(message);
+                }
+            }.start();
     }
 
     class ChatListAdapter
