@@ -55,6 +55,7 @@ public class EventDispatcher
             }
             catch (RejectedExecutionException ree)
             {
+                logger.error("Error firing event", ree);
             }
     }
 
