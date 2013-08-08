@@ -4,13 +4,28 @@
              android:layout_height="wrap_content"
              android:descendantFocusability="blocksDescendants">
 
-    <ImageView
-        android:id="@+id/incomingAvatarView"
-        android:layout_width="@dimen/chat_avatar"
-        android:layout_height="@dimen/chat_avatar"
-        android:layout_marginLeft="5dip"
-        android:layout_alignParentLeft="true"
-        android:src="@drawable/avatar_layer_drawable"/>
+    <RelativeLayout
+            android:id="@+id/incomingAvatarView"
+            android:layout_height="@dimen/chat_avatar"
+            android:layout_width="@dimen/chat_avatar"
+            android:layout_marginLeft="5dip"
+            android:layout_alignParentLeft="true">
+
+        <ImageView
+            android:id="@+id/incomingAvatarIcon"
+            android:layout_height="fill_parent"
+            android:layout_width="@dimen/chat_avatar"
+            android:layout_centerVertical="true"
+            android:src="@drawable/avatar"/>
+
+        <ImageView
+            android:id="@+id/incomingStatusIcon"
+            android:layout_height="20dip"
+            android:layout_width="20dip"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/contact_offline"/>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"

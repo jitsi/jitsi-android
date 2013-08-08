@@ -402,7 +402,11 @@ public class ChatFragment
 
                     messageViewHolder.avatarView
                         = (ImageView) convertView.findViewById(
-                            R.id.incomingAvatarView);
+                            R.id.incomingAvatarIcon);
+
+                    messageViewHolder.statusView
+                        = (ImageView) convertView.findViewById(
+                            R.id.incomingStatusIcon);
 
                     messageViewHolder.messageView
                         = (TextView) convertView.findViewById(
@@ -424,7 +428,11 @@ public class ChatFragment
 
                     messageViewHolder.avatarView
                         = (ImageView) convertView.findViewById(
-                            R.id.outgoingAvatarView);
+                            R.id.outgoingAvatarIcon);
+
+                    messageViewHolder.statusView
+                        = (ImageView) convertView.findViewById(
+                            R.id.outgoingStatusIcon);
 
                     messageViewHolder.messageView
                         = (TextView) convertView.findViewById(
@@ -463,9 +471,10 @@ public class ChatFragment
                 }
 
                 if (avatar == null)
-                        avatar = AccountUtil.getDefaultAvatarIcon(getActivity());
+                    avatar = AccountUtil.getDefaultAvatarIcon(getActivity());
 
-                setAvatar(messageViewHolder.avatarView, avatar, status);
+                setAvatar(messageViewHolder.avatarView, avatar);
+                setStatus(messageViewHolder.statusView, status);
 
                 messageViewHolder.messageView.setText(message.getMessage());
                 messageViewHolder.timeView.setText(
@@ -617,6 +626,7 @@ public class ChatFragment
     static class MessageViewHolder
     {
         ImageView avatarView;
+        ImageView statusView;
         ImageView typeIndicator;
         TextView messageView;
         TextView timeView;
@@ -743,18 +753,15 @@ public class ChatFragment
                     && chatListAdapter.getItemViewType(i)
                         == chatListAdapter.INCOMING_MESSAGE_VIEW)
                 {
-                    Drawable avatar = ContactListAdapter
-                        .getAvatarDrawable(
-                            chatSession.getMetaContact());
-
                     Drawable status = ContactListAdapter
                         .getStatusDrawable(
                             chatSession.getMetaContact());
 
-                    ImageView avatarView
-                        = (ImageView) chatRowView.getChildAt(0);
+                    ImageView statusView
+                        = (ImageView) chatRowView
+                            .findViewById(R.id.incomingStatusIcon);
 
-                    setAvatar(avatarView, avatar, status);
+                    setStatus(statusView, status);
                 }
             }
         }
@@ -829,21 +836,27 @@ public class ChatFragment
      * Sets the avatar icon for the given avatar view.
      *
      * @param avatarView the avatar image view
-     * @param avatar the avatar drawable to set
-     * @param status the presence status drawable to set
+     * @param avatarDrawable the avatar drawable to set
      */
     public void setAvatar(  ImageView avatarView,
-                            Drawable avatar,
-                            Drawable status)
+                            Drawable avatarDrawable)
     {
-        if (avatar == null)
-            avatar = AccountUtil.getDefaultAvatarIcon(getActivity());
+        if (avatarDrawable == null)
+            avatarDrawable = AccountUtil.getDefaultAvatarIcon(getActivity());
 
-        LayerDrawable avatarDrawable
-            = new LayerDrawable(new Drawable[]{avatar, status});
-
-        avatarDrawable.setLayerInset(1, 50, 50, 0, 0);
         avatarView.setImageDrawable(avatarDrawable);
+    }
+
+    /**
+     * Sets the status of the given view.
+     *
+     * @param statusView the status icon view
+     * @param statusDrawable the status drawable
+     */
+    public void setStatus(  ImageView statusView,
+                            Drawable statusDrawable)
+    {
+        statusView.setImageDrawable(statusDrawable);
     }
 
     /**

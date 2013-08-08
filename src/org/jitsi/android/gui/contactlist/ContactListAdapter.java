@@ -12,6 +12,7 @@ import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.contactlist.event.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.OperationSetExtendedAuthorizations.*;
+import net.java.sip.communicator.service.protocol.event.*;
 import net.java.sip.communicator.util.*;
 
 import org.jitsi.*;
@@ -33,7 +34,8 @@ import android.widget.*;
  */
 public class ContactListAdapter
     extends BaseExpandableListAdapter
-    implements  MetaContactListListener
+    implements  MetaContactListListener,
+                ContactPresenceStatusListener
 {
     /**
      * The logger for this class.
@@ -148,6 +150,8 @@ public class ContactListAdapter
     {
         if(contactListService != null)
             contactListService.removeMetaContactListListener(this);
+
+        removeContacts(contactListService.getRoot());
     }
 
     /**
@@ -197,6 +201,37 @@ public class ContactListAdapter
                 while(subGroups.hasNext())
                 {
                     addContacts(subGroups.next());
+                }
+            }
+        });
+    }
+
+    /**
+     * Removes the contacts contained in the given group.
+     *
+     * @param group the <tt>MetaContactGroup</tt>, which contacts we'd like to
+     * remove
+     */
+    private void removeContacts(final MetaContactGroup group)
+    {
+        contactListFragment.getActivity().runOnUiThread(new Runnable()
+        {
+            public void run()
+            {
+                removeGroup(group, false);
+
+                Iterator<MetaContact> childContacts
+                    = group.getChildContacts();
+
+                while (childContacts.hasNext())
+                {
+                    removeContact(group, childContacts.next());
+                }
+
+                Iterator<MetaContactGroup> subGroups = group.getSubgroups();
+                while(subGroups.hasNext())
+                {
+                    removeContacts(subGroups.next());
                 }
             }
         });
@@ -255,6 +290,8 @@ public class ContactListAdapter
     private void addContact(final MetaContactGroup metaGroup,
                             final MetaContact metaContact)
     {
+        addContactStatusListener(metaContact, this);
+
         contactListFragment.getActivity().runOnUiThread(new Runnable()
         {
             public void run()
@@ -343,6 +380,8 @@ public class ContactListAdapter
     private void removeContact( final MetaContactGroup metaGroup,
                                 final MetaContact metaContact)
     {
+        removeContactStatusListener(metaContact, this);
+
         contactListFragment.getActivity().runOnUiThread(new Runnable()
         {
             public void run()
@@ -436,24 +475,22 @@ public class ContactListAdapter
     private void updateDisplayName( final int groupIndex,
                                     final int contactIndex)
     {
-        contactListFragment.getActivity().runOnUiThread(new Runnable()
-        {
-            public void run()
-            {
-                View contactView = contactListView
-                    .getChildAt(getListIndex(groupIndex, contactIndex));
+        int firstIndex = contactListView.getFirstVisiblePosition();
 
-                if (contactView != null)
-                {
-                    MetaContact metaContact
-                        = (MetaContact) getChild(groupIndex, contactIndex);
-                    ViewUtil.setTextViewValue(
-                        contactView,
-                        R.id.displayName,
-                        metaContact.getDisplayName());
-                }
-            }
-        });
+        View contactView = contactListView
+            .getChildAt(
+                getListIndex(groupIndex, contactIndex) - firstIndex);
+
+        if (contactView != null)
+        {
+            MetaContact metaContact
+                = (MetaContact) getChild(groupIndex, contactIndex);
+
+            ViewUtil.setTextViewValue(
+                contactView,
+                R.id.displayName,
+                metaContact.getDisplayName());
+        }
     }
 
     /**
@@ -479,7 +516,7 @@ public class ContactListAdapter
                         = getChildIndex(contacts.get(groupIndex), metaContact);
 
                     if (contactIndex >= 0)
-                        updateAvatar(groupIndex, contactIndex);
+                        updateAvatar(groupIndex, contactIndex, metaContact);
                 }
             }
         });
@@ -491,16 +528,17 @@ public class ContactListAdapter
      * @param groupIndex the index of the group to update
      * @param contactIndex the index of the contact to update
      */
-    private void updateAvatar(final int groupIndex, final int contactIndex)
+    private void updateAvatar(  final int groupIndex,
+                                final int contactIndex,
+                                final MetaContact metaContact)
     {
+        int firstIndex = contactListView.getFirstVisiblePosition();
+
         View contactView = contactListView
-            .getChildAt(getListIndex(groupIndex, contactIndex));
+            .getChildAt(getListIndex(groupIndex, contactIndex) - firstIndex);
 
         if (contactView != null)
         {
-            MetaContact metaContact
-                = (MetaContact) getChild(groupIndex, contactIndex);
-
             ImageView avatarView
                 = (ImageView) contactView
                     .findViewById(R.id.avatarIcon);
@@ -533,7 +571,7 @@ public class ContactListAdapter
                         = getChildIndex(contacts.get(groupIndex), metaContact);
 
                     if (contactIndex >= 0)
-                        updateStatus(groupIndex, contactIndex);
+                        updateStatus(groupIndex, contactIndex, metaContact);
                 }
             }
         });
@@ -544,29 +582,26 @@ public class ContactListAdapter
      *
      * @param groupIndex the index of the group to update
      * @param contactIndex the index of the contact to update
+     * @param metaContact the <tt>MetaContact</tt> that has change status
      */
-    private void updateStatus(final int groupIndex, final int contactIndex)
+    private void updateStatus(  final int groupIndex,
+                                final int contactIndex,
+                                final MetaContact metaContact)
     {
-        contactListFragment.getActivity().runOnUiThread(new Runnable()
+        int firstIndex = contactListView.getFirstVisiblePosition();
+
+        View contactView = contactListView
+            .getChildAt(
+                getListIndex(groupIndex, contactIndex) - firstIndex);
+
+        if (contactView != null)
         {
-            public void run()
-            {
-                View contactView = contactListView
-                    .getChildAt(getListIndex(groupIndex, contactIndex));
+            ImageView statusView
+                = (ImageView) contactView
+                    .findViewById(R.id.contactStatusIcon);
 
-                if (contactView != null)
-                {
-                    MetaContact metaContact
-                        = (MetaContact) getChild(groupIndex, contactIndex);
-
-                    ImageView avatarView
-                        = (ImageView) contactView
-                            .findViewById(R.id.avatarIcon);
-
-                    setAvatar(avatarView, metaContact);
-                }
-            }
-        });
+            setStatus(statusView, metaContact);
+        }
     }
 
     /**
@@ -580,10 +615,9 @@ public class ContactListAdapter
      */
     public int getListIndex(int groupIndex, int contactIndex)
     {
-        int firstIndex = contactListView.getFirstVisiblePosition();
         int lastIndex = contactListView.getLastVisiblePosition();
 
-        for (int i = firstIndex; i <= lastIndex; i++)
+        for (int i = 0; i <= lastIndex; i++)
         {
             long longposition
                 = contactListView.getExpandableListPosition(i);
@@ -934,6 +968,8 @@ public class ContactListAdapter
                 = (TextView) convertView.findViewById(R.id.statusMessage);
             contactViewHolder.avatarView
                 = (ImageView) convertView.findViewById(R.id.avatarIcon);
+            contactViewHolder.statusView
+                = (ImageView) convertView.findViewById(R.id.contactStatusIcon);
             contactViewHolder.callButton
                 = (ImageButton) convertView
                     .findViewById(R.id.contactCallButton);
@@ -1016,6 +1052,7 @@ public class ContactListAdapter
 
             // Set avatar.
             setAvatar(contactViewHolder.avatarView, metaContact);
+            setStatus(contactViewHolder.statusView, metaContact);
 
             // Show call button.
             boolean isShowVideoCall
@@ -1315,26 +1352,27 @@ public class ContactListAdapter
     {
         Drawable avatarImage = getAvatarDrawable(metaContact);
 
-        int leftOffset = 50;
-        int topOffset = 50;
-        // TODO: This is a workaround, because it seems that the resolution of
-        // the default avatar is smaller.
         if (avatarImage == null)
         {
             avatarImage = AccountUtil.getDefaultAvatarIcon(
                 contactListFragment.getActivity());
-            leftOffset = 80;
-            topOffset = 80;
         }
 
+        avatarView.setImageDrawable(avatarImage);
+    }
+
+    /**
+     * Sets the avatar icon of the action bar.
+     *
+     * @param statusView the status image view
+     * @param metaContact the <tt>MetaContact</tt>, for which we set an avatar
+     */
+    public void setStatus(ImageView statusView, MetaContact metaContact)
+    {
         byte[] statusImage = getStatusImage(metaContact);
 
-        LayerDrawable avatarDrawable
-            = new LayerDrawable(new Drawable[]{avatarImage,
-                AndroidImageUtil.drawableFromBytes(statusImage)});
-
-        avatarDrawable.setLayerInset(1, leftOffset, topOffset, 0, 0);
-        avatarView.setImageDrawable(avatarDrawable);
+        statusView.setImageDrawable(
+            AndroidImageUtil.drawableFromBytes(statusImage));
     }
 
     /**
@@ -1406,6 +1444,7 @@ public class ContactListAdapter
         TextView displayName;
         TextView statusMessage;
         ImageView avatarView;
+        ImageView statusView;
         ImageButton callButton;
         ImageView selectedBgView;
         ImageView buttonSeparatorView;
@@ -1572,5 +1611,76 @@ public class ContactListAdapter
                 return true;
         }
         return false;
+    }
+
+    @Override
+    public void contactPresenceStatusChanged(
+        ContactPresenceStatusChangeEvent event)
+    {
+        Contact sourceContact = event.getSourceContact();
+
+        if (logger.isDebugEnabled())
+            logger.debug("Contact presence status changed: "
+                + sourceContact.getAddress());
+
+        MetaContact metaContact
+            = contactListService.findMetaContactByContact(sourceContact);
+
+        if (metaContact != null)
+            updateStatus(metaContact);
+    }
+
+    /**
+     * Adds the given <tt>MessageListener</tt> to listen for message events in
+     * this chat session.
+     *
+     * @param metaContact the <tt>MetaContact</tt> for which we add the listener
+     * @param l the <tt>MessageListener</tt> to add
+     */
+    public void addContactStatusListener(   MetaContact metaContact,
+                                            ContactPresenceStatusListener l)
+    {
+        Iterator<Contact> protoContacts = metaContact.getContacts();
+
+        while (protoContacts.hasNext())
+        {
+            Contact protoContact = protoContacts.next();
+
+            OperationSetPresence presenceOpSet
+                = protoContact.getProtocolProvider().getOperationSet(
+                    OperationSetPresence.class);
+
+            if (presenceOpSet != null)
+            {
+                presenceOpSet.addContactPresenceStatusListener(l);
+            }
+        }
+    }
+
+    /**
+     * Removes the given <tt>MessageListener</tt> from this chat session.
+     *
+     * @param metaContact the <tt>MetaContact</tt> for which we remove the
+     * listener
+     * @param l the <tt>MessageListener</tt> to remove
+     */
+    public void removeContactStatusListener(MetaContact metaContact,
+                                            ContactPresenceStatusListener l)
+    {
+        Iterator<Contact> protoContacts = metaContact.getContacts();
+
+        while (protoContacts.hasNext())
+        {
+            Contact protoContact = protoContacts.next();
+
+            OperationSetPresence presenceOpSet
+                = protoContact.getProtocolProvider().getOperationSet(
+                    OperationSetPresence.class);
+
+            if (presenceOpSet != null)
+            {
+                presenceOpSet.removeContactPresenceStatusListener(l);
+            }
+        }
     }
 }

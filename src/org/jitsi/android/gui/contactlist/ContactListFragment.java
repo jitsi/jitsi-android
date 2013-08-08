@@ -132,9 +132,9 @@ public class ContactListFragment
     }
 
     /**
-     * Returns 
+     * Returns the contact list view.
      *
-     * @return
+     * @return the contact list view
      */
     public ExpandableListView getContactListView()
     {
@@ -170,7 +170,14 @@ public class ContactListFragment
     }
 
     /**
-     * 
+     * Expands/collapses the group given by <tt>groupPosition</tt>.
+     *
+     * @param parent the parent expandable list view
+     * @param v the view
+     * @param groupPosition the position of the group
+     * @param id the identifier
+     *
+     * @return <tt>true</tt> if the group click action has been performed
      */
     public boolean onGroupClick(ExpandableListView parent, View v,
         int groupPosition, long id)
