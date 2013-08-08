@@ -126,7 +126,7 @@ public class AccountEnableActivity
             super( AccountEnableActivity.this,
                    R.layout.account_enable_row, -1,
                    accounts,
-                   false);
+                   false, true);
         }
 
         @Override

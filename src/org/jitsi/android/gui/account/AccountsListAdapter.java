@@ -76,6 +76,12 @@ public class AccountsListAdapter
     private final boolean filterDisabledAccounts;
 
     /**
+     * If set to true adapter will not remove accounts from the list on
+     * protocol service unregistered events.
+     */
+    private final boolean keepUnregisteredAccounts;
+
+    /**
      * Creates new instance of {@link AccountsListAdapter}
      *
      * @param parent the {@link Activity} running this adapter
@@ -84,17 +90,22 @@ public class AccountsListAdapter
      *  {@link AccountsListAdapter} for detailed description
      * @param filterDisabledAccounts flag indicates if disabled accounts
      *  should be filtered out from the list
+     * @param keepUnregisteredAccounts if set to <tt>true</tt> adapter
+     *                                 will not remove accounts on service
+     *                                 unregistered events.
      */
     public AccountsListAdapter(
             Activity parent,
             int listRowResourceID,
             int dropDownRowResourceID,
             Collection<AccountID> accounts,
-            boolean filterDisabledAccounts)
+            boolean filterDisabledAccounts,
+            boolean keepUnregisteredAccounts)
     {
         super(parent);
 
         this.filterDisabledAccounts = filterDisabledAccounts;
+        this.keepUnregisteredAccounts = keepUnregisteredAccounts;
 
         this.listRowResourceID = listRowResourceID;
         this.dropDownRowResourceID = dropDownRowResourceID;
@@ -158,18 +169,37 @@ public class AccountsListAdapter
         // Add or remove the protocol provider from our accounts list.
         if (event.getType() == ServiceEvent.REGISTERED)
         {
-            AccountID accountID = protocolProvider.getAccountID();
-            if(findAccountID(accountID) == null)
+            Account acc = findAccountID(protocolProvider.getAccountID());
+            if(acc == null)
             {
                 addAccount(
-                        new Account( accountID,
+                        new Account( protocolProvider.getAccountID(),
                                      bundleContext,
                                      getParentActivity().getBaseContext()));
+            }
+            else
+            {
+                // Register for events if account exists on this list
+                acc.addAccountEventListener(this);
             }
         }
         else if (event.getType() == ServiceEvent.UNREGISTERING)
         {
-            removeAccount(protocolProvider.getAccountID());
+            if(keepUnregisteredAccounts)
+            {
+                Account acc = findAccountID(protocolProvider.getAccountID());
+                if(acc != null)
+                {
+                    // Only unregisters from notifications
+                    acc.removeAccountEventListener(this);
+                }
+            }
+            else
+            {
+                // Remove the account completely
+                removeAccount(protocolProvider.getAccountID());
+            }
+
         }
     }
 
@@ -289,6 +319,7 @@ public class AccountsListAdapter
         if(acc != null)
         {
             acc.removeAccountEventListener(this);
+            remove(acc);
             logger.debug("Account removed: " + account.getDisplayName());
         }
     }
@@ -303,7 +334,7 @@ public class AccountsListAdapter
         if(logger.isTraceEnabled())
         {
             logger.trace("Received accountEvent update "
-                    + accountEvent.getSource().getAccountName(),
+                    + accountEvent.getSource().getAccountName()+" "+accountEvent.toString(),
                     new Throwable());
         }
         doRefreshList();

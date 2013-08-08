@@ -140,7 +140,7 @@ public class AccountsStatusActivity
            super( AccountsStatusActivity.this,
                   R.layout.account_list_row, -1,
                   accounts,
-                  true);
+                  true, false);
         }
     }
 }

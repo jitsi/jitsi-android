@@ -126,6 +126,7 @@
     <string name="service_gui_REMOTELY_ON_HOLD_STATUS">Remotely on hold</string>
     <string name="service_gui_RINGING_STATUS">Ringing</string>
     <string name="service_gui_UNKNOWN_STATUS">Unknown state</string>
+    <string name="service_gui_WAITING_AUTHORIZATION">Waiting for authorization</string>
 
     <string name="service_gui_PROACTIVE_NOTIFICATION">is writing a message</string>
     <string name="service_gui_MSG_RECEIVED">{0} wrote</string>

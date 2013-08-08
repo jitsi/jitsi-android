@@ -106,7 +106,7 @@ public class AddContactActivity
                 = new AccountsListAdapter( this,
                                            R.layout.select_account_row,
                                            R.layout.select_account_dropdown,
-                                           accounts, true);
+                                           accounts, true, false);
         accountsSpiner.setAdapter(accountsAdapter);
 
         // if we have only select account option and only one account
