@@ -28,7 +28,8 @@
             android:padding="5dp"
             android:background="@color/white"
             android:textColor="@color/black"
-            android:textColorHighlight="@color/white"/>
+            android:textColorHighlight="@color/white"
+            android:textCursorDrawable="@null"/>
 
         <ImageButton android:id="@+id/sendMessageButton"
             android:src="@drawable/send_message"
