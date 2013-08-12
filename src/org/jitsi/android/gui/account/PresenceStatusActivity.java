@@ -18,10 +18,12 @@ import android.view.*;
 import android.widget.*;
 
 import net.java.sip.communicator.service.protocol.*;
+import net.java.sip.communicator.service.protocol.globalstatus.*;
 import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.account.*;
 
 import org.jitsi.*;
+import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.android.gui.util.event.EventListener;/*Disambiguation*/
 
@@ -331,6 +333,13 @@ public class PresenceStatusActivity
                 {
                     // Try to publish selected status
                     logger.trace("Publishing status "+status+" msg: "+text);
+                    GlobalStatusService globalStatus
+                            = ServiceUtils.getService(
+                                    AndroidGUIActivator.bundleContext,
+                                    GlobalStatusService.class);
+                    globalStatus.publishStatus(account.getProtocolProvider(),
+                                               status,
+                                               true);
                     accountPresence.publishPresenceStatus(status, text);
                 }
                 catch (Exception e)

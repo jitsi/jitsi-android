@@ -53,6 +53,16 @@ public class AndroidGUIActivator
     public static BundleContext bundleContext;
 
     /**
+     * The presence status handler
+     */
+    private PresenceStatusHandler presenceStatusHandler;
+
+    /**
+     * Android login renderer impl.
+     */
+    private static AndroidLoginRenderer loginRenderer;
+
+    /**
      * {@inheritDoc}
      */
     public void start(BundleContext bundleContext)
@@ -65,7 +75,7 @@ public class AndroidGUIActivator
         SecurityAuthority secuirtyAuthority
                 = new AndroidSecurityAuthority(androidContext);
 
-        AndroidLoginRenderer loginRenderer
+        loginRenderer
                 = new AndroidLoginRenderer(androidContext, secuirtyAuthority);
 
         loginManager = new LoginManager(loginRenderer);
@@ -87,6 +97,10 @@ public class AndroidGUIActivator
                 UIService.class.getName(),
                 uiService,
                 null);
+
+        // Creates and registers presence status handler
+        this.presenceStatusHandler = new PresenceStatusHandler();
+        presenceStatusHandler.start(bundleContext);
 
         AccountManager accountManager
                 = ServiceUtils.getService(bundleContext, AccountManager.class);
@@ -111,7 +125,11 @@ public class AndroidGUIActivator
     public void stop(BundleContext bundleContext)
             throws Exception
     {
+        presenceStatusHandler.stop(bundleContext);
 
+        loginRenderer = null;
+        loginManager = null;
+        AndroidGUIActivator.bundleContext = null;
     }
 
     /**
@@ -206,5 +224,14 @@ public class AndroidGUIActivator
     {
         return ServiceUtils.getService( bundleContext,
                                         SystrayService.class );
+    }
+
+    /**
+     * Return Android login renderer.
+     * @return Android login renderer.
+     */
+    public static AndroidLoginRenderer getLoginRenderer()
+    {
+        return loginRenderer;
     }
 }
