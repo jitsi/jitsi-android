@@ -109,6 +109,9 @@ public class ProximitySensorFragment
      */
     public void onSensorChanged(SensorEvent event)
     {
+        if(sensorDisabled)
+            return;
+
         float proximity = event.values[0];
         float max = event.sensor.getMaximumRange();
         logger.debug("Proximity updated: " + proximity + " max range: " + max);
