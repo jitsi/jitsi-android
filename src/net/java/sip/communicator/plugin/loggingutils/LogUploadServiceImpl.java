@@ -7,10 +7,11 @@ package net.java.sip.communicator.plugin.loggingutils;
 
 import android.content.*;
 import android.net.*;
-import org.jitsi.android.*;
-import org.jitsi.service.fileaccess.*;
+import android.os.*;
+
 import org.jitsi.service.log.*;
 import org.jitsi.service.osgi.*;
+
 import net.java.sip.communicator.util.*;
 
 import java.io.*;
@@ -36,7 +37,13 @@ public class LogUploadServiceImpl
      * There is no easy way of waiting until email is sent and deleting temp log
      * file, so they are cached and removed on OSGI service stop action.
      */
-    private List<String> storedLogFiles = new ArrayList<String>();
+    private List<File> storedLogFiles = new ArrayList<File>();
+
+    /**
+     * The path pointing to directory used to store temporary log archives.
+     */
+    private static final String storagePath
+        = Environment.getExternalStorageDirectory().getPath()+"/jitsi-logs/";
 
     /**
      * Send the log files.
@@ -49,42 +56,23 @@ public class LogUploadServiceImpl
     {
         try
         {
-            FileAccessService fs = ServiceUtils.getService(
-                LoggingUtilsActivatorEx.bundleContext,
-                FileAccessService.class);
+            File storageDir = new File(storagePath);
 
-            File tempLogArchive
-                = LogsCollector.collectLogs(fs.getTemporaryDirectory(), null);
+            if(!storageDir.exists())
+                storageDir.mkdir();
 
-            // Copies the archive to world readable file
-            String worldReadableFname = tempLogArchive.getName();
-            Context ctx = JitsiApplication.getGlobalContext();
-            FileOutputStream fout
-                    = ctx.openFileOutput( worldReadableFname,
-                                          Context.MODE_WORLD_READABLE );
-            FileInputStream fin = new FileInputStream(tempLogArchive);
-            byte[] buffer = new byte[2048];
-            int read;
-            while(true)
-            {
-                read = fin.read(buffer);
-                if(read > 0)
-                    fout.write(buffer, 0, read);
-                else
-                    break;
-            }
-            fin.close();
-            // Removes temp logs archive
-            tempLogArchive.delete();
-            // Stores file name to remove it on service shutdown
-            storedLogFiles.add(worldReadableFname);
+            File externalStorageFile
+                = LogsCollector.collectLogs(storageDir, null);
+
+             // Stores file name to remove it on service shutdown
+            storedLogFiles.add(externalStorageFile);
 
             Intent sendIntent = new Intent(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_EMAIL, destinations);
             sendIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
             sendIntent.setType("application/zip");
             sendIntent.putExtra(Intent.EXTRA_STREAM,
-                    Uri.fromFile(ctx.getFileStreamPath(worldReadableFname)));
+                                Uri.fromFile(externalStorageFile));
 
             // we are starting this activity from context
             // that is most probably not from the current activity
@@ -110,10 +98,11 @@ public class LogUploadServiceImpl
      */
     public void dispose()
     {
-        Context ctx = JitsiApplication.getGlobalContext();
-        for(String logFileName : storedLogFiles)
+        for(File logFile : storedLogFiles)
         {
-            ctx.deleteFile(logFileName);
+            logFile.delete();
         }
+
+        storedLogFiles.clear();
     }
 }
