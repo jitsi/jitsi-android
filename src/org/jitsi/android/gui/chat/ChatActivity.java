@@ -6,6 +6,7 @@
  */
 package org.jitsi.android.gui.chat;
 
+import android.app.*;
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.protocol.*;
 
@@ -52,6 +53,13 @@ public class ChatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        if(Build.VERSION.SDK_INT >= 11)
+        {
+            ActionBar actionBar = getActionBar();
+            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setCustomView(R.layout.action_bar);
+        }
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.chat);

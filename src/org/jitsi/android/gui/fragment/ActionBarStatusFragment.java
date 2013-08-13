@@ -82,10 +82,7 @@ public class ActionBarStatusFragment
         super.onCreate(savedInstanceState);
 
         // Create custom ActionBar View
-        View actionBarView
-                = getActivity().getLayoutInflater()
-                .inflate(R.layout.action_bar, null, false);
-        getActivity().getActionBar().setCustomView(actionBarView);
+        getActivity().getActionBar().setCustomView(R.layout.action_bar);
 
         this.globalStatusMenu = createGlobalStatusMenu();
 
