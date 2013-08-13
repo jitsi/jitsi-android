@@ -35,6 +35,9 @@ public class ActionBarUtil
      */
     public static void setTitle(Activity a, String title)
     {
+        if(Build.VERSION.SDK_INT < 11)
+            return;
+
         TextView actionBarText
             = (TextView) a.getActionBar().getCustomView()
                 .findViewById(R.id.actionBarText);
@@ -50,6 +53,9 @@ public class ActionBarUtil
      */
     public static void setSubtitle(Activity a, String subtitle)
     {
+        if(Build.VERSION.SDK_INT < 11)
+            return;
+
         TextView actionBarText
             = (TextView) a.getActionBar().getCustomView()
                 .findViewById(R.id.actionBarStatusText);

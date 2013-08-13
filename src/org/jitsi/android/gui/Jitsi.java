@@ -34,8 +34,6 @@ import org.osgi.framework.*;
  */
 public class Jitsi
     extends MainMenuActivity
-    implements  OnQueryTextListener,
-                OnCloseListener
 {
     /**
      * The logger
@@ -87,10 +85,13 @@ public class Jitsi
         setContentView(R.layout.main_view);
 
         // Inserts ActionBar functionality
-        getSupportFragmentManager()
-                .beginTransaction()
-                .add(new ActionBarStatusFragment(), "action_bar")
-                .commit();
+        if(Build.VERSION.SDK_INT >= 11)
+        {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(new ActionBarStatusFragment(), "action_bar")
+                    .commit();
+        }
 
         handleIntent(getIntent(), savedInstanceState);
     }
@@ -131,17 +132,22 @@ public class Jitsi
             });
         }
 
-        SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setSearchableInfo(
-            searchManager.getSearchableInfo(getComponentName()));
+        if(Build.VERSION.SDK_INT >= 11)
+        {
+            SearchView searchView = (SearchView) searchItem.getActionView();
+            searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
 
-        int id = searchView.getContext().getResources()
-                .getIdentifier("android:id/search_src_text", null, null);
-        TextView textView = (TextView) searchView.findViewById(id);
-        textView.setTextColor(getResources().getColor(R.color.white));
-        textView.setHintTextColor(getResources().getColor(R.color.white));
-        searchView.setOnQueryTextListener(this);
-        searchView.setOnCloseListener(this);
+            int id = searchView.getContext().getResources()
+                    .getIdentifier("android:id/search_src_text", null, null);
+            TextView textView = (TextView) searchView.findViewById(id);
+            textView.setTextColor(getResources().getColor(R.color.white));
+            textView.setHintTextColor(getResources().getColor(R.color.white));
+
+            SearchViewListener listener = new SearchViewListener();
+            searchView.setOnQueryTextListener(listener);
+            searchView.setOnCloseListener(listener);
+        }
 
         return optionsMenu;
     }
@@ -282,30 +288,6 @@ public class Jitsi
         writeMessageView.setText("");
     }
 
-    @Override
-    public boolean onClose()
-    {
-        filterContactList("");
-
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String query)
-    {
-        filterContactList(query);
-
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query)
-    {
-        filterContactList(query);
-
-        return false;
-    }
-
     /**
      * Creates new start chat <tt>Intent</tt> fro given <tt>MetaContact</tt> UID
      * @param metaUID UID of the <tt>MetaContact</tt> to start chat with.
@@ -319,5 +301,39 @@ public class Jitsi
         chatIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         return chatIntent;
+    }
+
+    /**
+     * Class used to implement <tt>SearchView</tt> listeners for compatibility
+     * purposes.
+     *
+     */
+    class SearchViewListener
+        implements  OnQueryTextListener,
+                    OnCloseListener
+    {
+        @Override
+        public boolean onClose()
+        {
+            filterContactList("");
+
+            return false;
+        }
+
+        @Override
+        public boolean onQueryTextChange(String query)
+        {
+            filterContactList(query);
+
+            return false;
+        }
+
+        @Override
+        public boolean onQueryTextSubmit(String query)
+        {
+            filterContactList(query);
+
+            return false;
+        }
     }
 }

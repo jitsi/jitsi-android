@@ -338,6 +338,8 @@ public class AndroidLoginRenderer
      */
     private void updateGlobalStatus()
     {
-        globalStatusListeners.notifyEventListeners(getGlobalStatus());
+        // Only if the GUI is active (bundle context will be null on shutdown)
+        if(AndroidGUIActivator.bundleContext != null)
+            globalStatusListeners.notifyEventListeners(getGlobalStatus());
     }
 }

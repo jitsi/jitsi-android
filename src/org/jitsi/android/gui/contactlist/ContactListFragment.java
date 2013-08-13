@@ -223,13 +223,10 @@ public class ContactListFragment
         else
         {
             Intent chatIntent = new Intent(
-                getActivity().getApplicationContext(),
+                getActivity(),
                 ChatActivity.class);
 
-            chatIntent.setFlags(
-                Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-                | Intent.FLAG_ACTIVITY_NEW_TASK);
-            getActivity().getApplicationContext().startActivity(chatIntent);
+            getActivity().startActivity(chatIntent);
         }
     }
 
