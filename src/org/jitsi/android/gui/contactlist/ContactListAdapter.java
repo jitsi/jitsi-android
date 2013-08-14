@@ -16,6 +16,7 @@ import net.java.sip.communicator.service.protocol.event.*;
 import net.java.sip.communicator.util.*;
 
 import org.jitsi.*;
+import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.gui.util.*;
@@ -1354,8 +1355,17 @@ public class ContactListAdapter
 
         if (avatarImage == null)
         {
-            avatarImage = AccountUtil.getDefaultAvatarIcon(
+            LayerDrawable defaultIcon = AccountUtil.getDefaultAvatarIcon(
                 contactListFragment.getActivity());
+            // We have to restore default drawable inside R.id.avatarDrawable.
+            // Android seems to keep the one set by ActionBarUtil#setAvatar, but
+            // not sure why this happens
+            defaultIcon.setDrawableByLayerId(
+                    R.id.avatarDrawable,
+                    JitsiApplication.getAppResources()
+                            .getDrawable(R.drawable.avatar));
+
+            avatarImage = defaultIcon;
         }
 
         avatarView.setImageDrawable(avatarImage);

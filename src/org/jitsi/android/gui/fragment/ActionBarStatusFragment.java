@@ -75,10 +75,6 @@ public class ActionBarStatusFragment
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
-        // Hide title and show custom
-        getActivity().getActionBar().setDisplayShowTitleEnabled(false);
-        getActivity().getActionBar().setDisplayShowCustomEnabled(true);
-
         super.onCreate(savedInstanceState);
 
         // Create custom ActionBar View

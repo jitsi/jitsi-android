@@ -26,7 +26,7 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:gravity="bottom"
-        android:text="@string/service_gui_OFFLINE"
+        android:text=""
         android:textColor="@color/white"
         android:textStyle="normal|bold"
         android:focusable="true"

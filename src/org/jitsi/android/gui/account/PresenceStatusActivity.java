@@ -140,8 +140,8 @@ public class PresenceStatusActivity
 
         String title
                 = MessageFormat.format( titlePattern, account.getAccountName());
-        if(Build.VERSION.SDK_INT >= 11)
-            getActionBar().setTitle(title);
+
+        ActionBarUtil.setTitle(this, title);
 
         // Create spinner with status list
         Spinner statusSpinner = (Spinner) findViewById(

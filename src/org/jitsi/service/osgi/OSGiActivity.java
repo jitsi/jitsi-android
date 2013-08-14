@@ -15,6 +15,7 @@ import android.support.v4.app.*;
 import android.view.*;
 import net.java.sip.communicator.util.*;
 import org.jitsi.android.*;
+import org.jitsi.android.gui.util.*;
 import org.osgi.framework.*;
 
 import java.util.*;
@@ -118,6 +119,8 @@ public class OSGiActivity
                 getActionBar().setHomeButtonEnabled(false);
             }
         }
+
+        ActionBarUtil.setTitle(this, getTitle());
 
         super.onCreate(savedInstanceState);
 

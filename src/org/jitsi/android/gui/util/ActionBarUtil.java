@@ -7,12 +7,12 @@
 package org.jitsi.android.gui.util;
 
 import android.os.*;
-import org.jitsi.*;
 
 import android.app.*;
 import android.content.*;
 import android.graphics.drawable.*;
 import android.widget.*;
+import org.jitsi.R;
 
 /**
  * The <tt>ActionBarUtil</tt> provides utility methods for setting action bar
@@ -33,7 +33,7 @@ public class ActionBarUtil
      * @param a the <tt>Activity</tt>, for which we set the action bar title
      * @param title the title string to set
      */
-    public static void setTitle(Activity a, String title)
+    public static void setTitle(Activity a, CharSequence title)
     {
         if(Build.VERSION.SDK_INT < 11)
             return;
