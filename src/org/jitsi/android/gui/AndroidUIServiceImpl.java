@@ -12,6 +12,10 @@ import net.java.sip.communicator.service.gui.Container;
 import net.java.sip.communicator.service.gui.event.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.account.*;
+import net.java.sip.communicator.util.call.*;
+
+import org.jitsi.android.*;
+import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.util.java.awt.*;
 import org.jitsi.android.util.java.awt.event.*;
 
@@ -53,7 +57,7 @@ public class AndroidUIServiceImpl
      */
     public boolean isVisible()
     {
-        return false;
+        return JitsiApplication.getCurrentActivity() != null;
     }
 
     /**
@@ -254,7 +258,7 @@ public class AndroidUIServiceImpl
      */
     public Chat getChat(Contact contact)
     {
-        return null;
+        return ChatSessionManager.findChatForContact(contact, true);
     }
 
     /**
@@ -289,7 +293,7 @@ public class AndroidUIServiceImpl
      */
     public List<Chat> getChats()
     {
-        return null;
+        return ChatSessionManager.getActiveChats();
     }
 
     /**
@@ -302,7 +306,8 @@ public class AndroidUIServiceImpl
      */
     public MetaContact getChatContact(Chat chat)
     {
-        return null;
+        ChatSession chatSession = (ChatSession) chat;
+        return chatSession.getMetaContact();
     }
 
     /**
@@ -312,7 +317,8 @@ public class AndroidUIServiceImpl
      */
     public Chat getCurrentChat()
     {
-        return null;
+        String currentchatID = ChatSessionManager.getCurrentChatSession();
+        return ChatSessionManager.getActiveChat(currentchatID);
     }
 
     /**
@@ -513,7 +519,7 @@ public class AndroidUIServiceImpl
      */
     public Collection<Chat> getAllChats()
     {
-        return null;
+        return ChatSessionManager.getActiveChats();
     }
 
     /**
@@ -524,7 +530,7 @@ public class AndroidUIServiceImpl
      */
     public void addChatListener(ChatListener listener)
     {
-      
+        ChatSessionManager.addChatListener(listener);
     }
 
     /**
@@ -534,7 +540,7 @@ public class AndroidUIServiceImpl
      */
     public void removeChatListener(ChatListener listener)
     {
-      
+        ChatSessionManager.removeChatListener(listener);
     }
 
     /**
@@ -587,7 +593,7 @@ public class AndroidUIServiceImpl
      */
     public Collection<Call> getInProgressCalls()
     {
-        return null;
+        return CallManager.getActiveCalls();
     }
 
     @Override

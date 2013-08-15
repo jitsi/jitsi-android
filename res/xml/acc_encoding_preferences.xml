@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+            android:title="General"
+            android:key="@string/pref_cat_security_general">
+        <CheckBoxPreference
+                android:key="@string/pref_key_enable_encryption"
+                android:title="@string/service_gui_PREF_SECURITY_ENCRYPTION"
+                />
+        <Preference
+                android:key="@string/pref_key_enc_protocols_dialog"
+                android:title="@string/service_gui_PREF_SECURITY_ENC_PROTOCOLS"
+                android:persistent="false"
+                android:dependency="@string/pref_key_enable_encryption"
+                />
+    </PreferenceCategory>
+    <PreferenceCategory
+            android:title="@string/service_gui_PREF_SECURITY_ZRTP"
+            android:key="@string/pref_cat_security_zrtp"
+            >
+        <CheckBoxPreference
+                android:key="@string/pref_key_enc_sipzrtp_attr"
+                android:title="@string/service_gui_PREF_SECURITY_ZRTP_SIGNALING"
+                android:dependency="@string/pref_key_enable_encryption"
+                />
+    </PreferenceCategory>
+    <PreferenceCategory
+            android:title="@string/service_gui_PREF_SECURITY_SDES"
+            android:key="@string/pref_cat_security_sdes"
+            >
+        <MultiSelectListPreference
+                android:key="@string/pref_key_enc_cipher_suites"
+                android:title="@string/service_gui_PREF_SECURITY_SDES_TITLE"
+                android:dialogTitle="@string/service_gui_PREF_SECURITY_SDES_DLG_TITLE"
+                
+                android:dependency="@string/pref_key_enable_encryption"
+                />
+        <ListPreference
+                android:key="@string/pref_key_enc_savp_option"
+                android:title="@string/service_gui_PREF_SECURITY_RTP_SAVP"
+                android:dialogTitle="@string/service_gui_PREF_SECURITY_RTP_SAVP_TITLE"
+                android:entries="@array/pref_savp_option_desc"
+                android:entryValues="@array/pref_savp_option_desc"
+                android:dependency="@string/pref_key_enable_encryption"
+                />
+    </PreferenceCategory>
+</PreferenceScreen>

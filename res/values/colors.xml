@@ -7,6 +7,7 @@
 <color name="white">#ffffff</color>
 <color name="black">#000000</color>
 <color name="transparent_black">#50000000</color>
+<color name="red">#FF0000</color>
 <color name="red_padlock">#ff0000</color>
 <color name="green_padlock">#008800</color>
 <color name="orange_padlock">#AA6600</color>

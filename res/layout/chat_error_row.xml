@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="fill_parent"
+             android:layout_height="wrap_content"
+             android:descendantFocusability="blocksDescendants">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_toRightOf="@+id/incomingAvatarView"
+        android:background="@drawable/messageholder">
+
+        <TextView
+            android:id="@+id/messageView"
+            style="@style/MediumFont"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/red"
+            android:gravity="left"
+            android:layout_marginLeft="@dimen/chat_text_margin"
+            android:padding="7dip" android:text="{System message text}"
+            android:textStyle="bold"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

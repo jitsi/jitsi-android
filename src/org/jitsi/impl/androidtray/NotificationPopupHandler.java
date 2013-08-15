@@ -13,6 +13,7 @@ import android.support.v4.app.*;
 
 import java.util.*;
 
+import net.java.sip.communicator.service.gui.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.systray.*;
 import net.java.sip.communicator.service.systray.event.*;
@@ -20,6 +21,8 @@ import net.java.sip.communicator.util.*;
 
 import org.jitsi.*;
 import org.jitsi.android.*;
+import org.jitsi.android.gui.*;
+import org.jitsi.android.gui.chat.*;
 
 /**
  * Displays popup messages as Android status bar notifications.
@@ -74,13 +77,11 @@ public class NotificationPopupHandler
         // Check if it's message notification
         if(tag != null)
         {
-            if(tag instanceof Contact
-                    && JitsiApplication.isHomeActivityActive())
+            if(tag instanceof Contact)
             {
-                //TODO: temporary fix until Chat interface is not implemented
-                logger.info("Not showing message notification," +
-                                    " as main activity is started");
-                return;
+                if(ChatSessionManager
+                        .findChatForContact((Contact)tag, false) != null)
+                    return;
             }
 
             Integer prevId = tagToNotificationMap.get(tag);

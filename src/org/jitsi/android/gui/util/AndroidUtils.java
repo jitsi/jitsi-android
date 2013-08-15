@@ -286,4 +286,9 @@ public class AndroidUtils
             }
         });
     }
+
+    public static boolean isUIThread()
+    {
+        return Looper.getMainLooper().getThread() == Thread.currentThread();
+    }
 }

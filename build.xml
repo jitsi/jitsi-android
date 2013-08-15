@@ -223,6 +223,11 @@
             <rule pattern="org.bouncycastle.**"
                   result="org.jitsi.bouncycastle.@1"/>
         </jarjar>
+        <jarjar jarfile="libs/otr4j.jar">
+            <zipfileset src="lib/otr4j.jar"/>
+            <rule pattern="org.bouncycastle.**"
+                  result="org.jitsi.bouncycastle.@1"/>
+        </jarjar>
 
         <!-- and finally the stubs we use for common java
          packages that are missing in android, in order to

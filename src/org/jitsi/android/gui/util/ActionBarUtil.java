@@ -38,8 +38,13 @@ public class ActionBarUtil
         if(Build.VERSION.SDK_INT < 11)
             return;
 
+        ActionBar actionBar = a.getActionBar();
+        // Some activities don't have ActionBar
+        if(actionBar == null)
+            return;
+
         TextView actionBarText
-            = (TextView) a.getActionBar().getCustomView()
+            = (TextView) actionBar.getCustomView()
                 .findViewById(R.id.actionBarText);
 
         actionBarText.setText(title);

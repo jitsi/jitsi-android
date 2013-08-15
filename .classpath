@@ -28,6 +28,7 @@
 	<classpathentry kind="lib" path="libs/netaddr.jar"/>
 	<classpathentry kind="lib" path="libs/notification-service.jar"/>
 	<classpathentry kind="lib" path="libs/notification-wiring.jar"/>
+	<classpathentry kind="lib" path="libs/otr4j.jar"/>
 	<classpathentry kind="lib" path="libs/plugin-loggingutils.jar"/>
 	<classpathentry kind="lib" path="libs/protocol.jar"/>
 	<classpathentry kind="lib" path="libs/resourcemanager.jar"/>

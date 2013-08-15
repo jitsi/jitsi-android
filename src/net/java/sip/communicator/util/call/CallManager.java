@@ -95,6 +95,19 @@ public class CallManager
     }
 
     /**
+     * Returns currently active calls.
+     *
+     * @return collection of currently active calls.
+     */
+    public static Collection<Call> getActiveCalls()
+    {
+        synchronized (activeCalls)
+        {
+            return activeCalls.values();
+        }
+    }
+
+    /**
      * Returns the number of currently active calls.
      *
      * @return the number of currently active calls.

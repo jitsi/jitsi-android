@@ -182,7 +182,7 @@ public class SecurityActivity
             }
 
             // Load the preferences from an XML resource
-            addPreferencesFromResource(R.xml.security_preferences);
+            addPreferencesFromResource(R.xml.acc_encoding_preferences);
 
             Preference secProtocolsPref =
                     findPreference(PREF_KEY_SEC_PROTO_DIALOG);

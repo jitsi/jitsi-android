@@ -111,6 +111,55 @@
     <string name="service_gui_SEND_MESSAGE">Send a message</string>
     <string name="service_gui_CALL_WITH">Call with</string>
 
+    <!-- OTR plugin -->
+    <string name="plugin_otr_menu_TITLE">Secure chat</string>
+    <string name="plugin_otr_menu_START_OTR">Start private conversation</string>
+    <string name="plugin_otr_menu_END_OTR">End private conversation</string>
+    <string name="plugin_otr_menu_REFRESH_OTR">Refresh private conversation</string>
+    <string name="plugin_otr_menu_AUTHENTICATE_BUDDY">Authenticate buddy</string>
+    <string name="plugin_otr_menu_WHATS_THIS">What\'s this</string>
+    <string name="plugin_otr_menu_CB_AUTO">Automatically initiate private messaging</string>
+    <string name="plugin_otr_menu_CB_ENABLE">Enable private messaging</string>
+    <string name="plugin_otr_menu_CB_REQUIRE">Require private messaging</string>
+    <string name="plugin_otr_menu_CB_RESET">Reset</string>
+    <string name="plugin_otr_menu_OTR_TOOLTIP">Encrypt chats with OTR</string>
+    <string name="plugin_otr_authbuddydialog_HELP_URI">https://jitsi.org/GSOC2009/OTR</string>
+    <string name="plugin_otr_authbuddydialog_AUTHENTICATION_INFO">Authenticating a buddy helps
+    ensure that the person you are talking to is who he or she claims to be.
+    To verify the fingerprint, contact your buddy via some other authenticated
+    channel, such as the telephone or GPG-signed email. Each of you should tell
+    your fingerprint to the other. If everything matches up, you should indicate
+    in the following dialog that you *have* verified the fingerprint.</string>
+    <string name="plugin_otr_authbuddydialog_LOCAL_FINGERPRINT">Fingerprint for you, {0}: {1}</string>
+    <string name="plugin_otr_authbuddydialog_REMOTE_FINGERPRINT">Purported fingerprint for {0}: {1}</string>
+    <string name="plugin_otr_authbuddydialog_CANCEL">Cancel</string>
+    <string name="plugin_otr_authbuddydialog_HELP">Help</string>
+    <string name="plugin_otr_authbuddydialog_TITLE">Authenticate Buddy</string>
+    <string name="plugin_otr_authbuddydialog_AUTHENTICATE_BUDDY">Authenticate Buddy</string>
+    <string name="plugin_otr_authbuddydialog_I_HAVE">I have</string>
+    <string name="plugin_otr_authbuddydialog_I_HAVE_NOT">I have not</string>
+    <string name="plugin_otr_authbuddydialog_VERIFY_ACTION">verified that this is in fact the correct fingerprint for {0}.</string>
+    <string name="plugin_otr_authbuddydialog_FINGERPRINT_CHECK">Please enter the fingerprint you recieved from {0}.</string>
+    <string name="plugin_otr_configform_MY_PRIVATE_KEYS">My Private Keys</string>
+    <string name="plugin_otr_configform_KNOWN_FINGERPRINTS">Known Fingerprints</string>
+    <string name="plugin_otr_configform_CB_AUTO">Automatically initiate private messaging</string>
+    <string name="plugin_otr_configform_CB_ENABLE">Enable private messaging</string>
+    <string name="plugin_otr_configform_CB_REQUIRE">Require private messaging</string>
+    <string name="plugin_otr_configform_NO_KEY_PRESENT">No key present</string>
+    <string name="plugin_otr_configform_GENERATE">Generate</string>
+    <string name="plugin_otr_configform_REGENERATE">Re-generate</string>
+    <string name="plugin_otr_configform_FINGERPRINT">Fingerprint</string>
+    <string name="plugin_otr_configform_VERIFY_FINGERPRINT">Verify Fingerprint</string>
+    <string name="plugin_otr_configform_FORGET_FINGERPRINT">Forget Fingerprint</string>
+    <string name="plugin_otr_configform_COLUMN_NAME_CONTACT">Contact</string>
+    <string name="plugin_otr_configform_COLUMN_NAME_VERIFIED_STATUS">Verified</string>
+    <string name="plugin_otr_configform_COLUMN_VALUE_VERIFIED_TRUE">Yes</string>
+    <string name="plugin_otr_configform_COLUMN_VALUE_VERIFIED_FALSE">No</string>
+    <string name="plugin_otr_activator_unverifiedsessionwarning">{0} is contacting you from an unrecognized computer. You should &lt;a href="jitsi://{1}/{2}?{3}">authenticate {0}&lt;/a>.</string>
+    <string name="plugin_otr_activator_unverifiedsessionstared">&lt;b>Unverified&lt;/b> private conversation with {0} started.</string>
+    <string name="plugin_otr_activator_sessionstared">Private conversation with {0} started.</string>
+    <string name="plugin_otr_activator_sessionfinished">{0} has ended his/her private conversation with you; you should do the same.</string>
+    <string name="plugin_otr_activator_sessionlost">Private conversation with {0} lost.</string>
     <!-- From resources.properties -->
     <string name="service_gui_NOT_IN_CONTACT_LIST_GROUP_NAME">NotInContactList</string>
     <string name="service_gui_CONNECTED_STATUS">Connected</string>
@@ -724,5 +773,18 @@
 
     <string name="pref_key_video_bitrate">pref.key.video.bitrate</string>
     <string name="service_gui_settings_VIDEO_BITRATE">Video bitrate (kilobits/s)</string>
+
+    <!-- Security settings -->
+    <string name="pref_cat_settings_security">pref.cat.settings.security</string>
+    <string name="service_gui_settings_SECURITY">Security</string>
+    <!-- Chat security -->
+    <string name="service_gui_settings_CHAT_SECURITY_TITLE">Chat</string>
+    <string name="service_gui_settings_CHAT_SECURITY_SUMMARY">Chat security settings</string>
+    <!-- OTR Enable -->
+    <string name="pref_key_otr_enable">perf.key.otr.enable</string>
+    <string name="service_gui_settings_OTR_ENABLE_TITLE">Private messaging</string>
+    <string name="service_gui_settings_OTR_ENABLE_ON">Messaging encryption enabled</string>
+    <string name="service_gui_settings_OTR_ENABLE_OFF">No messaging encryption</string>
+
 
 </resources>

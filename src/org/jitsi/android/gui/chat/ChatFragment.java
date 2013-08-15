@@ -7,10 +7,12 @@
 package org.jitsi.android.gui.chat;
 
 import java.util.*;
+
+import android.text.*;
+import android.text.method.*;
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.globaldisplaydetails.*;
 import net.java.sip.communicator.service.protocol.*;
-import net.java.sip.communicator.service.protocol.Message;
 import net.java.sip.communicator.service.protocol.event.*;
 import net.java.sip.communicator.service.protocol.globalstatus.*;
 import net.java.sip.communicator.util.*;
@@ -247,7 +249,7 @@ public class ChatFragment
 
     class ChatListAdapter
         extends BaseAdapter
-        implements  MessageListener,
+        implements  ChatSession.ChatSessionListener,
                     ContactPresenceStatusListener,
                     TypingNotificationsListener
     {
@@ -268,57 +270,44 @@ public class ChatFragment
         final int OUTGOING_MESSAGE_VIEW = 1;
 
         /**
+         * The type of the system message view.
+         */
+        final int SYSTEM_MESSAGE_VIEW = 2;
+
+        /**
+         * The type of the error message view.
+         */
+        final int ERROR_MESSAGE_VIEW = 3;
+
+        /**
          * Passes the message to the contained <code>ChatConversationPanel</code>
          * for processing and appends it at the end of the conversationPanel
          * document.
          *
-         * @param contactName the name of the contact sending the message
-         * @param displayName the display name of the contact
-         * @param date the time at which the message is sent or received
-         * @param messageType the type of the message. One of OUTGOING_MESSAGE
-         * or INCOMING_MESSAGE
-         * @param message the message text
-         * @param contentType the content type
          */
-        public void addMessage( final String contactName,
-                                final String displayName,
-                                final Date date,
-                                final int messageType,
-                                final String message,
-                                final String contentType,
-                                final String messageUID,
-                                final String correctedMessageUID)
+        public void addMessage( ChatMessage newMessage, boolean update)
         {
-            ChatMessage chatMessage = null;
-
             synchronized (messages)
             {
-                if (!isConsecutiveMessage(  contactName,
-                                            messageType,
-                                            date.getTime()))
+                if (!isConsecutiveMessage(  newMessage.getContactName(),
+                                            newMessage.getMessageType(),
+                                            newMessage.getDate().getTime()))
                 {
-                     chatMessage
-                         = new ChatMessage(contactName, displayName,
-                            date, messageType, null, message,
-                            contentType, messageUID,
-                            correctedMessageUID);
+                     messages.add(newMessage);
+                }
+                else
+                {
+                    // Return the last message.
+                    ChatMessage chatMessage = getMessage(getCount() - 1);
 
-                     messages.add(chatMessage);
+                    chatMessage.setMessage(
+                            chatMessage.getMessage() + " \n"
+                                    + newMessage.getMessage());    
                 }
             }
 
-            // A consecutive message.
-            if (chatMessage == null)
-            {
-                // Return the last message.
-                chatMessage = getMessage(getCount() - 1);
-
-                chatMessage.setMessage(
-                    chatMessage.getMessage() + " \n"
-                    + message);
-            }
-
-            dataChanged();
+            if(update)
+                dataChanged();
         }
 
         /**
@@ -360,7 +349,7 @@ public class ChatFragment
 
         public int getViewTypeCount()
         {
-            return 2;
+            return 4;
         }
 
         public int getItemViewType(int position)
@@ -372,6 +361,10 @@ public class ChatFragment
                 return INCOMING_MESSAGE_VIEW;
             else if (messageType == ChatMessage.OUTGOING_MESSAGE)
                 return OUTGOING_MESSAGE_VIEW;
+            else if (messageType == ChatMessage.SYSTEM_MESSAGE)
+                return SYSTEM_MESSAGE_VIEW;
+            else if(messageType == ChatMessage.ERROR_MESSAGE)
+                return ERROR_MESSAGE_VIEW;
 
             return 0;
         }
@@ -420,7 +413,7 @@ public class ChatFragment
                         = (ImageView) convertView.findViewById(
                             R.id.typingImageView);
                 }
-                else
+                else if(viewType == OUTGOING_MESSAGE_VIEW)
                 {
                     convertView = inflater.inflate( R.layout.chat_outgoing_row,
                                                     parent,
@@ -442,6 +435,19 @@ public class ChatFragment
                         = (TextView) convertView.findViewById(
                             R.id.outgoingTimeView);
                 }
+                else
+                {
+                    // System or error view
+                    convertView = inflater.inflate(
+                            viewType == SYSTEM_MESSAGE_VIEW
+                                    ? R.layout.chat_system_row
+                                    : R.layout.chat_error_row,
+                                    parent, false);
+
+                    messageViewHolder.messageView
+                            = (TextView) convertView.findViewById(
+                            R.id.messageView);
+                }
 
                 convertView.setTag(messageViewHolder);
             }
@@ -454,31 +460,48 @@ public class ChatFragment
 
             if (message != null)
             {
-                Drawable avatar = null;
-                Drawable status = null;
-                if (messageViewHolder.viewType == INCOMING_MESSAGE_VIEW)
+                if(messageViewHolder.viewType == INCOMING_MESSAGE_VIEW
+                        || messageViewHolder.viewType == OUTGOING_MESSAGE_VIEW)
                 {
-                    avatar = ContactListAdapter.getAvatarDrawable(
-                        chatSession.getMetaContact());
+                    Drawable avatar = null;
+                    Drawable status = null;
+                    if (messageViewHolder.viewType == INCOMING_MESSAGE_VIEW)
+                    {
+                        avatar = ContactListAdapter.getAvatarDrawable(
+                            chatSession.getMetaContact());
 
-                    status = ContactListAdapter.getStatusDrawable(
-                        chatSession.getMetaContact());
+                        status = ContactListAdapter.getStatusDrawable(
+                            chatSession.getMetaContact());
+                    }
+                    else if (messageViewHolder.viewType == OUTGOING_MESSAGE_VIEW)
+                    {
+                        avatar = getLocalAvatarDrawable();
+                        status = getLocalStatusDrawable();
+                    }
+
+
+                    if (avatar == null)
+                        avatar = AccountUtil.getDefaultAvatarIcon(getActivity());
+
+                    setAvatar(messageViewHolder.avatarView, avatar);
+                    setStatus(messageViewHolder.statusView, status);
+
+                    messageViewHolder.timeView.setText(
+                            GuiUtils.formatTime(message.getDate()));
                 }
-                else if (messageViewHolder.viewType == OUTGOING_MESSAGE_VIEW)
+
+                if(message.getContentType().equals(
+                        OperationSetBasicInstantMessaging.HTML_MIME_TYPE))
                 {
-                    avatar = getLocalAvatarDrawable();
-                    status = getLocalStatusDrawable();
+                    messageViewHolder.messageView.setText(
+                            Html.fromHtml(message.getMessage()));
+                    messageViewHolder.messageView.setMovementMethod(
+                            LinkMovementMethod.getInstance());
                 }
-
-                if (avatar == null)
-                    avatar = AccountUtil.getDefaultAvatarIcon(getActivity());
-
-                setAvatar(messageViewHolder.avatarView, avatar);
-                setStatus(messageViewHolder.statusView, status);
-
-                messageViewHolder.messageView.setText(message.getMessage());
-                messageViewHolder.timeView.setText(
-                    GuiUtils.formatTime(message.getDate()));
+                else
+                {
+                    messageViewHolder.messageView.setText(message.getMessage());
+                }
             }
 
             return convertView;
@@ -510,31 +533,15 @@ public class ChatFragment
             if (metaContact != null
                 && chatSession.getMetaContact().equals(metaContact))
             {
-                final Message msg = evt.getSourceMessage();
+                final ChatMessage msg = ChatMessage.getMsgForEvent(evt);
 
                 if (logger.isTraceEnabled())
                     logger.trace(
                     "MESSAGE DELIVERED: process message to chat for contact: "
                     + contact.getAddress()
-                    + " MESSAGE: " + msg.getContent());
+                    + " MESSAGE: " + msg.getMessage());
 
-                getActivity().runOnUiThread(new Runnable()
-                {
-                    public void run()
-                    {
-                        addMessage(
-                            contact.getProtocolProvider().getAccountID()
-                                .getAccountAddress(),
-                            getAccountDisplayName(
-                                contact.getProtocolProvider()),
-                            evt.getTimestamp(),
-                            ChatMessage.OUTGOING_MESSAGE,
-                            msg.getContent(),
-                            msg.getContentType(),
-                            msg.getMessageUID(),
-                            evt.getCorrectedMessageUID());
-                    }
-                });
+                addMessage(msg, true);
             }
         }
 
@@ -552,9 +559,6 @@ public class ChatFragment
                 + evt.getSourceContact().getAddress());
 
             final Contact protocolContact = evt.getSourceContact();
-            final ContactResource contactResource = evt.getContactResource();
-            final Message message = evt.getSourceMessage();
-            final int eventType = evt.getEventType();
             final MetaContact metaContact
                 = AndroidGUIActivator.getContactListService()
                     .findMetaContactByContact(protocolContact);
@@ -562,20 +566,9 @@ public class ChatFragment
             if(metaContact != null
                 && chatSession.getMetaContact().equals(metaContact))
             {
-                getActivity().runOnUiThread(new Runnable()
-                {
-                    public void run()
-                    {
-                        addMessage( protocolContact.getAddress(),
-                                    metaContact.getDisplayName(),
-                                    evt.getTimestamp(),
-                                    ChatMessage.getMessageType(evt),
-                                    message.getContent(),
-                                    message.getContentType(),
-                                    message.getMessageUID(),
-                                    evt.getCorrectedMessageUID());
-                    }
-                });
+                final ChatMessage msg = ChatMessage.getMsgForEvent(evt);
+
+                addMessage(msg, true);
             }
             else
             {
@@ -583,6 +576,12 @@ public class ChatFragment
                     logger.trace("MetaContact not found for protocol contact: "
                         + protocolContact + ".");
             }
+        }
+
+        @Override
+        public void messageAdded(ChatMessage msg)
+        {
+            addMessage(msg, true);
         }
 
         /**
@@ -636,37 +635,6 @@ public class ChatFragment
     }
 
     /**
-     * Returns the account user display name for the given protocol provider.
-     * @param protocolProvider the protocol provider corresponding to the
-     * account to add
-     * @return The account user display name for the given protocol provider.
-     */
-    private static String getAccountDisplayName(
-        ProtocolProviderService protocolProvider)
-    {
-        final OperationSetServerStoredAccountInfo accountInfoOpSet
-            = protocolProvider.getOperationSet(
-                    OperationSetServerStoredAccountInfo.class);
-
-        try
-        {
-            if (accountInfoOpSet != null)
-            {
-                String displayName
-                    = AccountInfoUtils.getDisplayName(accountInfoOpSet);
-                if(displayName != null && displayName.length() > 0)
-                    return displayName;
-            }
-        }
-        catch(Throwable e)
-        {
-            logger.error("Cannot obtain display name through OPSet");
-        }
-
-        return protocolProvider.getAccountID().getDisplayName();
-    }
-
-    /**
      * Indicates if this is a consecutive message.
      *
      * @param messageContactAddress the address of the contact associated with
@@ -692,8 +660,7 @@ public class ChatFragment
         String contactAddress = lastMessage.getContactName();
 
         if (contactAddress != null
-                && (messageType == ChatMessage.INCOMING_MESSAGE
-                    || messageType == ChatMessage.OUTGOING_MESSAGE)
+                && (messageType == lastMessage.getMessageType())
                 && contactAddress.equals(messageContactAddress)
                 // And if the new message is within a minute from the last one.
                 && ((messageTime - lastMessage.getDate().getTime()) < 60000))
@@ -709,20 +676,27 @@ public class ChatFragment
      * messages to the user interface.
      */
     private class LoadHistoryTask
-        extends AsyncTask<Void, Void, Collection<Object>>
+        extends AsyncTask<Void, Void, Collection<ChatMessage>>
     {
         @Override
-        protected Collection<Object> doInBackground(Void... params)
+        protected Collection<ChatMessage> doInBackground(Void... params)
         {
             return chatSession.getHistory(10);
         }
 
         @Override
-        protected void onPostExecute(Collection<Object> result)
+        protected void onPostExecute(Collection<ChatMessage> result)
         {
             super.onPostExecute(result);
 
-            loadHistory((Collection<Object>) result, false);
+            Iterator<ChatMessage> iterator = result.iterator();
+
+            while (iterator.hasNext())
+            {
+                chatListAdapter.addMessage(iterator.next(), false);
+            }
+
+            chatListAdapter.dataChanged();
         }
     }
 
@@ -765,36 +739,6 @@ public class ChatFragment
                 }
             }
         }
-    }
-
-    /**
-     * Process history messages.
-     *
-     * @param historyList the collection of messages coming from history
-     * @param dataChanged The incoming message needed to be ignored if
-     * contained in history.
-     */
-    private void loadHistory( Collection<Object> historyList,
-                              boolean dataChanged)
-    {
-        Iterator<Object> iterator = historyList.iterator();
-
-        while (iterator.hasNext())
-        {
-            Object o = iterator.next();
-
-            if(o instanceof MessageDeliveredEvent)
-            {
-                chatListAdapter.messageDelivered((MessageDeliveredEvent) o);
-            }
-            else if(o instanceof MessageReceivedEvent)
-            {
-                chatListAdapter.messageReceived((MessageReceivedEvent) o);
-            }
-        }
-
-        if(dataChanged)
-            chatListAdapter.dataChanged();
     }
 
     /**

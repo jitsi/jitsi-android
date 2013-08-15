@@ -1,0 +1,427 @@
+/*
+ * Jitsi, the OpenSource Java VoIP and Instant Messaging client.
+ *
+ * Distributable under LGPL license.
+ * See terms of license at gnu.org.
+ */
+package org.jitsi.android.plugin.otr;
+
+import net.java.otr4j.*;
+import net.java.otr4j.session.*;
+import net.java.sip.communicator.service.browserlauncher.*;
+import net.java.sip.communicator.service.gui.*;
+import net.java.sip.communicator.service.protocol.*;
+import org.osgi.framework.*;
+
+import java.net.*;
+import java.security.*;
+import java.util.*;
+
+/**
+ *
+ * @author George Politis
+ * @author Lyubomir Marinov
+ */
+public class ScOtrEngineImpl
+    implements ScOtrEngine,
+               ChatLinkClickedListener
+{
+    private final OtrConfigurator configurator = new OtrConfigurator();
+
+    private static final Map<ScSessionID, Contact> contactsMap =
+        new Hashtable<ScSessionID, Contact>();
+
+    private final List<String> injectedMessageUIDs = new Vector<String>();
+
+    private final List<ScOtrEngineListener> listeners =
+        new Vector<ScOtrEngineListener>();
+
+    private final OtrEngine otrEngine
+        = new OtrEngineImpl(new ScOtrEngineHost());
+
+    public void addListener(ScOtrEngineListener l)
+    {
+        synchronized (listeners)
+        {
+            if (!listeners.contains(l))
+                listeners.add(l);
+        }
+    }
+
+    /**
+     * Gets a copy of the list of <tt>ScOtrEngineListener</tt>s registered with
+     * this instance which may safely be iterated without the risk of a
+     * <tt>ConcurrentModificationException</tt>.
+     *
+     * @return a copy of the list of <tt>ScOtrEngineListener<tt>s registered
+     * with this instance which may safely be iterated without the risk of a
+     * <tt>ConcurrentModificationException</tt>
+     */
+    private ScOtrEngineListener[] getListeners()
+    {
+        synchronized (listeners)
+        {
+            return listeners.toArray(new ScOtrEngineListener[listeners.size()]);
+        }
+    }
+
+    public void removeListener(ScOtrEngineListener l)
+    {
+        synchronized (listeners)
+        {
+            listeners.remove(l);
+        }
+    }
+
+    public boolean isMessageUIDInjected(String mUID)
+    {
+        return injectedMessageUIDs.contains(mUID);
+    }
+
+    class ScOtrEngineHost
+        implements OtrEngineHost
+    {
+        public KeyPair getKeyPair(SessionID sessionID)
+        {
+            AccountID accountID =
+                OtrActivator.getAccountIDByUID(sessionID.getAccountID());
+            KeyPair keyPair =
+                OtrActivator.scOtrKeyManager.loadKeyPair(accountID);
+            if (keyPair == null)
+                OtrActivator.scOtrKeyManager.generateKeyPair(accountID);
+
+            return OtrActivator.scOtrKeyManager.loadKeyPair(accountID);
+        }
+
+        public void showWarning(SessionID sessionID, String warn)
+        {
+            Contact contact = getContact(sessionID);
+            if (contact == null)
+                return;
+
+            OtrActivator.uiService.getChat(contact).addMessage(
+                contact.getDisplayName(), new Date(),
+                Chat.SYSTEM_MESSAGE, warn,
+                OperationSetBasicInstantMessaging.DEFAULT_MIME_TYPE);
+        }
+
+        public void showError(SessionID sessionID, String err)
+        {
+            ScOtrEngineImpl.this.showError(sessionID, err);
+        }
+
+        public void injectMessage(SessionID sessionID, String messageText)
+        {
+            Contact contact = getContact(sessionID);
+            OperationSetBasicInstantMessaging imOpSet
+                = contact
+                    .getProtocolProvider()
+                        .getOperationSet(OperationSetBasicInstantMessaging.class);
+            Message message = imOpSet.createMessage(messageText);
+
+            injectedMessageUIDs.add(message.getMessageUID());
+            imOpSet.sendInstantMessage(contact, message);
+        }
+
+        public OtrPolicy getSessionPolicy(SessionID sessionID)
+        {
+            return getContactPolicy(getContact(sessionID));
+        }
+    }
+
+    public void showError(SessionID sessionID, String err)
+    {
+        Contact contact = getContact(sessionID);
+        if (contact == null)
+            return;
+
+        OtrActivator.uiService.getChat(contact).addMessage(
+            contact.getDisplayName(), new Date(),
+            Chat.ERROR_MESSAGE, err,
+            OperationSetBasicInstantMessaging.DEFAULT_MIME_TYPE);
+    }
+
+    public ScOtrEngineImpl()
+    {
+        this.otrEngine.addOtrEngineListener(new OtrEngineListener()
+        {
+            public void sessionStatusChanged(SessionID sessionID)
+            {
+                Contact contact = getContact(sessionID);
+                if (contact == null)
+                    return;
+
+                String message = "";
+                switch (otrEngine.getSessionStatus(sessionID))
+                {
+                case ENCRYPTED:
+                    PublicKey remotePubKey =
+                        otrEngine.getRemotePublicKey(sessionID);
+
+                    PublicKey storedPubKey =
+                        OtrActivator.scOtrKeyManager.loadPublicKey(contact);
+
+                    if (!remotePubKey.equals(storedPubKey))
+                        OtrActivator.scOtrKeyManager.savePublicKey(contact,
+                            remotePubKey);
+
+                    if (!OtrActivator.scOtrKeyManager.isVerified(contact))
+                    {
+                        UUID sessionGuid = null;
+                        for(ScSessionID scSessionID : contactsMap.keySet())
+                        {
+                            if(scSessionID.getSessionID().equals(sessionID))
+                            {
+                                sessionGuid = scSessionID.getGUID();
+                                break;
+                            }
+                        }
+
+                        OtrActivator.uiService.getChat(contact)
+                            .addChatLinkClickedListener(ScOtrEngineImpl.this);
+
+                        String unverifiedSessionWarning =
+                            OtrActivator.resourceService
+                                .getI18NString(
+                                    "plugin.otr.activator.unverifiedsessionwarning",
+                                    new String[]
+                                    {
+                                        contact.getDisplayName(),
+                                        this.getClass().getName(),
+                                        "AUTHENTIFICATION",
+                                        sessionGuid.toString()
+                                    });
+                        OtrActivator.uiService.getChat(contact).addMessage(
+                            contact.getDisplayName(),
+                            new Date(), Chat.SYSTEM_MESSAGE,
+                            unverifiedSessionWarning,
+                            OperationSetBasicInstantMessaging.HTML_MIME_TYPE);
+
+                    }
+                    message =
+                        OtrActivator.resourceService
+                            .getI18NString(
+                                (OtrActivator.scOtrKeyManager
+                                    .isVerified(contact)) ? "plugin.otr.activator.sessionstared"
+                                    : "plugin.otr.activator.unverifiedsessionstared",
+                                new String[]
+                                { contact.getDisplayName() });
+
+                    break;
+                case FINISHED:
+                    message =
+                        OtrActivator.resourceService.getI18NString(
+                            "plugin.otr.activator.sessionfinished",
+                            new String[]
+                            { contact.getDisplayName() });
+                    break;
+                case PLAINTEXT:
+                    message =
+                        OtrActivator.resourceService.getI18NString(
+                            "plugin.otr.activator.sessionlost", new String[]
+                            { contact.getDisplayName() });
+                    break;
+                }
+
+                OtrActivator.uiService.getChat(contact).addMessage(
+                    contact.getDisplayName(), new Date(),
+                    Chat.SYSTEM_MESSAGE, message,
+                    OperationSetBasicInstantMessaging.HTML_MIME_TYPE);
+
+                for (ScOtrEngineListener l : getListeners())
+                    l.sessionStatusChanged(contact);
+            }
+        });
+    }
+
+    public static SessionID getSessionID(Contact contact)
+    {
+        if(contact == null)
+            throw new NullPointerException("Contact is null");
+
+        ProtocolProviderService pps = contact.getProtocolProvider();
+        SessionID sessionID
+            = new SessionID(
+                    pps.getAccountID().getAccountUniqueID(),
+                    contact.getAddress(),
+                    pps.getProtocolName());
+
+        synchronized (contactsMap)
+        {
+            if(contactsMap.containsKey(new ScSessionID(sessionID)))
+                return sessionID;
+
+            ScSessionID scSessionID = new ScSessionID(sessionID);
+
+            System.err.println("putting "+contact+" as "+scSessionID);
+            contactsMap.put(scSessionID, contact);
+            System.err.println("Contains session? "+contactsMap.containsKey(scSessionID)+" toStr"+scSessionID.toString());
+            System.err.println("Contains session? "+contactsMap.containsKey(sessionID)+" toStr"+sessionID.toString());
+        }
+
+        return sessionID;
+    }
+
+    public static ScSessionID getScSessionForGuid(UUID guid)
+    {
+        for(ScSessionID scSessionID : contactsMap.keySet())
+        {
+            if(scSessionID.getGUID().equals(guid))
+            {
+                return scSessionID;
+            }
+        }
+        return null;
+    }
+
+    public static Contact getContact(SessionID sessionID)
+    {
+        return contactsMap.get(new ScSessionID(sessionID));
+    }
+
+    public void endSession(Contact contact)
+    {
+        SessionID sessionID = getSessionID(contact);
+        try
+        {
+            otrEngine.endSession(sessionID);
+        }
+        catch (OtrException e)
+        {
+            showError(sessionID, e.getMessage());
+        }
+    }
+
+    public SessionStatus getSessionStatus(Contact contact)
+    {
+        return otrEngine.getSessionStatus(getSessionID(contact));
+    }
+
+    public String transformReceiving(Contact contact, String msgText)
+    {
+        SessionID sessionID = getSessionID(contact);
+        try
+        {
+            return otrEngine.transformReceiving(sessionID, msgText);
+        }
+        catch (OtrException e)
+        {
+            showError(sessionID, e.getMessage());
+            return null;
+        }
+    }
+
+    public String transformSending(Contact contact, String msgText)
+    {
+        SessionID sessionID = getSessionID(contact);
+        try
+        {
+            return otrEngine.transformSending(sessionID, msgText);
+        }
+        catch (OtrException e)
+        {
+            showError(sessionID, e.getMessage());
+            return null;
+        }
+    }
+
+    public void refreshSession(Contact contact)
+    {
+        SessionID sessionID = getSessionID(contact);
+        try
+        {
+            otrEngine.refreshSession(sessionID);
+        }
+        catch (OtrException e)
+        {
+            showError(sessionID, e.getMessage());
+        }
+    }
+
+    public void startSession(Contact contact)
+    {
+        SessionID sessionID = getSessionID(contact);
+        try
+        {
+            otrEngine.startSession(sessionID);
+        }
+        catch (OtrException e)
+        {
+            showError(sessionID, e.getMessage());
+        }
+    }
+
+    public OtrPolicy getGlobalPolicy()
+    {
+        return new OtrPolicyImpl(this.configurator.getPropertyInt("POLICY",
+            OtrPolicy.OTRL_POLICY_DEFAULT));
+    }
+
+    public void setGlobalPolicy(OtrPolicy policy)
+    {
+        if (policy == null)
+            this.configurator.removeProperty("POLICY");
+        else
+            this.configurator.setProperty("POLICY", policy.getPolicy());
+
+        for (ScOtrEngineListener l : getListeners())
+            l.globalPolicyChanged();
+    }
+
+    public void launchHelp()
+    {
+        ServiceReference ref =
+            OtrActivator.bundleContext
+                .getServiceReference(BrowserLauncherService.class.getName());
+
+        if (ref == null)
+            return;
+
+        BrowserLauncherService service =
+            (BrowserLauncherService) OtrActivator.bundleContext.getService(ref);
+
+        service.openURL(OtrActivator.resourceService
+            .getI18NString("plugin.otr.authbuddydialog.HELP_URI"));
+    }
+
+    public OtrPolicy getContactPolicy(Contact contact)
+    {
+        int policy =
+            this.configurator.getPropertyInt(getSessionID(contact) + "policy",
+                -1);
+        if (policy < 0)
+            return getGlobalPolicy();
+        else
+            return new OtrPolicyImpl(policy);
+    }
+
+    public void setContactPolicy(Contact contact, OtrPolicy policy)
+    {
+        String propertyID = getSessionID(contact) + "policy";
+        if (policy == null)
+            this.configurator.removeProperty(propertyID);
+        else
+            this.configurator.setProperty(propertyID, policy.getPolicy());
+
+        for (ScOtrEngineListener l : getListeners())
+            l.contactPolicyChanged(contact);
+    }
+
+    public void chatLinkClicked(URI url)
+    {
+        String action = url.getPath();
+        if(action.equals("/AUTHENTIFICATION"))
+        {
+            UUID guid = UUID.fromString(url.getQuery());
+            ScSessionID scSessionID = getScSessionForGuid(guid);
+            if(scSessionID != null)
+            {
+                OtrActionHandlers.openAuthDialog(guid);
+            }
+            else
+            {
+                System.err.println("Session for gui: "+guid+" no longer exists");
+            }
+        }
+    }
+}

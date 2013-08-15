@@ -22,6 +22,7 @@ import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.fragment.*;
 import org.jitsi.android.gui.menu.*;
+import org.jitsi.android.plugin.otr.*;
 import org.osgi.framework.*;
 
 /**
@@ -84,13 +85,27 @@ public class Jitsi
 
         setContentView(R.layout.main_view);
 
-        // Inserts ActionBar functionality
-        if(Build.VERSION.SDK_INT >= 11)
+        boolean isTablet = findViewById(R.id.chatView) != null;
+
+        if(savedInstanceState == null)
         {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .add(new ActionBarStatusFragment(), "action_bar")
-                    .commit();
+            // Inserts ActionBar functionality
+            if(Build.VERSION.SDK_INT >= 11)
+            {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .add(new ActionBarStatusFragment(), "action_bar")
+                        .commit();
+            }
+
+            if(isTablet)
+            {
+                // OTR menu padlock
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .add(new OtrFragment(), "otr_fragment")
+                        .commit();
+            }
         }
 
         handleIntent(getIntent(), savedInstanceState);

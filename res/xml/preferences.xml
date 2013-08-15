@@ -148,4 +148,13 @@
                 android:inputType="number"
                 />
     </PreferenceCategory>
+    <PreferenceCategory
+            android:title="@string/service_gui_settings_SECURITY"
+            android:key="@string/pref_cat_settings_security">
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_CHAT_SECURITY_TITLE"
+                android:summary="@string/service_gui_settings_CHAT_SECURITY_SUMMARY">
+            <intent android:action=".android.gui.settings.ChatSecuritySettings"/>
+        </PreferenceScreen>
+    </PreferenceCategory>
 </PreferenceScreen>

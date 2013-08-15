@@ -66,6 +66,9 @@
 	<lib name="notification-wiring.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/libs/notification-wiring.jar!/"/>
 	</lib>
+	<lib name="otr4j.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libs/otr4j.jar!/"/>
+	</lib>
 	<lib name="plugin-loggingutils.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/libs/plugin-loggingutils.jar!/"/>
 	</lib>

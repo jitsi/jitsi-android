@@ -398,6 +398,15 @@ public class OSGiActivity
     }
 
     /**
+     * Returns the content <tt>View</tt>.
+     * @return the content <tt>View</tt>.
+     */
+    protected View getContentView()
+    {
+        return findViewById(android.R.id.content);
+    }
+
+    /**
      * Broadcast listener that listens for {@link JitsiApplication#ACTION_EXIT}
      * and then finishes this <tt>Activity</tt>.
      * 

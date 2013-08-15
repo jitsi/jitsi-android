@@ -49,7 +49,7 @@ public class ChatPagerAdapter
      */
     private void initChats()
     {
-        List<String> activeChats = ChatSessionManager.getActiveChats();
+        List<String> activeChats = ChatSessionManager.getActiveChatsIDs();
 
         if (activeChats == null)
             return;
