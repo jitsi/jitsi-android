@@ -785,6 +785,16 @@
     <string name="service_gui_settings_OTR_ENABLE_TITLE">Private messaging</string>
     <string name="service_gui_settings_OTR_ENABLE_ON">Messaging encryption enabled</string>
     <string name="service_gui_settings_OTR_ENABLE_OFF">No messaging encryption</string>
+    <!-- OTR Auto -->
+    <string name="pref_key_otr_auto">perf.key.otr.auto</string>
+    <string name="service_gui_settings_OTR_AUTO_TITLE">Auto private messaging</string>
+    <string name="service_gui_settings_OTR_AUTO_ON">Encrypts sessions automatically</string>
+    <string name="service_gui_settings_OTR_AUTO_OFF">Session have to be encrypted manually</string>
+    <!-- OTR Required -->
+    <string name="pref_key_otr_require">perf.key.otr.require</string>
+    <string name="service_gui_settings_OTR_REQUIRE_TITLE">Require private messaging</string>
+    <string name="service_gui_settings_OTR_REQUIRE_ON">Only secure sessions will be accepted</string>
+    <string name="service_gui_settings_OTR_REQUIRE_OFF">Secure messaging will be used if supported</string>
 
 
 </resources>

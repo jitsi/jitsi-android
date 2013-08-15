@@ -7,4 +7,16 @@
             android:summaryOff="@string/service_gui_settings_OTR_ENABLE_OFF"
             android:summaryOn="@string/service_gui_settings_OTR_ENABLE_ON"
             />
+    <CheckBoxPreference
+            android:title="@string/service_gui_settings_OTR_AUTO_TITLE"
+            android:key="@string/pref_key_otr_auto"
+            android:summaryOff="@string/service_gui_settings_OTR_AUTO_OFF"
+            android:summaryOn="@string/service_gui_settings_OTR_AUTO_ON"
+            />
+    <CheckBoxPreference
+            android:title="@string/service_gui_settings_OTR_REQUIRE_TITLE"
+            android:key="@string/pref_key_otr_require"
+            android:summaryOff="@string/service_gui_settings_OTR_REQUIRE_OFF"
+            android:summaryOn="@string/service_gui_settings_OTR_REQUIRE_ON"
+            />
 </PreferenceScreen>

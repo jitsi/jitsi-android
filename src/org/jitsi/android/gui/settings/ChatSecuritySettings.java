@@ -10,6 +10,7 @@ import android.content.*;
 import android.os.Bundle;
 import net.java.otr4j.*;
 import net.java.sip.communicator.util.*;
+import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.settings.util.*;
 import org.jitsi.android.gui.util.*;
@@ -31,7 +32,13 @@ public class ChatSecuritySettings
     // Preference keys
     static private final String P_KEY_OTR_ENABLE
             = JitsiApplication.getResString(
-            org.jitsi.R.string.pref_key_otr_enable);
+                    org.jitsi.R.string.pref_key_otr_enable);
+    static private final String P_KEY_OTR_AUTO
+            = JitsiApplication.getResString(
+                    org.jitsi.R.string.pref_key_otr_auto);
+    static private final String P_KEY_OTR_REQUIRE
+            = JitsiApplication.getResString(
+                    R.string.pref_key_otr_require);
 
 
     /**
@@ -80,6 +87,10 @@ public class ChatSecuritySettings
         public void onStart()
         {
             super.onStart();
+
+            // Messages section
+            initOtrPreferences();
+
             SharedPreferences shPrefs = getPreferenceManager()
                     .getSharedPreferences();
 
@@ -103,20 +114,6 @@ public class ChatSecuritySettings
         }
 
         /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void onOSGiConnected()
-        {
-            super.onOSGiConnected();
-
-            // Messages section
-            initOtrPreferences();
-
-
-        }
-
-        /**
          * Initializes messages section
          */
         private void initOtrPreferences()
@@ -126,6 +123,14 @@ public class ChatSecuritySettings
             PreferenceUtil.setCheckboxVal(
                     this, P_KEY_OTR_ENABLE,
                     otrPolicy.getEnableManual());
+
+            PreferenceUtil.setCheckboxVal(
+                    this, P_KEY_OTR_AUTO,
+                    otrPolicy.getEnableAlways());
+
+            PreferenceUtil.setCheckboxVal(
+                    this, P_KEY_OTR_REQUIRE,
+                    otrPolicy.getRequireEncryption());
         }
 
         /**
@@ -142,13 +147,34 @@ public class ChatSecuritySettings
                                 P_KEY_OTR_ENABLE,
                                 otrPolicy.getEnableManual()));
             }
-            /*else if(key.equals(P_KEY_SHOW_HISTORY))
+            else if(key.equals(P_KEY_OTR_AUTO))
             {
-                ConfigurationUtils.setHistoryShown(
-                        shPreferences.getBoolean(
-                                P_KEY_SHOW_HISTORY,
-                                ConfigurationUtils.isHistoryShown()));
-            }*/
+                boolean isAutoInit
+                        = shPreferences.getBoolean(
+                                P_KEY_OTR_AUTO,
+                                otrPolicy.getEnableAlways());
+
+                otrPolicy.setEnableAlways(isAutoInit);
+                OtrActivator.configService.setProperty(
+                        OtrActivator.AUTO_INIT_OTR_PROP,
+                        Boolean.toString(isAutoInit));
+            }
+            else if(key.equals(P_KEY_OTR_REQUIRE))
+            {
+                boolean isRequired
+                        = shPreferences.getBoolean(
+                                P_KEY_OTR_REQUIRE,
+                                otrPolicy.getRequireEncryption());
+
+                otrPolicy.setRequireEncryption(isRequired);
+
+                OtrActivator.configService.setProperty(
+                        OtrActivator.OTR_MANDATORY_PROP,
+                        Boolean.toString(isRequired));
+            }
+
+            // Store changes immediately
+            OtrActivator.scOtrEngine.setGlobalPolicy(otrPolicy);
         }
     }
 }
