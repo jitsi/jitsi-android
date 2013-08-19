@@ -26,9 +26,11 @@ public class ScOtrEngineImpl
     implements ScOtrEngine,
                ChatLinkClickedListener
 {
+    private static ScOtrEngineImpl instance;
+
     private final OtrConfigurator configurator = new OtrConfigurator();
 
-    private static final Map<ScSessionID, Contact> contactsMap =
+    private final Map<ScSessionID, Contact> contactsMap =
         new Hashtable<ScSessionID, Contact>();
 
     private final List<String> injectedMessageUIDs = new Vector<String>();
@@ -136,13 +138,15 @@ public class ScOtrEngineImpl
             return;
 
         OtrActivator.uiService.getChat(contact).addMessage(
-            contact.getDisplayName(), new Date(),
-            Chat.ERROR_MESSAGE, err,
-            OperationSetBasicInstantMessaging.DEFAULT_MIME_TYPE);
+                contact.getDisplayName(), new Date(),
+                Chat.ERROR_MESSAGE, err,
+                OperationSetBasicInstantMessaging.DEFAULT_MIME_TYPE);
     }
 
     public ScOtrEngineImpl()
     {
+        instance = this;
+
         this.otrEngine.addOtrEngineListener(new OtrEngineListener()
         {
             public void sessionStatusChanged(SessionID sessionID)
@@ -246,6 +250,7 @@ public class ScOtrEngineImpl
                     contact.getAddress(),
                     pps.getProtocolName());
 
+        final Map<ScSessionID, Contact> contactsMap = instance.contactsMap;
         synchronized (contactsMap)
         {
             if(contactsMap.containsKey(new ScSessionID(sessionID)))
@@ -253,10 +258,7 @@ public class ScOtrEngineImpl
 
             ScSessionID scSessionID = new ScSessionID(sessionID);
 
-            System.err.println("putting "+contact+" as "+scSessionID);
             contactsMap.put(scSessionID, contact);
-            System.err.println("Contains session? "+contactsMap.containsKey(scSessionID)+" toStr"+scSessionID.toString());
-            System.err.println("Contains session? "+contactsMap.containsKey(sessionID)+" toStr"+sessionID.toString());
         }
 
         return sessionID;
@@ -264,7 +266,7 @@ public class ScOtrEngineImpl
 
     public static ScSessionID getScSessionForGuid(UUID guid)
     {
-        for(ScSessionID scSessionID : contactsMap.keySet())
+        for(ScSessionID scSessionID : instance.contactsMap.keySet())
         {
             if(scSessionID.getGUID().equals(guid))
             {
@@ -276,7 +278,7 @@ public class ScOtrEngineImpl
 
     public static Contact getContact(SessionID sessionID)
     {
-        return contactsMap.get(new ScSessionID(sessionID));
+        return instance.contactsMap.get(new ScSessionID(sessionID));
     }
 
     public void endSession(Contact contact)
@@ -381,7 +383,8 @@ public class ScOtrEngineImpl
             (BrowserLauncherService) OtrActivator.bundleContext.getService(ref);
 
         service.openURL(OtrActivator.resourceService
-            .getI18NString("plugin.otr.authbuddydialog.HELP_URI"));
+                                .getI18NString(
+                                        "plugin.otr.authbuddydialog.HELP_URI"));
     }
 
     public OtrPolicy getContactPolicy(Contact contact)

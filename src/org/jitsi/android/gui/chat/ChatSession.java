@@ -300,7 +300,7 @@ public class ChatSession
                     metaHistory.findLast(
                         chatHistoryFilter,
                         metaContact,
-                        20));
+                        10), 15);
     }
 
     /**
@@ -308,10 +308,11 @@ public class ChatSession
      *
      * @param historyList the collection of messages coming from history
      */
-    private Collection<ChatMessage> loadHistory(Collection<Object> historyList)
+    private Collection<ChatMessage> loadHistory(Collection<Object> historyList,
+                                                int msgLimit)
     {
         Iterator<Object> iterator = historyList.iterator();
-        ArrayList<ChatMessage> output = new ArrayList<ChatMessage>();
+        ArrayList<ChatMessage> historyMsgs = new ArrayList<ChatMessage>();
 
         while (iterator.hasNext())
         {
@@ -319,12 +320,12 @@ public class ChatSession
 
             if(o instanceof MessageDeliveredEvent)
             {
-                output.add(
+                historyMsgs.add(
                         ChatMessage.getMsgForEvent((MessageDeliveredEvent) o));
             }
             else if(o instanceof MessageReceivedEvent)
             {
-                output.add(
+                historyMsgs.add(
                         ChatMessage.getMsgForEvent((MessageReceivedEvent) o));
             }
             else
@@ -333,11 +334,41 @@ public class ChatSession
             }
         }
 
-        // Adds messages inserted by services
-        for(ChatMessage msg :insertedMessages)
+        // Merge sorts history and inserted messages
+        ArrayList<ChatMessage> output = new ArrayList<ChatMessage>();
+        int historyIdx=0;
+        int insertedIdx=0;
+
+        while(historyIdx < historyMsgs.size()
+                && insertedIdx < insertedMessages.size()
+                && output.size() < msgLimit)
         {
-            output.add(msg);
+            ChatMessage historyMsg = historyMsgs.get(historyIdx);
+            ChatMessage insertedMsg = insertedMessages.get(insertedIdx);
+
+            if(historyMsg.getDate().before(insertedMsg.getDate()))
+            {
+                output.add(historyMsg);
+                historyIdx++;
+            }
+            else
+            {
+                // Inserted messages have to be cloned in order to prevent
+                // original message text modification
+                output.add(insertedMsg.clone());
+                insertedIdx++;
+            }
         }
+
+        // Input remaining history messages
+        while(historyIdx < historyMsgs.size()
+                && output.size() < msgLimit)
+            output.add(historyMsgs.get(historyIdx++));
+
+        // Input remaining "inserted" messages
+        while(insertedIdx < insertedMessages.size()
+                && output.size() < msgLimit)
+            output.add(insertedMessages.get(insertedIdx++).clone());
 
         return output;
     }
@@ -578,6 +609,12 @@ public class ChatSession
         }
     }
 
+    /**
+     * Extends <tt>MessageListener</tt> interface in order to provide
+     * notifications about injected messages without the need of event objects.
+     *
+     * @author Pawel Domas
+     */
     public interface ChatSessionListener
         extends MessageListener
     {

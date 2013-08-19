@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_gravity="center"
+              android:padding="@dimen/screen_padding">
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="account@server.org"
+            style="@style/MediumFont"
+            android:id="@+id/accountName" android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="{private key text}"
+            style="@style/MediumFont"
+            android:id="@+id/fingerprint"
+            android:layout_alignLeft="@+id/accountName"
+            android:layout_below="@+id/accountName"/>
+</RelativeLayout>

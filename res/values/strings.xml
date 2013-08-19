@@ -72,6 +72,8 @@
     <string name="service_gui_CLOSE_CHAT">Close chat</string>
     <string name="service_gui_CLOSE_ALL_CHATS">Close all chats</string>
     <string name="service_gui_OK">Ok</string>
+    <string name="service_gui_YES">Yes</string>
+    <string name="service_gui_NO">No</string>
     <string name="service_gui_CANCEL">Cancel</string>
     <string name="service_gui_SEARCH">Search</string>
     <string name="service_gui_ADD_CONTACT">Add contact</string>
@@ -155,6 +157,9 @@
     <string name="plugin_otr_configform_COLUMN_NAME_VERIFIED_STATUS">Verified</string>
     <string name="plugin_otr_configform_COLUMN_VALUE_VERIFIED_TRUE">Yes</string>
     <string name="plugin_otr_configform_COLUMN_VALUE_VERIFIED_FALSE">No</string>
+    <string name="plugin_otr_configform_VERIFY_STATUS">Verified: %s</string>
+    <string name="plugin_otr_GENERATE_DLG_TITLE">Private key generation</string>
+    <string name="plugin_otr_REGENERATE_QUESTION">Do you want to re-generate key for %s</string>
     <string name="plugin_otr_activator_unverifiedsessionwarning">{0} is contacting you from an unrecognized computer. You should &lt;a href="jitsi://{1}/{2}?{3}">authenticate {0}&lt;/a>.</string>
     <string name="plugin_otr_activator_unverifiedsessionstared">&lt;b>Unverified&lt;/b> private conversation with {0} started.</string>
     <string name="plugin_otr_activator_sessionstared">Private conversation with {0} started.</string>
@@ -781,20 +786,26 @@
     <string name="service_gui_settings_CHAT_SECURITY_TITLE">Chat</string>
     <string name="service_gui_settings_CHAT_SECURITY_SUMMARY">Chat security settings</string>
     <!-- OTR Enable -->
-    <string name="pref_key_otr_enable">perf.key.otr.enable</string>
+    <string name="pref_key_otr_enable">pref.key.otr.enable</string>
     <string name="service_gui_settings_OTR_ENABLE_TITLE">Private messaging</string>
     <string name="service_gui_settings_OTR_ENABLE_ON">Messaging encryption enabled</string>
     <string name="service_gui_settings_OTR_ENABLE_OFF">No messaging encryption</string>
     <!-- OTR Auto -->
-    <string name="pref_key_otr_auto">perf.key.otr.auto</string>
+    <string name="pref_key_otr_auto">pref.key.otr.auto</string>
     <string name="service_gui_settings_OTR_AUTO_TITLE">Auto private messaging</string>
     <string name="service_gui_settings_OTR_AUTO_ON">Encrypts sessions automatically</string>
     <string name="service_gui_settings_OTR_AUTO_OFF">Session have to be encrypted manually</string>
     <!-- OTR Required -->
-    <string name="pref_key_otr_require">perf.key.otr.require</string>
+    <string name="pref_key_otr_require">pref.key.otr.require</string>
     <string name="service_gui_settings_OTR_REQUIRE_TITLE">Require private messaging</string>
     <string name="service_gui_settings_OTR_REQUIRE_ON">Only secure sessions will be accepted</string>
     <string name="service_gui_settings_OTR_REQUIRE_OFF">Secure messaging will be used if supported</string>
+    <!-- OTR private keys screen -->
+    <string name="service_gui_settings_OTR_PRIV_KEYS_TITLE">Private keys</string>
+    <string name="service_gui_settings_OTR_PRIV_KEYS_SUMMARY">Manage OTR private fingerprints</string>
+    <!-- OTR fingerprints screen -->
+    <string name="service_gui_settings_OTR_FINGERPRINTS_TITLE">Known fingerprints</string>
+    <string name="service_gui_settings_OTR_FINGERPRINTS_SUMMARY">Manage known fingerprints</string>
 
 
 </resources>

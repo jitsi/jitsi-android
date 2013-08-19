@@ -300,9 +300,19 @@ public class ChatFragment
                     // Return the last message.
                     ChatMessage chatMessage = getMessage(getCount() - 1);
 
-                    chatMessage.setMessage(
-                            chatMessage.getMessage() + " \n"
-                                    + newMessage.getMessage());    
+                    if(chatMessage.getContentType().equals(
+                            OperationSetBasicInstantMessaging.HTML_MIME_TYPE))
+                    {
+                        chatMessage.setMessage(
+                                chatMessage.getMessage() + " <br/>"
+                                        + newMessage.getMessage());
+                    }
+                    else
+                    {
+                        chatMessage.setMessage(
+                                chatMessage.getMessage() + " \n"
+                                        + newMessage.getMessage());
+                    }
                 }
             }
 

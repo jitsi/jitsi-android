@@ -153,7 +153,7 @@ public class OtrMetaContactButton
     }
 
     /*
-     * Implements PluginComponent#setCurrentContact(Contact).
+     * Implements PluginComponent#setCurrentChatSession(Contact).
      */
     @Override
     public void setCurrentContact(Contact contact)
@@ -175,7 +175,7 @@ public class OtrMetaContactButton
     }
 
     /*
-     * Implements PluginComponent#setCurrentContact(MetaContact).
+     * Implements PluginComponent#setCurrentChatSession(MetaContact).
      */
     @Override
     public void setCurrentContact(MetaContact metaContact)

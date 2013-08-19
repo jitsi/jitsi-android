@@ -23,6 +23,7 @@ import net.java.sip.communicator.util.account.*;
 
 import org.jitsi.android.*;
 import org.jitsi.android.gui.account.*;
+import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.gui.login.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.service.configuration.*;
@@ -126,6 +127,9 @@ public class AndroidGUIActivator
             throws Exception
     {
         presenceStatusHandler.stop(bundleContext);
+
+        // Clears chat sessions
+        ChatSessionManager.dispose();
 
         loginRenderer = null;
         loginManager = null;

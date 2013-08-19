@@ -67,21 +67,21 @@ public class OtrActivator
     public static ScOtrKeyManager scOtrKeyManager = new ScOtrKeyManagerImpl();
 
     /**
-     * The {@link org.jitsi.service.resources.ResourceManagementService} of the {@link OtrActivator}. Can
+     * The {@link ResourceManagementService} of the {@link OtrActivator}. Can
      * also be obtained from the {@link OtrActivator#bundleContext} on demand,
      * but we add it here for convenience.
      */
     public static ResourceManagementService resourceService;
 
     /**
-     * The {@link net.java.sip.communicator.service.gui.UIService} of the {@link OtrActivator}. Can also be obtained
+     * The {@link UIService} of the {@link OtrActivator}. Can also be obtained
      * from the {@link OtrActivator#bundleContext} on demand, but we add it here
      * for convenience.
      */
     public static UIService uiService;
 
     /**
-     * The {@link org.jitsi.service.configuration.ConfigurationService} of the {@link OtrActivator}. Can also be
+     * The {@link ConfigurationService} of the {@link OtrActivator}. Can also be
      * obtained from the {@link OtrActivator#bundleContext} on demand, but we
      * add it here for convenience.
      */
@@ -315,7 +315,7 @@ public class OtrActivator
     /**
      * Gets all the available accounts in SIP Communicator.
      *
-     * @return a {@link java.util.List} of {@link net.java.sip.communicator.service.protocol.AccountID}.
+     * @return a {@link List} of {@link AccountID}.
      */
     public static List<AccountID> getAllAccountIDs()
     {
@@ -339,10 +339,10 @@ public class OtrActivator
     }
 
     /**
-     * Gets an {@link net.java.sip.communicator.service.protocol.AccountID} by its UID.
+     * Gets an {@link AccountID} by its UID.
      *
-     * @param uid The {@link net.java.sip.communicator.service.protocol.AccountID} UID.
-     * @return The {@link net.java.sip.communicator.service.protocol.AccountID} with the requested UID or null.
+     * @param uid The {@link AccountID} UID.
+     * @return The {@link AccountID} with the requested UID or null.
      */
     public static AccountID getAccountIDByUID(String uid)
     {

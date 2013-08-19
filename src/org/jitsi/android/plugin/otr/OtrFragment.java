@@ -6,20 +6,17 @@
  */
 package org.jitsi.android.plugin.otr;
 
-import android.os.*;
 import android.view.*;
 
 import net.java.otr4j.*;
 import net.java.otr4j.session.*;
 
 import net.java.sip.communicator.service.contactlist.*;
-import net.java.sip.communicator.service.gui.*;
-import net.java.sip.communicator.service.gui.event.*;
 import net.java.sip.communicator.service.protocol.*;
 
 import org.jitsi.*;
 import org.jitsi.android.gui.chat.*;
-import org.jitsi.android.gui.util.*;
+import org.jitsi.android.gui.util.event.*;
 import org.jitsi.service.osgi.*;
 
 /**
@@ -28,9 +25,18 @@ import org.jitsi.service.osgi.*;
  */
 public class OtrFragment
     extends OSGiFragment
-    implements ChatListener
 {
     private Menu menu;
+
+    private EventListener<String> activeChatListener
+            = new EventListener<String>()
+    {
+        @Override
+        public void onChangeEvent(String eventObject)
+        {
+            setCurrentChatSession(eventObject);
+        }
+    };
 
     public OtrFragment()
     {
@@ -51,19 +57,15 @@ public class OtrFragment
         OtrActivator.scOtrEngine.addListener(scOtrEngineListener);
         OtrActivator.scOtrKeyManager.addListener(scOtrKeyManagerListener);
 
-        ChatSessionManager.addChatListener(this);
+        ChatSessionManager.addActiveChatListener(activeChatListener);
 
-        ChatSession chatSession
-                = ChatSessionManager.getActiveChat(
-                        ChatSessionManager.getCurrentChatSession());
-
-        setCurrentContact(chatSession.getMetaContact());
+        setCurrentChatSession(ChatSessionManager.getCurrentChatSession());
     }
 
     @Override
     public void onPause()
     {
-        ChatSessionManager.removeChatListener(this);
+        ChatSessionManager.removeActiveChatListener(activeChatListener);
 
         OtrActivator.scOtrEngine.removeListener(scOtrEngineListener);
         OtrActivator.scOtrKeyManager.removeListener(scOtrKeyManagerListener);
@@ -155,9 +157,6 @@ public class OtrFragment
                 }
             };
 
-    /*
-     * Implements PluginComponent#setCurrentContact(Contact).
-     */
     public void setCurrentContact(Contact contact)
     {
         if (this.currentContact == contact)
@@ -176,13 +175,18 @@ public class OtrFragment
         }
     }
 
-    /*
-     * Implements PluginComponent#setCurrentContact(MetaContact).
-     */
-    public void setCurrentContact(MetaContact metaContact)
+    public void setCurrentChatSession(String chatSessionKey)
     {
-        setCurrentContact((metaContact == null) ? null : metaContact
-                .getDefaultContact());
+        ChatSession activeChat
+            = ChatSessionManager.getActiveChat(chatSessionKey);
+
+        MetaContact metaContact
+            = activeChat != null
+                    ? activeChat.getMetaContact() : null;
+
+        setCurrentContact(
+            (metaContact != null)
+                    ? metaContact.getDefaultContact() : null);
     }
 
     /**
@@ -245,23 +249,5 @@ public class OtrFragment
     public MenuItem getButton()
     {
         return menu.findItem(R.id.otr_padlock);
-    }
-
-    @Override
-    public void chatClosed(Chat chat)
-    {
-        ChatSession chatSession = (ChatSession) chat;
-        if(chatSession.getMetaContact().containsContact(currentContact))
-        {
-            // Close session
-            setCurrentContact((Contact)null);
-        }
-    }
-
-    @Override
-    public void chatCreated(Chat chat)
-    {
-        ChatSession chatSession = (ChatSession) chat;
-        setCurrentContact(chatSession.getMetaContact());
     }
 }

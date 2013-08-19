@@ -328,6 +328,20 @@ public class ChatMessage
         this.messageType = msgType;
     }
 
+    public ChatMessage clone()
+    {
+        return new ChatMessage(
+                        contactName,
+                        contactDisplayName,
+                        date,
+                        messageType,
+                        messageTitle,
+                        message,
+                        contentType,
+                        messageUID,
+                        correctedMessageUID);
+    }
+
     /**
      * Returns the message type corresponding to the given
      * <tt>MessageReceivedEvent</tt>.

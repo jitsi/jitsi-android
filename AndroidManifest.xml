@@ -103,6 +103,20 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".android.gui.settings.OtrPrivatekeys"
+                  android:label="@string/service_gui_settings_OTR_PRIV_KEYS_TITLE">
+            <intent-filter>
+                <action android:name=".android.gui.settings.OtrPrivatekeys" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".android.gui.settings.OtrFingerprints"
+                  android:label="@string/service_gui_settings_OTR_FINGERPRINTS_TITLE">
+            <intent-filter>
+                <action android:name=".android.gui.settings.OtrFingerprints" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <activity android:name=".android.gui.account.settings.AccountPreferencesActivity"
                   android:label="@string/app_name">
         </activity>

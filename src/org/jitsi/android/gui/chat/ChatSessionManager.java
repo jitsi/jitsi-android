@@ -13,8 +13,10 @@ import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.gui.*;
 import net.java.sip.communicator.service.gui.event.*;
 import net.java.sip.communicator.service.protocol.*;
-import org.jitsi.android.*;
+
 import org.jitsi.android.gui.*;
+import org.jitsi.android.gui.util.event.*;
+import org.jitsi.android.gui.util.event.EventListener;
 
 /**
  * The <tt>ChatSessionManager</tt> managing active chat sessions.
@@ -39,6 +41,12 @@ public class ChatSessionManager
      */
     private static final List<ChatListener> chatListeners
         = new ArrayList<ChatListener>();
+
+    /**
+     * The list of active chats.
+     */
+    private static final EventListenerList<String> activeChatListeners
+            = new EventListenerList<String>();
 
     /**
      * The list of chat link listeners.
@@ -178,6 +186,9 @@ public class ChatSessionManager
     public synchronized static void setCurrentChatSession(String chatId)
     {
         currentChatId = chatId;
+
+        // Notifies about active session switch
+        activeChatListeners.notifyEventListeners(chatId);
     }
 
     /**
@@ -224,7 +235,18 @@ public class ChatSessionManager
         }
     }
 
-    public synchronized static Chat findChatForContact(Contact contact, boolean startIfNotExists)
+    public static void addActiveChatListener(EventListener<String> l)
+    {
+        activeChatListeners.addEventListener(l);
+    }
+
+    public static void removeActiveChatListener(EventListener<String> l)
+    {
+        activeChatListeners.removeEventListener(l);
+    }
+
+    public synchronized static Chat findChatForContact(Contact contact,
+                                                       boolean startIfNotExists)
     {
         for(ChatSession chat : activeChats.values())
         {
@@ -272,5 +294,16 @@ public class ChatSessionManager
         {
             l.chatLinkClicked(uri);
         }
+    }
+
+    /**
+     * Disposes of static resources held by this instance.
+     */
+    public synchronized static void dispose()
+    {
+        chatLinkListeners.clear();
+        chatListeners.clear();
+        activeChatListeners.clear();
+        activeChats.clear();
     }
 }
