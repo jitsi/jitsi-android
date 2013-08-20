@@ -120,7 +120,8 @@ public class OSGiActivity
             }
         }
 
-        ActionBarUtil.setTitle(this, getTitle());
+        if (getActionBar() != null)
+            ActionBarUtil.setTitle(this, getTitle());
 
         super.onCreate(savedInstanceState);
 
