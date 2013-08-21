@@ -10,13 +10,13 @@ import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
 
+import net.java.sip.communicator.plugin.otr.*;
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.*;
 
 import org.jitsi.*;
 import org.jitsi.android.gui.util.*;
-import org.jitsi.android.plugin.otr.*;
 import org.jitsi.service.osgi.*;
 
 import org.osgi.framework.*;
@@ -24,12 +24,17 @@ import org.osgi.framework.*;
 import java.util.*;
 
 /**
+ * Settings screen with known OTR fingerprints for all contacts.
+ *
  * @author Pawel Domas
  */
 public class OtrFingerprints
     extends OSGiActivity
 {
-    private FingerprintListAdapater adapter;
+    /**
+     * Fingerprints adapter instance.
+     */
+    private FingerprintListAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -38,7 +43,7 @@ public class OtrFingerprints
 
         setContentView(R.layout.list_layout);
 
-        this.adapter = new FingerprintListAdapater(getContacts());
+        this.adapter = new FingerprintListAdapter(getContacts());
 
         ListView fingerprintsList = ((ListView)findViewById(R.id.list));
 
@@ -47,6 +52,11 @@ public class OtrFingerprints
         registerForContextMenu(fingerprintsList);
     }
 
+    /**
+     * Gets the list of all known contacts.
+     *
+     * @return the list of all known contacts.
+     */
     List<Contact> getContacts()
     {
         java.util.List<Contact> allContacts = new Vector<Contact>();
@@ -89,6 +99,9 @@ public class OtrFingerprints
         return allContacts;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo)
@@ -110,13 +123,19 @@ public class OtrFingerprints
         menu.findItem(R.id.forget).setEnabled(isVerified);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean onContextItemSelected(MenuItem item)
     {
         AdapterView.AdapterContextMenuInfo info
                 = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
         Contact contact = (Contact) adapter.getItem(info.position);
+
         int id = item.getItemId();
+
         if(id == R.id.forget)
         {
             OtrActivator.scOtrKeyManager.unverify(contact);
@@ -133,38 +152,63 @@ public class OtrFingerprints
 
             return true;
         }
+
         return super.onContextItemSelected(item);
     }
 
-    class FingerprintListAdapater
+    /**
+     * Adapter displays fingerprints for given list of <tt>Contact</tt>s.
+     */
+    class FingerprintListAdapter
         extends BaseAdapter
     {
 
+        /**
+         * The list of currently displayed contacts.
+         */
         private final List<Contact> contacts;
 
-        FingerprintListAdapater(List<Contact> contacts)
+        /**
+         * Creates new instance of <tt>FingerprintListAdapter</tt>.
+         *
+         * @param contacts list of <tt>Contact</tt> for which OTR fingerprints
+         *                 will be displayed.
+         */
+        FingerprintListAdapter(List<Contact> contacts)
         {
             this.contacts = contacts;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int getCount()
         {
             return contacts.size();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Object getItem(int position)
         {
             return contacts.get(position);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public long getItemId(int position)
         {
             return position;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public View getView(int position, View convertView, ViewGroup parent)
         {

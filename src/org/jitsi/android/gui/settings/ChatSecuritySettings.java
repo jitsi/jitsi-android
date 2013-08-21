@@ -8,16 +8,19 @@ package org.jitsi.android.gui.settings;
 
 import android.content.*;
 import android.os.Bundle;
+
 import net.java.otr4j.*;
+import net.java.sip.communicator.plugin.otr.*;
 import net.java.sip.communicator.util.*;
+
 import org.jitsi.*;
 import org.jitsi.android.*;
-import org.jitsi.android.gui.settings.util.*;
 import org.jitsi.android.gui.util.*;
-import org.jitsi.android.plugin.otr.*;
 import org.jitsi.service.osgi.*;
 
 /**
+ * Chat security settings screen with OTR preferences.
+ *
  * @author Pawel Domas
  */
 public class ChatSecuritySettings
@@ -58,17 +61,12 @@ public class ChatSecuritySettings
     }
 
     /**
-     * The preferences fragment implements Jitsi settings.
+     * The preferences fragment implements OTR settings.
      */
     public static class SettingsFragment
             extends OSGiPreferenceFragment
             implements SharedPreferences.OnSharedPreferenceChangeListener
     {
-        /**
-         * Summary mapper used to display preferences values as summaries.
-         */
-        private SummaryMapper summaryMapper = new SummaryMapper();
-
         /**
          * {@inheritDoc}
          */
@@ -88,36 +86,6 @@ public class ChatSecuritySettings
         {
             super.onStart();
 
-            // Messages section
-            initOtrPreferences();
-
-            SharedPreferences shPrefs = getPreferenceManager()
-                    .getSharedPreferences();
-
-            shPrefs.registerOnSharedPreferenceChangeListener(this);
-            shPrefs.registerOnSharedPreferenceChangeListener(summaryMapper);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void onStop()
-        {
-            SharedPreferences shPrefs = getPreferenceManager()
-                    .getSharedPreferences();
-
-            shPrefs.unregisterOnSharedPreferenceChangeListener(this);
-            shPrefs.unregisterOnSharedPreferenceChangeListener(summaryMapper);
-
-            super.onStop();
-        }
-
-        /**
-         * Initializes messages section
-         */
-        private void initOtrPreferences()
-        {
             OtrPolicy otrPolicy = OtrActivator.scOtrEngine.getGlobalPolicy();
 
             PreferenceUtil.setCheckboxVal(
@@ -131,6 +99,25 @@ public class ChatSecuritySettings
             PreferenceUtil.setCheckboxVal(
                     this, P_KEY_OTR_REQUIRE,
                     otrPolicy.getRequireEncryption());
+
+            SharedPreferences shPrefs = getPreferenceManager()
+                    .getSharedPreferences();
+
+            shPrefs.registerOnSharedPreferenceChangeListener(this);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void onStop()
+        {
+            SharedPreferences shPrefs = getPreferenceManager()
+                    .getSharedPreferences();
+
+            shPrefs.unregisterOnSharedPreferenceChangeListener(this);
+
+            super.onStop();
         }
 
         /**

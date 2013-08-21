@@ -11,6 +11,7 @@ import android.view.*;
 import net.java.otr4j.*;
 import net.java.otr4j.session.*;
 
+import net.java.sip.communicator.plugin.otr.*;
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.protocol.*;
 
@@ -20,14 +21,24 @@ import org.jitsi.android.gui.util.event.*;
 import org.jitsi.service.osgi.*;
 
 /**
+ * Fragment when added to <tt>Activity</tt> will display the padlock allowing
+ * user to control OTR chat status. Only currently active chat is handled by
+ * this fragment.
  *
  * @author Pawel Domas
  */
 public class OtrFragment
     extends OSGiFragment
 {
+    /**
+     * Menu instance used to control the padlock.
+     */
     private Menu menu;
 
+    /**
+     * Active chat session listener. Updates the padlock when active
+     * chat is switched.
+     */
     private EventListener<String> activeChatListener
             = new EventListener<String>()
     {
@@ -38,11 +49,17 @@ public class OtrFragment
         }
     };
 
+    /**
+     * Creates new instance of <tt>OtrFragment</tt>.
+     */
     public OtrFragment()
     {
         setHasOptionsMenu(true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onResume()
     {
@@ -52,6 +69,9 @@ public class OtrFragment
             doInit();
     }
 
+    /**
+     * Initializes the padlock and registers listeners.
+     */
     private void doInit()
     {
         OtrActivator.scOtrEngine.addListener(scOtrEngineListener);
@@ -62,6 +82,9 @@ public class OtrFragment
         setCurrentChatSession(ChatSessionManager.getCurrentChatSession());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onPause()
     {
@@ -73,6 +96,9 @@ public class OtrFragment
         super.onPause();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
@@ -83,9 +109,13 @@ public class OtrFragment
 
         this.menu = menu;
 
+        // Initialize the padlock when new menu is created
         doInit();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
@@ -110,53 +140,67 @@ public class OtrFragment
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Contact for currently active chat session.
+     */
     private Contact currentContact;
 
+    /**
+     * OTR engine listener.
+     */
     private final ScOtrEngineListener scOtrEngineListener =
             new ScOtrEngineListener()
+    {
+        public void sessionStatusChanged(Contact contact)
+        {
+            // OtrMetaContactButton.this.contact can be null.
+            if (contact.equals(currentContact))
             {
-                public void sessionStatusChanged(Contact contact)
-                {
-                    // OtrMetaContactButton.this.contact can be null.
-                    if (contact.equals(currentContact))
-                    {
-                        setStatus(
-                                OtrActivator.scOtrEngine.getSessionStatus(contact));
-                    }
-                }
+                setStatus(
+                    OtrActivator.scOtrEngine.getSessionStatus(contact));
+            }
+        }
 
-                public void contactPolicyChanged(Contact contact)
-                {
-                    // OtrMetaContactButton.this.contact can be null.
-                    if (contact.equals(currentContact))
-                    {
-                        setPolicy(
-                                OtrActivator.scOtrEngine.getContactPolicy(contact));
-                    }
-                }
+        public void contactPolicyChanged(Contact contact)
+        {
+            // OtrMetaContactButton.this.contact can be null.
+            if (contact.equals(currentContact))
+            {
+                setPolicy(
+                    OtrActivator.scOtrEngine.getContactPolicy(contact));
+            }
+        }
 
-                public void globalPolicyChanged()
-                {
-                    if (currentContact != null)
-                        setPolicy(
-                                OtrActivator.scOtrEngine.getContactPolicy(currentContact));
-                }
-            };
+        public void globalPolicyChanged()
+        {
+            if (currentContact != null)
+                setPolicy(
+                    OtrActivator.scOtrEngine.getContactPolicy(currentContact));
+        }
+    };
 
+    /**
+     * OTR key manager listener.
+     */
     private final ScOtrKeyManagerListener scOtrKeyManagerListener =
-            new ScOtrKeyManagerListener()
+    new ScOtrKeyManagerListener()
+    {
+        public void contactVerificationStatusChanged(Contact contact)
+        {
+            // OtrMetaContactButton.this.contact can be null.
+            if (contact.equals(currentContact))
             {
-                public void contactVerificationStatusChanged(Contact contact)
-                {
-                    // OtrMetaContactButton.this.contact can be null.
-                    if (contact.equals(currentContact))
-                    {
-                        setStatus(
-                                OtrActivator.scOtrEngine.getSessionStatus(contact));
-                    }
-                }
-            };
+                setStatus(
+                        OtrActivator.scOtrEngine.getSessionStatus(contact));
+            }
+        }
+    };
 
+    /**
+     * Sets the current <tt>Contact</tt> and updates status and policy.
+     *
+     * @param contact new <tt>Contact</tt> to be used.
+     */
     public void setCurrentContact(Contact contact)
     {
         this.currentContact = contact;
@@ -172,6 +216,13 @@ public class OtrFragment
         }
     }
 
+    /**
+     * Sets current <tt>ChatSession</tt> identified by given
+     * <tt>chatSessionKey</tt>.
+     *
+     * @param chatSessionKey chat session key managed by
+     *                       <tt>ChatSessionManager</tt>
+     */
     public void setCurrentChatSession(String chatSessionKey)
     {
         ChatSession activeChat
@@ -199,7 +250,7 @@ public class OtrFragment
             @Override
             public void run()
             {
-                getButton().setEnabled(
+                getPadlock().setEnabled(
                         contactPolicy != null
                                 && contactPolicy.getEnableManual());
             }
@@ -208,7 +259,7 @@ public class OtrFragment
     }
 
     /**
-     * Sets the button icon according to the passed in {@link SessionStatus}.
+     * Sets the padlock icon according to the passed in {@link SessionStatus}.
      *
      * @param status the {@link SessionStatus}.
      */
@@ -218,10 +269,9 @@ public class OtrFragment
         switch (status)
         {
             case ENCRYPTED:
-                iconId
-                        = OtrActivator.scOtrKeyManager.isVerified(currentContact)
-                        ? R.drawable.encrypted_verified
-                        : R.drawable.encrypted_unverified;
+                iconId = OtrActivator.scOtrKeyManager.isVerified(currentContact)
+                       ? R.drawable.encrypted_verified
+                       : R.drawable.encrypted_unverified;
                 break;
             case FINISHED:
                 iconId = R.drawable.encrypted_finished;
@@ -238,12 +288,16 @@ public class OtrFragment
             @Override
             public void run()
             {
-                getButton().setIcon(iconId);
+                getPadlock().setIcon(iconId);
             }
         });
     }
 
-    public MenuItem getButton()
+    /**
+     * Gets the <tt>MenuItem</tt> used for the padlock.
+     * @return the <tt>MenuItem</tt> used for the padlock.
+     */
+    public MenuItem getPadlock()
     {
         return menu.findItem(R.id.otr_padlock);
     }

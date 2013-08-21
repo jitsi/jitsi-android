@@ -12,16 +12,18 @@ import android.os.*;
 import android.view.*;
 import android.widget.*;
 
+import net.java.sip.communicator.plugin.otr.*;
 import net.java.sip.communicator.service.protocol.*;
 
 import org.jitsi.*;
 import org.jitsi.android.gui.util.*;
-import org.jitsi.android.plugin.otr.*;
 import org.jitsi.service.osgi.*;
 
 import java.util.*;
 
 /**
+ * Settings screen which displays local OTR private keys.
+ * Allows user to generate new ones.
  *
  * @author Pawel Domas
  */
@@ -29,8 +31,14 @@ public class OtrPrivatekeys
         extends OSGiActivity
 {
 
-    private PrivateKeyListAdapater accountsAdapter;
+    /**
+     * Adapter used to displays OTR private keys for all accounts.
+     */
+    private PrivateKeyListAdapter accountsAdapter;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -38,21 +46,13 @@ public class OtrPrivatekeys
 
         setContentView(R.layout.list_layout);
 
-        initAccountSpinner();
-    }
-
-    /**
-     * Initializes "select account" spinner with existing accounts.
-     */
-    private void initAccountSpinner()
-    {
         ListView accountsKeysList
                 = (ListView) findViewById(R.id.list);
 
         List<AccountID> accounts = OtrActivator.getAllAccountIDs();
 
         this.accountsAdapter
-                = new PrivateKeyListAdapater(accounts);
+                = new PrivateKeyListAdapter(accounts);
 
         accountsKeysList.setAdapter(accountsAdapter);
 
@@ -69,6 +69,12 @@ public class OtrPrivatekeys
         });
     }
 
+    /**
+     * Displays alert asking user if he wants to generate new private key.
+     *
+     * @param position the position of <tt>AccountID</tt> in adapter's list
+     *                 which has to be used in the alert.
+     */
     private void showGenerateKeyAlert(int position)
     {
         final AccountID account = (AccountID) accountsAdapter.getItem(position);
@@ -108,35 +114,62 @@ public class OtrPrivatekeys
                 .show();
     }
 
-    class PrivateKeyListAdapater
+    /**
+     * Adapter which displays OTR private keys for given list of
+     * <tt>AccountID</tt>s.
+     *
+     */
+    class PrivateKeyListAdapter
         extends BaseAdapter
     {
 
+        /**
+         * List of <tt>AccountID</tt> for which the private keys are being
+         * displayed.
+         */
         private final List<AccountID> accountIDs;
 
-        PrivateKeyListAdapater(List<AccountID> accountIDs)
+        /**
+         * Creates new instance of <tt>PrivateKeyListAdapter</tt>.
+         *
+         * @param accountIDs the list of <tt>AccountID</tt>s for which OTR
+         *                   private keys will be displayed by this adapter.
+         */
+        PrivateKeyListAdapter(List<AccountID> accountIDs)
         {
             this.accountIDs = accountIDs;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int getCount()
         {
             return accountIDs.size();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Object getItem(int position)
         {
             return accountIDs.get(position);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public long getItemId(int position)
         {
             return position;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public View getView(int position, View convertView, ViewGroup parent)
         {
