@@ -77,8 +77,8 @@ public class OtrPrivatekeys
 
         int getResStrId = OtrActivator.scOtrKeyManager
                 .getLocalFingerprint(account) != null
-                ? R.string.plugin_otr_GENERATE_DLG_TITLE
-                : R.string.plugin_otr_REGENERATE_QUESTION;
+                ? R.string.plugin_otr_REGENERATE_QUESTION
+                : R.string.plugin_otr_GENERATE_QUESTION;
 
         b.setTitle(getString(R.string.plugin_otr_GENERATE_DLG_TITLE))
                 .setMessage(getString(getResStrId, account.getDisplayName()))

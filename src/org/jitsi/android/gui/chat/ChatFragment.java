@@ -154,8 +154,6 @@ public class ChatFragment
         if (chatId != null && chatId.length() > 0)
         {
             chatSession = ChatSessionManager.getActiveChat(chatId);
-
-            initAdapter();
         }
 
         return content;
@@ -175,6 +173,8 @@ public class ChatFragment
     public void onResume()
     {
         super.onResume();
+
+        initAdapter();
 
         chatSession.addMessageListener(chatListAdapter);
         chatSession.addContactStatusListener(chatListAdapter);
@@ -630,6 +630,14 @@ public class ChatFragment
             TypingNotificationHandler
                 .handleTypingNotificationReceived(evt, ChatFragment.this);
         }
+
+        /**
+         * Removes all messages from the adapter
+         */
+        public void removeAllMessages()
+        {
+            messages.clear();
+        }
     }
 
     static class MessageViewHolder
@@ -691,13 +699,15 @@ public class ChatFragment
         @Override
         protected Collection<ChatMessage> doInBackground(Void... params)
         {
-            return chatSession.getHistory(10);
+            return chatSession.getHistory();
         }
 
         @Override
         protected void onPostExecute(Collection<ChatMessage> result)
         {
             super.onPostExecute(result);
+
+            chatListAdapter.removeAllMessages();
 
             Iterator<ChatMessage> iterator = result.iterator();
 

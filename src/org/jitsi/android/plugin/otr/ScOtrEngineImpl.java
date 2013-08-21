@@ -8,9 +8,12 @@ package org.jitsi.android.plugin.otr;
 
 import net.java.otr4j.*;
 import net.java.otr4j.session.*;
+
 import net.java.sip.communicator.service.browserlauncher.*;
 import net.java.sip.communicator.service.gui.*;
 import net.java.sip.communicator.service.protocol.*;
+import net.java.sip.communicator.util.*;
+
 import org.osgi.framework.*;
 
 import java.net.*;
@@ -26,6 +29,11 @@ public class ScOtrEngineImpl
     implements ScOtrEngine,
                ChatLinkClickedListener
 {
+    /**
+     * The logger
+     */
+    private final Logger logger = Logger.getLogger(ScOtrEngineImpl.class);
+
     private static ScOtrEngineImpl instance;
 
     private final OtrConfigurator configurator = new OtrConfigurator();
@@ -308,6 +316,7 @@ public class ScOtrEngineImpl
         }
         catch (OtrException e)
         {
+            logger.error("Error receiving the message", e);
             showError(sessionID, e.getMessage());
             return null;
         }
@@ -322,6 +331,7 @@ public class ScOtrEngineImpl
         }
         catch (OtrException e)
         {
+            logger.error("Error transforming the message", e);
             showError(sessionID, e.getMessage());
             return null;
         }
@@ -336,6 +346,7 @@ public class ScOtrEngineImpl
         }
         catch (OtrException e)
         {
+            logger.error("Error refreshing session", e);
             showError(sessionID, e.getMessage());
         }
     }
@@ -349,6 +360,7 @@ public class ScOtrEngineImpl
         }
         catch (OtrException e)
         {
+            logger.error("Error starting session", e);
             showError(sessionID, e.getMessage());
         }
     }

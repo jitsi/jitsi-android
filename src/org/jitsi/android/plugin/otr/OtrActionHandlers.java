@@ -38,7 +38,7 @@ class OtrActionHandlers
         //authenticateBuddyDialog.setVisible(true);
     }
 
-    public static void openAuthDialog(UUID guid)
+    static void openAuthDialog(UUID guid)
     {
         JitsiApplication.getGlobalContext()
                 .startActivity(

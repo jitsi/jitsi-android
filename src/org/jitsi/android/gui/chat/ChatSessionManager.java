@@ -279,7 +279,8 @@ public class ChatSessionManager
     public synchronized static void addChatLinkListener(
             ChatLinkClickedListener chatLinkClickedListener)
     {
-        chatLinkListeners.add(chatLinkClickedListener);
+        if(!chatLinkListeners.contains(chatLinkClickedListener))
+            chatLinkListeners.add(chatLinkClickedListener);
     }
 
     public synchronized static void removeChatLinkListener(

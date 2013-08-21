@@ -32,6 +32,13 @@ public class ChatSession
     implements Chat, MessageListener
 {
     /**
+     * Number of history messages returned from loadHistory call.
+     * Used to limit number of stored system messages.
+     *
+     * TODO: use history settings instead of constant
+     */
+    private static final int HISTORY_LIMIT = 10;
+    /**
      * The chat identifier.
      */
     private String chatId;
@@ -280,12 +287,11 @@ public class ChatSession
     }
 
     /**
-     * Returns a collection of the last N number of messages given by count.
+     * Returns a collection of last messages.
      *
-     * @param count The number of messages from history to return.
-     * @return a collection of the last N number of messages given by count.
+     * @return a collection of last messages.
      */
-    public Collection<ChatMessage> getHistory(int count)
+    public Collection<ChatMessage> getHistory()
     {
         final MetaHistoryService metaHistory
             = AndroidGUIActivator.getMetaHistoryService();
@@ -300,7 +306,7 @@ public class ChatSession
                     metaHistory.findLast(
                         chatHistoryFilter,
                         metaContact,
-                        10), 15);
+                        HISTORY_LIMIT), HISTORY_LIMIT);
     }
 
     /**
@@ -336,39 +342,39 @@ public class ChatSession
 
         // Merge sorts history and inserted messages
         ArrayList<ChatMessage> output = new ArrayList<ChatMessage>();
-        int historyIdx=0;
-        int insertedIdx=0;
+        int historyIdx = historyMsgs.size()-1;
+        int insertedIdx = insertedMessages.size()-1;
 
-        while(historyIdx < historyMsgs.size()
-                && insertedIdx < insertedMessages.size()
+        while(historyIdx >= 0
+                && insertedIdx >= 0
                 && output.size() < msgLimit)
         {
             ChatMessage historyMsg = historyMsgs.get(historyIdx);
             ChatMessage insertedMsg = insertedMessages.get(insertedIdx);
 
-            if(historyMsg.getDate().before(insertedMsg.getDate()))
+            if(historyMsg.getDate().after(insertedMsg.getDate()))
             {
-                output.add(historyMsg);
-                historyIdx++;
+                output.add(0, historyMsg);
+                historyIdx--;
             }
             else
             {
                 // Inserted messages have to be cloned in order to prevent
                 // original message text modification
-                output.add(insertedMsg.clone());
-                insertedIdx++;
+                output.add(0, insertedMsg.clone());
+                insertedIdx--;
             }
         }
 
         // Input remaining history messages
-        while(historyIdx < historyMsgs.size()
+        while(historyIdx >= 0
                 && output.size() < msgLimit)
-            output.add(historyMsgs.get(historyIdx++));
+            output.add(0, historyMsgs.get(historyIdx--));
 
         // Input remaining "inserted" messages
-        while(insertedIdx < insertedMessages.size()
+        while(insertedIdx >= 0
                 && output.size() < msgLimit)
-            output.add(insertedMessages.get(insertedIdx++).clone());
+            output.add(0, insertedMessages.get(insertedIdx--).clone());
 
         return output;
     }
@@ -476,6 +482,9 @@ public class ChatSession
                                               chatMsgType, message,
                                               contentType);
         insertedMessages.add(chatMsg);
+
+        if(insertedMessages.size() > HISTORY_LIMIT)
+            insertedMessages.remove(0);
 
         for(ChatSessionListener l : msgListeners)
         {

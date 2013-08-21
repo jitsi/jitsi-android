@@ -13,6 +13,7 @@ import net.java.sip.communicator.service.protocol.*;
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.util.*;
+import org.jitsi.android.plugin.otr.*;
 import org.jitsi.service.osgi.*;
 
 import android.os.*;
@@ -72,6 +73,15 @@ public class ChatActivity
         chatPager.setOffscreenPageLimit(4);
 
         chatPager.setOnPageChangeListener(this);
+
+        if(savedInstanceState == null)
+        {
+            // OTR menu padlock
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(new OtrFragment(), "otr_fragment")
+                    .commit();
+        }
     }
 
     /**

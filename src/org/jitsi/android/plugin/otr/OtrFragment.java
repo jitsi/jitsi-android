@@ -159,9 +159,6 @@ public class OtrFragment
 
     public void setCurrentContact(Contact contact)
     {
-        if (this.currentContact == contact)
-            return;
-
         this.currentContact = contact;
         if (contact != null)
         {

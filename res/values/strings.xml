@@ -159,6 +159,7 @@
     <string name="plugin_otr_configform_COLUMN_VALUE_VERIFIED_FALSE">No</string>
     <string name="plugin_otr_configform_VERIFY_STATUS">Verified: %s</string>
     <string name="plugin_otr_GENERATE_DLG_TITLE">Private key generation</string>
+    <string name="plugin_otr_GENERATE_QUESTION">Do you want to generate key for %s</string>
     <string name="plugin_otr_REGENERATE_QUESTION">Do you want to re-generate key for %s</string>
     <string name="plugin_otr_activator_unverifiedsessionwarning">{0} is contacting you from an unrecognized computer. You should &lt;a href="jitsi://{1}/{2}?{3}">authenticate {0}&lt;/a>.</string>
     <string name="plugin_otr_activator_unverifiedsessionstared">&lt;b>Unverified&lt;/b> private conversation with {0} started.</string>
