@@ -69,9 +69,7 @@ public class ConnectivityManagerListenerImpl
      */
     public void stop()
     {
-        Context context = ServiceUtils.getService(
-            SysActivityActivator.getBundleContext(),
-            OSGiService.class);
+        Context context = JitsiApplication.getGlobalContext();
         context.unregisterReceiver(this);
 
         connected = false;
