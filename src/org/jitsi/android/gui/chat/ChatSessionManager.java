@@ -14,6 +14,7 @@ import net.java.sip.communicator.service.gui.*;
 import net.java.sip.communicator.service.gui.event.*;
 import net.java.sip.communicator.service.protocol.*;
 
+import net.java.sip.communicator.util.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.util.event.*;
 import org.jitsi.android.gui.util.event.EventListener;
@@ -126,6 +127,25 @@ public class ChatSessionManager
     }
 
     /**
+     * Returns active <tt>ChatSession</tt> for given <tt>Contact</tt>.
+     * @param contact the <tt>Contact</tt> for which we want to find active
+     *                session.
+     * @return active <tt>ChatSession</tt> for given <tt>Contact</tt>.
+     */
+    public synchronized static ChatSession getActiveChat(Contact contact)
+    {
+        MetaContactListService metaContactList
+            = ServiceUtils.getService(
+                    AndroidGUIActivator.bundleContext,
+                    MetaContactListService.class);
+
+        MetaContact metaContact
+            = metaContactList.findMetaContactByContact(contact);
+
+        return getActiveChat(metaContact);
+    }
+
+    /**
      * Returns the <tt>ChatSession</tt> corresponding to the given
      * <tt>MetaContact</tt>.
      *
@@ -183,7 +203,7 @@ public class ChatSessionManager
      *
      * @param chatId the identifier of the current chat session
      */
-    public synchronized static void setCurrentChatSession(String chatId)
+    public synchronized static void setCurrentChatId(String chatId)
     {
         currentChatId = chatId;
 
@@ -196,9 +216,18 @@ public class ChatSessionManager
      *
      * @return the identifier of the current chat session
      */
-    public synchronized static String getCurrentChatSession()
+    public synchronized static String getCurrentChatId()
     {
         return currentChatId;
+    }
+
+    /**
+     * Returns currently active <tt>ChatSession</tt>.
+     * @return currently active <tt>ChatSession</tt>.
+     */
+    public synchronized static ChatSession getCurrentChatSession()
+    {
+        return getActiveChat(currentChatId);
     }
 
     /**

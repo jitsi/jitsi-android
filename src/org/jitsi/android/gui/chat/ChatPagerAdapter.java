@@ -60,7 +60,7 @@ public class ChatPagerAdapter
         {
             String chatId = activeChatsIter.next();
             int index = addChatFragment(ChatFragment.newInstance(chatId));
-            if (ChatSessionManager.getCurrentChatSession().equals(chatId))
+            if (ChatSessionManager.getCurrentChatId().equals(chatId))
                 selectedIndex = index;
         }
     }

@@ -317,8 +317,7 @@ public class AndroidUIServiceImpl
      */
     public Chat getCurrentChat()
     {
-        String currentchatID = ChatSessionManager.getCurrentChatSession();
-        return ChatSessionManager.getActiveChat(currentchatID);
+        return ChatSessionManager.getCurrentChatSession();
     }
 
     /**

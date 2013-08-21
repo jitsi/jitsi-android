@@ -79,7 +79,7 @@ public class OtrFragment
 
         ChatSessionManager.addActiveChatListener(activeChatListener);
 
-        setCurrentChatSession(ChatSessionManager.getCurrentChatSession());
+        setCurrentChatSession(ChatSessionManager.getCurrentChatId());
     }
 
     /**

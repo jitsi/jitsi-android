@@ -1262,9 +1262,9 @@ public class ContactListAdapter
 
     private boolean isContactSelected(MetaContact metaContact)
     {
-        return ChatSessionManager.getCurrentChatSession() != null
+        return ChatSessionManager.getCurrentChatId() != null
             && ChatSessionManager.getActiveChat(metaContact) != null
-            && ChatSessionManager.getCurrentChatSession().equals(
+            && ChatSessionManager.getCurrentChatId().equals(
             ChatSessionManager.getActiveChat(metaContact).getChatId());
     }
 

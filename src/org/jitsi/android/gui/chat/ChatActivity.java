@@ -211,8 +211,9 @@ public class ChatActivity
     {
         chatPagerAdapter.setSelectedIndex(pos);
 
-        ChatSessionManager.setCurrentChatSession(
-            chatPagerAdapter.getChatFragment(pos).getChatSession().getChatId());
+        ChatSessionManager.setCurrentChatId(
+                chatPagerAdapter.getChatFragment(pos)
+                        .getChatSession().getChatId());
 
         setSelectedChat();
     }
@@ -226,7 +227,7 @@ public class ChatActivity
     private void setSelectedChat()
     {
         MetaContact metaContact = ChatSessionManager.getActiveChat(
-            ChatSessionManager.getCurrentChatSession()).getMetaContact();
+            ChatSessionManager.getCurrentChatId()).getMetaContact();
 
         ActionBarUtil.setTitle(this, metaContact.getDisplayName());
 

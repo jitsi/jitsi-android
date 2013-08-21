@@ -206,7 +206,7 @@ public class ContactListFragment
             ChatSessionManager.addActiveChat(chatSession);
         }
 
-        ChatSessionManager.setCurrentChatSession(chatSession.getChatId());
+        ChatSessionManager.setCurrentChatId(chatSession.getChatId());
 
         View chatExtendedView = getActivity().findViewById(R.id.chatView);
 

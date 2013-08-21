@@ -382,7 +382,7 @@ public class ChatSession
     @Override
     public boolean isChatFocused()
     {
-        return ChatSessionManager.getCurrentChatSession().equals(chatId);
+        return ChatSessionManager.getCurrentChatId().equals(chatId);
     }
 
     @Override

@@ -13,7 +13,6 @@ import android.support.v4.app.*;
 
 import java.util.*;
 
-import net.java.sip.communicator.service.gui.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.systray.*;
 import net.java.sip.communicator.service.systray.event.*;
@@ -21,7 +20,6 @@ import net.java.sip.communicator.util.*;
 
 import org.jitsi.*;
 import org.jitsi.android.*;
-import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.chat.*;
 
 /**
@@ -79,8 +77,8 @@ public class NotificationPopupHandler
         {
             if(tag instanceof Contact)
             {
-                if(ChatSessionManager
-                        .findChatForContact((Contact)tag, false) != null)
+                if(ChatSessionManager.getActiveChat((Contact)tag)
+                        .isChatFocused())
                     return;
             }
 
