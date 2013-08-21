@@ -9,9 +9,11 @@ package org.jitsi.impl.osgi.framework.launch;
 import java.io.*;
 import java.util.*;
 
-import org.jitsi.impl.osgi.framework.*;
+import net.java.sip.communicator.util.*;
 
+import org.jitsi.impl.osgi.framework.*;
 import org.jitsi.impl.osgi.framework.startlevel.*;
+
 import org.osgi.framework.*;
 import org.osgi.framework.launch.*;
 import org.osgi.framework.startlevel.*;
@@ -24,6 +26,11 @@ public class FrameworkImpl
     extends BundleImpl
     implements Framework
 {
+    /**
+     * The logger
+     */
+    private final Logger logger = Logger.getLogger(FrameworkImpl.class);
+
     private final List<BundleImpl> bundles = new LinkedList<BundleImpl>();
 
     private final Map<String, String> configuration;
@@ -116,6 +123,7 @@ public class FrameworkImpl
                     {
                         // TODO Auto-generated method stub
                     }
+                    logger.error("Error firing framework event", t);
                 }
         }
     }
@@ -450,6 +458,8 @@ public class FrameworkImpl
                     if (t instanceof ThreadDeath)
                         throw (ThreadDeath) t;
                     // TODO Auto-generated method stub
+
+                    logger.error("Error changing start level", t);
                 }
             }
         }
@@ -474,6 +484,8 @@ public class FrameworkImpl
                     if (t instanceof ThreadDeath)
                         throw (ThreadDeath) t;
                     // TODO Auto-generated method stub
+
+                    logger.error("Error changing start level", t);
                 }
             }
         }

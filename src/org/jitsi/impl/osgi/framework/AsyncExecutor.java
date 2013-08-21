@@ -6,6 +6,8 @@
  */
 package org.jitsi.impl.osgi.framework;
 
+import net.java.sip.communicator.util.*;
+
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -240,7 +242,8 @@ public class AsyncExecutor<T extends Runnable>
 
     protected void uncaughtException(T command, Throwable exception)
     {
-        // TODO Auto-generated method stub
+        Logger.getLogger(AsyncExecutor.class)
+                .error("Error executing command "+command, exception);
     }
 
     private static class CommandFuture<T extends Runnable>

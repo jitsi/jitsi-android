@@ -51,7 +51,7 @@ public class EventDispatcher
         if (listeners.length != 0)
             try
             {
-                executor.execute(new Command(clazz, listeners, event));
+                executor.execute(new Command(clazz, event));
             }
             catch (RejectedExecutionException ree)
             {
@@ -89,20 +89,21 @@ public class EventDispatcher
 
         private final EventObject event;
 
-        private final EventListener[] listeners;
-
         public <T extends EventListener> Command(
                 Class<T> clazz,
-                T[] listeners,
                 EventObject event)
         {
             this.clazz = clazz;
-            this.listeners = listeners;
             this.event = event;
         }
 
         public void run()
         {
+            // Fetches listeners before command is started
+            // to get latest version of the list
+            EventListener[] listeners
+                    = EventDispatcher.this.listeners.getListeners(clazz);
+
             for (EventListener listener : listeners)
             {
                 try
