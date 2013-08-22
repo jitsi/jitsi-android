@@ -184,7 +184,7 @@ public class ContactListAdapter
      */
     private void addContacts(final MetaContactGroup group)
     {
-        contactListFragment.getActivity().runOnUiThread(new Runnable()
+        contactListFragment.runOnUiThread(new Runnable()
         {
             public void run()
             {
@@ -215,7 +215,7 @@ public class ContactListAdapter
      */
     private void removeContacts(final MetaContactGroup group)
     {
-        contactListFragment.getActivity().runOnUiThread(new Runnable()
+        contactListFragment.runOnUiThread(new Runnable()
         {
             public void run()
             {
@@ -248,7 +248,7 @@ public class ContactListAdapter
     private void addGroup(  final MetaContactGroup group,
                             final boolean isSynchronized)
     {
-        contactListFragment.getActivity().runOnUiThread(new Runnable()
+        contactListFragment.runOnUiThread(new Runnable()
         {
             public void run()
             {
@@ -293,7 +293,7 @@ public class ContactListAdapter
     {
         addContactStatusListener(metaContact, this);
 
-        contactListFragment.getActivity().runOnUiThread(new Runnable()
+        contactListFragment.runOnUiThread(new Runnable()
         {
             public void run()
             {
@@ -341,7 +341,7 @@ public class ContactListAdapter
     private void removeGroup(   final MetaContactGroup metaGroup,
                                 final boolean isSynchronized)
     {
-        contactListFragment.getActivity().runOnUiThread(new Runnable()
+        contactListFragment.runOnUiThread(new Runnable()
         {
             public void run()
             {
@@ -383,7 +383,7 @@ public class ContactListAdapter
     {
         removeContactStatusListener(metaContact, this);
 
-        contactListFragment.getActivity().runOnUiThread(new Runnable()
+        contactListFragment.runOnUiThread(new Runnable()
         {
             public void run()
             {
@@ -445,7 +445,7 @@ public class ContactListAdapter
      */
     private void updateDisplayName(final MetaContact metaContact)
     {
-        contactListFragment.getActivity().runOnUiThread(new Runnable()
+        contactListFragment.runOnUiThread(new Runnable()
         {
             public void run()
             {
@@ -501,7 +501,7 @@ public class ContactListAdapter
      */
     private void updateAvatar(final MetaContact metaContact)
     {
-        contactListFragment.getActivity().runOnUiThread(new Runnable()
+        contactListFragment.runOnUiThread(new Runnable()
         {
             public void run()
             {
@@ -556,7 +556,7 @@ public class ContactListAdapter
      */
     private void updateStatus(final MetaContact metaContact)
     {
-        contactListFragment.getActivity().runOnUiThread(new Runnable()
+        contactListFragment.runOnUiThread(new Runnable()
         {
             public void run()
             {

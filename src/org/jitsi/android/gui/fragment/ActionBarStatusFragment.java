@@ -6,8 +6,8 @@
  */
 package org.jitsi.android.gui.fragment;
 
+import android.app.*;
 import android.os.*;
-import android.support.v4.app.*;
 import android.view.*;
 import android.widget.*;
 
@@ -25,6 +25,7 @@ import org.jitsi.android.gui.menu.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.android.gui.util.event.EventListener;
 import org.jitsi.android.gui.widgets.*;
+import org.jitsi.service.osgi.*;
 import org.jitsi.util.*;
 
 import java.util.*;
@@ -37,7 +38,7 @@ import java.util.*;
  * @author Pawel Domas
  */
 public class ActionBarStatusFragment
-    extends Fragment
+    extends OSGiFragment
     implements EventListener<PresenceStatus>,
                GlobalDisplayDetailsListener
 {
@@ -236,20 +237,22 @@ public class ActionBarStatusFragment
     @Override
     public void onChangeEvent(final PresenceStatus presenceStatus)
     {
-        if(presenceStatus == null)
+        final Activity activity = getActivity();
+
+        if(presenceStatus == null || activity == null)
             return;
 
-        getActivity().runOnUiThread(new Runnable()
+        activity.runOnUiThread(new Runnable()
         {
             @Override
             public void run()
             {
                 ActionBarUtil.setSubtitle(
-                        getActivity(),
+                        activity,
                         presenceStatus.getStatusName());
 
                 ActionBarUtil.setStatus(
-                        getActivity(),
+                        activity,
                         StatusUtil.getContactStatusIcon(presenceStatus));
             }
         });
@@ -261,7 +264,7 @@ public class ActionBarStatusFragment
     @Override
     public void globalDisplayAvatarChanged(final GlobalAvatarChangeEvent evt)
     {
-        getActivity().runOnUiThread(new Runnable()
+        runOnUiThread(new Runnable()
         {
             @Override
             public void run()
@@ -278,7 +281,7 @@ public class ActionBarStatusFragment
     @Override
     public void globalDisplayNameChanged(final GlobalDisplayNameChangeEvent evt)
     {
-        getActivity().runOnUiThread(new Runnable()
+        runOnUiThread(new Runnable()
         {
             @Override
             public void run()

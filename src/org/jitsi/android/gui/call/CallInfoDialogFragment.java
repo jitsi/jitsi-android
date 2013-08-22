@@ -19,6 +19,7 @@ import org.jitsi.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.android.util.java.awt.*;
 import org.jitsi.service.neomedia.*;
+import org.jitsi.service.osgi.*;
 
 import java.net.*;
 import java.util.*;
@@ -33,7 +34,7 @@ import java.util.List; // Disambiguation
  * @author Pawel Domas
  */
 public class CallInfoDialogFragment
-    extends DialogFragment
+    extends OSGiDialogFragment
 {
     /**
      * The extra key pointing to the "call key" that will be used to retrieve
@@ -104,7 +105,7 @@ public class CallInfoDialogFragment
      */
     private void updateView()
     {
-        getActivity().runOnUiThread(new Runnable()
+        runOnUiThread(new Runnable()
         {
             public void run()
             {

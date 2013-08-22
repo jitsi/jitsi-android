@@ -519,7 +519,7 @@ public class ChatFragment
 
         private void dataChanged()
         {
-            getActivity().runOnUiThread(new Runnable()
+            runOnUiThread(new Runnable()
             {
                 public void run()
                 {

@@ -7,7 +7,10 @@
 package org.jitsi.service.osgi;
 
 import android.app.*;
+import android.support.v4.app.*;
 import android.support.v4.app.Fragment;
+
+import net.java.sip.communicator.util.*;
 
 import org.osgi.framework.*;
 
@@ -21,6 +24,11 @@ public class OSGiFragment
     extends Fragment
     implements OSGiUiPart
 {
+    /**
+     * The logger
+     */
+    private static final Logger logger = Logger.getLogger(OSGiFragment.class);
+
     /**
      * {@inheritDoc}
      */
@@ -55,5 +63,24 @@ public class OSGiFragment
      */
     public void stop(BundleContext bundleContext) throws Exception
     {
+    }
+
+    /**
+     * Tries to run given <tt>action</tt> on the UI thread.
+     * If there's no <tt>Activity</tt> available warning will be logged.
+     *
+     * @param action <tt>Runnable</tt> action to execute on UI thread.
+     */
+    public void runOnUiThread(Runnable action)
+    {
+        FragmentActivity activity = getActivity();
+        if(activity == null)
+        {
+            logger.warn("Called runOnUiThread when Activity was null!",
+                        new Throwable());
+            return;
+        }
+
+        activity.runOnUiThread(action);
     }
 }

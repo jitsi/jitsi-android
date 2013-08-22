@@ -245,7 +245,7 @@ public class OtrFragment
      */
     private void setPolicy(final OtrPolicy contactPolicy)
     {
-        getActivity().runOnUiThread(new Runnable()
+        runOnUiThread(new Runnable()
         {
             @Override
             public void run()
@@ -283,7 +283,7 @@ public class OtrFragment
                 return;
         }
 
-        getActivity().runOnUiThread(new Runnable()
+        runOnUiThread(new Runnable()
         {
             @Override
             public void run()
