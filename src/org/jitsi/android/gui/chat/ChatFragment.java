@@ -19,6 +19,7 @@ import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.Logger;
 
 import org.jitsi.*;
+import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.util.*;
@@ -27,7 +28,6 @@ import org.jitsi.util.*;
 
 import android.graphics.drawable.*;
 import android.os.*;
-import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
 import android.widget.LinearLayout.*;
@@ -489,10 +489,6 @@ public class ChatFragment
                         status = getLocalStatusDrawable();
                     }
 
-
-                    if (avatar == null)
-                        avatar = AccountUtil.getDefaultAvatarIcon(getActivity());
-
                     setAvatar(messageViewHolder.avatarView, avatar);
                     setStatus(messageViewHolder.statusView, status);
 
@@ -806,7 +802,10 @@ public class ChatFragment
                             Drawable avatarDrawable)
     {
         if (avatarDrawable == null)
-            avatarDrawable = AccountUtil.getDefaultAvatarIcon(getActivity());
+        {
+            avatarDrawable = JitsiApplication.getAppResources()
+                .getDrawable(R.drawable.avatar);
+        }
 
         avatarView.setImageDrawable(avatarDrawable);
     }
