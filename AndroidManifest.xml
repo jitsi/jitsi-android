@@ -47,6 +47,15 @@
         <!-- Verify Certificate Activity -->
         <activity android:name=".impl.androidcertdialog.VerifyCertificateActivity"
                   android:theme="@android:style/Theme.Holo.Dialog.MinWidth"/>
+        <!-- Authorization requested dialog -->
+        <activity android:name=".android.gui.authorization.AuthorizationRequestedDialog"
+                  android:label="@string/service_gui_AUTHORIZATION_RESPONSE"
+                  android:theme="@android:style/Theme.Holo.Dialog.MinWidth"
+                />
+        <!-- Request authorization dialog -->
+        <activity android:name=".android.gui.authorization.RequestAuthorizationDialog"
+                  android:label="@string/service_gui_REQUEST_AUTHORIZATION"
+                  android:theme="@android:style/Theme.Holo.Dialog.MinWidth"/>
         <activity android:name=".android.gui.call.CallContactActivity"
                     android:label="@string/app_name"
                     android:icon="@drawable/logoblue"

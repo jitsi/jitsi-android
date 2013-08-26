@@ -86,4 +86,27 @@ public class ViewUtil
             view.setVisibility(View.GONE);
         }
     }
+
+    /**
+     * Ensures that the <tt>View</tt> is currently in enabled or disabled state.
+     *
+     * @param container parent <tt>View</tt> that contains displayed
+     * <tt>View</tt>.
+     * @param viewId the id of <tt>View</tt> that will be enabled/disabled.
+     * @param isEnabled flag telling whether the <tt>View</tt> has to be enabled
+     * or disabled.
+     */
+    static public void ensureEnabled(View container, int viewId,
+                                     boolean isEnabled )
+    {
+        View view = container.findViewById(viewId);
+        if( isEnabled && !view.isEnabled() )
+        {
+            view.setEnabled(isEnabled);
+        }
+        else if( !isEnabled && view.isEnabled() )
+        {
+            view.setEnabled(isEnabled);
+        }
+    }
 }

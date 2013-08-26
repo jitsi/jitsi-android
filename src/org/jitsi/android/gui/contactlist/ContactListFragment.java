@@ -7,9 +7,11 @@
 package org.jitsi.android.gui.contactlist;
 
 import net.java.sip.communicator.service.contactlist.*;
+import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.*;
 
 import org.jitsi.*;
+import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.chat.*;
 import org.jitsi.service.osgi.*;
@@ -58,6 +60,8 @@ public class ContactListFragment
      */
     private ExpandableListView contactListView;
 
+    private MetaContact clickedContact;
+
     /**
      * {@inheritDoc}
      */
@@ -94,6 +98,8 @@ public class ContactListFragment
         contactListView.setSelector(R.drawable.contact_list_selector);
         contactListView.setOnChildClickListener(this);
         contactListView.setOnGroupClickListener(this);
+        // Adds context menu for contact list items
+        registerForContextMenu(contactListView);
 
         // If the MetaContactListService is already available we need to
         // initialize the adapter.
@@ -129,6 +135,161 @@ public class ContactListFragment
         }
 
         super.onDestroy();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, v, menuInfo);
+
+        // Inflate contact list context menu
+        MenuInflater inflater = getActivity().getMenuInflater();
+        inflater.inflate(R.menu.contact_menu, menu);
+
+        ExpandableListView.ExpandableListContextMenuInfo info =
+                (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
+
+        int type =
+                ExpandableListView.getPackedPositionType(info.packedPosition);
+
+        int group =
+                ExpandableListView.getPackedPositionGroup(info.packedPosition);
+
+        int child =
+                ExpandableListView.getPackedPositionChild(info.packedPosition);
+
+        // Only create a context menu for child items
+        if (type != ExpandableListView.PACKED_POSITION_TYPE_CHILD)
+        {
+            return;
+        }
+
+        // Remembers clicked contact
+        clickedContact
+                = ((MetaContact) contactListAdapter.getChild(group, child));
+
+        // Checks if the re-request authorization item should be visible
+        Contact contact = clickedContact.getDefaultContact();
+
+        OperationSetExtendedAuthorizations authOpSet
+                = contact.getProtocolProvider().getOperationSet(
+                OperationSetExtendedAuthorizations.class);
+
+        boolean reRequestVisible = false;
+
+        if (authOpSet != null
+                && authOpSet.getSubscriptionStatus(contact) != null
+                && !authOpSet.getSubscriptionStatus(contact)
+                .equals(OperationSetExtendedAuthorizations
+                                .SubscriptionStatus.Subscribed))
+        {
+            reRequestVisible = true;
+        }
+
+        menu.findItem(R.id.re_request_auth).setVisible(reRequestVisible);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+        if(item.getItemId() == R.id.re_request_auth
+                && clickedContact != null)
+        {
+            requestAuthorization(clickedContact.getDefaultContact());
+            return true;
+        }
+        else if(item.getItemId() == R.id.remove_contact)
+        {
+            removeContact(clickedContact);
+            return true;
+        }
+
+        return super.onContextItemSelected(item);
+    }
+
+    /**
+     * Removes given <tt>contact</tt> from the contact list.
+     * Asks the user for confirmation, before it's done.
+     *
+     * @param contact the contact to be removed from the contact list.
+     */
+    private void removeContact(final MetaContact contact)
+    {
+        Context ctx = JitsiApplication.getGlobalContext();
+        DialogActivity.showConfirmDialog(
+                ctx,
+                ctx.getString(R.string.service_gui_REMOVE_CONTACT),
+                ctx.getString(R.string.service_gui_REMOVE_CONTACT_TEXT,
+                              contact.getDisplayName()),
+                ctx.getString(R.string.service_gui_REMOVE),
+                new DialogActivity.DialogListener()
+                {
+                    @Override
+                    public void onConfirmClicked(DialogActivity dialog)
+                    {
+                        MetaContactListService mls = AndroidGUIActivator
+                                .getMetaContactListService();
+                        mls.removeMetaContact(contact);
+                    }
+
+                    @Override
+                    public void onDialogCancelled(DialogActivity dialog)
+                    {
+                        // Do nothing
+                    }
+                }
+        );
+    }
+
+    /**
+     * Requests authorization for contact.
+     *
+     * @param contact the contact for which we request authorization
+     */
+    private void requestAuthorization(final Contact contact)
+    {
+        final OperationSetExtendedAuthorizations authOpSet
+                = contact.getProtocolProvider().getOperationSet(
+                OperationSetExtendedAuthorizations.class);
+
+        if (authOpSet == null)
+            return;
+
+        new Thread()
+        {
+            @Override
+            public void run()
+            {
+                AuthorizationRequest request
+                        = AndroidGUIActivator.getLoginRenderer()
+                        .getAuthorizationHandler()
+                        .createAuthorizationRequest(contact);
+
+                if(request == null)
+                    return;
+
+                try
+                {
+                    authOpSet.reRequestAuthorization(request, contact);
+                }
+                catch (OperationFailedException e)
+                {
+                    Context ctx = JitsiApplication.getGlobalContext();
+                    DialogActivity.showConfirmDialog(
+                            ctx,
+                            ctx.getString(
+                                R.string.service_gui_RE_REQUEST_AUTHORIZATION),
+                            e.getMessage(), null, null);
+                }
+            }
+        }.start();
     }
 
     /**

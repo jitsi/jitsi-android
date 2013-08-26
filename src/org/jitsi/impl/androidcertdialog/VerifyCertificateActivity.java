@@ -41,6 +41,13 @@ public class VerifyCertificateActivity
      */
     private VerifyCertDialog certDialog;
 
+
+    /**
+     * Flag indicates that this <tt>Activity</tt> was paused and may
+     * be recreated.
+     */
+    private boolean flagPaused = false;
+
     /**
      * {@inheritDoc}
      */
@@ -105,11 +112,23 @@ public class VerifyCertificateActivity
      * {@inheritDoc}
      */
     @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+
+        this.flagPaused = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     protected void onDestroy()
     {
         super.onDestroy();
 
-        CertificateDialogActivator.getDialog(requestId).notifyFinished();
+        if(!flagPaused)
+            CertificateDialogActivator.getDialog(requestId).notifyFinished();
     }
 
     /**

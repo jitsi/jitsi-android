@@ -13,6 +13,7 @@ import android.content.*;
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
+import org.jitsi.android.gui.authorization.*;
 import org.jitsi.android.gui.call.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.android.gui.util.event.*;
@@ -59,6 +60,11 @@ public class AndroidLoginRenderer
     private final SecurityAuthority securityAuthority;
 
     /**
+     * Authorization handler instance.
+     */
+    private final AuthorizationHandlerImpl authorizationHandler;
+
+    /**
      * List of global status listeners.
      */
     private EventListenerList<PresenceStatus> globalStatusListeners
@@ -80,6 +86,8 @@ public class AndroidLoginRenderer
         androidCallListener = new AndroidCallListener(appContext);
 
         securityAuthority = defaultSecurityAuthority;
+
+        authorizationHandler = new AuthorizationHandlerImpl();
     }
 
     /**
@@ -166,16 +174,14 @@ public class AndroidLoginRenderer
         ProtocolProviderService protocolProvider,
         long date)
     {
-        /*
-        TODO: Implement AuthorizationHandler and register it here
-        OperationSetPresence presence
-                = AccountStatusUtils.getProtocolPresenceOpSet(protocolProvider);
+
+        OperationSetPresence presence = AccountStatusUtils
+                .getProtocolPresenceOpSet(protocolProvider);
 
         if (presence != null)
         {
-            AuthorizationHandler ah;
-            presence.setAuthorizationHandler(null);
-        }*/
+            presence.setAuthorizationHandler(authorizationHandler);
+        }
 
         showStatusNotification(
             protocolProvider,
@@ -294,6 +300,14 @@ public class AndroidLoginRenderer
     {
         return AndroidGUIActivator.getGlobalStatusService()
                 .getGlobalPresenceStatus();
+    }
+
+    /**
+     * AuthorizationHandler instance used by this login renderer.
+     */
+    public AuthorizationHandlerImpl getAuthorizationHandler()
+    {
+        return authorizationHandler;
     }
 
     /**

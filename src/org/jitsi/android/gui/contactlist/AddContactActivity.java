@@ -6,7 +6,6 @@
  */
 package org.jitsi.android.gui.contactlist;
 
-import android.app.*;
 import android.os.*;
 import android.view.*;
 import android.widget.*;
@@ -47,7 +46,7 @@ public class AddContactActivity
     /**
      * Spinner adapter that displays meta contact groups.
      */
-    private MContactGroupAdapter contactGroupAdapter;
+    private MetaContactGroupAdapter contactGroupAdapter;
 
     /**
      * {@inheritDoc}
@@ -124,21 +123,8 @@ public class AddContactActivity
     {
         Spinner groupSpinner = (Spinner) findViewById(R.id.selectGroupSpinner);
 
-        MetaContactListService contactListService
-                = AndroidGUIActivator.getContactListService();
+        this.contactGroupAdapter = new MetaContactGroupAdapter(this);
 
-        MetaContactGroup root = contactListService.getRoot();
-        ArrayList<MetaContactGroup> merge = new ArrayList<MetaContactGroup>();
-        merge.add(root);
-        Iterator<MetaContactGroup> mcg = root.getSubgroups();
-        while(mcg.hasNext())
-        {
-            merge.add(mcg.next());
-        }
-
-        this.contactGroupAdapter
-            = new MContactGroupAdapter( this,
-                                        merge.iterator());
         groupSpinner.setAdapter(contactGroupAdapter);
     }
 
@@ -251,49 +237,5 @@ public class AddContactActivity
         }.start();
     }
 
-    /**
-     * This adapter displays <tt>MetaContactGroup</tt> items.
-     */
-    public static class MContactGroupAdapter
-            extends CollectionAdapter<MetaContactGroup>
-    {
-        /**
-         * {@inheritDoc}
-         */
-        public MContactGroupAdapter(Activity parent,
-                                    Iterator<MetaContactGroup> items)
-        {
-            super(parent,items);
-        }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected View getView(boolean isDropDown,
-                               MetaContactGroup item, ViewGroup parent,
-                               LayoutInflater inflater)
-        {
-            int rowResId = isDropDown
-                    ? android.R.layout.simple_spinner_dropdown_item
-                    : android.R.layout.simple_spinner_item;
-
-            View rowView = inflater.inflate(rowResId, parent, false);
-
-            TextView tv = (TextView) rowView.findViewById(android.R.id.text1);
-
-            if(item.equals(
-                    AndroidGUIActivator.getContactListService().getRoot()))
-            {
-                // Root
-                tv.setText(R.string.service_gui_SELECT_NO_GROUP);
-            }
-            else
-            {
-                tv.setText(item.getGroupName());
-            }
-
-            return rowView;
-        }
-    }
 }

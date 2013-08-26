@@ -33,6 +33,37 @@
     <string name="service_gui_CONTACT_PAUSED_TYPING">paused typing</string>
     <string name="service_gui_CONTACT_TYPING">is typing</string>
 
+    <string name="service_gui_ADD_AUTHORIZED_CONTACT">Add %s to your contact list</string>
+    <string name="service_gui_AUTHORIZE">Authorize</string>
+    <string name="service_gui_AUTHORIZATION_ACCEPTED">contact has accepted your authorization request.</string>
+    <string name="service_gui_AUTHENTICATION_REJECTED">contact has rejected your authorization request.</string>
+    <string name="service_gui_AUTHORIZATION_REQUESTED">Authorization requested</string>
+    <string name="service_gui_AUTHORIZATION_REQUESTED_INFO">The %s contact requests your authorization.</string>
+    <string name="service_gui_AUTHORIZATION_RESPONSE">Authorization response</string>
+    <string name="service_gui_DENY">Deny</string>
+    <string name="service_gui_IGNORE">Ignore</string>
+    <string name="service_gui_NOT_AUTHORIZED">Not authorized</string>
+    <string name="service_gui_TYPE_YOUR_REQUEST">Type your request here</string>
+    <string name="service_gui_REQUEST">Request</string>
+    <string name="service_gui_REQUEST_AUTHORIZATION">Request authorization</string>
+    <string name="service_gui_REQUEST_AUTHORIZATION_MSG">
+        Can\'t add %1$s to your Contact List.
+        %1$s must authorize your request to add him/her.
+        Please enter your request below.
+    </string>
+    <string name="service_gui_RE_REQUEST_AUTHORIZATION">
+        Re-request authorization
+    </string>
+    <string name="service_gui_REMOVE">
+        Remove
+    </string>
+    <string name="service_gui_REMOVE_CONTACT">
+        Remove contact
+    </string>
+    <string name="service_gui_REMOVE_CONTACT_TEXT">
+        <DIV>Are you sure you want to remove <B> %s </B><BR/>from your contact list?</DIV>
+    </string>
+
     <!-- Main Menu items -->
     <string name="service_gui_ACCOUNTS_STATUS">Accounts status</string>
     <string name="service_gui_ACCOUNTS_SETTINGS">Accounts settings</string>

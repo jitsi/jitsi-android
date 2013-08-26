@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/re_request_auth"
+          android:title="@string/service_gui_RE_REQUEST_AUTHORIZATION">
+    </item>
+    <item android:id="@+id/remove_contact"
+          android:title="@string/service_gui_REMOVE_CONTACT">
+    </item>
+</menu>
