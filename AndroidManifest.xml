@@ -4,6 +4,7 @@
       android:versionCode="1"
       android:versionName="1.0">
     <application    android:label="@string/app_name"
+                    android:logo="@drawable/actionbaricon"
                     android:icon="@drawable/logoblue"
                     android:theme="@style/JitsiTheme"
                     android:name=".android.JitsiApplication">
@@ -58,7 +59,7 @@
                   android:theme="@android:style/Theme.Holo.Dialog.MinWidth"/>
         <activity android:name=".android.gui.call.CallContactActivity"
                     android:label="@string/app_name"
-                    android:icon="@drawable/logoblue"
+                    android:icon="@drawable/actionbaricon"
                     android:launchMode="singleTask">
             <intent-filter> 
                 <action android:name="android.intent.action.CALL" />
