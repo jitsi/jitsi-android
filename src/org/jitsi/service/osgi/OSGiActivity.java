@@ -110,18 +110,22 @@ public class OSGiActivity
     {
         if(Build.VERSION.SDK_INT >= 11)
         {
-            // Disable up arrow on home activity
-            Class<?> homeActivity
-                    = JitsiApplication.getHomeScreenActivityClass();
-            if(this.getClass().equals(homeActivity))
+            ActionBar actionBar = getActionBar();
+            if(actionBar != null)
             {
-                getActionBar().setDisplayHomeAsUpEnabled(false);
-                getActionBar().setHomeButtonEnabled(false);
+
+                // Disable up arrow on home activity
+                Class<?> homeActivity
+                        = JitsiApplication.getHomeScreenActivityClass();
+                if(this.getClass().equals(homeActivity))
+                {
+                    actionBar.setDisplayHomeAsUpEnabled(false);
+                    actionBar.setHomeButtonEnabled(false);
+                }
+
+                ActionBarUtil.setTitle(this, getTitle());
             }
         }
-
-        if (getActionBar() != null)
-            ActionBarUtil.setTitle(this, getTitle());
 
         super.onCreate(savedInstanceState);
 
