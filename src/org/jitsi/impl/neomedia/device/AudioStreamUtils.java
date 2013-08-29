@@ -14,7 +14,7 @@ import net.java.sip.communicator.util.*;
 import org.jitsi.impl.neomedia.*;
 import org.jitsi.service.osgi.*;
 
-import javax.media.*;
+import javax.media.format.*;
 import java.io.*;
 
 /**
@@ -85,7 +85,7 @@ public class AudioStreamUtils
      * @param audioInputStream the input stream.
      * @return the format of the audio stream.
      */
-    public static Format getFormat(InputStream audioInputStream)
+    public static AudioFormat getFormat(InputStream audioInputStream)
     {
         WaveHeader waveHeader = new WaveHeader(audioInputStream);
 

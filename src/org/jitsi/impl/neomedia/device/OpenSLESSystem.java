@@ -177,7 +177,7 @@ public class OpenSLESSystem
      * @param audioInputStream the input stream.
      * @return the format of the audio stream.
      */
-    public Format getFormat(InputStream audioInputStream)
+    public AudioFormat getFormat(InputStream audioInputStream)
     {
         return AudioStreamUtils.getFormat(audioInputStream);
     }
