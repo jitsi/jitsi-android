@@ -132,16 +132,6 @@ public class ContactListAdapter
 
         expandAllGroups();
 
-        MetaContact firstMetaContact = (MetaContact) getChild(0, 0);
-
-        View chatExtendedView
-            = contactListFragment.getActivity().findViewById(R.id.chatView);
-
-        isExtendedChat = (chatExtendedView != null);
-
-        // In extended/tablet view we pre-select the first contact.
-        if (firstMetaContact != null && isExtendedChat)
-            contactListFragment.startChatActivity(firstMetaContact);
     }
 
     /**

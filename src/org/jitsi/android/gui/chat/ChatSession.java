@@ -33,6 +33,11 @@ public class ChatSession
     implements Chat, MessageListener
 {
     /**
+     * The logger
+     */
+    private final static Logger logger = Logger.getLogger(ChatSession.class);
+
+    /**
      * Number of history messages returned from loadHistory call.
      * Used to limit number of stored system messages.
      *
@@ -138,12 +143,18 @@ public class ChatSession
         if (StringUtils.isNullOrEmpty(message))
             return;
 
-        final OperationSetBasicInstantMessaging imOpSet
-            = currentChatTransport.getProtocolProvider()
-                    .getOperationSet(OperationSetBasicInstantMessaging.class);
+        ProtocolProviderService pps
+                = currentChatTransport.getProtocolProvider();
 
-        if (imOpSet == null)
+        if(pps == null)
+        {
+            logger.error("No protocol provider returned by "
+                                 + currentChatTransport);
             return;
+        }
+
+        final OperationSetBasicInstantMessaging imOpSet
+            = pps.getOperationSet(OperationSetBasicInstantMessaging.class);
 
         new Thread()
         {

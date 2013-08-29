@@ -122,23 +122,39 @@ public class OtrFragment
     {
         if(item.getItemId() == R.id.otr_padlock)
         {
-            switch (OtrActivator.scOtrEngine.getSessionStatus(currentContact))
+            // prevents network on main thread exception
+            new Thread()
             {
-                case ENCRYPTED:
-                case FINISHED:
-                    // Default action for finished and encrypted sessions is
-                    // end session.
-                    OtrActivator.scOtrEngine.endSession(currentContact);
-                    break;
-                case PLAINTEXT:
-                    // Default action for finished and plaintext sessions is
-                    // start session.
-                    OtrActivator.scOtrEngine.startSession(currentContact);
-                    break;
-            }
+                @Override
+                public void run()
+                {
+                    doHandleOtrPadlockPressed();
+                }
+            }.start();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Toggles OTR state when the padlock button is pressed.
+     */
+    private void doHandleOtrPadlockPressed()
+    {
+        switch (OtrActivator.scOtrEngine.getSessionStatus(currentContact))
+        {
+            case ENCRYPTED:
+            case FINISHED:
+                // Default action for finished and encrypted sessions is
+                // end session.
+                OtrActivator.scOtrEngine.endSession(currentContact);
+                break;
+            case PLAINTEXT:
+                // Default action for finished and plaintext sessions is
+                // start session.
+                OtrActivator.scOtrEngine.startSession(currentContact);
+                break;
+        }
     }
 
     /**
@@ -204,6 +220,21 @@ public class OtrFragment
      */
     public void setCurrentContact(Contact contact)
     {
+        OperationSetBasicInstantMessaging msgingOpSet = null;
+
+        if(contact != null && contact.getProtocolProvider() != null)
+        {
+            msgingOpSet
+                    = contact.getProtocolProvider().getOperationSet(
+                        OperationSetBasicInstantMessaging.class);
+        }
+
+        if(msgingOpSet == null)
+        {
+            // deactivate plugin if messaging is not supported
+            contact = null;
+        }
+
         this.currentContact = contact;
         if (contact != null)
         {
@@ -251,6 +282,10 @@ public class OtrFragment
             @Override
             public void run()
             {
+                // Hides the padlock when OTR is not supported
+                getPadlock().setVisible(
+                        contactPolicy != null);
+
                 getPadlock().setEnabled(
                         contactPolicy != null
                                 && contactPolicy.getEnableManual());

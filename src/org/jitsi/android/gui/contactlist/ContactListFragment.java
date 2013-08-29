@@ -362,7 +362,11 @@ public class ContactListFragment
 
         if (metaContact != null)
         {
-            startChatActivity(metaContact);
+            if(!metaContact.getContactsForOperationSet(
+                    OperationSetBasicInstantMessaging.class).isEmpty())
+            {
+                startChatActivity(metaContact);
+            }
             return true;
         }
         return false;
