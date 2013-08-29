@@ -77,7 +77,7 @@ public class OtrFragment
         OtrActivator.scOtrEngine.addListener(scOtrEngineListener);
         OtrActivator.scOtrKeyManager.addListener(scOtrKeyManagerListener);
 
-        ChatSessionManager.addActiveChatListener(activeChatListener);
+        ChatSessionManager.addCurrentChatListener(activeChatListener);
 
         setCurrentChatSession(ChatSessionManager.getCurrentChatId());
     }
@@ -88,7 +88,7 @@ public class OtrFragment
     @Override
     public void onPause()
     {
-        ChatSessionManager.removeActiveChatListener(activeChatListener);
+        ChatSessionManager.removeCurrentChatListener(activeChatListener);
 
         OtrActivator.scOtrEngine.removeListener(scOtrEngineListener);
         OtrActivator.scOtrKeyManager.removeListener(scOtrKeyManagerListener);

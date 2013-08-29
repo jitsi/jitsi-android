@@ -15,6 +15,7 @@ import net.java.sip.communicator.service.systray.event.*;
 import net.java.sip.communicator.util.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
+import org.jitsi.android.gui.chat.*;
 
 /**
  * Android system tray implementation. Makes use of status bar notifications to
@@ -159,7 +160,7 @@ public class SystrayServiceImpl
                 }
 
                 Context ctx = JitsiApplication.getGlobalContext();
-                Intent chat = Jitsi.getChatIntent(ctx,metaContact.getMetaUID());
+                Intent chat = ChatSessionManager.getChatIntent(metaContact);
                 ctx.startActivity(chat);
 
                 return;

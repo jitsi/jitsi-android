@@ -13,18 +13,18 @@ import android.support.v4.view.*;
 import android.view.*;
 
 /**
- * A simple pager adapter that represents 5 ScreenSlidePageFragment objects,
- * in sequence.
+ * A pager adapter used to display active chats.
  * 
  * @author Yana Stamcheva
+ * @author Pawel Domas
  */
 public class ChatPagerAdapter
     extends FragmentStatePagerAdapter
 {
     /**
-     * The list of contained chat fragments.
+     * The list of contained chat session ids.
      */
-    private List<ChatFragment> chatFragments = new LinkedList<ChatFragment>();
+    private List<String> chats = new LinkedList<String>();
 
     /**
      * The currently selected chat index.
@@ -49,18 +49,11 @@ public class ChatPagerAdapter
      */
     private void initChats()
     {
-        List<String> activeChats = ChatSessionManager.getActiveChatsIDs();
+        this.chats = ChatSessionManager.getActiveChatsIDs();
 
-        if (activeChats == null)
-            return;
-
-        Iterator<String> activeChatsIter = activeChats.iterator();
-
-        while (activeChatsIter.hasNext())
+        for(int index=0; index<chats.size(); index++)
         {
-            String chatId = activeChatsIter.next();
-            int index = addChatFragment(ChatFragment.newInstance(chatId));
-            if (ChatSessionManager.getCurrentChatId().equals(chatId))
+            if (ChatSessionManager.getCurrentChatId().equals(chats.get(index)))
                 selectedIndex = index;
         }
     }
@@ -86,76 +79,32 @@ public class ChatPagerAdapter
     }
 
     /**
-     * Returns the <tt>ChatFragment</tt> corresponding to the given position.
+     * Returns chat id corresponding to the given position.
      *
-     * @param pos the position of the chat fragment we're looking for
-     * @return the <tt>ChatFragment</tt> corresponding to the given position
+     * @param pos the position of the chat we're looking for
+     * @return chat id corresponding to the given position
      */
-    public ChatFragment getChatFragment(int pos)
+    public String getChatId(int pos)
     {
-        synchronized (chatFragments)
+        synchronized (chats)
         {
-            if (chatFragments.size() <= pos)
+            if (chats.size() <= pos)
                 return null;
 
-            return (ChatFragment) chatFragments.get(pos);
+            return chats.get(pos);
         }
     }
 
     /**
-     * Returns the <tt>ChatFragment</tt> corresponding to the given
-     * <tt>chatSession</tt>.
+     * Removes the given chat session id from this pager.
      *
-     * @param chatSession the <tt>ChatSession</tt> corresponding to the chat
-     * fragment we're looking for
-     * @return the <tt>ChatFragment</tt> corresponding to the given given
-     * <tt>chatSession</tt>
+     * @param chatId the chat id to remove from this pager
      */
-    public ChatFragment getChatFragment(ChatSession chatSession)
+    public void removeChatSession(String chatId)
     {
-        synchronized (chatFragments)
+        synchronized (chats)
         {
-            Iterator<ChatFragment> chatFragmentsIter = chatFragments.iterator();
-
-            while (chatFragmentsIter.hasNext())
-            {
-                ChatFragment chatFragment = chatFragmentsIter.next();
-                if (chatFragment.getChatSession().equals(chatSession))
-                    return chatFragment;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Adss the given <tt>ChatFragment</tt> to this pager.
-     *
-     * @param chatFragment the <tt>ChatFragment</tt> to add to this pager
-     * @return the index where the <tt>ChatFragment</tt> has been added in this
-     * pager
-     */
-    private int addChatFragment(ChatFragment chatFragment)
-    {
-        synchronized (chatFragments)
-        {
-            chatFragments.add(chatFragment);
-            int index = chatFragments.size() - 1;
-            chatFragment.setChatPosition(index);
-            return index;
-        }
-    }
-
-    /**
-     * Removes the given <tt>ChatFragment</tt> from this pager.
-     *
-     * @param chatFragment the <tt>ChatFragment</tt> to remove from this pager
-     */
-    public void removeChatFragment(ChatFragment chatFragment)
-    {
-        synchronized (chatFragments)
-        {
-            chatFragments.remove(chatFragment);
+            chats.remove(chatId);
         }
         notifyDataSetChanged();
     }
@@ -163,11 +112,11 @@ public class ChatPagerAdapter
     /**
      * Removes all <tt>ChatFragment</tt>s from this pager.
      */
-    public void removeAllChatFragments()
+    public void removeAllChatSessions()
     {
-        synchronized (chatFragments)
+        synchronized (chats)
         {
-            chatFragments.clear();
+            chats.clear();
         }
         notifyDataSetChanged();
     }
@@ -180,11 +129,13 @@ public class ChatPagerAdapter
     @Override
     public int getItemPosition(Object object)
     {
-        int position = -1;
+        int position;
 
-        synchronized (chatFragments)
+        String id = ((ChatFragment)object).getChatSession().getChatId();
+
+        synchronized (chats)
         {
-            position = chatFragments.indexOf(object);
+            position = chats.indexOf(id);
         }
 
         if(position >= 0)
@@ -201,7 +152,7 @@ public class ChatPagerAdapter
     @Override
     public android.support.v4.app.Fragment getItem(int pos)
     {
-        return getChatFragment(pos);
+        return ChatFragment.newInstance(chats.get(pos));
     }
 
     /**
@@ -229,9 +180,9 @@ public class ChatPagerAdapter
     @Override
     public int getCount()
     {
-        synchronized (chatFragments)
+        synchronized (chats)
         {
-            return chatFragments.size();
+            return chats.size();
         }
     }
 }

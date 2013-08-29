@@ -15,6 +15,7 @@ import android.view.MenuItem.OnActionExpandListener;
 import android.widget.*;
 import android.widget.SearchView.*;
 
+import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.util.Logger;
 
 import org.jitsi.*;
@@ -22,6 +23,7 @@ import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.fragment.*;
 import org.jitsi.android.gui.menu.*;
+import org.jitsi.android.gui.util.*;
 import org.jitsi.android.plugin.otr.*;
 import org.osgi.framework.*;
 
@@ -221,13 +223,22 @@ public class Jitsi
     private void showContactsFragment(Intent intent)
     {
         contactListFragment = new ContactListFragment();
-        if(ACTION_SHOW_CHAT.equals(intent.getAction()))
+
+        String chatId
+                = getIntent().getStringExtra(
+                        ChatSessionManager.CHAT_IDENTIFIER);
+
+        if(chatId != null)
         {
             Bundle args = new Bundle();
-            args.putString(ContactListFragment.META_CONTACT_UID_ARG,
-                           intent.getStringExtra(CONTACT_EXTRA));
+
+            args.putString(ChatSessionManager.CHAT_IDENTIFIER,
+                           intent.getStringExtra(
+                                   ChatSessionManager.CHAT_IDENTIFIER));
+
             contactListFragment.setArguments(args);
         }
+
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.contactListFragment, contactListFragment)

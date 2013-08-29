@@ -36,6 +36,7 @@ import android.widget.LinearLayout.*;
  * The <tt>ChatFragment</tt> is responsible for chat interface.
  * 
  * @author Yana Stamcheva
+ * @author Pawel Domas
  */
 public class ChatFragment
     extends OSGiFragment
@@ -67,11 +68,6 @@ public class ChatFragment
     private LinearLayout typingView;
 
     /**
-     * The current position of this chat in the chat pager.
-     */
-    private int position;
-
-    /**
      * The task that loads history.
      */
     private LoadHistoryTask loadHistoryTask;
@@ -84,26 +80,6 @@ public class ChatFragment
     public ChatSession getChatSession()
     {
         return chatSession;
-    }
-
-    /**
-     * Returns the chat position.
-     *
-     * @return the chat position
-     */
-    public int getChatPosition()
-    {
-        return position;
-    }
-
-    /**
-     * Sets this chat position in the view pager.
-     *
-     * @param pos the position of this chat
-     */
-    public void setChatPosition(int pos)
-    {
-        this.position = pos;
     }
 
     /**
@@ -151,10 +127,11 @@ public class ChatFragment
         Bundle arguments = getArguments();
         String chatId
                 = arguments.getString(ChatSessionManager.CHAT_IDENTIFIER);
-        if (chatId != null && chatId.length() > 0)
-        {
-            chatSession = ChatSessionManager.getActiveChat(chatId);
-        }
+
+        if(chatId == null)
+            throw new IllegalArgumentException();
+
+        chatSession = ChatSessionManager.getActiveChat(chatId);
 
         return content;
     }
@@ -238,13 +215,7 @@ public class ChatFragment
      */
     public void sendMessage(final String message)
     {
-        if (!StringUtils.isNullOrEmpty(message))
-            new Thread(){
-                public void run()
-                {
-                    chatSession.sendMessage(message);
-                }
-            }.start();
+        chatSession.sendMessage(message);
     }
 
     class ChatListAdapter

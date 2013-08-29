@@ -9,13 +9,16 @@ package org.jitsi.android.gui.chat;
 import java.net.*;
 import java.util.*;
 
+import android.content.*;
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.gui.*;
 import net.java.sip.communicator.service.gui.event.*;
 import net.java.sip.communicator.service.protocol.*;
 
 import net.java.sip.communicator.util.*;
+import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
+import org.jitsi.android.gui.util.*;
 import org.jitsi.android.gui.util.event.*;
 import org.jitsi.android.gui.util.event.EventListener;
 
@@ -26,6 +29,12 @@ import org.jitsi.android.gui.util.event.EventListener;
  */
 public class ChatSessionManager
 {
+    /**
+     * The logger
+     */
+    private final static Logger logger
+            = Logger.getLogger(ChatSessionManager.class);
+
     /**
      * The chat identifier property.
      */
@@ -46,7 +55,7 @@ public class ChatSessionManager
     /**
      * The list of active chats.
      */
-    private static final EventListenerList<String> activeChatListeners
+    private static final EventListenerList<String> currentChatListeners
             = new EventListenerList<String>();
 
     /**
@@ -207,8 +216,14 @@ public class ChatSessionManager
     {
         currentChatId = chatId;
 
+        logger.debug("Current chat id: " + chatId);
+        ChatSession currChat = getActiveChat(currentChatId);
+        if(currChat != null)
+            logger.debug("Current chat with: "
+                                 + currChat.getMetaContact().getDisplayName());
+
         // Notifies about active session switch
-        activeChatListeners.notifyEventListeners(chatId);
+        currentChatListeners.notifyEventListeners(chatId);
     }
 
     /**
@@ -248,6 +263,10 @@ public class ChatSessionManager
         chatListeners.remove(listener);
     }
 
+    /**
+     * Notifies all chat listener about chat started event.
+     * @param chat the chat that has been started.
+     */
     private static void notifyChatStarted(ChatSession chat)
     {
         for(ChatListener l : chatListeners)
@@ -256,6 +275,10 @@ public class ChatSessionManager
         }
     }
 
+    /**
+     * Notifies about chat ended event.
+     * @param chat the chat that has been ended.
+     */
     private static void notifyChatEnded(ChatSession chat)
     {
         for(ChatListener l : chatListeners)
@@ -264,16 +287,32 @@ public class ChatSessionManager
         }
     }
 
-    public static void addActiveChatListener(EventListener<String> l)
+    /**
+     * Adds given listener to the current chat listeners list.
+     * @param l the listener to add to the current chat listeners list.
+     */
+    public static void addCurrentChatListener(EventListener<String> l)
     {
-        activeChatListeners.addEventListener(l);
+        currentChatListeners.addEventListener(l);
     }
 
-    public static void removeActiveChatListener(EventListener<String> l)
+    /**
+     * Removes given listener form the current chat listeners list.
+     * @param l the listener to remove fro the current chat listeners list.
+     */
+    public static void removeCurrentChatListener(EventListener<String> l)
     {
-        activeChatListeners.removeEventListener(l);
+        currentChatListeners.removeEventListener(l);
     }
 
+    /**
+     * Finds the chat for given <tt>Contact</tt>. Create one if
+     * <tt>startIfNotExists</tt> flag is set to <tt>true</tt>.
+     * @param contact the contact for which active chat will be returned.
+     * @param startIfNotExists <tt>true</tt> if new chat should be created
+     *                         in case it doesn't exists yet.
+     * @return active chat for given contact.
+     */
     public synchronized static Chat findChatForContact(Contact contact,
                                                        boolean startIfNotExists)
     {
@@ -305,6 +344,11 @@ public class ChatSessionManager
         return newChat;
     }
 
+    /**
+     * Adds <tt>ChatLinkClickedListener</tt>.
+     * @param chatLinkClickedListener the <tt>ChatLinkClickedListener</tt>
+     *                                to add.
+     */
     public synchronized static void addChatLinkListener(
             ChatLinkClickedListener chatLinkClickedListener)
     {
@@ -312,12 +356,22 @@ public class ChatSessionManager
             chatLinkListeners.add(chatLinkClickedListener);
     }
 
+    /**
+     * Removes given <tt>ChatLinkClickedListener</tt>.
+     * @param chatLinkClickedListener the <tt>ChatLinkClickedListener</tt>
+     *                                to remove.
+     */
     public synchronized static void removeChatLinkListener(
             ChatLinkClickedListener chatLinkClickedListener)
     {
         chatLinkListeners.remove(chatLinkClickedListener);
     }
 
+    /**
+     * Notifies currently registers <tt>ChatLinkClickedListener</tt> when
+     * the link is licked.
+     * @param uri clicked link <tt>URI</tt>
+     */
     public synchronized static void notifyChatLinkClicked(URI uri)
     {
         for(ChatLinkClickedListener l : chatLinkListeners)
@@ -327,13 +381,47 @@ public class ChatSessionManager
     }
 
     /**
+     * Creates the <tt>Intent</tt> for starting new chat with given
+     * <tt>MetaContact</tt>.
+     *
+     * @param contact the contact we want to start new chat with.
+     * @return the <tt>Intent</tt> for starting new chat with given
+     *         <tt>MetaContact</tt>.
+     */
+    public static Intent getChatIntent(MetaContact contact)
+    {
+        ChatSession chatSession
+                = (ChatSession) findChatForContact(
+                                    contact.getDefaultContact(),
+                                    true);
+        Intent chatIntent;
+        if(AndroidUtils.isTablet())
+        {
+            // Use home activity
+            chatIntent = new Intent(JitsiApplication.getGlobalContext(),
+                                    Jitsi.class);
+        }
+        else
+        {
+            // Use chat activity
+            chatIntent = new Intent(JitsiApplication.getGlobalContext(),
+                                    ChatActivity.class);
+        }
+
+        chatIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        chatIntent.putExtra(CHAT_IDENTIFIER, chatSession.getChatId());
+
+        return chatIntent;
+    }
+
+    /**
      * Disposes of static resources held by this instance.
      */
     public synchronized static void dispose()
     {
         chatLinkListeners.clear();
         chatListeners.clear();
-        activeChatListeners.clear();
+        currentChatListeners.clear();
         activeChats.clear();
     }
 }

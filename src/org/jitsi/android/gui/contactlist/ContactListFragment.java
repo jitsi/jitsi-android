@@ -14,6 +14,7 @@ import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.chat.*;
+import org.jitsi.android.gui.util.*;
 import org.jitsi.service.osgi.*;
 
 import android.content.*;
@@ -39,12 +40,6 @@ public class ContactListFragment
             = Logger.getLogger(ContactListFragment.class);
 
     /**
-     * If this argument is present fragment will start new chat with
-     * <tt>MetaContact</tt> identified by UID carried by this arg.
-     */
-    public static final String META_CONTACT_UID_ARG="arg.meta_uid";
-
-    /**
      * The <tt>MetaContactListService</tt> giving access to the contact list
      * content.
      */
@@ -60,7 +55,15 @@ public class ContactListFragment
      */
     private ExpandableListView contactListView;
 
+    /**
+     * Stores last clicked <tt>MetaContact</tt>.
+     */
     private MetaContact clickedContact;
+
+    /**
+     * Stores current chat id, when the activity is paused.
+     */
+    private String currentChatId;
 
     /**
      * {@inheritDoc}
@@ -74,23 +77,12 @@ public class ContactListFragment
                                          container,
                                          false);
 
-        return content;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onStart()
-    {
-        super.onStart();
-
         this.contactListService
                 = ServiceUtils.getService( AndroidGUIActivator.bundleContext,
                                            MetaContactListService.class);
 
-        contactListView
-            = (ExpandableListView) getView().findViewById(R.id.contactListView);
+        contactListView = (ExpandableListView) content
+                .findViewById(R.id.contactListView);
 
         this.contactListAdapter = new ContactListAdapter(this);
 
@@ -108,24 +100,73 @@ public class ContactListFragment
             contactListAdapter.initAdapterData(contactListService);
         }
 
-        // Check if we have contact UID argument to start new chat
-        Bundle args = getArguments();
-        if(args == null)
-            return;
-        String metaUID = args.getString(META_CONTACT_UID_ARG);
-        if(metaUID == null)
-            return;
-        MetaContact metaContact
-                = contactListService.findMetaContactByMetaUID(metaUID);
-        if(metaContact == null)
+        // If we have stored state use savedInstanceState bundle
+        // or the arguments otherwise
+        Bundle state
+                = savedInstanceState != null
+                    ? savedInstanceState : getArguments();
+        if(state != null)
         {
-            logger.error("Meta contact not found for UID: " + metaUID);
-            return;
+            String intentChatId
+                    = state.getString(ChatSessionManager.CHAT_IDENTIFIER);
+            if(intentChatId != null)
+            {
+                // It has to be initialized when the view is restored
+                currentChatId = intentChatId;
+
+                selectChatSession(
+                        ChatSessionManager.getActiveChat(intentChatId));
+            }
         }
-        logger.info("Start chat with contact: " + metaContact);
-        startChatActivity(metaContact);
+
+        return content;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+
+        // Manages current chat id only on tablet layout
+        if(AndroidUtils.isTablet())
+        {
+            currentChatId = ChatSessionManager.getCurrentChatId();
+            ChatSessionManager.setCurrentChatId(null);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+
+        // Manages current chat id only on tablet layout
+        if(AndroidUtils.isTablet())
+        {
+            ChatSessionManager.setCurrentChatId(currentChatId);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        outState.putString(ChatSessionManager.CHAT_IDENTIFIER, currentChatId);
+
+        super.onSaveInstanceState(outState);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void onDestroy()
     {
@@ -358,24 +399,30 @@ public class ContactListFragment
      */
     public void startChatActivity(MetaContact metaContact)
     {
-        ChatSession chatSession = ChatSessionManager.getActiveChat(metaContact);
+        ChatSession chatSession
+                = (ChatSession) ChatSessionManager.findChatForContact(
+                                    metaContact.getDefaultContact(), true);
 
-        if (chatSession == null)
-        {
-            chatSession = new ChatSession(metaContact);
+        selectChatSession(chatSession);
+    }
 
-            ChatSessionManager.addActiveChat(chatSession);
-        }
-
-        ChatSessionManager.setCurrentChatId(chatSession.getChatId());
+    /**
+     * Selects current chat session. Depends on the current layout new chat
+     * fragment will be selected or new <tt>ChatActivity</tt> will be started.
+     *
+     * @param currentChat current chat session to be selected.
+     */
+    private void selectChatSession(ChatSession currentChat)
+    {
+        ChatSessionManager.setCurrentChatId(currentChat.getChatId());
 
         View chatExtendedView = getActivity().findViewById(R.id.chatView);
 
         if (chatExtendedView != null)
         {
             ChatTabletFragment chatTabletFragment
-                = ChatTabletFragment.newInstance(chatSession.getChatId());
-                    getActivity().getSupportFragmentManager()
+                    = ChatTabletFragment.newInstance(currentChat.getChatId());
+            getActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.chatView, chatTabletFragment)
                     .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
@@ -383,10 +430,9 @@ public class ContactListFragment
         }
         else
         {
-            Intent chatIntent = new Intent(
-                getActivity(),
-                ChatActivity.class);
-
+            Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
+            chatIntent.putExtra(ChatSessionManager.CHAT_IDENTIFIER,
+                                currentChat.getChatId());
             getActivity().startActivity(chatIntent);
         }
     }

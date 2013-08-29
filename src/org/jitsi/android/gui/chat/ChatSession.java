@@ -20,6 +20,7 @@ import org.jitsi.android.gui.*;
 import org.jitsi.android.util.java.awt.event.*;
 import org.jitsi.android.util.javax.swing.event.*;
 import org.jitsi.android.util.javax.swing.text.*;
+import org.jitsi.util.*;
 
 import java.util.*;
 
@@ -132,20 +133,30 @@ public class ChatSession
      *
      * @param message the message to send
      */
-    public void sendMessage(String message)
+    public void sendMessage(final String message)
     {
-        OperationSetBasicInstantMessaging imOpSet
+        if (StringUtils.isNullOrEmpty(message))
+            return;
+
+        final OperationSetBasicInstantMessaging imOpSet
             = currentChatTransport.getProtocolProvider()
                     .getOperationSet(OperationSetBasicInstantMessaging.class);
 
         if (imOpSet == null)
             return;
 
-        Message msg = imOpSet.createMessage(message);
+        new Thread()
+        {
+            @Override
+            public void run()
+            {
+                Message msg = imOpSet.createMessage(message);
 
-        imOpSet.sendInstantMessage( currentChatTransport,
-                                    ContactResource.BASE_RESOURCE,
-                                    msg);
+                imOpSet.sendInstantMessage( currentChatTransport,
+                                            ContactResource.BASE_RESOURCE,
+                                            msg);
+            }
+        }.start();
     }
 
     public void dispose()
@@ -382,7 +393,7 @@ public class ChatSession
     @Override
     public boolean isChatFocused()
     {
-        return ChatSessionManager.getCurrentChatId().equals(chatId);
+        return chatId.equals(ChatSessionManager.getCurrentChatId());
     }
 
     @Override

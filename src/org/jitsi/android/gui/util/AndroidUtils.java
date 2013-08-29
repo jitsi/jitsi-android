@@ -8,6 +8,7 @@ package org.jitsi.android.gui.util;
 
 import java.util.*;
 
+import android.content.res.*;
 import net.java.sip.communicator.util.Logger;
 
 import org.jitsi.*;
@@ -285,6 +286,20 @@ public class AndroidUtils
                 return false;
             }
         });
+    }
+
+    /**
+     * Returns <tt>true</tt> if we are currently running on tablet device.
+     * @return <tt>true</tt> if we are currently running on tablet device.
+     */
+    public static boolean isTablet()
+    {
+        Context context = JitsiApplication.getGlobalContext();
+
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB
+                && (context.getResources().getConfiguration().screenLayout
+                        & Configuration.SCREENLAYOUT_SIZE_MASK)
+                    >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
     public static boolean isUIThread()
