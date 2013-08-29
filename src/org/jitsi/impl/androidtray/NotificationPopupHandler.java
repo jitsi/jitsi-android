@@ -13,6 +13,7 @@ import android.support.v4.app.*;
 
 import java.util.*;
 
+import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.systray.*;
 import net.java.sip.communicator.service.systray.event.*;
@@ -20,7 +21,9 @@ import net.java.sip.communicator.util.*;
 
 import org.jitsi.*;
 import org.jitsi.android.*;
+import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.chat.*;
+import org.jitsi.android.gui.util.event.EventListener;
 
 /**
  * Displays popup messages as Android status bar notifications.
@@ -53,6 +56,45 @@ public class NotificationPopupHandler
      * Maps <tt>PopupMessage</tt> tags to notification ids.
      */
     private Map<Object, Integer> tagToNotificationMap = new HashMap<Object, Integer>();
+
+    /**
+     * Creates new instance of <tt>NotificationPopupHandler</tt>.
+     * Registers as active chat listener.
+     */
+    public NotificationPopupHandler()
+    {
+        ChatSessionManager.addCurrentChatListener(activeChatListener);
+    }
+
+    /**
+     * Listens for currently active chat and clear notifications related to it.
+     */
+    private EventListener<String> activeChatListener
+            = new EventListener<String>()
+    {
+        @Override
+        public void onChangeEvent(String chatKey)
+        {
+            // Clears chat notification related to currently opened chat
+            ChatSession openChat = ChatSessionManager.getActiveChat(chatKey);
+
+            if(openChat == null)
+                return;
+
+            Integer notificationId
+                    = tagToNotificationMap.get(openChat.getMetaContact());
+
+            if(notificationId != null)
+            {
+                // Clears the notification
+                JitsiApplication
+                        .getNotificationManager().cancel(notificationId);
+                // removes data related to this notification
+                removeNotification(notificationId);
+            }
+        }
+    };
+
     /**
      * {@inheritDoc}
      */
@@ -77,9 +119,26 @@ public class NotificationPopupHandler
         {
             if(tag instanceof Contact)
             {
-                if(ChatSessionManager.getActiveChat((Contact)tag)
-                        .isChatFocused())
+                // Converts contact to meta contact
+                tag = getMetaContact((Contact)tag);
+
+                if(tag == null)
+                {
+                    logger.error(
+                            "No meta contact found for " + tag
+                            + ", there will be no notification displayed.");
                     return;
+                }
+
+                ChatSession chat
+                        = ChatSessionManager.getActiveChat((MetaContact) tag);
+
+                if(chat != null && chat.isChatFocused())
+                {
+                    logger.info("Skipping chat notification, "
+                                + "because the chat is focused");
+                    return;
+                }
             }
 
             Integer prevId = tagToNotificationMap.get(tag);
@@ -115,12 +174,8 @@ public class NotificationPopupHandler
                         PopupClickReceiver.createDeleteIntent(nId),
                         PendingIntent.FLAG_UPDATE_CURRENT));
 
-        NotificationManager mNotificationManager
-            = (NotificationManager) ctx
-                    .getSystemService(Context.NOTIFICATION_SERVICE);
-
         // post the notification
-        mNotificationManager.notify(nId, builder.build());
+        JitsiApplication.getNotificationManager().notify(nId, builder.build());
 
         // handle discard timeout
         if(timeoutHandlers.containsKey(nId))
@@ -152,6 +207,22 @@ public class NotificationPopupHandler
 
         // caches the notification until clicked or cleared
         notificationMap.put(nId, popupMessage);
+    }
+
+    /**
+     * Converts given <tt>Contact</tt> to <tt>MetaContact</tt>.
+     * @param contact the <tt>Contact</tt> that will be converted into
+     *                <tt>MetaContact</tt>
+     * @return <tt>MetaContact</tt> for given <tt>Contact</tt>
+     */
+    private MetaContact getMetaContact(Contact contact)
+    {
+        MetaContactListService metaContactList
+                = ServiceUtils.getService(
+                AndroidGUIActivator.bundleContext,
+                MetaContactListService.class);
+
+        return metaContactList.findMetaContactByContact(contact);
     }
 
     /**
@@ -207,20 +278,13 @@ public class NotificationPopupHandler
         notificationMap.remove(notificationId);
 
         Object tag = msg.getTag();
-        Object toBeRemovedKey = null;
-        for(Object key : tagToNotificationMap.keySet())
+        if(tag instanceof Contact)
         {
-            if(key.equals(tag))
-            {
-                toBeRemovedKey = key;
-                break;
-            }
+            // Converts tag to meta contact
+            tag = getMetaContact((Contact)tag);
         }
 
-        if(toBeRemovedKey != null)
-        {
-            tagToNotificationMap.remove(toBeRemovedKey);
-        }
+        tagToNotificationMap.remove(tag);
     }
 
     /**
@@ -228,6 +292,9 @@ public class NotificationPopupHandler
      */
     void dispose()
     {
+        // Removes active chat listener
+        ChatSessionManager.removeCurrentChatListener(activeChatListener);
+
         NotificationManager notifyManager
                 = JitsiApplication.getNotificationManager();
 
