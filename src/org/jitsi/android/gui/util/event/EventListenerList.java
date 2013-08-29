@@ -32,7 +32,8 @@ public class EventListenerList<T>
      */
     public void addEventListener(EventListener<T> listener)
     {
-        listeners.add(listener);
+        if(!listeners.contains(listener))
+            listeners.add(listener);
     }
 
     /**

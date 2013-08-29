@@ -110,7 +110,8 @@ public class OtrFragment
         this.menu = menu;
 
         // Initialize the padlock when new menu is created
-        doInit();
+        if(getActivity() != null)
+            doInit();
     }
 
     /**
