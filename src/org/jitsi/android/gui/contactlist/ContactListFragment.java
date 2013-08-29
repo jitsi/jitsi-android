@@ -111,9 +111,6 @@ public class ContactListFragment
                     = state.getString(ChatSessionManager.CHAT_IDENTIFIER);
             if(intentChatId != null)
             {
-                // It has to be initialized when the view is restored
-                currentChatId = intentChatId;
-
                 selectChatSession(
                         ChatSessionManager.getActiveChat(intentChatId));
             }
@@ -414,7 +411,9 @@ public class ContactListFragment
      */
     private void selectChatSession(ChatSession currentChat)
     {
-        ChatSessionManager.setCurrentChatId(currentChat.getChatId());
+        currentChatId = currentChat.getChatId();
+
+        ChatSessionManager.setCurrentChatId(currentChatId);
 
         View chatExtendedView = getActivity().findViewById(R.id.chatView);
 
