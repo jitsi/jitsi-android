@@ -3,42 +3,53 @@
              android:layout_width="fill_parent"
               android:layout_height="@dimen/account_list_row_height"
               >
-
     <ImageView
-                android:id="@+id/accountProtoIcon"
+            android:id="@+id/accountProtoIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:src="@drawable/jabber_logo"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"/>
+    <RelativeLayout android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/accountProtoIcon"
+                    android:layout_marginLeft="15dp"
+                    android:layout_centerVertical="true"
+                    android:gravity="center|left">
+        <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_centerVertical="true"
-                android:src="@drawable/jabber_logo"/>
-        <TextView
+                android:layout_below="@+id/accountName"
+                android:layout_marginTop="3dp">
+            <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/accountStatusIcon"
+                    android:src="@drawable/jabber_status_phone"
+                    android:layout_alignBottom="@+id/accountStatus"
+                    android:layout_alignTop="@+id/accountStatus"
+                    />
+            <TextView
                     style="@style/MediumFont"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/accountStatus"
-                    android:text="Unknown"
-                    android:layout_alignParentRight="true"
-                    android:layout_column="2"
-                    android:gravity="center"
-                    android:layout_marginRight="5dp"
-                    android:layout_centerVertical="true"
-                />
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/accountStatusIcon"
-            android:layout_toLeftOf="@+id/accountStatus"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
-            android:src="@drawable/jabber_status_phone"
-            android:adjustViewBounds="false"/>
+                    android:text="Offline"
+                    android:gravity="center_vertical"
+                    android:layout_alignParentTop="true"
+                    android:layout_toRightOf="@+id/accountStatusIcon"
+                    android:layout_marginLeft="5dp"/>
+        </RelativeLayout>
         <TextView
-                    style="@style/MediumFont"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/accountName"
-                    android:text="AccountName"
-                    android:layout_toRightOf="@+id/accountProtoIcon"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="10dp"/>
+                style="@style/LargeFont"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/accountName"
+                android:text="sipcommunicator@jitsi.org"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="false"
+                android:layout_alignParentRight="true"/>
+    </RelativeLayout>
 </RelativeLayout>

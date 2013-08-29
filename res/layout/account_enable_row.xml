@@ -2,7 +2,8 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="fill_parent"
-                android:layout_height="@dimen/account_list_row_height" >
+                android:layout_height="wrap_content"
+                android:minHeight="@dimen/account_list_row_height">
     <ToggleButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -29,15 +30,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/accountName"
-                android:layout_marginTop="3dp">
+                android:layout_marginTop="3dp"
+                android:gravity="center_vertical">
             <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/accountStatusIcon"
-                    android:src="@drawable/jabber_status_phone"
-                    android:layout_alignBottom="@+id/accountStatus"
-                    android:layout_alignTop="@+id/accountStatus"
-                    />
+                    android:src="@drawable/jabber_status_phone"/>
             <TextView
                     style="@style/MediumFont"
                     android:layout_width="wrap_content"
@@ -45,19 +44,15 @@
                     android:id="@+id/accountStatus"
                     android:text="Offline"
                     android:gravity="center_vertical"
-                    android:layout_alignParentTop="true"
                     android:layout_toRightOf="@+id/accountStatusIcon"
-                    android:layout_marginLeft="5dp"/>
+                    android:layout_marginLeft="5dp"
+                    />
         </RelativeLayout>
         <TextView
                 style="@style/MediumFont"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/accountName"
-                android:text="sipcommunicator@jitsi.org"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentBottom="false"
-                android:layout_alignParentRight="true"/>
+                android:text="sipcommunicator@jitsi.org"/>
     </RelativeLayout>
 </RelativeLayout>
