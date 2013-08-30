@@ -355,6 +355,6 @@
     <target name="rebuild" depends="clean,setup-libs,make"/>
 
     <!-- makes, install and runs the project on the default device -->
-    <target name="run" depends="debug-install,adb-install-and-run"/>
+    <target name="run" depends="make,adb-install-and-run"/>
 
 </project>
