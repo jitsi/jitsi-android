@@ -11,7 +11,6 @@ import android.content.*;
 import android.database.*;
 import android.graphics.*;
 import android.net.*;
-import android.os.*;
 import android.provider.*;
 import android.text.*;
 import android.view.*;
@@ -24,10 +23,11 @@ import net.java.sip.communicator.util.account.*;
 
 import org.jitsi.*;
 import org.jitsi.android.gui.*;
+import org.jitsi.android.gui.account.settings.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.android.gui.util.event.EventListener;/*Disambiguation*/
-
 import org.jitsi.service.osgi.*;
+
 import org.osgi.framework.*;
 
 import java.io.*;
@@ -90,9 +90,6 @@ public class PresenceStatusActivity
     protected void onCreate(android.os.Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        // Enable title
-        if(Build.VERSION.SDK_INT >= 11)
-            getActionBar().setDisplayShowTitleEnabled(true);
         // Set the main layout
         setContentView(R.layout.presence_status);
     }
@@ -202,6 +199,55 @@ public class PresenceStatusActivity
         super.stop(bundleContext);
 
         commitStatusChanges();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        super.onCreateOptionsMenu(menu);
+
+        getMenuInflater().inflate(R.menu.presence_status_menu, menu);
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        int id = item.getItemId();
+        if(id == R.id.remove)
+        {
+            RemoveAccountDialog
+                    .create(this, account.getAccountID(),
+                            new RemoveAccountDialog.OnAccountRemovedListener()
+                            {
+                                @Override
+                                public void onAccountRemoved(AccountID accID)
+                                {
+                                    // Prevent from submitting status
+                                    hasChanges = false;
+                                    finish();
+                                }
+                            })
+                    .show();
+            return true;
+        }
+        else if(id == R.id.account_settings)
+        {
+            Intent preferences
+                    = AccountPreferencesActivity
+                            .getIntent(this, account.getAccountID());
+            startActivity(preferences);
+            return true;
+        }
+
+        return super.onContextItemSelected(item);
     }
 
     /**

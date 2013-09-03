@@ -13,13 +13,11 @@ import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.account.*;
 
 import org.jitsi.*;
-import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.account.*;
 import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.settings.*;
 import org.jitsi.service.log.*;
-import org.jitsi.service.osgi.*;
 
 import android.os.*;
 import android.view.*;
@@ -103,11 +101,8 @@ public class MainMenuActivity
                 }
             }
             return true;
-        case R.id.accounts_status:
-            startActivity(AccountsStatusActivity.class);
-            return true;
-        case R.id.accounts_settings:
-            startActivity(AccountEnableActivity.class);
+        case R.id.accounts:
+            startActivity(AccountsListActivity.class);
             return true;
         case R.id.main_settings:
             startActivity(SettingsActivity.class);

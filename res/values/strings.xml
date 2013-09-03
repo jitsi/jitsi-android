@@ -30,6 +30,7 @@
     <string name="exit_app">Exit</string>
     <string name="service_gui_UNKNOWN_CONTACT">Unknown</string>
     <string name="service_gui_ACCOUNT_ME">Me</string>
+    <string name="service_gui_ACCOUNT_SETTINGS">Account settings</string>
     <string name="service_gui_CONTACT_PAUSED_TYPING">paused typing</string>
     <string name="service_gui_CONTACT_TYPING">is typing</string>
 
@@ -63,10 +64,10 @@
     <string name="service_gui_REMOVE_CONTACT_TEXT">
         <DIV>Are you sure you want to remove <B> %s </B><BR/>from your contact list?</DIV>
     </string>
-
-    <!-- Main Menu items -->
-    <string name="service_gui_ACCOUNTS_STATUS">Accounts status</string>
-    <string name="service_gui_ACCOUNTS_SETTINGS">Accounts settings</string>
+    <string name="service_gui_REMOVE_ACCOUNT">Remove account</string>
+    <string name="service_gui_REMOVE_ACCOUNT_MESSAGE">
+        Are you sure you want to remove %s?
+    </string>
 
     <!-- Sign in -->
     <string name="service_gui_SIGN_IN">Sign in</string>
@@ -115,7 +116,7 @@
     <string name="service_gui_DND_STATUS">Do not disturb</string>
     <string name="service_gui_RETRY">Retry</string>
     <string name="service_gui_ERROR">Error</string>
-    <string name="service.gui.AUTHENTICATION_FAILED">
+    <string name="service_gui_AUTHENTICATION_FAILED">
         Authentication failed for {0}. The password you entered is not valid.
     </string>
     <string name="service_gui_CONNECTION_FAILED_MSG">Connection failed for the

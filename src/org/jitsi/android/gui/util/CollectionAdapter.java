@@ -131,12 +131,21 @@ public abstract class CollectionAdapter<T>
      *
      * @param object instance of {@link T} that will be removed from the adapter
      */
-    public void remove(T object)
+    public void remove(final T object)
     {
-        if(items.remove(object))
+        // Remove item on UI thread to make sure
+        // it's not being painted at the same time
+        parentActivity.runOnUiThread(new Runnable()
         {
-            doRefreshList();
-        }
+            @Override
+            public void run()
+            {
+                if(items.remove(object))
+                {
+                    doRefreshList();
+                }
+            }
+        });
     }
 
     /**

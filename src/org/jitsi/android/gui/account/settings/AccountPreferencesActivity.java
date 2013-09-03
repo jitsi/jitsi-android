@@ -6,11 +6,14 @@
  */
 package org.jitsi.android.gui.account.settings;
 
+import android.content.*;
 import android.os.*;
 import android.view.*;
+
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.account.*;
+
 import org.jitsi.service.osgi.*;
 
 /**
@@ -145,5 +148,23 @@ public class AccountPreferencesActivity
         }
         return super.onKeyUp(keyCode, event);
     }
+
+    /**
+     * Creates new <tt>Intent</tt> for starting account preferences activity.
+     * @param ctx the context.
+     * @param accountID <tt>AccountID</tt> for which preferences will be opened.
+     * @return <tt>Intent</tt> for starting account preferences activity
+     *         parametrized with given <tt>AccountID</tt>.
+     */
+    public static Intent getIntent(Context ctx, AccountID accountID)
+    {
+        Intent intent = new Intent(ctx, AccountPreferencesActivity.class);
+
+        intent.putExtra(AccountPreferencesActivity.EXTRA_USER_ID,
+                        accountID.getAccountUniqueID());
+
+        return intent;
+    }
+
     
 }
