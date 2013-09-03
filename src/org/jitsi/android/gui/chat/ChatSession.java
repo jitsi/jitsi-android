@@ -20,6 +20,7 @@ import org.jitsi.android.gui.*;
 import org.jitsi.android.util.java.awt.event.*;
 import org.jitsi.android.util.javax.swing.event.*;
 import org.jitsi.android.util.javax.swing.text.*;
+import org.jitsi.service.resources.*;
 import org.jitsi.util.*;
 
 import java.util.*;
@@ -631,13 +632,78 @@ public class ChatSession
     }
 
     @Override
-    public void messageDeliveryFailed(
-            MessageDeliveryFailedEvent messageDeliveryFailedEvent)
+    public void messageDeliveryFailed(MessageDeliveryFailedEvent evt)
     {
         for(MessageListener l : msgListeners)
         {
-            l.messageDeliveryFailed(messageDeliveryFailedEvent);
+            l.messageDeliveryFailed(evt);
         }
+
+        // Insert error message
+        logger.error(evt.getReason());
+
+        String errorMsg;
+
+        Message sourceMessage = (Message) evt.getSource();
+
+        Contact sourceContact = evt.getDestinationContact();
+
+        MetaContact metaContact = AndroidGUIActivator.getContactListService()
+                .findMetaContactByContact(sourceContact);
+
+        ResourceManagementService rms
+                = AndroidGUIActivator.getResourcesService();
+
+        if (evt.getErrorCode()
+                == MessageDeliveryFailedEvent.OFFLINE_MESSAGES_NOT_SUPPORTED)
+        {
+            errorMsg = rms.getI18NString(
+                    "service.gui.MSG_DELIVERY_NOT_SUPPORTED",
+                    new String[] {sourceContact.getDisplayName()});
+        }
+        else if (evt.getErrorCode()
+                == MessageDeliveryFailedEvent.NETWORK_FAILURE)
+        {
+            errorMsg = rms.getI18NString(
+                    "service.gui.MSG_NOT_DELIVERED");
+        }
+        else if (evt.getErrorCode()
+                == MessageDeliveryFailedEvent.PROVIDER_NOT_REGISTERED)
+        {
+            errorMsg = rms.getI18NString(
+                    "service.gui.MSG_SEND_CONNECTION_PROBLEM");
+        }
+        else if (evt.getErrorCode()
+                == MessageDeliveryFailedEvent.INTERNAL_ERROR)
+        {
+            errorMsg = rms.getI18NString(
+                    "service.gui.MSG_DELIVERY_INTERNAL_ERROR");
+        }
+        else
+        {
+            errorMsg = rms.getI18NString(
+                    "service.gui.MSG_DELIVERY_ERROR");
+        }
+
+        String reason = evt.getReason();
+        if (reason != null)
+            errorMsg += " " + rms.getI18NString(
+                    "service.gui.ERROR_WAS",
+                    new String[]{reason});
+
+        addMessage(
+                metaContact.getDisplayName(),
+                new Date(),
+                Chat.OUTGOING_MESSAGE,
+                sourceMessage.getContent(),
+                sourceMessage.getContentType());
+
+        addMessage(
+                metaContact.getDisplayName(),
+                new Date(),
+                Chat.ERROR_MESSAGE,
+                errorMsg,
+                OperationSetBasicInstantMessaging.DEFAULT_MIME_TYPE);
     }
 
     /**

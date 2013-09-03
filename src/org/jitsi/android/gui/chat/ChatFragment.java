@@ -525,7 +525,7 @@ public class ChatFragment
         @Override
         public void messageDeliveryFailed(MessageDeliveryFailedEvent arg0)
         {
-            // TODO Auto-generated method stub
+            // Do nothing, handled in ChatSession
         }
 
         @Override

@@ -116,6 +116,7 @@
     <string name="service_gui_DND_STATUS">Do not disturb</string>
     <string name="service_gui_RETRY">Retry</string>
     <string name="service_gui_ERROR">Error</string>
+    <string name="service_gui_ERROR_WAS">Error was: {0}</string>
     <string name="service_gui_AUTHENTICATION_FAILED">
         Authentication failed for {0}. The password you entered is not valid.
     </string>
@@ -130,6 +131,29 @@
     <string name="service_gui_VIDEO_CALL">Video call</string>
     <string name="service_gui_CONTACTS">Contacts</string>
     <string name="service_gui_ENTER_NAME_OR_NUMBER">Enter name or number</string>
+    <string name="service_gui_MSG_DELIVERY_FAILURE">
+        The above message could not be delivered
+    </string>
+    <string name="service_gui_MSG_DELIVERY_NOT_SUPPORTED">
+        The protocol you are using doesn\'\'t \
+        support offline messages. You could try to reach {0} through another \
+        protocol or wait until he/she becomes online.
+    </string>
+    <string name="service_gui_MSG_DELIVERY_INTERNAL_ERROR">
+        An internal error occurred. This is most probably a bug. Please report it here: https://jitsi.org/Development/BugsAndIssues.
+    </string>
+    <string name="service_gui_MSG_DELIVERY_ERROR">
+        Failed to deliver message.
+    </string>
+    <string name="service_gui_MSG_DELIVERY_UNKNOWN_ERROR">
+        Unknown error has occurred while delivering your message.
+    </string>
+    <string name="service_gui_MSG_NOT_DELIVERED">
+        A network problem occurred. Please check your network configuration and try again.
+    </string>
+    <string name="service_gui_MSG_SEND_CONNECTION_PROBLEM">
+        You should be connected to be able to send messages.
+    </string>
 
     <!-- Logs -->
     <string name="service_gui_SEND_LOGS_SUBJECT">Jitsi logs</string>
