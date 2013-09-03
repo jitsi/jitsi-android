@@ -225,7 +225,7 @@ public class Jitsi
         contactListFragment = new ContactListFragment();
 
         String chatId
-                = getIntent().getStringExtra(
+                = intent.getStringExtra(
                         ChatSessionManager.CHAT_IDENTIFIER);
 
         if(chatId != null)
