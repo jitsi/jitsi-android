@@ -29,6 +29,8 @@
             android:background="@color/white"
             android:textColor="@color/black"
             android:textColorHighlight="@color/white"
+            android:imeOptions="actionSend"
+            android:singleLine="true"
             android:textCursorDrawable="@null"/>
 
         <ImageButton android:id="@+id/sendMessageButton"

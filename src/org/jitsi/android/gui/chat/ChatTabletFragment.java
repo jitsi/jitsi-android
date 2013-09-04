@@ -13,6 +13,8 @@ import org.osgi.framework.*;
 import android.app.*;
 import android.os.Bundle;
 import android.view.*;
+import android.view.inputmethod.*;
+import android.widget.*;
 
 /**
  * @author Yana Stamcheva
@@ -54,6 +56,27 @@ public class ChatTabletFragment
             .replace(R.id.chatFragment, chatFragment, "chatFragment")
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit();
+
+        // Handle IME send action
+        ((EditText)content.findViewById(R.id.chatWriteText))
+                .setOnEditorActionListener(
+                        new TextView.OnEditorActionListener()
+            {
+                @Override
+                public boolean onEditorAction(TextView v,
+                                              int actionId,
+                                              KeyEvent event)
+                {
+                    if (actionId == EditorInfo.IME_ACTION_SEND)
+                    {
+                        chatFragment.getChatSession()
+                                .sendMessage(v.getText().toString());
+                        v.setText("");
+                        return true;
+                    }
+                    return false;
+                }
+            });
 
         return content;
     }

@@ -29,6 +29,8 @@
             android:layout_margin="5dip"
             android:padding="5dip"
             android:background="@color/white"
+            android:imeOptions="actionSend"
+            android:singleLine="true"
             android:textColor="@color/black"
             android:textColorHighlight="@color/white"/>
 

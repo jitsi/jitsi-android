@@ -19,6 +19,7 @@ import android.os.*;
 import android.support.v4.view.*;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.*;
+import android.view.inputmethod.*;
 import android.widget.*;
 
 /**
@@ -98,6 +99,25 @@ public class ChatActivity
                     .add(new OtrFragment(), "otr_fragment")
                     .commit();
         }
+
+        // Handle IME send action
+        ((EditText)findViewById(R.id.chatWriteText))
+                .setOnEditorActionListener(
+                        new TextView.OnEditorActionListener()
+            {
+                @Override
+                public boolean onEditorAction(TextView v,
+                                              int actionId,
+                                              KeyEvent event)
+                {
+                    if (actionId == EditorInfo.IME_ACTION_SEND)
+                    {
+                        onSendMessageClick(v);
+                        return true;
+                    }
+                    return false;
+                }
+            });
     }
 
     /**
