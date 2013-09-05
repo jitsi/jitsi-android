@@ -9,6 +9,7 @@ package org.jitsi.android.gui.util;
 import android.app.*;
 import android.view.*;
 import android.widget.*;
+import net.java.sip.communicator.service.contactlist.*;
 
 import java.util.*;
 
@@ -124,6 +125,17 @@ public abstract class CollectionAdapter<T>
             items.add(object);
             doRefreshList();
         }
+    }
+
+    /**
+     * Insert given object at specified position without notifying about adapter
+     * data change.
+     * @param pos the position at which given object will be inserted.
+     * @param object the object to insert into adapter's list.
+     */
+    protected void insert(int pos, T object)
+    {
+        items.add(pos, object);
     }
 
     /**

@@ -183,19 +183,6 @@ public class AndroidGUIActivator
                                         GlobalDisplayDetailsService.class);
     }
 
-    /**
-     * Returns the <tt>MetaContactListService</tt> obtained from the bundle
-     * context.
-     *
-     * @return the <tt>MetaContactListService</tt> obtained from the bundle
-     *         context.
-     */
-    public static MetaContactListService getMetaContactListService()
-    {
-        return ServiceUtils.getService( bundleContext,
-                                        MetaContactListService.class );
-    }
-
     public static MetaHistoryService getMetaHistoryService()
     {
         return ServiceUtils.getService(bundleContext, MetaHistoryService.class);

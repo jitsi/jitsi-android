@@ -143,7 +143,7 @@ public class AndroidSecurityAuthority
                 resources.getI18NString("sign_in"),
                 new DialogActivity.DialogListener()
                 {
-                    public void onConfirmClicked(DialogActivity dialog)
+                    public boolean onConfirmClicked(DialogActivity dialog)
                     {
                         View dialogContent
                                 = dialog.findViewById(R.id.alertContent);
@@ -164,6 +164,8 @@ public class AndroidSecurityAuthority
                         {
                             credentialsLock.notify();
                         }
+
+                        return true;
                     }
 
                     public void onDialogCancelled(DialogActivity dialog)

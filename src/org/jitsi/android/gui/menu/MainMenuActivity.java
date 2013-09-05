@@ -85,6 +85,9 @@ public class MainMenuActivity
         case R.id.add_contact:
             startActivity(AddContactActivity.class);
             return true;
+        case R.id.add_group:
+            AddGroupDialog.showCreateGroupDialog(this, null);
+            return true;
         case R.id.sign_out:
             Collection<AccountID> accounts
                 = AccountUtils.getStoredAccounts();

@@ -332,7 +332,7 @@ public class ChatSessionManager
             return null;
 
         MetaContact metaContact
-            = AndroidGUIActivator.getMetaContactListService()
+            = AndroidGUIActivator.getContactListService()
                 .findMetaContactByContact(contact);
 
         if(metaContact == null)

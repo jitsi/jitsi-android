@@ -15,6 +15,9 @@
     <item android:id="@+id/add_account"
            android:title="@string/service_gui_NEW_ACCOUNT">
     </item>
+    <item android:id="@+id/add_group"
+          android:title="@string/service_gui_CREATE_GROUP">
+    </item>
     <item android:id="@+id/sign_out"
            android:title="@string/service_gui_SIGN_OUT">
     </item>

@@ -84,7 +84,10 @@ public class AuthorizationRequestedDialog
         Spinner contactGroupSpinner
                 = (Spinner) findViewById(R.id.selectGroupSpinner);
 
-        contactGroupSpinner.setAdapter(new MetaContactGroupAdapter(this));
+        contactGroupSpinner.setAdapter(
+                new MetaContactGroupAdapter(
+                        this,
+                        R.id.selectGroupSpinner));
 
         CompoundButton addToContactsCb
                 = (CompoundButton) findViewById(R.id.addToContacts);

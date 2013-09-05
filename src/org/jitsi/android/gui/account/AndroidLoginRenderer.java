@@ -215,9 +215,10 @@ public class AndroidLoginRenderer
             androidContext.getString(R.string.service_gui_RETRY),
             new DialogActivity.DialogListener()
             {
-                public void onConfirmClicked(DialogActivity dialog)
+                public boolean onConfirmClicked(DialogActivity dialog)
                 {
                     loginManagerCallback.login(protocolProvider);
+                    return true;
                 }
 
                 public void onDialogCancelled(DialogActivity dialog)

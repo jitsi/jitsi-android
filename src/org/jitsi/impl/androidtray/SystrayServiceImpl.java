@@ -151,7 +151,7 @@ public class SystrayServiceImpl
             {
                 Contact contact = (Contact) tag;
                 MetaContact metaContact
-                    = AndroidGUIActivator.getMetaContactListService()
+                    = AndroidGUIActivator.getContactListService()
                         .findMetaContactByContact(contact);
                 if(metaContact == null)
                 {

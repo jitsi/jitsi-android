@@ -22,6 +22,8 @@ import org.jitsi.R;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.account.*;
 import org.jitsi.android.gui.util.*;
+import org.jitsi.android.gui.util.event.*;
+import org.jitsi.android.gui.util.event.EventListener;
 import org.jitsi.service.osgi.*;
 
 /**
@@ -123,7 +125,8 @@ public class AddContactActivity
     {
         Spinner groupSpinner = (Spinner) findViewById(R.id.selectGroupSpinner);
 
-        this.contactGroupAdapter = new MetaContactGroupAdapter(this);
+        this.contactGroupAdapter
+            = new MetaContactGroupAdapter(this, R.id.selectGroupSpinner);
 
         groupSpinner.setAdapter(contactGroupAdapter);
     }

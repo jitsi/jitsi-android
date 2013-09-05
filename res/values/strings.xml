@@ -35,12 +35,35 @@
     <string name="service_gui_CONTACT_TYPING">is typing</string>
 
     <string name="service_gui_ADD_AUTHORIZED_CONTACT">Add %s to your contact list</string>
+    <string name="service_gui_ADD_GROUP_LOCAL_ERROR">
+        Failed to add group with name: %s. The problem occurred during a local IO operation.
+    </string>
+    <string name="service_gui_ADD_GROUP_EXIST_ERROR">
+        The group %s already exists in your contact list. Please choose another name.
+    </string>
+    <string name="service_gui_ADD_GROUP_NET_ERROR">
+        Failed to add group with name: %s. The problem occurred due to a network failure.
+        Please check your network connection and try again.
+    </string>
+    <string name="service_gui_ADD_GROUP_ERROR">
+        Failed to add group with name: %s.
+    </string>
+    <string name="service_gui_ADD_GROUP_EMPTY_NAME">
+        The group name must not be empty.
+    </string>
+    <string name="service_gui_ADD_GROUP_HINT">
+        Enter group name
+    </string>
+    <string name="service_gui_ADD_GROUP">Create group</string>
     <string name="service_gui_AUTHORIZE">Authorize</string>
     <string name="service_gui_AUTHORIZATION_ACCEPTED">contact has accepted your authorization request.</string>
     <string name="service_gui_AUTHENTICATION_REJECTED">contact has rejected your authorization request.</string>
     <string name="service_gui_AUTHORIZATION_REQUESTED">Authorization requested</string>
     <string name="service_gui_AUTHORIZATION_REQUESTED_INFO">The %s contact requests your authorization.</string>
     <string name="service_gui_AUTHORIZATION_RESPONSE">Authorization response</string>
+    <string name="service_gui_CREATE_GROUP_NAME">
+        In the field below enter the name of the group you would like to create.
+    </string>
     <string name="service_gui_DENY">Deny</string>
     <string name="service_gui_IGNORE">Ignore</string>
     <string name="service_gui_NOT_AUTHORIZED">Not authorized</string>
@@ -263,6 +286,7 @@
         Failed to add contact with id: %s. Operation not supported.
     </string>
     <string name="service_gui_CONTACT_NAME">ID or Number</string>
+    <string name="service_gui_CREATE">Create</string>
     <string name="service_gui_CREATE_GROUP">Create group...</string>
     <string name="service_gui_DISPLAY_NAME">Display name</string>
     <string name="service_gui_SELECT_ACCOUNT">Select account</string>

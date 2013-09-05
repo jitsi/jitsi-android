@@ -10,8 +10,10 @@ import android.content.*;
 import android.os.*;
 import android.support.v4.app.*;
 import android.view.*;
+
 import org.jitsi.R;
 import org.jitsi.android.gui.util.*;
+import org.jitsi.service.osgi.*;
 
 import java.util.*;
 
@@ -29,7 +31,7 @@ import java.util.*;
  * @author Pawel Domas
  */
 public class DialogActivity
-    extends FragmentActivity
+    extends OSGiActivity
 {
 
     /**
@@ -84,6 +86,12 @@ public class DialogActivity
      * Flag remembers if the dialog was confirmed.
      */
     private boolean confirmed;
+
+    /**
+     * Flag indicates that this instance state was saved and it might
+     * get recreated in future(device rotation).
+     */
+    private boolean flagSaved = false;
 
     /**
      * {@inheritDoc}
@@ -160,6 +168,16 @@ public class DialogActivity
     }
 
     /**
+     * Returns the content fragment. It can contain alert message or be
+     * the custom fragment class instance.
+     * @return dialog content fragment.
+     */
+    public Fragment getContentFragment()
+    {
+        return getSupportFragmentManager().findFragmentById(R.id.alertContent);
+    }
+
+    /**
      * Fired when confirm button is clicked.
      * @param v the confirm button view.
      */
@@ -167,7 +185,10 @@ public class DialogActivity
     {
         if(listener != null)
         {
-            listener.onConfirmClicked(this);
+            if(!listener.onConfirmClicked(this))
+            {
+                return;
+            }
         }
         confirmed = true;
         finish();
@@ -183,11 +204,29 @@ public class DialogActivity
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+
+        this.flagSaved = true;
+    }
+
+    /**
      * Removes listener from the map.
      */
     @Override
     protected void onDestroy()
     {
+        super.onDestroy();
+
+        // Skip this phase in case state was saved and Activity
+        // might get recreated(device rotation)
+        if(flagSaved)
+            return;
+
         // Notify that dialog was cancelled if confirmed == false
         if(listener != null && !confirmed)
         {
@@ -199,8 +238,6 @@ public class DialogActivity
         {
             listenersMap.remove(listenerID);
         }
-
-        super.onDestroy();
     }
 
     /**
@@ -307,7 +344,7 @@ public class DialogActivity
          * Fired when user clicks the dialog's confirm button.
          * @param dialog source <tt>DialogActivity</tt>.
          */
-        public void onConfirmClicked(DialogActivity dialog);
+        public boolean onConfirmClicked(DialogActivity dialog);
 
         /**
          * Fired when user dismisses the dialog.

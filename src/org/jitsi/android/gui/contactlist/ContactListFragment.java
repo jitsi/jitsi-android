@@ -270,11 +270,12 @@ public class ContactListFragment
                 new DialogActivity.DialogListener()
                 {
                     @Override
-                    public void onConfirmClicked(DialogActivity dialog)
+                    public boolean onConfirmClicked(DialogActivity dialog)
                     {
-                        MetaContactListService mls = AndroidGUIActivator
-                                .getMetaContactListService();
+                        MetaContactListService mls
+                            = AndroidGUIActivator.getContactListService();
                         mls.removeMetaContact(contact);
+                        return true;
                     }
 
                     @Override
