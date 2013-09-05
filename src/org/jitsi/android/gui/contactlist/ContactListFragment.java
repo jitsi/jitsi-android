@@ -61,6 +61,11 @@ public class ContactListFragment
     private MetaContact clickedContact;
 
     /**
+     * Stores recently clicked contact group.
+     */
+    private MetaContactGroup clickedGroup;
+
+    /**
      * Stores current chat id, when the activity is paused.
      */
     private String currentChatId;
@@ -184,10 +189,6 @@ public class ContactListFragment
     {
         super.onCreateContextMenu(menu, v, menuInfo);
 
-        // Inflate contact list context menu
-        MenuInflater inflater = getActivity().getMenuInflater();
-        inflater.inflate(R.menu.contact_menu, menu);
-
         ExpandableListView.ExpandableListContextMenuInfo info =
                 (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
 
@@ -201,10 +202,33 @@ public class ContactListFragment
                 ExpandableListView.getPackedPositionChild(info.packedPosition);
 
         // Only create a context menu for child items
-        if (type != ExpandableListView.PACKED_POSITION_TYPE_CHILD)
+        MenuInflater inflater = getActivity().getMenuInflater();
+        if(type == ExpandableListView.PACKED_POSITION_TYPE_GROUP)
+        {
+            createGroupCtxMenu(menu, inflater, group);
+        }
+        else if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD)
+        {
+            createContactCtxMenu(menu, inflater, group, child);
+        }
+        else
         {
             return;
         }
+    }
+
+    /**
+     * Inflates contact context menu.
+     * @param menu the menu to inflate into.
+     * @param inflater the menu inflater.
+     * @param group clicked group index.
+     * @param child clicked contact index.
+     */
+    private void createContactCtxMenu(Menu menu, MenuInflater inflater,
+                                      int group, int child)
+    {
+        // Inflate contact list context menu
+        inflater.inflate(R.menu.contact_menu, menu);
 
         // Remembers clicked contact
         clickedContact
@@ -232,6 +256,21 @@ public class ContactListFragment
     }
 
     /**
+     * Inflates group context menu.
+     * @param menu the menu to inflate into.
+     * @param inflater the inflater.
+     * @param group clicked group index.
+     */
+    private void createGroupCtxMenu(Menu menu, MenuInflater inflater, int group)
+    {
+        // Inflate contact list context menu
+        inflater.inflate(R.menu.group_menu, menu);
+
+        this.clickedGroup
+                = (MetaContactGroup) contactListAdapter.getGroup(group);
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -245,46 +284,16 @@ public class ContactListFragment
         }
         else if(item.getItemId() == R.id.remove_contact)
         {
-            removeContact(clickedContact);
+            MetaContactListManager.removeMetaContact(clickedContact);
+            return true;
+        }
+        else if(item.getItemId() == R.id.remove_group)
+        {
+            MetaContactListManager.removeMetaContactGroup(clickedGroup);
             return true;
         }
 
         return super.onContextItemSelected(item);
-    }
-
-    /**
-     * Removes given <tt>contact</tt> from the contact list.
-     * Asks the user for confirmation, before it's done.
-     *
-     * @param contact the contact to be removed from the contact list.
-     */
-    private void removeContact(final MetaContact contact)
-    {
-        Context ctx = JitsiApplication.getGlobalContext();
-        DialogActivity.showConfirmDialog(
-                ctx,
-                ctx.getString(R.string.service_gui_REMOVE_CONTACT),
-                ctx.getString(R.string.service_gui_REMOVE_CONTACT_TEXT,
-                              contact.getDisplayName()),
-                ctx.getString(R.string.service_gui_REMOVE),
-                new DialogActivity.DialogListener()
-                {
-                    @Override
-                    public boolean onConfirmClicked(DialogActivity dialog)
-                    {
-                        MetaContactListService mls
-                            = AndroidGUIActivator.getContactListService();
-                        mls.removeMetaContact(contact);
-                        return true;
-                    }
-
-                    @Override
-                    public void onDialogCancelled(DialogActivity dialog)
-                    {
-                        // Do nothing
-                    }
-                }
-        );
     }
 
     /**

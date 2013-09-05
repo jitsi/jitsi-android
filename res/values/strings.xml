@@ -154,6 +154,20 @@
     <string name="service_gui_VIDEO_CALL">Video call</string>
     <string name="service_gui_CONTACTS">Contacts</string>
     <string name="service_gui_ENTER_NAME_OR_NUMBER">Enter name or number</string>
+    <string name="service_gui_MOVE">Move</string>
+    <string name="service_gui_MOVE_SUBCONTACT">Move contact</string>
+    <string name="service_gui_MOVE_SUBCONTACT_MSG">
+    Select the contact or the group, where you would like to move the selected contact.
+    </string>
+    <string name="service_gui_MOVE_SUBCONTACT_FAILED">
+    The contact you have chosen is the same as \n the source one. Please choose another contact!
+    </string>
+    <string name="service_gui_MOVE_SUBCONTACT_QUESTION">
+    Are you sure you want to move %1$s to %2$s?
+    </string>
+    <string name="service_gui_MOVE_TO_GROUP">Move to group</string>
+    <string name="service_gui_MOVE_CONTACT">Move Contact</string>
+    <string name="service_gui_MOVE_CONTACT_ERROR">Contact cannot be moved</string>
     <string name="service_gui_MSG_DELIVERY_FAILURE">
         The above message could not be delivered
     </string>
@@ -258,6 +272,10 @@
     <string name="service_gui_MUTUALLY_ON_HOLD_STATUS">Mutually On Hold</string>
     <string name="service_gui_REFERRED_STATUS">Referred</string>
     <string name="service_gui_REMOTELY_ON_HOLD_STATUS">Remotely on hold</string>
+    <string name="service_gui_REMOVE_CONTACT_NOT_CONNECTED">
+    You need to be connected in order to remove this contact. Please sign in and try again.
+    </string>
+    <string name="service_gui_REMOVE_GROUP">Remove group</string>
     <string name="service_gui_RINGING_STATUS">Ringing</string>
     <string name="service_gui_UNKNOWN_STATUS">Unknown state</string>
     <string name="service_gui_WAITING_AUTHORIZATION">Waiting for authorization</string>
