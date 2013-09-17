@@ -906,5 +906,44 @@
     <string name="service_gui_settings_OTR_FINGERPRINTS_TITLE">Known fingerprints</string>
     <string name="service_gui_settings_OTR_FINGERPRINTS_SUMMARY">Manage known fingerprints</string>
 
+    <!-- Advanced settings category -->
+    <string name="pref_cat_settings_advanced">pref.cat.settings.advanced</string>
+    <string name="service_gui_settings_ADVANCED">Advanced</string>
+
+    <!-- Logging -->
+    <string name="service_gui_settings_LOGGING_TITLE">Logging</string>
+    <string name="service_gui_settings_LOGGING_SUMMARY">Adjust logging properties</string>
+    <!-- Enable packet logging -->
+    <string name="service_gui_settings_LOGGING_ENABLE_TITLE">Packet logging</string>
+    <string name="service_gui_settings_LOGGING_ENABLE_SUMMARY_ON">Logs debug packets of various protocols</string>
+    <string name="service_gui_settings_LOGGING_ENABLE_SUMMARY_OFF">No packets will be logged</string>
+    <string name="pref_key_logging_enable">pref.key.logging.enable</string>
+
+    <!-- Protocol category -->
+    <string name="pref_cat_settings_logging_protocol">pref.cat.settings.logging.protocol</string>
+    <string name="service_gui_settings_PROTOCOL">Protocol</string>
+    <!-- SIP -->
+    <string name="service_gui_settings_LOGGING_SIP">SIP</string>
+    <string name="pref_key_logging_sip">pref.key.logging.sip</string>
+    <!-- XMPP -->
+    <string name="service_gui_settings_LOGGING_XMPP">XMPP</string>
+    <string name="pref_key_logging_xmpp">pref.key.logging.xmpp</string>
+    <!-- RTP -->
+    <string name="service_gui_settings_LOGGING_RTP">RTP</string>
+    <string name="service_gui_settings_LOGGING_RTP_SUMMARY">stores 1 packet out of every 5000</string>
+    <string name="pref_key_logging_rtp">pref.key.logging.rtp</string>
+    <!-- ICE4J -->
+    <string name="service_gui_settings_LOGGING_ICE4J">ice4j.org</string>
+    <string name="pref_key_logging_ice4j">pref.key.logging.ice4j</string>
+
+    <!-- Advanced category -->
+    <string name="pref_cat_settings_logging_advanced">pref.cat.settings.logging.advanced</string>
+    <!--<string name="service_gui_settings_ADVANCED">Advanced</string>  already defined -->
+    <string name="service_gui_settings_LOGGING_FILE_COUNT">Number of log files</string>
+    <string name="pref_key_logging_file_count">pref.key.logging.file_count</string>
+    <string name="service_gui_settings_LOGGING_LIMIT">Maximum file size (in KB)</string>
+    <string name="pref_key_logging_limit">pref.key.logging.limit</string>
+
+
 
 </resources>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Enable packet logging -->
+    <CheckBoxPreference android:title="@string/service_gui_settings_LOGGING_ENABLE_TITLE"
+                        android:key="@string/pref_key_logging_enable"
+                        android:summaryOn="@string/service_gui_settings_LOGGING_ENABLE_SUMMARY_ON"
+                        android:summaryOff="@string/service_gui_settings_LOGGING_ENABLE_SUMMARY_OFF"
+            />
+    <!-- Protocol -->
+    <PreferenceCategory android:title="@string/service_gui_settings_PROTOCOL"
+                        android:key="@string/pref_cat_settings_logging_protocol">
+        <!-- SIP -->
+        <CheckBoxPreference android:title="@string/service_gui_settings_LOGGING_SIP"
+                        android:key="@string/pref_key_logging_sip"
+                        android:dependency="@string/pref_key_logging_enable"
+                />
+        <!-- XMPP -->
+        <CheckBoxPreference android:title="@string/service_gui_settings_LOGGING_XMPP"
+                            android:key="@string/pref_key_logging_xmpp"
+                            android:dependency="@string/pref_key_logging_enable"
+                />
+        <!-- RTP -->
+        <CheckBoxPreference android:title="@string/service_gui_settings_LOGGING_RTP"
+                            android:summary="@string/service_gui_settings_LOGGING_RTP_SUMMARY"
+                            android:key="@string/pref_key_logging_rtp"
+                            android:dependency="@string/pref_key_logging_enable"
+                />
+        <!-- ICE4J -->
+        <CheckBoxPreference android:title="@string/service_gui_settings_LOGGING_ICE4J"
+                            android:key="@string/pref_key_logging_ice4j"
+                            android:dependency="@string/pref_key_logging_enable"
+                />
+    </PreferenceCategory>
+    <!-- Advanced -->
+    <PreferenceCategory android:title="@string/service_gui_settings_ADVANCED"
+                        android:key="@string/pref_cat_settings_logging_advanced">
+        <!-- Number of log files -->
+        <EditTextPreference android:title="@string/service_gui_settings_LOGGING_FILE_COUNT"
+                            android:key="@string/pref_key_logging_file_count"
+                            android:dependency="@string/pref_key_logging_enable"
+                            android:inputType="number"
+                />
+        <!-- Maximum file size (in KB) -->
+        <EditTextPreference android:title="@string/service_gui_settings_LOGGING_LIMIT"
+                            android:key="@string/pref_key_logging_limit"
+                            android:dependency="@string/pref_key_logging_enable"
+                            android:inputType="number"
+                />
+    </PreferenceCategory>
+</PreferenceScreen>

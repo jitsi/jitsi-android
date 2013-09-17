@@ -157,4 +157,13 @@
             <intent android:action=".android.gui.settings.ChatSecuritySettings"/>
         </PreferenceScreen>
     </PreferenceCategory>
+    <PreferenceCategory
+            android:title="@string/service_gui_settings_ADVANCED"
+            android:key="@string/pref_cat_settings_advanced">
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_LOGGING_TITLE"
+                android:summary="@string/service_gui_settings_LOGGING_SUMMARY">
+            <intent android:action=".android.gui.settings.LoggingSettings"/>
+        </PreferenceScreen>
+    </PreferenceCategory>
 </PreferenceScreen>

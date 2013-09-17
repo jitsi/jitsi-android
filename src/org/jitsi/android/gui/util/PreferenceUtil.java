@@ -9,6 +9,7 @@ package org.jitsi.android.gui.util;
 import android.preference.*;
 
 import net.java.sip.communicator.util.*;
+import org.jitsi.android.gui.settings.*;
 
 /**
  * Utility class exposing methods to operate on <tt>Preference</tt> subclasses.
@@ -39,5 +40,26 @@ public class PreferenceUtil
                         .findPreference(prefKey);
         logger.debug("Setting "+isChecked+" on "+prefKey);
         cbPref.setChecked(isChecked);
+    }
+
+    /**
+     * Sets the text of <tt>EditTextPreference</tt> identified by given
+     * preference key string.
+     * @param fragment the <tt>PreferenceFragment</tt> containing the
+     *        <tt>EditTextPreference</tt> we want to edit.
+     * @param prefKey preference key id from <tt>R.string</tt>.
+     * @param txtValue the text value we want to set on
+     *                 <tt>EditTextPreference</tt>
+     */
+    public static void setEditTextVal( PreferenceFragment fragment,
+                                       String prefKey,
+                                       String txtValue )
+    {
+        EditTextPreference cbPref
+            = (EditTextPreference) fragment.findPreference(prefKey);
+
+        logger.debug("Setting "+txtValue+" on "+prefKey);
+
+        cbPref.setText(txtValue);
     }
 }

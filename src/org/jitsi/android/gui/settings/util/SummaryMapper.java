@@ -72,6 +72,17 @@ public class SummaryMapper
     }
 
     /**
+     * Triggers summary update on all registered <tt>Preference</tt>s.
+     */
+    public void updatePreferences()
+    {
+        for(Preference pref : mappedPreferences.values())
+        {
+            setSummary(pref.getSharedPreferences(), pref);
+        }
+    }
+
+    /**
      * Overload method for
      * {@link #includePreference(Preference, String, SummaryConverter)}
      *
