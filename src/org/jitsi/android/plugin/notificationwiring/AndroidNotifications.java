@@ -49,7 +49,7 @@ public class AndroidNotifications
          */
         VibrateNotificationAction inCallVibrate
                 = new VibrateNotificationAction( "incoming_call",
-                                                 new long[]{800,1000}, 0 );
+                                                 new long[]{1800,1000}, 0 );
         notificationService.registerDefaultNotificationForEvent(
                 NotificationManager.INCOMING_CALL,
                 inCallVibrate);
@@ -66,6 +66,12 @@ public class AndroidNotifications
                         null, // No default message
                         7000  // Notification hide timeout
                 ));
+
+        // Remove not-used events
+        notificationService.removeEventNotification(
+                NotificationManager.INCOMING_FILE);
+        notificationService.removeEventNotification(
+                NotificationManager.CALL_SAVED);
     }
 
     /**
