@@ -52,8 +52,10 @@ public class SettingsActivity
         = JitsiApplication.getResString(R.string.pref_key_chat_history_size);
     static private final String P_KEY_TYPING_NOTIFICATIONS
         = JitsiApplication.getResString(R.string.pref_key_typing_notifications);
+    /*
+    Chat alerter is not implemented on Android
     static private final String P_KEY_CHAT_ALERTS
-        = JitsiApplication.getResString(R.string.pref_key_chat_alerts);
+        = JitsiApplication.getResString(R.string.pref_key_chat_alerts);*/
 
     // Notifications
     static private final String P_KEY_POPUP_HANDLER
@@ -233,9 +235,9 @@ public class SettingsActivity
                     this, P_KEY_TYPING_NOTIFICATIONS,
                     ConfigurationUtils.isSendTypingNotifications());
 
-            PreferenceUtil.setCheckboxVal(
+            /*PreferenceUtil.setCheckboxVal(
                     this, P_KEY_CHAT_ALERTS,
-                    ConfigurationUtils.isAlerterEnabled());
+                    ConfigurationUtils.isAlerterEnabled());*/
         }
 
         /**
@@ -576,6 +578,14 @@ public class SettingsActivity
                                 ConfigurationUtils.isSendTypingNotifications())
                 );
             }
+            /* Chat alerter is not implemented on Android
+            else if(key.equals(P_KEY_CHAT_ALERTS))
+            {
+                ConfigurationUtils.setAlerterEnabled(
+                        shPreferences.getBoolean(
+                                P_KEY_CHAT_ALERTS,
+                                ConfigurationUtils.isAlerterEnabled()));
+            }*/
             else if(key.equals(P_KEY_POPUP_HANDLER))
             {
                 String handler = shPreferences.getString( P_KEY_POPUP_HANDLER,
