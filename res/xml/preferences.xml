@@ -50,13 +50,14 @@
             android:summaryOn="@string/service_gui_settings_ENABLED_STR"
             android:summaryOff="@string/service_gui_settings_DISABLED_STR"
             />
-        <!-- Use task bar / dock alerts on incoming calls and chats -->
+        <!-- Use task bar / dock alerts on incoming calls and chats
+            not implemented on Android
         <CheckBoxPreference
                 android:title="@string/service_gui_settings_CHAT_ALERTS"
                 android:key="@string/pref_key_chat_alerts"
                 android:summaryOn="@string/service_gui_settings_ENABLED_STR"
                 android:summaryOff="@string/service_gui_settings_DISABLED_STR"
-                />
+                />-->
     </PreferenceCategory>
     <!-- Notifications -->
     <PreferenceCategory
@@ -67,6 +68,12 @@
             android:title="@string/service_gui_settings_POPUP_HANDLER"
             android:key="@string/pref_key_popup_handler"
             />
+        <!-- Events -->
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_EVENTS_TITLE"
+                android:summary="@string/service_gui_settings_EVENTS_SUMMARY">
+            <intent android:action=".android.gui.settings.NotificationsSettings"/>
+        </PreferenceScreen>
     </PreferenceCategory>
     <PreferenceCategory
             android:title="@string/service_gui_settings_CALL"

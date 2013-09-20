@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TableRow xmlns:android="http://schemas.android.com/apk/res/android"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:minHeight="@dimen/item_height"
+        >
+    <ToggleButton
+            android:tag="enable"
+            android:layout_gravity="center"
+            android:onClick="onEnableItemClicked"
+            />
+    <CheckBox
+            android:tag="popup"
+            android:layout_gravity="center"
+            android:onClick="onPopupItemClicked"
+            />
+    <CheckBox
+            android:tag="soundNotification"
+            android:layout_gravity="center"
+            android:onClick="onSoundNotificationItemClicked"
+            />
+    <CheckBox
+            android:tag="soundPlayback"
+            android:layout_gravity="center"
+            android:onClick="onSoundPlaybackItemClicked"
+            />
+    <CheckBox
+            android:tag="vibrate"
+            android:layout_gravity="center"
+            android:onClick="onVibrateItemClicked"
+            />
+    <TextView
+            android:layout_height="fill_parent"
+            android:layout_width="fill_parent"
+            android:tag="description"
+            android:gravity="center"
+            />
+</TableRow>

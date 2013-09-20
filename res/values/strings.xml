@@ -814,6 +814,27 @@
     <!-- Status bar notifications handler -->
     <string name="impl_popup_status_bar">Status bar notifications</string>
 
+    <!-- Events -->
+    <string name="service_gui_settings_EVENTS_TITLE">Events</string>
+    <string name="service_gui_settings_EVENTS_SUMMARY">Configure individual notifications</string>
+
+    <!-- Notification strings -->
+    <string name="plugin_notificationconfig_event_IncomingCall">Incoming Call</string>
+    <string name="plugin_notificationconfig_event_SecurityMessage">Security Message</string>
+    <string name="plugin_notificationconfig_event_IncomingFile">Incoming File</string>
+    <string name="plugin_notificationconfig_event_LogFilesArchived">Log Files Archived</string>
+    <string name="plugin_notificationconfig_event_CallSecurityError">Call Security Error</string>
+    <string name="plugin_notificationconfig_event_NetworkNotifications">Network Notifications</string>
+    <string name="plugin_notificationconfig_event_Dialing">Dialing</string>
+    <string name="plugin_notificationconfig_event_ProactiveNotification">Proactive Typing Notifications</string>
+    <string name="plugin_notificationconfig_event_CallSecurityOn">Call Security On</string>
+    <string name="plugin_notificationconfig_event_IncomingMessage">Incoming Message</string>
+    <string name="plugin_notificationconfig_event_OutgoingCall">Outgoing Call</string>
+    <string name="plugin_notificationconfig_event_BusyCall">Busy Call</string>
+    <string name="plugin_notificationconfig_event_CallSaved">Call Saved</string>
+    <string name="plugin_notificationconfig_event_HangUp">Hang Up</string>
+
+
     <!-- Locale -->
     <string name="pref_key_locale">pref.key.locale</string>
     <string name="service_gui_settings_LOCALE">Interface language</string>
