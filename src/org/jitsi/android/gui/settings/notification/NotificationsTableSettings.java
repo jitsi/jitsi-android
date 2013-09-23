@@ -4,7 +4,7 @@
  * Distributable under LGPL license.
  * See terms of license at gnu.org.
  */
-package org.jitsi.android.gui.settings;
+package org.jitsi.android.gui.settings.notification;
 
 import android.os.*;
 import android.view.*;
@@ -26,7 +26,7 @@ import org.jitsi.service.resources.*;
  *
  * @author Pawel Domas
  */
-public class NotificationsSettings
+public class NotificationsTableSettings
     extends OSGiActivity
     implements NotificationChangeListener
 {

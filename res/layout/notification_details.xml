@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:padding="5dp"
+        >
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="[Some detailed event description text explaining when it's being fired]"
+            android:id="@+id/description"
+            android:layout_gravity="center_vertical"
+            android:textAppearance="@style/MediumFont"
+            android:padding="10dp"
+            android:visibility="gone"
+            />
+    <CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/plugin_notificationconfig_popup_notification"
+            android:id="@+id/popup"
+            android:layout_gravity="center_vertical"
+            android:onClick="onPopupClicked"
+            android:textAppearance="@style/MediumFont"
+            android:layout_margin="5dp"
+            />
+    <CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/plugin_notificationconfig_notification_sound"
+            android:id="@+id/soundNotification"
+            android:layout_gravity="center_vertical"
+            android:onClick="onSoundNotificationClicked"
+            android:textAppearance="@style/MediumFont"
+            android:layout_margin="5dp"
+            />
+    <CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/plugin_notificationconfig_playback_sound"
+            android:id="@+id/soundPlayback"
+            android:layout_gravity="center_vertical"
+            android:onClick="onSoundPlaybackClicked"
+            android:textAppearance="@style/MediumFont"
+            android:layout_margin="5dp"
+            />
+    <CheckBox
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/plugin_notificationconfig_vibration"
+            android:id="@+id/vibrate"
+            android:layout_gravity="center_vertical"
+            android:onClick="onVibrateClicked"
+            android:textAppearance="@style/MediumFont"
+            android:layout_margin="5dp"
+            />
+</LinearLayout>

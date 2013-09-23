@@ -820,20 +820,35 @@
 
     <!-- Notification strings -->
     <string name="plugin_notificationconfig_event_IncomingCall">Incoming Call</string>
+    <string name="plugin_notificationconfig_event_IncomingCall_description">Incoming call description.</string>
     <string name="plugin_notificationconfig_event_SecurityMessage">Security Message</string>
+    <string name="plugin_notificationconfig_event_SecurityMessage_description">Security message description</string>
     <string name="plugin_notificationconfig_event_IncomingFile">Incoming File</string>
     <string name="plugin_notificationconfig_event_LogFilesArchived">Log Files Archived</string>
     <string name="plugin_notificationconfig_event_CallSecurityError">Call Security Error</string>
+    <string name="plugin_notificationconfig_event_CallSecurityError_description">Call security error description</string>
     <string name="plugin_notificationconfig_event_NetworkNotifications">Network Notifications</string>
+    <string name="plugin_notificationconfig_event_NetworkNotifications_description">Network notification description</string>
     <string name="plugin_notificationconfig_event_Dialing">Dialing</string>
-    <string name="plugin_notificationconfig_event_ProactiveNotification">Proactive Typing Notifications</string>
+    <string name="plugin_notificationconfig_event_Dialing_description">Dialing description</string>
+    <string name="plugin_notificationconfig_event_ProactiveNotification">Typing Notifications</string>
+    <string name="plugin_notificationconfig_event_ProactiveNotification_description">Proactive typing notification description</string>
     <string name="plugin_notificationconfig_event_CallSecurityOn">Call Security On</string>
+    <string name="plugin_notificationconfig_event_CallSecurityOn_description">Call security on description</string>
     <string name="plugin_notificationconfig_event_IncomingMessage">Incoming Message</string>
+    <string name="plugin_notificationconfig_event_IncomingMessage_description">Incoming message description</string>
     <string name="plugin_notificationconfig_event_OutgoingCall">Outgoing Call</string>
+    <string name="plugin_notificationconfig_event_OutgoingCall_description">Outgoing call description</string>
     <string name="plugin_notificationconfig_event_BusyCall">Busy Call</string>
+    <string name="plugin_notificationconfig_event_BusyCall_description">Busy call description</string>
     <string name="plugin_notificationconfig_event_CallSaved">Call Saved</string>
     <string name="plugin_notificationconfig_event_HangUp">Hang Up</string>
-
+    <string name="plugin_notificationconfig_event_HangUp_description">Hang up description</string>
+    <string name="plugin_notificationconfig_popup_notification">Popup notification</string>
+    <string name="plugin_notificationconfig_notification_sound">Sound on notification device
+    </string>
+    <string name="plugin_notificationconfig_playback_sound">Sound on playback device</string>
+    <string name="plugin_notificationconfig_vibration">Vibration</string>
 
     <!-- Locale -->
     <string name="pref_key_locale">pref.key.locale</string>
