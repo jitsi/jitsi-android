@@ -357,18 +357,20 @@ public class DataSource
             if(AcousticEchoCanceler.isAvailable())
             {
                 AcousticEchoCanceler echoCanceller
-                        = AcousticEchoCanceler.create(
-                        audioRecord.getAudioSessionId());
-                echoCanceller.setEnabled(audioSystem.isEchoCancel());
+                    = AcousticEchoCanceler.create(
+                            audioRecord.getAudioSessionId());
+                if(echoCanceller != null)
+                    echoCanceller.setEnabled(audioSystem.isEchoCancel());
             }
 
             // Creates noise suppressor if available
             if(NoiseSuppressor.isAvailable())
             {
                 NoiseSuppressor noiseSuppressor
-                        = NoiseSuppressor.create(
-                        audioRecord.getAudioSessionId());
-                noiseSuppressor.setEnabled(audioSystem.isDenoise());
+                    = NoiseSuppressor.create(
+                            audioRecord.getAudioSessionId());
+                if(noiseSuppressor != null)
+                    noiseSuppressor.setEnabled(audioSystem.isDenoise());
             }
         }
 
