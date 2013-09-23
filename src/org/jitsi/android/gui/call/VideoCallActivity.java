@@ -237,6 +237,9 @@ public class VideoCallActivity
                 .beginTransaction()
                 .add(new ProximitySensorFragment(), PROXIMITY_FRAGMENT_TAG)
                 .commit();
+        // Keep the screen on
+        getWindow().addFlags(
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override
