@@ -54,11 +54,16 @@ public class MediaRecorderSystem
     private static final Dimension[] PREFERRED_SIZES
         = new Dimension[]
                 {
+                    new Dimension(176, 144),
                     new Dimension(352, 288),
                     new Dimension(320, 240),
 //                    new Dimension(704, 576),
                     new Dimension(640, 480)
                 };
+
+
+    public static Dimension[] SUPPORTED_SIZES
+            = new Dimension[]{};
 
     /**
      * Initializes a new <tt>MediaRecorderSystem</tt> instance which discovers
@@ -227,6 +232,11 @@ public class MediaRecorderSystem
 
             if (count == 0)
                 continue;
+
+            // Saves supported video sizes
+            Dimension[] array = new Dimension[count];
+            sizes.toArray(array);
+            SUPPORTED_SIZES = array;
 
             Format[] formats = new Format[count];
 

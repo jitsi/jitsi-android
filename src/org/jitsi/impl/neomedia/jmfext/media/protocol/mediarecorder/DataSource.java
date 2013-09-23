@@ -409,7 +409,8 @@ public class DataSource
                 }
 
                 // Tries to read previously stored parameters
-                this.h264Params = H264Parameters.getStoredParameters();
+                this.h264Params
+                    = H264Parameters.getStoredParameters(videoFormat);
                 if(this.h264Params == null)
                 {
                     // Pre-configure media recorder and camera for video format
@@ -417,7 +418,8 @@ public class DataSource
                     // Obtain h264 parameters from short sample video
                     this.h264Params = obtainParameters(camera, mediaRecorder);
                     // Persists the parameters
-                    H264Parameters.storeParameters(this.h264Params);
+                    H264Parameters.storeParameters(this.h264Params,
+                                                   videoFormat);
                 }
                 // Prints the parameters
                 h264Params.logParamaters();

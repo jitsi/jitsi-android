@@ -11,6 +11,7 @@ import android.util.*;
 import org.jitsi.android.*;
 import org.jitsi.util.*;
 
+import javax.media.format.*;
 import java.io.*;
 
 /**
@@ -291,27 +292,49 @@ public class H264Parameters
     /**
      * ID used for shared preferences name and key that stores the string value.
      */
-    private static final String STORE_ID="h264parameters";
+    private static final String STORE_ID = "org.jitsi.h264parameters.value";
+
+    /**
+     * Name of shared preference key that stores video size string.
+     */
+    private static final String VIDEO_SIZE_STORE_ID
+            = "org.jitsi.h264parameters.video_size";
 
     /**
      * Returns previously stored <tt>H264Parameters</tt> instance or
-     * <tt>null</tt> if nothing was stored.
+     * <tt>null</tt> if nothing was stored or if the video size of given format
+     * doesn't match the stored one.
+     *
+     * @param formatUsed format for which the H264 parameters will be retrieved.
      *
      * @return previously stored <tt>H264Parameters</tt> instance or
-     * <tt>null</tt> if nothing was stored.
+     * <tt>null</tt> if nothing was stored or format video size doesn't match.
      */
-    static H264Parameters getStoredParameters()
+    static H264Parameters getStoredParameters(VideoFormat formatUsed)
     {
         SharedPreferences config
                 = JitsiApplication.getGlobalContext()
                 .getSharedPreferences(STORE_ID,
                                       Context.MODE_PRIVATE);
+
+        // Checks if the video size matches
+        String storedSizeStr = config.getString(VIDEO_SIZE_STORE_ID, null);
+        if(!formatUsed.getSize().toString().equals(storedSizeStr))
+            return null;
+
         String storedValue = config.getString(STORE_ID, null);
 
         if(storedValue == null || storedValue.isEmpty())
             return null;
 
         String[] spsAndPps = storedValue.split(",");
+
+        if(spsAndPps.length != 2)
+        {
+            logger.error("Invalid store parameters string: "+storedValue);
+            return null;
+        }
+
         H264Parameters params = new H264Parameters();
         params.seq_parameter_set_rbsp = Base64.decode( spsAndPps[0],
                                                        Base64.DEFAULT );
@@ -326,7 +349,7 @@ public class H264Parameters
      *
      * @param params the <tt>H264Parameters</tt> instance to be stored.
      */
-    static void storeParameters(H264Parameters params)
+    static void storeParameters(H264Parameters params, VideoFormat formatUsed)
     {
         SharedPreferences config
                 = JitsiApplication.getGlobalContext()
@@ -347,6 +370,7 @@ public class H264Parameters
 
         config.edit()
                 .putString(STORE_ID, storeString)
+                .putString(VIDEO_SIZE_STORE_ID, formatUsed.getSize().toString())
                 .commit();
     }
 }

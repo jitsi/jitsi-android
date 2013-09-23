@@ -360,16 +360,17 @@ public class SettingsActivity
 
             // Resolutions
             String[] resolutionValues
-                = new String[
-                    DeviceConfiguration.SUPPORTED_RESOLUTIONS.length+1];
+                = new String[MediaRecorderSystem.SUPPORTED_SIZES.length+1];
+
+            // Auto resolution entry
             String autoResStr
                     = getString(R.string.service_gui_settings_AUTO_RESOLUTION);
             resolutionValues[0] = autoResStr;
+
             for(int i=0; i<resolutionValues.length-1; i++)
             {
                 resolutionValues[i+1]
-                        = resToStr(
-                                DeviceConfiguration.SUPPORTED_RESOLUTIONS[i]);
+                        = resToStr(MediaRecorderSystem.SUPPORTED_SIZES[i]);
             }
 
             ListPreference resList
@@ -462,7 +463,7 @@ public class SettingsActivity
          */
         private static Dimension resoultionForStr(String resStr)
         {
-            Dimension[] resolutions = DeviceConfiguration.SUPPORTED_RESOLUTIONS;
+            Dimension[] resolutions = MediaRecorderSystem.SUPPORTED_SIZES;
             for (Dimension resolution : resolutions)
             {
                 if (resToStr(resolution).equals(resStr))
