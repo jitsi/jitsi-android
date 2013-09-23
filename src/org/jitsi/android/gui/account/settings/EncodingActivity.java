@@ -10,9 +10,9 @@ import android.app.*;
 import android.content.*;
 import android.os.*;
 import android.view.*;
-import android.widget.*;
 import net.java.sip.communicator.service.protocol.*;
 import org.jitsi.*;
+import org.jitsi.android.gui.fragment.*;
 import org.jitsi.impl.neomedia.*;
 import org.jitsi.service.neomedia.*;
 import org.jitsi.service.neomedia.codec.*;
@@ -38,6 +38,7 @@ import java.util.*;
  */
 public class EncodingActivity
     extends OSGiActivity
+    implements ActionBarToggleFragment.ActionBarToggleModel
 {
 
     /**
@@ -110,6 +111,16 @@ public class EncodingActivity
         super.onCreate(savedInstanceState);
 
         loadEncodings(savedInstanceState);
+
+        if(savedInstanceState == null)
+        {
+            getSupportFragmentManager()
+                .beginTransaction()
+                .add(ActionBarToggleFragment.create(
+                        getString(R.string.service_gui_ENC_OVERRIDE_GLOBAL)),
+                     "action_bar_toggle")
+                .commit();
+        }
     }
 
     /**
@@ -343,27 +354,7 @@ public class EncodingActivity
     {
         super.onCreateOptionsMenu(menu);
 
-        MenuInflater inflater = getMenuInflater();
-
-        inflater.inflate(R.menu.encoding_menu, menu);
-
         encodingsFragment.setEnabled(isOverrideEncodings);
-        
-        // Binds the global button to enable/disable list component
-        CompoundButton cBox =
-                (CompoundButton) menu.findItem(R.id.toggleView)
-                        .getActionView().findViewById(android.R.id.toggle);
-        cBox.setChecked(isOverrideEncodings);
-        cBox.setOnCheckedChangeListener(
-                new CompoundButton.OnCheckedChangeListener()
-                {
-                    public void onCheckedChanged( CompoundButton cb, boolean b)
-                    {
-                        isOverrideEncodings = b;
-                        encodingsFragment.setEnabled(isOverrideEncodings);
-                        hasChanges=true;
-                    }
-                });
 
         return true;
     }
@@ -436,5 +427,19 @@ public class EncodingActivity
 
         encReg.setOverrideEncodings(isOverrideEncodings);
         encReg.setEncodingProperties(encodingProperties);
+    }
+
+    @Override
+    public boolean isChecked()
+    {
+        return isOverrideEncodings;
+    }
+
+    @Override
+    public void setChecked(boolean isChecked)
+    {
+        isOverrideEncodings = isChecked;
+        encodingsFragment.setEnabled(isOverrideEncodings);
+        hasChanges=true;
     }
 }

@@ -3,6 +3,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/toggleView"
           android:showAsAction="always"
-          android:actionLayout="@layout/enc_toggle_button"
+          android:actionLayout="@layout/actionbar_toggle_button"
             />
 </menu>
