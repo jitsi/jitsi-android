@@ -13,6 +13,7 @@ import android.preference.*;
 import java.util.*;
 import javax.media.*;
 
+import net.java.sip.communicator.service.replacement.*;
 import net.java.sip.communicator.service.systray.*;
 import net.java.sip.communicator.util.*;
 
@@ -24,6 +25,7 @@ import org.jitsi.android.gui.util.*;
 import org.jitsi.android.util.java.awt.*;
 import org.jitsi.impl.neomedia.*;
 import org.jitsi.impl.neomedia.device.*;
+import org.jitsi.service.configuration.*;
 import org.jitsi.service.neomedia.*;
 import org.jitsi.service.osgi.*;
 
@@ -52,6 +54,8 @@ public class SettingsActivity
         = JitsiApplication.getResString(R.string.pref_key_chat_history_size);
     static private final String P_KEY_TYPING_NOTIFICATIONS
         = JitsiApplication.getResString(R.string.pref_key_typing_notifications);
+    static private final String P_KEY_SMILEY_REPLACEMENT
+        = JitsiApplication.getResString(R.string.pref_key_smiley_replacement);
     /*
     Chat alerter is not implemented on Android
     static private final String P_KEY_CHAT_ALERTS
@@ -234,6 +238,15 @@ public class SettingsActivity
             PreferenceUtil.setCheckboxVal(
                     this, P_KEY_TYPING_NOTIFICATIONS,
                     ConfigurationUtils.isSendTypingNotifications());
+
+            ConfigurationService cfg
+                    = AndroidGUIActivator.getConfigurationService();
+
+            PreferenceUtil.setCheckboxVal(
+                    this, P_KEY_SMILEY_REPLACEMENT,
+                    cfg.getBoolean(
+                            ReplacementProperty.getPropertyName("SMILEY"),
+                            true));
 
             /*PreferenceUtil.setCheckboxVal(
                     this, P_KEY_CHAT_ALERTS,
@@ -578,6 +591,15 @@ public class SettingsActivity
                                 P_KEY_TYPING_NOTIFICATIONS,
                                 ConfigurationUtils.isSendTypingNotifications())
                 );
+            }
+            else if(key.equals(P_KEY_SMILEY_REPLACEMENT))
+            {
+                AndroidGUIActivator.getConfigurationService()
+                        .setProperty(
+                                ReplacementProperty.getPropertyName("SMILEY"),
+                                shPreferences.getBoolean(
+                                        P_KEY_SMILEY_REPLACEMENT,
+                                        true));
             }
             /* Chat alerter is not implemented on Android
             else if(key.equals(P_KEY_CHAT_ALERTS))

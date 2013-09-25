@@ -320,8 +320,13 @@ public class ChatFragment
 
         private void processReplacements(ChatMessage chatMsg)
         {
-            //ConfigurationService cfg
-            //  = AndroidGUIActivator.getConfigurationService();
+            ConfigurationService cfg
+                    = AndroidGUIActivator.getConfigurationService();
+
+            if(!cfg.getBoolean(
+                    ReplacementProperty.getPropertyName("SMILEY"), true))
+                return;
+
             //boolean isEnabled
               //= cfg.getBoolean(ReplacementProperty.REPLACEMENT_ENABLE, true);
 

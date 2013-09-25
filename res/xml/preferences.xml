@@ -50,6 +50,13 @@
             android:summaryOn="@string/service_gui_settings_ENABLED_STR"
             android:summaryOff="@string/service_gui_settings_DISABLED_STR"
             />
+        <!-- Smiley replacement -->
+        <CheckBoxPreference
+            android:title="@string/plugin_chatconfig_replacement_ENABLE_SMILEY_STATUS"
+            android:key="@string/pref_key_smiley_replacement"
+            android:summaryOn="@string/service_gui_settings_ENABLED_STR"
+            android:summaryOff="@string/service_gui_settings_DISABLED_STR"
+            />
         <!-- Use task bar / dock alerts on incoming calls and chats
             not implemented on Android
         <CheckBoxPreference

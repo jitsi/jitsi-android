@@ -132,7 +132,9 @@
     <string name="service_gui_CANCEL">Cancel</string>
     <string name="service_gui_SEARCH">Search</string>
     <string name="service_gui_ADD_CONTACT">Add contact</string>
+    <string name="service_gui_ON">On</string>
     <string name="service_gui_ONLINE">Online</string>
+    <string name="service_gui_OFF">Off</string>
     <string name="service_gui_OFFLINE">Offline</string>
     <string name="service_gui_FFC_STATUS">Free for chat</string>
     <string name="service_gui_AWAY_STATUS">Away</string>
@@ -795,6 +797,9 @@
     <!-- Tell others when we are writing to them -->
     <string name="pref_key_typing_notifications">pref.key.msg.typing_notifications</string>
     <string name="service_gui_settings_TYPING_NOTIFICATIONS">Tell others when we are writing to them</string>
+    <!-- Enable smiley replacement -->
+    <string name="pref_key_smiley_replacement">pref.key.msg.smiley_replacement</string>
+    <string name="plugin_chatconfig_replacement_ENABLE_SMILEY_STATUS">Enable smiley replacement</string>
     <!-- Bring chat window to front(not sure if this makes sense on Android, so omitted) -->
     <!-- Use task bar / dock alerts on incoming calls and chats -->
     <string name="pref_key_chat_alerts">pref.key.msg.chat_alerts</string>
