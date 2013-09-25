@@ -108,7 +108,7 @@ public class ChatMessage
     /**
      * The content type of the message.
      */
-    private final String contentType;
+    private String contentType;
 
     /**
      * A unique identifier for this message.
@@ -294,6 +294,15 @@ public class ChatMessage
     public String getContentType()
     {
         return contentType;
+    }
+
+    /**
+     * Sets the content type of the message (e.g. "text", "text/html", etc.).
+     * @param contentType the content type to set
+     */
+    public void setContentType(String contentType)
+    {
+        this.contentType = contentType;
     }
     
     /**

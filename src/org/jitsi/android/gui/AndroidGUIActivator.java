@@ -14,6 +14,7 @@ import net.java.sip.communicator.service.globaldisplaydetails.*;
 import net.java.sip.communicator.service.gui.*;
 import net.java.sip.communicator.service.metahistory.*;
 import net.java.sip.communicator.service.protocol.*;
+import net.java.sip.communicator.service.replacement.*;
 import net.java.sip.communicator.service.systray.*;
 
 import net.java.sip.communicator.service.protocol.globalstatus.*;
@@ -30,6 +31,8 @@ import org.jitsi.service.configuration.*;
 import org.jitsi.service.resources.*;
 
 import org.osgi.framework.*;
+
+import java.util.*;
 
 /**
  * Creates <tt>LoginManager</tt> and registers <tt>AlertUIService</tt>.
@@ -224,5 +227,36 @@ public class AndroidGUIActivator
     public static AndroidLoginRenderer getLoginRenderer()
     {
         return loginRenderer;
+    }
+
+    /**
+     * Returns all <tt>ReplacementService</tt>s obtained from the bundle
+     * context.
+     *
+     * @return all <tt>ReplacementService</tt> implementation obtained from the
+     *         bundle context
+     */
+    public static Map<String, ReplacementService> getReplacementSources()
+    {
+        Map<String, ReplacementService> replacementSourcesMap
+                = new HashMap<String, ReplacementService>();
+
+        ServiceReference[] serRefs
+            = ServiceUtils.getServiceReferences(bundleContext,
+                                                ReplacementService.class);
+        if (serRefs != null)
+        {
+            for (int i = 0; i < serRefs.length; i++)
+            {
+                ReplacementService replacementSources =
+                    (ReplacementService) bundleContext.getService(serRefs[i]);
+
+                replacementSourcesMap.put(
+                        (String)serRefs[i]
+                                .getProperty(ReplacementService.SOURCE_NAME),
+                        replacementSources);
+            }
+        }
+        return replacementSourcesMap;
     }
 }

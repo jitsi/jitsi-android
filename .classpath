@@ -32,6 +32,7 @@
 	<classpathentry kind="lib" path="libs/plugin-loggingutils.jar"/>
 	<classpathentry kind="lib" path="libs/protocol.jar"/>
 	<classpathentry kind="lib" path="libs/resourcemanager.jar"/>
+	<classpathentry kind="lib" path="libs/replacement.jar"/>
 	<classpathentry kind="lib" path="libs/sdes4j.jar"/>
 	<classpathentry kind="lib" path="libs/sysactivitynotifications.jar"/>
 	<classpathentry kind="lib" path="libs/systray-service.jar"/>

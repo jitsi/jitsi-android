@@ -6,7 +6,10 @@
  */
 package org.jitsi.android.gui.chat;
 
+import java.io.*;
+import java.net.*;
 import java.util.*;
+import java.util.regex.*;
 
 import android.text.*;
 import android.text.method.*;
@@ -15,6 +18,8 @@ import net.java.sip.communicator.service.globaldisplaydetails.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.event.*;
 import net.java.sip.communicator.service.protocol.globalstatus.*;
+import net.java.sip.communicator.service.replacement.*;
+import net.java.sip.communicator.service.replacement.smilies.*;
 import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.Logger;
 
@@ -23,6 +28,7 @@ import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.util.*;
+import org.jitsi.service.configuration.*;
 import org.jitsi.service.osgi.*;
 import org.jitsi.util.*;
 
@@ -260,6 +266,9 @@ public class ChatFragment
         {
             synchronized (messages)
             {
+                // Checks for replacements in message body
+                processReplacements(newMessage);
+
                 if (!isConsecutiveMessage(  newMessage.getContactName(),
                                             newMessage.getMessageType(),
                                             newMessage.getDate().getTime()))
@@ -270,6 +279,24 @@ public class ChatFragment
                 {
                     // Return the last message.
                     ChatMessage chatMessage = getMessage(getCount() - 1);
+
+                    // If smile is added to new message it has changed
+                    // it's content type to HTML, so we have to update it also
+                    // in previous message
+                    String newMsgContentType = newMessage.getContentType();
+
+                    if(newMsgContentType.equals(
+                            OperationSetBasicInstantMessaging.HTML_MIME_TYPE)
+                        && !chatMessage.getContentType()
+                                .equals(newMsgContentType))
+                    {
+                        // Change plain message type to html
+                        // and replace newline marks
+                        chatMessage.setContentType(newMsgContentType);
+                        chatMessage.setMessage(
+                                chatMessage.getMessage()
+                                        .replace(" \n"," <br/>"));
+                    }
 
                     if(chatMessage.getContentType().equals(
                             OperationSetBasicInstantMessaging.HTML_MIME_TYPE))
@@ -289,6 +316,76 @@ public class ChatFragment
 
             if(update)
                 dataChanged();
+        }
+
+        private void processReplacements(ChatMessage chatMsg)
+        {
+            //ConfigurationService cfg
+            //  = AndroidGUIActivator.getConfigurationService();
+            //boolean isEnabled
+              //= cfg.getBoolean(ReplacementProperty.REPLACEMENT_ENABLE, true);
+
+            String msgStore = chatMsg.getMessage();
+
+            for (Map.Entry<String, ReplacementService> entry
+                    : AndroidGUIActivator.getReplacementSources().entrySet())
+            {
+                ReplacementService source = entry.getValue();
+
+                boolean isSmiley
+                        = source instanceof SmiliesReplacementService;
+
+                if(!isSmiley)
+                    continue;
+
+                String sourcePattern = source.getPattern();
+                Pattern p = Pattern.compile(
+                        sourcePattern,
+                        Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+                Matcher m = p.matcher(msgStore);
+
+                StringBuilder msgBuff = new StringBuilder();
+                int startPos = 0;
+
+                while (m.find())
+                {
+                    msgBuff.append(msgStore.substring(startPos, m.start()));
+                    startPos = m.end();
+
+                    String group = m.group();
+                    String temp = source.getReplacement(group);
+                    String group0 = m.group(0);
+
+                    if(!temp.equals(group0))
+                    {
+                        // Change message type to HTML
+                        chatMsg.setContentType(
+                            OperationSetBasicInstantMessaging.HTML_MIME_TYPE);
+                        msgBuff.append("<IMG SRC=\"");
+                        msgBuff.append(temp);
+                        msgBuff.append("\" BORDER=\"0\" ALT=\"");
+                        msgBuff.append(group0);
+                        msgBuff.append("\"></IMG>");
+                    }
+                    else
+                    {
+                        msgBuff.append(group);
+                    }
+                }
+
+                msgBuff.append(msgStore.substring(startPos));
+
+                    /*
+                     * replace the msgStore variable with the current replaced
+                     * message before next iteration
+                     */
+                String msgBuffString = msgBuff.toString();
+
+                if (!msgBuffString.equals(msgStore))
+                    msgStore = msgBuffString;
+            }
+
+            chatMsg.setMessage(msgStore);
         }
 
         /**
@@ -470,8 +567,31 @@ public class ChatFragment
                 if(message.getContentType().equals(
                         OperationSetBasicInstantMessaging.HTML_MIME_TYPE))
                 {
-                    messageViewHolder.messageView.setText(
-                            Html.fromHtml(message.getMessage()));
+                    messageViewHolder.messageView.setText(Html.fromHtml(
+                            message.getMessage(),
+                            // Image loader
+                            new Html.ImageGetter()
+                        {
+                            @Override
+                            public Drawable getDrawable(String source)
+                            {
+                                // Image resource id is returned here in form:
+                                // jitsi.resource://{Integer drawable id}
+                                // Example: jitsi.resource://2130837599
+                                Drawable img = getResources()
+                                        .getDrawable(
+                                                Integer.parseInt(
+                                                        source.substring(17)));
+                                if(img == null)
+                                    return null;
+
+                                img.setBounds(0, 0,
+                                              img.getIntrinsicWidth(),
+                                              img.getIntrinsicHeight());
+                                return img;
+                            }
+                        }, null));
+
                     messageViewHolder.messageView.setMovementMethod(
                             LinkMovementMethod.getInstance());
                 }
@@ -856,4 +976,6 @@ public class ChatFragment
         else
             typingView.setVisibility(View.INVISIBLE);
     }
+
+
 }

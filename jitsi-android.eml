@@ -78,6 +78,9 @@
 	<lib name="resourcemanager.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/libs/resourcemanager.jar!/"/>
 	</lib>
+	<lib name="replacement.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libs/replacement.jar!/"/>
+	</lib>
 	<lib name="sdes4j.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/libs/sdes4j.jar!/"/>
 	</lib>
