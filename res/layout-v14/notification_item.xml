@@ -20,5 +20,7 @@
                   android:layout_alignParentRight="true"
                   android:layout_centerVertical="true"
                   android:layout_marginRight="15dp"
+                  android:textOn="@string/service_gui_ON"
+                  android:textOff="@string/service_gui_OFF"
             />
 </RelativeLayout>

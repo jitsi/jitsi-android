@@ -9,6 +9,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@android:id/toggle"
+            android:textOn="@string/service_gui_ON"
+            android:textOff="@string/service_gui_OFF"
             />
     <TextView
             android:layout_width="wrap_content"
