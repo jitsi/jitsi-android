@@ -92,9 +92,9 @@ public class ProximitySensorFragment
      * {@inheritDoc}
      */
     @Override
-    public void onDestroy()
+    public void onPause()
     {
-        super.onDestroy();
+        super.onPause();
 
         if(proximitySensor != null)
         {
