@@ -122,8 +122,7 @@
             android:layout_height="fill_parent"
             android:layout_weight="1"
             android:layout_gravity="center_vertical"
-            android:focusable="true"
-            android:onClick="onLocalVideoButtonClicked"/>
+            android:focusable="true"/>
 
         <ImageButton
                 android:id="@+id/callHoldButton"
