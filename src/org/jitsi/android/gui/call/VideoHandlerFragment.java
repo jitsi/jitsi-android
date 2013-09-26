@@ -20,7 +20,9 @@ import net.java.sip.communicator.util.call.*;
 
 import org.jitsi.*;
 import org.jitsi.android.gui.controller.*;
+import org.jitsi.android.gui.settings.util.*;
 import org.jitsi.android.util.java.awt.*;
+import org.jitsi.impl.neomedia.device.*;
 import org.jitsi.impl.neomedia.jmfext.media.protocol.mediarecorder.*;
 import org.jitsi.service.neomedia.*;
 import org.jitsi.service.osgi.*;
@@ -84,6 +86,24 @@ public class VideoHandlerFragment
      * The call for which this fragment is handling video events.
      */
     private Call call;
+
+    /**
+     * Menu object used by this fragment.
+     */
+    private Menu menu;
+
+    /**
+     * The thread that switches the camera.
+     */
+    private Thread cameraSwitchThread;
+
+    /**
+     * Creates new instance of <tt>VideoHandlerFragment</tt>.
+     */
+    public VideoHandlerFragment()
+    {
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
@@ -156,6 +176,19 @@ public class VideoHandlerFragment
     {
         super.onPause();
 
+        // Make sure to join the switch camera thread
+        if(cameraSwitchThread != null)
+        {
+            try
+            {
+                cameraSwitchThread.join();
+            }
+            catch (InterruptedException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
+
         removeVideoListener();
 
         if(call.getCallState() != CallState.CALL_ENDED)
@@ -183,6 +216,99 @@ public class VideoHandlerFragment
             remoteVideoContainer.removeView(
                     remoteVideoAccessor.getView(getActivity()));
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        // Check if this device supports two cameras
+        AndroidCamera[] cameras = AndroidCamera.getCameras();
+        if(cameras.length != 2)
+            return;
+
+        inflater.inflate(R.menu.camera_menu, menu);
+        this.menu = menu;
+
+        updateMenu();
+    }
+
+    /**
+     * Updates menu status.
+     */
+    private void updateMenu()
+    {
+        if(menu == null)
+            return;
+
+        String currentDevice = AndroidCamera.getSelectedCameraDevName();
+        String displayName
+            = currentDevice.contains(MediaRecorderSystem.CAMERA_FACING_FRONT)
+                    ? getString(R.string.service_gui_settings_USE_BACK_CAMERA)
+                    : getString(R.string.service_gui_settings_USE_FRONT_CAMERA);
+
+        menu.findItem(R.id.switch_camera).setTitle(displayName);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if(item.getItemId() == R.id.switch_camera)
+        {
+            // Ignore action if camera switching is in progress
+            if(cameraSwitchThread != null)
+                return true;
+
+            String back
+                = getString(R.string.service_gui_settings_USE_BACK_CAMERA);
+            String front
+                = getString(R.string.service_gui_settings_USE_FRONT_CAMERA);
+            String newTitle;
+
+            AndroidCamera[] cameras = AndroidCamera.getCameras();
+            final String newDeviceName;
+
+            if(item.getTitle().equals(back))
+            {
+                // Switch to back camera
+                newDeviceName
+                    = cameras[0].getDeviceName().contains(
+                        MediaRecorderSystem.CAMERA_FACING_BACK)
+                            ? cameras[0].getDeviceName()
+                            : cameras[1].getDeviceName();
+                // Set opposite title
+                newTitle = front;
+            }
+            else
+            {
+                // Switch to front camera
+                newDeviceName
+                    = cameras[0].getDeviceName().contains(
+                        MediaRecorderSystem.CAMERA_FACING_FRONT)
+                            ? cameras[0].getDeviceName()
+                            : cameras[1].getDeviceName();
+                // Set opposite title
+                newTitle = back;
+            }
+            item.setTitle(newTitle);
+
+            // Switch the camera in separate thread
+            this.cameraSwitchThread = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    AndroidCamera.setSelectedCamera(newDeviceName);
+                    // Keep track of created threads
+                    cameraSwitchThread = null;
+                }
+            };
+            cameraSwitchThread.start();
+
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**
@@ -248,8 +374,7 @@ public class VideoHandlerFragment
                     // corner depending on if we have a remote video shown.
                     realignPreviewDisplay();
                     previewDisplay.setVisibility(View.VISIBLE);
-                }
-                else
+                } else
                 {
                     previewDisplay.setVisibility(View.GONE);
                 }

@@ -342,20 +342,13 @@ public class SettingsActivity
          */
         private void initVideoPreferences()
         {
-            List<CaptureDeviceInfo> videoDevices = getCameras();
-            String[] names = new String[videoDevices.size()];
-            String[] values = new String[videoDevices.size()];
-            for(int i=0; i<videoDevices.size(); i++)
+            AndroidCamera[] cameras = AndroidCamera.getCameras();
+            String[] names = new String[cameras.length];
+            String[] values = new String[cameras.length];
+            for(int i=0; i<cameras.length; i++)
             {
-                CaptureDeviceInfo device = videoDevices.get(i);
-                String devName = device.getName();
-                String displayName
-                    = devName
-                        .contains(MediaRecorderSystem.CAMERA_FACING_FRONT)
-                        ? getString(R.string.service_gui_settings_FRONT_CAMERA)
-                        : getString(R.string.service_gui_settings_BACK_CAMERA);
-                values[i] = devName;
-                names[i] = displayName;
+                names[i] = cameras[i].getName();
+                values[i] = cameras[i].getDeviceName();
             }
 
             ListPreference cameraList
@@ -363,13 +356,8 @@ public class SettingsActivity
             cameraList.setEntries(names);
             cameraList.setEntryValues(values);
 
-            // Set the first one as default camera
-            String currentCamera = cameraList.getValue();
-            if(currentCamera == null || currentCamera.isEmpty())
-            {
-                if(values.length > 0)
-                    cameraList.setValueIndex(0);
-            }
+            // Get camera from configuration
+            cameraList.setValue(AndroidCamera.getSelectedCameraDevName());
 
             // Resolutions
             String[] resolutionValues
@@ -670,24 +658,8 @@ public class SettingsActivity
                 // Camera
                 String cameraName
                         = shPreferences.getString(P_KEY_VIDEO_CAMERA, null);
-                List<CaptureDeviceInfo> cameras = getCameras();
-                CaptureDeviceInfo selectedCamera = null;
-                for(CaptureDeviceInfo camera : cameras)
-                {
-                    if(camera.getName().equals(cameraName))
-                    {
-                        selectedCamera = camera;
-                        break;
-                    }
-                }
-                if(selectedCamera != null)
-                {
-                    deviceConfig.setVideoCaptureDevice(selectedCamera, true);
-                }
-                else
-                {
-                    logger.warn("No camera found for name: "+cameraName);
-                }
+
+                AndroidCamera.setSelectedCamera(cameraName);
             }
             else if(key.equals(P_KEY_VIDEO_RES))
             {

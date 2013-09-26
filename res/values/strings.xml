@@ -896,6 +896,8 @@
     <string name="service_gui_settings_NO_CAMERA">No camera device found</string>
     <string name="service_gui_settings_FRONT_CAMERA">Front camera</string>
     <string name="service_gui_settings_BACK_CAMERA">Back camera</string>
+    <string name="service_gui_settings_USE_FRONT_CAMERA">Use front camera</string>
+    <string name="service_gui_settings_USE_BACK_CAMERA">Use back camera</string>
     <!-- Video encodings -->
     <string name="service_gui_settings_VIDEO_CODECS_TITLE">Video codecs</string>
     <string name="service_gui_settings_VIDEO_CODECS_SUMMARY">Adjust video encodings</string>
