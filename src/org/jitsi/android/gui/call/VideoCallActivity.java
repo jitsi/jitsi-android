@@ -189,9 +189,6 @@ public class VideoCallActivity
                     .add(new VideoHandlerFragment(), VIDEO_FRAGMENT_TAG)
                     .commit();
         }
-        // Keep the screen on
-        getWindow().addFlags(
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override
@@ -462,13 +459,16 @@ public class VideoCallActivity
     {
         call.removeCallChangeListener(this);
 
-        Iterator<? extends CallPeer> callPeerIter = call.getCallPeers();
-        if (callPeerIter.hasNext())
+        if(callPeerAdapter != null)
         {
-            removeCallPeerUI(callPeerIter.next());
+            Iterator<? extends CallPeer> callPeerIter = call.getCallPeers();
+            if (callPeerIter.hasNext())
+            {
+                removeCallPeerUI(callPeerIter.next());
+            }
+            callPeerAdapter.dispose();
+            callPeerAdapter = null;
         }
-        callPeerAdapter.dispose();
-        callPeerAdapter = null;
 
         if(call.getCallState() != CallState.CALL_ENDED)
         {
@@ -652,16 +652,6 @@ public class VideoCallActivity
         {
             holdButton.setBackgroundColor(Color.TRANSPARENT);
         }
-    }
-
-    public void setCallPeerAdapter(CallPeerAdapter adapter)
-    {
-        this.callPeerAdapter = adapter;
-    }
-
-    public CallPeerAdapter getCallPeerAdapter()
-    {
-        return callPeerAdapter;
     }
 
     public void printDTMFTone(char dtmfChar)
