@@ -62,11 +62,17 @@ public class ProximitySensorFragment
     {
         super.onResume();
 
+        SensorManager manager = JitsiApplication.getSensorManager();
+
         // Skips if the sensor has been already attached
         if(proximitySensor != null)
+        {
+            // Re-registers the listener as it might have been
+            // unregistered in onPause()
+            manager.registerListener( this, proximitySensor,
+                                      SensorManager.SENSOR_DELAY_UI );
             return;
-
-        SensorManager manager = JitsiApplication.getSensorManager();
+        }
 
         List<Sensor> sensors = manager.getSensorList(Sensor.TYPE_ALL);
         logger.trace("Device has "+sensors.size()+" sensors");
@@ -95,6 +101,22 @@ public class ProximitySensorFragment
     public void onPause()
     {
         super.onPause();
+        // If the screen is on in onPause() call it means that this was caused
+        // by "home screen" button(or other system action) and we don't want
+        // to keep turning the screen on and off in this case
+        if(isScreenOff() == false)
+        {
+            JitsiApplication.getSensorManager().unregisterListener(this);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
 
         if(proximitySensor != null)
         {
@@ -127,6 +149,33 @@ public class ProximitySensorFragment
     }
 
     /**
+     * Returns <tt>true</tt> if screen off lock is held which means that
+     * the screen is turned off by this <tt>ProximitySensorFragment</tt>.
+     * @return <tt>true</tt> if the screen is turned off by this
+     *         <tt>ProximitySensorFragment</tt>.
+     */
+    private boolean isScreenOff()
+    {
+        return getScreenOffLock().isHeld();
+    }
+
+    /**
+     * Screen off lock getter.
+     * @return the screen off lock instance.
+     */
+    private PowerManager.WakeLock getScreenOffLock()
+    {
+        if(screenOffLock == null)
+        {
+            this.screenOffLock
+                = JitsiApplication.getPowerManager()
+                    .newWakeLock( PROXIMITY_SCREEN_OFF_WAKE_LOCK,
+                                  "proximity_off" );
+        }
+        return screenOffLock;
+    }
+
+    /**
      * Turns the screen off.
      */
     private void screenOff()
@@ -135,13 +184,7 @@ public class ProximitySensorFragment
         if(activity == null || sensorDisabled)
             return;
 
-        if(screenOffLock == null)
-        {
-            this.screenOffLock
-                    = JitsiApplication.getPowerManager()
-                        .newWakeLock( PROXIMITY_SCREEN_OFF_WAKE_LOCK,
-                                      "proximity_off" );
-        }
+        PowerManager.WakeLock screenOffLock = getScreenOffLock();
 
         if(!screenOffLock.isHeld())
         {
@@ -157,7 +200,8 @@ public class ProximitySensorFragment
      */
     private void screenOn()
     {
-        if(screenOffLock == null || !screenOffLock.isHeld())
+        PowerManager.WakeLock screenOffLock = getScreenOffLock();
+        if(!screenOffLock.isHeld())
         {
            return;
         }
