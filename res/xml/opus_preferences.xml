@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference android:title="@string/service_gui_settings_OPUS_AUDIO_BANDWIDTH"
+                    android:key="@string/pref_key_opus_audio_bandwidth"
+                    android:entries="@array/pref_opus_bandwidth"
+                    android:entryValues="@array/pref_opus_bandwidth_values"/>
+    <EditTextPreference android:title="@string/service_gui_settings_OPUS_BITRATE"
+                        android:key="@string/pref_key_opus_bitrate"
+                        android:inputType="number"/>
+    <CheckBoxPreference android:title="@string/service_gui_settings_OPUS_USE_DTX"
+                        android:key="@string/pref_key_opus_use_dtx" />
+    <CheckBoxPreference android:title="@string/service_gui_settings_OPUS_USE_FEC"
+                        android:key="@string/pref_key_opus_use_fec" />
+    <EditTextPreference android:title="@string/service_gui_settings_OPUS_MIN_EXPECTED_PACKET_LOSS"
+                        android:key="@string/pref_key_opus_min_expected_packet_loss"
+                        android:inputType="number" />
+    <ListPreference android:title="@string/service_gui_settings_OPUS_COMPLEXITY"
+                    android:key="@string/pref_key_opus_complexity"
+                    android:entries="@array/pref_opus_complexity"
+                    android:entryValues="@array/pref_opus_complexity" />
+</PreferenceScreen>

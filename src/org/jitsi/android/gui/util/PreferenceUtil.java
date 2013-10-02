@@ -62,4 +62,24 @@ public class PreferenceUtil
 
         cbPref.setText(txtValue);
     }
+
+    /**
+     * Sets the value of <tt>ListPreference</tt> identified by given
+     * preference key string.
+     * @param fragment the <tt>PreferenceFragment</tt> containing the
+     *        <tt>ListPreference</tt> we want to edit.
+     * @param prefKey preference key id from <tt>R.string</tt>.
+     * @param value the value we want to set on <tt>ListPreference</tt>
+     */
+    public static void setListVal( PreferenceFragment fragment,
+                                       String prefKey,
+                                       String value )
+    {
+        ListPreference lstPref
+                = (ListPreference) fragment.findPreference(prefKey);
+
+        logger.debug("Setting "+value+" on "+prefKey);
+
+        lstPref.setValue(value);
+    }
 }

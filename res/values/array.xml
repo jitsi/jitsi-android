@@ -42,4 +42,32 @@
         <item>RTP_DTMF</item>        
         <item>INBAND_DTMF</item>
     </string-array>
+    <string-array name="pref_opus_bandwidth">
+        <item>Auto</item>
+        <item>Fullband (48kHz)</item>
+        <item>Super-wideband (24kHz)</item>
+        <item>Wideband (16kHz)</item>
+        <item>Medium-band (12kHz)</item>
+        <item>Narrowband (8kHz)</item>
+    </string-array>
+    <string-array name="pref_opus_bandwidth_values">
+        <item>auto</item>
+        <item>fb</item>
+        <item>swb</item>
+        <item>wb</item>
+        <item>mb</item>
+        <item>nb</item>
+    </string-array>
+    <string-array name="pref_opus_complexity">
+        <item>10</item>
+        <item>9</item>
+        <item>8</item>
+        <item>7</item>
+        <item>6</item>
+        <item>5</item>
+        <item>4</item>
+        <item>3</item>
+        <item>2</item>
+        <item>1</item>
+    </string-array>
 </resources>

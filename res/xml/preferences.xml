@@ -175,6 +175,11 @@
             android:title="@string/service_gui_settings_ADVANCED"
             android:key="@string/pref_cat_settings_advanced">
         <PreferenceScreen
+                android:title="@string/service_gui_settings_OPUS"
+                android:summary="@string/service_gui_settings_OPUS_SUMMARY">
+            <intent android:action=".android.gui.settings.OpusSettings"/>
+        </PreferenceScreen>
+        <PreferenceScreen
                 android:title="@string/service_gui_settings_LOGGING_TITLE"
                 android:summary="@string/service_gui_settings_LOGGING_SUMMARY">
             <intent android:action=".android.gui.settings.LoggingSettings"/>
