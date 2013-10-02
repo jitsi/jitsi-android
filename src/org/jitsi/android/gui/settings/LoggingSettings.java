@@ -71,7 +71,7 @@ public class LoggingSettings
         }
     }
 
-    static class SettingsFragment
+    public static class SettingsFragment
         extends OSGiPreferenceFragment
         implements SharedPreferences.OnSharedPreferenceChangeListener
     {
