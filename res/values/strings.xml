@@ -990,16 +990,17 @@
     <string name="service_gui_settings_OPUS">Opus</string>
     <string name="service_gui_settings_OPUS_SUMMARY">Configure Opus encoder settings</string>
     <string name="service_gui_settings_OPUS_AUDIO_BANDWIDTH">Sampling rate</string>
-    <string name="pref_key_opus_audio_bandwidth">pref.key.opus.audio_bandwidth</string>
     <string name="service_gui_settings_OPUS_BITRATE">Encoder average bitrate (kbps)</string>
-    <string name="pref_key_opus_bitrate">pref.key.opus.bitrate</string>
     <string name="service_gui_settings_OPUS_USE_DTX">Use DTX</string>
-    <string name="pref_key_opus_use_dtx">pref.key.opus.use_dtx</string>
     <string name="service_gui_settings_OPUS_USE_FEC">Use inband FEC</string>
-    <string name="pref_key_opus_use_fec">pref.key.opus.use_fec</string>
     <string name="service_gui_settings_OPUS_MIN_EXPECTED_PACKET_LOSS">Minimum expected packet loss(%)</string>
-    <string name="pref_key_opus_min_expected_packet_loss">pref.key.opus.min_expected_packet_loss</string>
     <string name="service_gui_settings_OPUS_COMPLEXITY">Encoder complexity</string>
-    <string name="pref_key_opus_complexity">pref.key.opus.complexity</string>
+    <string name="pref_key_opus_audio_bandwidth">net.java.sip.communicator.impl.neomedia.codec.audio.opus.encoder.AUDIO_BANDWIDTH</string>
+    <string name="pref_key_opus_bitrate">net.java.sip.communicator.impl.neomedia.codec.audio.opus.encoder.BITRATE</string>
+    <string name="pref_key_opus_use_dtx">net.java.sip.communicator.impl.neomedia.codec.audio.opus.encoder.DTX</string>
+    <string name="pref_key_opus_use_fec">net.java.sip.communicator.impl.neomedia.codec.audio.opus.encoder.FEC</string>
+    <string name="pref_key_opus_min_expected_packet_loss">net.java.sip.communicator.impl.neomedia.codec.audio.opus.encoder.MIN_EXPECTED_PACKET_LOSS</string>
+    <string name="pref_key_opus_complexity">net.java.sip.communicator.impl.neomedia.codec.audio.opus.encoder.COMPLEXITY</string>
+
 
 </resources>
