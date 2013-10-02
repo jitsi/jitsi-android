@@ -54,6 +54,8 @@ public class ConfigCheckBox
     @Override
     protected boolean persistBoolean(boolean value)
     {
+        super.persistBoolean(value);
+
         // Sets boolean value in the ConfigurationService
         AndroidGUIActivator
                 .getConfigurationService()

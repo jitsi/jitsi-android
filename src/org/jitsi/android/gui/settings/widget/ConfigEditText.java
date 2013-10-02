@@ -68,6 +68,8 @@ public class ConfigEditText
     @Override
     protected boolean persistString(String value)
     {
+        super.persistString(value);
+
         AndroidGUIActivator
                 .getConfigurationService()
                 .setProperty(getKey(), value);
