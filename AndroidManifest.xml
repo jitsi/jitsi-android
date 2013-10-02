@@ -150,6 +150,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <!-- Silk settings -->
+        <activity android:name=".android.gui.settings.SilkSettings"
+                  android:label="@string/app_name">
+            <intent-filter>
+                <action android:name=".android.gui.settings.SilkSettings" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <!-- Logging settings -->
         <activity android:name=".android.gui.settings.LoggingSettings"
                   android:label="@string/app_name">

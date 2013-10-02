@@ -180,6 +180,11 @@
             <intent android:action=".android.gui.settings.OpusSettings"/>
         </PreferenceScreen>
         <PreferenceScreen
+                android:title="@string/service_gui_settings_SILK"
+                android:summary="@string/service_gui_settings_SILK_SUMMARY">
+            <intent android:action=".android.gui.settings.SilkSettings"/>
+        </PreferenceScreen>
+        <PreferenceScreen
                 android:title="@string/service_gui_settings_LOGGING_TITLE"
                 android:summary="@string/service_gui_settings_LOGGING_SUMMARY">
             <intent android:action=".android.gui.settings.LoggingSettings"/>

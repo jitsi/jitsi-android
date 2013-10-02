@@ -1001,6 +1001,17 @@
     <string name="pref_key_opus_use_fec">net.java.sip.communicator.impl.neomedia.codec.audio.opus.encoder.FEC</string>
     <string name="pref_key_opus_min_expected_packet_loss">net.java.sip.communicator.impl.neomedia.codec.audio.opus.encoder.MIN_EXPECTED_PACKET_LOSS</string>
     <string name="pref_key_opus_complexity">net.java.sip.communicator.impl.neomedia.codec.audio.opus.encoder.COMPLEXITY</string>
+    <!-- Silk -->
+    <string name="service_gui_settings_SILK">Silk</string>
+    <string name="service_gui_settings_SILK_SUMMARY">Configure Silk encoder settings</string>
+    <string name="service_gui_settings_SILK_FEC">Use inband FEC</string>
+    <string name="service_gui_settings_SILK_ASSUME_PL">Always assume packet loss</string>
+    <string name="service_gui_settings_SILK_FEC_SAT">Speech activity threshold (0–1)</string>
+    <string name="service_gui_settings_SILK_ADVERTISE_FEC">Advertise FEC support in SDP</string>
+    <string name="pref_key_silk_fec">net.java.sip.communicator.impl.neomedia.codec.audio.silk.encoder.USE_FEC</string>
+    <string name="pref_key_silk_assume_pl">net.java.sip.communicator.impl.neomedia.codec.audio.silk.encoder.AWLAYS_ASSUME_PACKET_LOSS</string>
+    <string name="pref_key_silk_fec_sat">net.java.sip.communicator.impl.neomedia.codec.audio.silk.encoder.SPEECH_ACTIVITY_THRESHOLD</string>
+    <string name="pref_key_silk_advertise_FEC">net.java.sip.communicator.impl.neomedia.codec.audio.silk.ADVERTISE_FEC</string>
 
 
 </resources>
