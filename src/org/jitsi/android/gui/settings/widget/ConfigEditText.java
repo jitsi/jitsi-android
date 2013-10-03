@@ -8,6 +8,7 @@ package org.jitsi.android.gui.settings.widget;
 
 import android.content.*;
 import android.preference.*;
+import android.text.*;
 import android.util.*;
 
 import org.jitsi.android.gui.*;
@@ -46,7 +47,7 @@ public class ConfigEditText
         super.onSetInitialValue(restoreValue,defaultValue);
 
         // Set summary on init
-        setSummary(getText());
+        updateSummary(getText());
     }
 
     /**
@@ -75,8 +76,24 @@ public class ConfigEditText
                 .setProperty(getKey(), value);
 
         // Update summary when the value has changed
-        setSummary(value);
+        updateSummary(value);
 
         return true;
+    }
+
+    /**
+     * Updates the summary with given <tt>text</tt>. If the input type is
+     * password variation all characters will be replaced with '*'.
+     *
+     * @param text the text that will be set as a summary.
+     */
+    private void updateSummary(String text)
+    {
+        if( (getEditText().getInputType() & InputType.TYPE_MASK_VARIATION)
+                == InputType.TYPE_TEXT_VARIATION_PASSWORD )
+        {
+            text = text.replaceAll("(?s).", "*");
+        }
+        setSummary(text);
     }
 }

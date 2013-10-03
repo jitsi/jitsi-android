@@ -160,12 +160,7 @@ public class SummaryMapper
     {
         public String convertToSummary(String input)
         {
-            StringBuilder out = new StringBuilder();
-            for(int i=0; i<input.length(); i++)
-            {
-                out.append("*");
-            }
-            return out.toString();
+            return input.replaceAll("(?s).", "*");
         }
     }
 }
