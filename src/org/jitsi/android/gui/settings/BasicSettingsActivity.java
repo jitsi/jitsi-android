@@ -6,7 +6,6 @@
  */
 package org.jitsi.android.gui.settings;
 
-import android.*;
 import android.content.pm.*;
 import android.os.*;
 
@@ -20,7 +19,7 @@ import org.jitsi.service.osgi.*;
  * @author Pawel Domas
  */
 public class BasicSettingsActivity
-    extends OSGiActivity
+    extends OSGiPreferenceActivity
 {
 
     /**
@@ -54,28 +53,6 @@ public class BasicSettingsActivity
     {
         super.onCreate(savedInstanceState);
 
-        if(savedInstanceState == null)
-        {
-            getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.content, new SettingsFragment())
-                    .commit();
-        }
-    }
-
-    /**
-     * Preferences fragment.
-     */
-    public static class SettingsFragment
-        extends OSGiPreferenceFragment
-    {
-        @Override
-        public void onCreate(Bundle savedInstanceState)
-        {
-            super.onCreate(savedInstanceState);
-
-            addPreferencesFromResource(
-                ((BasicSettingsActivity)getActivity()).getPreferencesXmlId());
-        }
+        addPreferencesFromResource(getPreferencesXmlId());
     }
 }

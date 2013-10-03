@@ -1025,5 +1025,14 @@
     <string name="pref_key_conn_proxy_port">net.java.sip.communicator.service.connectionProxyPort</string>
     <string name="pref_key_conn_proxy_username">net.java.sip.communicator.service.connectionProxyUsername</string>
     <string name="pref_key_conn_proxy_password">net.java.sip.communicator.service.connectionProxyPassword</string>
+    <!-- SIP config -->
+    <string name="service_gui_settings_SIP">SIP</string>
+    <string name="service_gui_settings_SIP_SUMMARY">Configure SIP protocol settings</string>
+    <string name="plugin_generalconfig_SIP_CLIENT_PORT">SIP client port</string>
+    <string name="plugin_generalconfig_SIP_CLIENT_SECURE_PORT">SIP client secure port</string>
+    <string name="plugin_generalconfig_SIP_SSL_PROTOCOLS">Enabled SSL/TLS protocols</string>
+    <string name="pref_cat_sip_ssl_protocols">pref.cat.sip.ssl_protocols</string>
+    <string name="pref_key_sip_client_port">net.java.sip.communicator.SIP_PREFERRED_CLEAR_PORT</string>
+    <string name="pref_key_sip_client_secure_port">net.java.sip.communicator.SIP_PREFERRED_SECURE_PORT</string>
 
 </resources>

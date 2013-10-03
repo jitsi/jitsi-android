@@ -19,6 +19,8 @@
         android:key="@string/pref_key_conn_proxy_port"
         android:dependency="@string/pref_key_conn_proxy_type"
         android:inputType="number"
+        custom:intMax="65535"
+        custom:intMin="0"
         />
     <org.jitsi.android.gui.settings.widget.ConfigEditText
         android:title="@string/plugin_globalproxy_PROXY_USERNAME"

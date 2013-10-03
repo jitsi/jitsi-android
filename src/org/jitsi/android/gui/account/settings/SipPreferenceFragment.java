@@ -150,7 +150,7 @@ public class SipPreferenceFragment
      */
     public SipPreferenceFragment()
     {
-        super(R.xml.sip_preferences);
+        super(R.xml.acc_sip_preferences);
     }
 
     /**

@@ -148,7 +148,7 @@ public class JabberPreferenceFragment
      */
     public JabberPreferenceFragment()
     {
-        super(R.xml.jabber_preferences);
+        super(R.xml.acc_jabber_preferences);
     }
 
     /**

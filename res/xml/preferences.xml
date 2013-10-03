@@ -185,6 +185,11 @@
             <intent android:action=".android.gui.settings.SilkSettings"/>
         </PreferenceScreen>
         <PreferenceScreen
+                android:title="@string/service_gui_settings_SIP"
+                android:summary="@string/service_gui_settings_SIP_SUMMARY">
+            <intent android:action=".android.gui.settings.SipSettings"/>
+        </PreferenceScreen>
+        <PreferenceScreen
                 android:title="@string/service_gui_settings_LOGGING_TITLE"
                 android:summary="@string/service_gui_settings_LOGGING_SUMMARY">
             <intent android:action=".android.gui.settings.LoggingSettings"/>
