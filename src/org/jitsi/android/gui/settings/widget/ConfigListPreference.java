@@ -7,27 +7,64 @@
 package org.jitsi.android.gui.settings.widget;
 
 import android.content.*;
+import android.content.res.*;
 import android.preference.*;
 import android.util.*;
 
+import org.jitsi.*;
 import org.jitsi.android.gui.*;
 
 /**
+ * List preference that stores it's value through the
+ * <tt>ConfigurationService</tt>. It also supports "disable dependents value"
+ * attribute.
+ *
  * @author Pawel Domas
  */
 public class ConfigListPreference
     extends ListPreference
 {
+    /**
+     * Optional attribute which contains value that disables all dependents.
+     */
+    private String dependentValue;
+
     public ConfigListPreference(Context context,
                                 AttributeSet attrs)
     {
         super(context, attrs);
+
+        initAttributes(context, attrs);
     }
 
     public ConfigListPreference(Context context)
     {
         super(context);
     }
+
+    /**
+     * Parses attribute set.
+     * @param context Android context.
+     * @param attrs attribute set.
+     */
+    private void initAttributes(Context context, AttributeSet attrs)
+    {
+        TypedArray attArray
+            = context.obtainStyledAttributes(attrs,
+                                             R.styleable.ConfigListPreference);
+
+        for(int i=0; i<attArray.getIndexCount(); i++)
+        {
+            int attribute = attArray.getIndex(i);
+            switch (attribute)
+            {
+                case R.styleable.ConfigListPreference_disableDependentsValue:
+                    this.dependentValue = attArray.getString(attribute);
+                    break;
+            }
+        }
+    }
+
 
     /**
      * {@inheritDoc}
@@ -85,5 +122,30 @@ public class ConfigListPreference
         {
             setSummary(getEntries()[idx]);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setValue(String value)
+    {
+        super.setValue(value);
+
+        // Disables dependents
+        notifyDependencyChange(shouldDisableDependents());
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Additionally checks if current value is equal to disable dependents
+     * value.
+     */
+    @Override
+    public boolean shouldDisableDependents()
+    {
+        return super.shouldDisableDependents()
+               || (dependentValue != null && getValue().equals(dependentValue));
     }
 }

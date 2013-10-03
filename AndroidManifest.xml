@@ -142,22 +142,40 @@
         <activity android:name=".android.gui.settings.notification.NotificationDetails"
                   >
         </activity>
-        <!-- Opus settings -->
-        <activity android:name=".android.gui.settings.OpusSettings"
+        <!-- Basic settings -->
+        <activity android:name=".android.gui.settings.BasicSettingsActivity"
                   android:label="@string/app_name">
+        </activity>
+        <!-- Opus settings -->
+        <activity-alias android:name=".android.gui.settings.OpusSettings"
+                        android:targetActivity=".android.gui.settings.BasicSettingsActivity" >
             <intent-filter>
                 <action android:name=".android.gui.settings.OpusSettings" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </activity>
+            <meta-data android:name="android.preference"
+                       android:resource="@xml/opus_preferences" />
+        </activity-alias>
         <!-- Silk settings -->
-        <activity android:name=".android.gui.settings.SilkSettings"
-                  android:label="@string/app_name">
+        <activity-alias android:name=".android.gui.settings.SilkSettings"
+                        android:targetActivity=".android.gui.settings.BasicSettingsActivity" >
             <intent-filter>
                 <action android:name=".android.gui.settings.SilkSettings" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </activity>
+            <meta-data android:name="android.preference"
+                       android:resource="@xml/silk_preferences" />
+        </activity-alias>
+        <!-- Proxy settings -->
+        <activity-alias android:name=".android.gui.settings.ProxySettings"
+                        android:targetActivity=".android.gui.settings.BasicSettingsActivity" >
+            <intent-filter>
+                <action android:name=".android.gui.settings.ProxySettings" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data android:name="android.preference"
+                       android:resource="@xml/proxy_preferences" />
+        </activity-alias>
         <!-- Logging settings -->
         <activity android:name=".android.gui.settings.LoggingSettings"
                   android:label="@string/app_name">

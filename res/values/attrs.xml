@@ -6,4 +6,13 @@
         <attr name="dragRegionStartX" format="dimension" />
         <attr name="dragRegionEndX" format="dimension" />
     </declare-styleable>
+    <declare-styleable name="ConfigEditText">
+        <attr name="intMax" format="integer" />
+        <attr name="intMin" format="integer" />
+        <attr name="floatMax" format="float" />
+        <attr name="floatMin" format="float" />
+    </declare-styleable>
+    <declare-styleable name="ConfigListPreference">
+        <attr name="disableDependentsValue" format="string" />
+    </declare-styleable>
 </resources>

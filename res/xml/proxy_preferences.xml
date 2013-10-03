@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:custom="http://schemas.android.com/apk/res/org.jitsi">
+    <org.jitsi.android.gui.settings.widget.ConfigListPreference
+        android:title="@string/plugin_globalproxy_PROXY_TYPE"
+        android:key="@string/pref_key_conn_proxy_type"
+        android:entries="@array/pref_proxy_type"
+        android:entryValues="@array/pref_proxy_type"
+        custom:disableDependentsValue="NONE"
+        />
+    <org.jitsi.android.gui.settings.widget.ConfigEditText
+        android:title="@string/plugin_globalproxy_PROXY_ADDRESS"
+        android:key="@string/pref_key_conn_proxy_address"
+        android:dependency="@string/pref_key_conn_proxy_type"
+        />
+    <org.jitsi.android.gui.settings.widget.ConfigEditText
+        android:title="@string/plugin_globalproxy_PROXY_PORT"
+        android:key="@string/pref_key_conn_proxy_port"
+        android:dependency="@string/pref_key_conn_proxy_type"
+        android:inputType="number"
+        />
+    <org.jitsi.android.gui.settings.widget.ConfigEditText
+        android:title="@string/plugin_globalproxy_PROXY_USERNAME"
+        android:key="@string/pref_key_conn_proxy_username"
+        android:dependency="@string/pref_key_conn_proxy_type"
+        />
+    <org.jitsi.android.gui.settings.widget.ConfigEditText
+        android:title="@string/plugin_globalproxy_PROXY_PASSWORD"
+        android:key="@string/pref_key_conn_proxy_password"
+        android:dependency="@string/pref_key_conn_proxy_type"
+        android:inputType="textPassword"
+        />
+</PreferenceScreen>

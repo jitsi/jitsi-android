@@ -7,17 +7,19 @@
 package org.jitsi.android.gui.settings;
 
 import android.*;
+import android.content.pm.*;
 import android.os.*;
 
 import org.jitsi.service.osgi.*;
 
 /**
  * Base class for settings screens which only adds preferences
- * from XML resource.
+ * from XML resource. By default preference resource id is obtained from
+ * <tt>Activity</tt> meta-data, resource key: "android.preference".
  *
  * @author Pawel Domas
  */
-public abstract class BasicSettingsActivity
+public class BasicSettingsActivity
     extends OSGiActivity
 {
 
@@ -25,7 +27,24 @@ public abstract class BasicSettingsActivity
      * Returns preference XML resource ID.
      * @return preference XML resource ID.
      */
-    protected abstract int getPreferencesXmlId();
+    protected int getPreferencesXmlId()
+    {
+        // Cant' find custom preference classes using:
+        //addPreferencesFromIntent(getActivity().getIntent());
+        try
+        {
+            ActivityInfo app = getPackageManager()
+                    .getActivityInfo(
+                            getComponentName(),
+                            PackageManager.GET_ACTIVITIES
+                                    | PackageManager.GET_META_DATA);
+            return app.metaData.getInt("android.preference");
+        }
+        catch (PackageManager.NameNotFoundException e)
+        {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * {@inheritDoc}

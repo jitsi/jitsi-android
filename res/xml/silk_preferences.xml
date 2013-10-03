@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:custom="http://schemas.android.com/apk/res/org.jitsi">
     <org.jitsi.android.gui.settings.widget.ConfigCheckBox
         android:title="@string/service_gui_settings_SILK_FEC"
         android:key="@string/pref_key_silk_fec"
@@ -16,6 +17,8 @@
         android:key="@string/pref_key_silk_fec_sat"
         android:inputType="numberDecimal"
         android:defaultValue="0.5"
+        custom:floatMin="0"
+        custom:floatMax="1"
         />
     <org.jitsi.android.gui.settings.widget.ConfigCheckBox
         android:title="@string/service_gui_settings_SILK_ADVERTISE_FEC"

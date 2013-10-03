@@ -1012,6 +1012,18 @@
     <string name="pref_key_silk_assume_pl">net.java.sip.communicator.impl.neomedia.codec.audio.silk.encoder.AWLAYS_ASSUME_PACKET_LOSS</string>
     <string name="pref_key_silk_fec_sat">net.java.sip.communicator.impl.neomedia.codec.audio.silk.encoder.SPEECH_ACTIVITY_THRESHOLD</string>
     <string name="pref_key_silk_advertise_FEC">net.java.sip.communicator.impl.neomedia.codec.audio.silk.ADVERTISE_FEC</string>
-
+    <!-- Global proxy -->
+    <string name="service_gui_settings_PROXY">Global proxy</string>
+    <string name="service_gui_settings_PROXY_SUMMARY">Configure proxy settings</string>
+    <string name="plugin_globalproxy_PROXY_TYPE">Proxy Type</string>
+    <string name="plugin_globalproxy_PROXY_ADDRESS">Proxy Server</string>
+    <string name="plugin_globalproxy_PROXY_USERNAME">Proxy username</string>
+    <string name="plugin_globalproxy_PROXY_PASSWORD">Proxy password</string>
+    <string name="plugin_globalproxy_PROXY_PORT">Proxy port</string>
+    <string name="pref_key_conn_proxy_type">net.java.sip.communicator.service.connectionProxyType</string>
+    <string name="pref_key_conn_proxy_address">net.java.sip.communicator.service.connectionProxyAddress</string>
+    <string name="pref_key_conn_proxy_port">net.java.sip.communicator.service.connectionProxyPort</string>
+    <string name="pref_key_conn_proxy_username">net.java.sip.communicator.service.connectionProxyUsername</string>
+    <string name="pref_key_conn_proxy_password">net.java.sip.communicator.service.connectionProxyPassword</string>
 
 </resources>

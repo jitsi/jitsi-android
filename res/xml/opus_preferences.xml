@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:custom="http://schemas.android.com/apk/res/org.jitsi">
     <org.jitsi.android.gui.settings.widget.ConfigListPreference
             android:title="@string/service_gui_settings_OPUS_AUDIO_BANDWIDTH"
             android:key="@string/pref_key_opus_audio_bandwidth"
@@ -29,6 +30,8 @@
             android:key="@string/pref_key_opus_min_expected_packet_loss"
             android:inputType="number"
             android:defaultValue="1"
+            custom:intMax="100"
+            custom:intMin="1"
             />
     <org.jitsi.android.gui.settings.widget.ConfigListPreference
             android:title="@string/service_gui_settings_OPUS_COMPLEXITY"

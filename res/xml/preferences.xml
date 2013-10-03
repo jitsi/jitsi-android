@@ -189,5 +189,10 @@
                 android:summary="@string/service_gui_settings_LOGGING_SUMMARY">
             <intent android:action=".android.gui.settings.LoggingSettings"/>
         </PreferenceScreen>
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_PROXY"
+                android:summary="@string/service_gui_settings_PROXY_SUMMARY">
+            <intent android:action=".android.gui.settings.ProxySettings"/>
+        </PreferenceScreen>
     </PreferenceCategory>
 </PreferenceScreen>

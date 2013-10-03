@@ -70,4 +70,10 @@
         <item>2</item>
         <item>1</item>
     </string-array>
+    <string-array name="pref_proxy_type">
+        <item>NONE</item>
+        <item>HTTP</item>
+        <item>SOCKS4</item>
+        <item>SOCKS5</item>
+    </string-array>
 </resources>
