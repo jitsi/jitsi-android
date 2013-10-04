@@ -184,6 +184,16 @@
             <meta-data android:name="android.preference"
                        android:resource="@xml/proxy_preferences" />
         </activity-alias>
+        <!-- Dns settings -->
+        <activity android:name=".android.gui.settings.DnsSettings"
+                  android:label="@string/service_gui_settings_DNS">
+            <intent-filter>
+                <action android:name=".android.gui.settings.DnsSettings" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data android:name="android.preference"
+                       android:resource="@xml/dns_preferences" />
+        </activity>
         <!-- Logging settings -->
         <activity android:name=".android.gui.settings.LoggingSettings"
                   android:label="@string/app_name">

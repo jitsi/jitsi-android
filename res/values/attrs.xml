@@ -6,6 +6,10 @@
         <attr name="dragRegionStartX" format="dimension" />
         <attr name="dragRegionEndX" format="dimension" />
     </declare-styleable>
+    <declare-styleable name="ConfigWidget">
+        <attr name="storeInNewThread" format="boolean" />
+        <attr name="mapSummary" format="boolean" />
+    </declare-styleable>
     <declare-styleable name="ConfigEditText">
         <attr name="intMax" format="integer" />
         <attr name="intMin" format="integer" />

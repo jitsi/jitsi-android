@@ -76,4 +76,18 @@
         <item>SOCKS4</item>
         <item>SOCKS5</item>
     </string-array>
+    <string-array name="pref_dnssec_default_behaviour">
+        <item>Ignore</item>
+        <item>Required</item>
+        <item>Required for signed zones</item>
+        <item>Ask on bogus reply</item>
+        <item>Ask on unsigned or bogus reply</item>
+    </string-array>
+    <string-array name="pref_dnssec_default_behaviour_values">
+        <item>IgnoreDnssec</item>
+        <item>SecureOnly</item>
+        <item>SecureOrUnsigned</item>
+        <item>WarnIfBogus</item>
+        <item>WarnIfBogusOrUnsigned</item>
+    </string-array>
 </resources>

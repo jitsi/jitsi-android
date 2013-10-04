@@ -43,6 +43,11 @@ public class ConfigEditText
      */
     private Float floatMax;
 
+    /**
+     * <tt>ConfigWidgetUtil</tt> used by this instance
+     */
+    private ConfigWidgetUtil configUtil = new ConfigWidgetUtil(this, true);
+
     public ConfigEditText(Context context,
                           AttributeSet attrs, int defStyle)
     {
@@ -95,6 +100,8 @@ public class ConfigEditText
         }
         // Register listener to perform checks before new value is accepted
         setOnPreferenceChangeListener(this);
+
+        configUtil.parseAttributes(context, attrs);
     }
 
     /**
@@ -106,7 +113,7 @@ public class ConfigEditText
         super.onSetInitialValue(restoreValue,defaultValue);
 
         // Set summary on init
-        updateSummary(getText());
+        configUtil.updateSummary(getText());
     }
 
     /**
@@ -130,30 +137,9 @@ public class ConfigEditText
     {
         super.persistString(value);
 
-        AndroidGUIActivator
-                .getConfigurationService()
-                .setProperty(getKey(), value);
-
-        // Update summary when the value has changed
-        updateSummary(value);
+        configUtil.handlePersistValue(value);
 
         return true;
-    }
-
-    /**
-     * Updates the summary with given <tt>text</tt>. If the input type is
-     * password variation all characters will be replaced with '*'.
-     *
-     * @param text the text that will be set as a summary.
-     */
-    private void updateSummary(String text)
-    {
-        if( (getEditText().getInputType() & InputType.TYPE_MASK_VARIATION)
-                == InputType.TYPE_TEXT_VARIATION_PASSWORD )
-        {
-            text = text.replaceAll("(?s).", "*");
-        }
-        setSummary(text);
     }
 
     /**

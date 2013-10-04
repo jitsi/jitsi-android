@@ -199,5 +199,10 @@
                 android:summary="@string/service_gui_settings_PROXY_SUMMARY">
             <intent android:action=".android.gui.settings.ProxySettings"/>
         </PreferenceScreen>
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_DNS"
+                android:summary="@string/service_gui_settings_DNS_SUMMARY">
+            <intent android:action=".android.gui.settings.DnsSettings"/>
+        </PreferenceScreen>
     </PreferenceCategory>
 </PreferenceScreen>

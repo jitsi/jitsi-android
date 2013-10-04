@@ -21,20 +21,40 @@ import org.jitsi.android.gui.*;
 public class ConfigCheckBox
     extends CheckBoxPreference
 {
+    /**
+     * <tt>ConfigWidgetUtil</tt> used by this instance.
+     */
+    private ConfigWidgetUtil configUtil = new ConfigWidgetUtil(this);
+
     public ConfigCheckBox(Context context,
                           AttributeSet attrs, int defStyle)
     {
         super(context, attrs, defStyle);
+
+        configUtil.parseAttributes(context, attrs);
     }
 
     public ConfigCheckBox(Context context, AttributeSet attrs)
     {
         super(context, attrs);
+
+        configUtil.parseAttributes(context, attrs);
     }
 
     public ConfigCheckBox(Context context)
     {
         super(context);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void onSetInitialValue(boolean restoreValue, Object defaultValue)
+    {
+        super.onSetInitialValue(restoreValue, defaultValue);
+
+        configUtil.updateSummary(isChecked());
     }
 
     /**
@@ -57,9 +77,7 @@ public class ConfigCheckBox
         super.persistBoolean(value);
 
         // Sets boolean value in the ConfigurationService
-        AndroidGUIActivator
-                .getConfigurationService()
-                .setProperty(getKey(), value);
+        configUtil.handlePersistValue(value);
 
         return true;
     }

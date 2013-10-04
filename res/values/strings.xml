@@ -1034,5 +1034,45 @@
     <string name="pref_cat_sip_ssl_protocols">pref.cat.sip.ssl_protocols</string>
     <string name="pref_key_sip_client_port">net.java.sip.communicator.SIP_PREFERRED_CLEAR_PORT</string>
     <string name="pref_key_sip_client_secure_port">net.java.sip.communicator.SIP_PREFERRED_SECURE_PORT</string>
+    <!-- DNS config -->
+    <string name="service_gui_settings_DNS">DNS</string>
+    <string name="service_gui_settings_DNS_SUMMARY">Configure DNS settings</string>
+
+    <string name="pref_cat_dns_parallel_dns">pref.cat.dns.parallel_dns</string>
+    <string name="pref_cat_dns_dnssec">pref.cat.dns.dnssec</string>
+
+    <string name="pref_key_dns_backup_dns_enabled">net.java.sip.communicator.util.dns.BACKUP_RESOLVER_ENABLED</string>
+    <string name="pref_key_dns_backup_resolver">net.java.sip.communicator.util.dns.BACKUP_RESOLVER</string>
+    <string name="pref_key_dns_backup_resolver_fallback_ip">net.java.sip.communicator.util.dns.BACKUP_RESOLVER_FALLBACK_IP</string>
+    <string name="pref_key_dns_backup_port">net.java.sip.communicator.util.dns.BACKUP_RESOLVER_PORT</string>
+    <string name="pref_key_dns_backup_redemption">net.java.sip.communicator.util.dns.DNS_REDEMPTION</string>
+    <string name="pref_key_dns_backup_patience">net.java.sip.communicator.util.dns.DNS_PATIENCE</string>
+
+    <string name="pref_key_dns_dnssec_enabled">net.java.sip.communicator.util.dns.DNSSEC_ENABLED</string>
+    <string name="pref_key_dns_dnssec_absolute">net.java.sip.communicator.util.dns.DNSSEC_ALWAYS_ABSOLUTE</string>
+    <string name="pref_key_dns_dnssec_nameservers">net.java.sip.communicator.util.dns.DNSSEC_NAMESERVERS</string>
+    <string name="pref_key_dns_dnssec_default_behaviour">net.java.sip.communicator.util.dns.DNSSEC_VALIDATION_MODE</string>
+
+    <string name="plugin.dnsconfig.DNSSEC">DNS Security (DNSSEC)</string>
+    <string name="plugin.dnsconfig.PARALLEL_DNS">Parallel DNS</string>
+    <string name="plugin.dnsconfig.border.TITLE">Backup resolver</string>
+    <string name="plugin.dnsconfig.chkBackupDnsEnabled.text">Enable parallel DNS resolving</string>
+    <string name="plugin.dnsconfig.lblBackupResolver.text">Hostname</string>
+    <string name="plugin.dnsconfig.lblBackupResolverFallbackIP.text">Fallback IP</string>
+    <string name="plugin.dnsconfig.lblBackupPort.text">Port</string>
+    <string name="plugin.dnsconfig.lblRedemption.text">Back to primary resolver</string>
+    <string name="plugin.dnsconfig.lblRedemption.description"><html>the number of prompt responses that the primary resolver needs to provide before we turn that backup off again</html></string>
+    <string name="plugin.dnsconfig.lblPatience.text">Start backup resolver after</string>
+    <string name="plugin.dnsconfig.lblPatience.description"><html>number of ms to wait for a response from primary DNS before starting the backup resolver</html></string>
+    <string name="plugin.dnsconfig.dnssec.chkEnabled">Enable DNSSEC resolver</string>
+    <string name="plugin.dnsconfig.dnssec.lblDefault">Default behavior</string>
+    <string name="plugin.dnsconfig.dnssec.chkAbsolute">Treat all domain names as absolute</string>
+    <string name="plugin.dnsconfig.dnssec.lblNameservers">Custom name servers</string>
+    <string name="plugin.dnsconfig.dnssec.lblNameserversHint"><html>Multiple servers can be delimited with a comma, e.g. 149.20.64.20, 149.20.64.21 (OARC\'s Open DNSSEC Validating Resolver)</html></string>
+    <string name="plugin.dnsconfig.dnssec.DOMAIN_NAME">Domain</string>
+    <string name="plugin.dnsconfig.dnssec.MODE">Behavior</string>
+    <string name="plugin.dnsconfig.dnssec.ENABLE_FAILED">State change failed</string>
+    <string name="plugin.dnsconfig.dnssec.ENABLE_FAILED_MSG">Change of the DNSSEC enabled state has failed.</string>
+    <string name="plugin.dnsconfig.dnssec.RESTART_WARNING"><html>Note that enabling or disabling DNSSEC disables the parallel resolver and will only take effect the next time you start Jitsi.</html></string>
 
 </resources>
