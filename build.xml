@@ -232,6 +232,17 @@
             <rule pattern="javax.swing.**"
                   result="org.jitsi.android.util.javax.swing.@1"/>
         </jarjar>
+        <!-- Rename Apache commons codec -->
+        <jarjar jarfile="libs/commons-codec.jar">
+            <zipfileset src="lib/bundles/commons-codec.jar"/>
+            <rule pattern="org.apache.commons.codec.**"
+                  result="org.jitsi.apache.commons.codec.@1"/>
+        </jarjar>
+        <jarjar jarfile="libs/sdes4j.jar">
+            <zipfileset src="lib/bundles/sdes4j.jar"/>
+            <rule pattern="org.apache.commons.codec.**"
+                  result="org.jitsi.apache.commons.codec.@1"/>
+        </jarjar>
 
         <!-- and finally the stubs we use for common java
          packages that are missing in android, in order to

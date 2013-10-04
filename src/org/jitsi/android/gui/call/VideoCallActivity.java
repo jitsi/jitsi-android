@@ -1118,15 +1118,15 @@ public class VideoCallActivity
                         = zrtpControl != null
                                 && zrtpControl.isSecurityVerified();
 
-                doUpdatePadlockStatus(true, isVerified);
+                doUpdatePadlockStatus(zrtpControl != null, isVerified);
 
                 // Protocol name label
                 ViewUtil.setTextViewValue(
                         findViewById(R.id.videoCallLayout),
                         R.id.security_protocol,
-                        zrtpControl != null ? "zrtp" : "");
+                        zrtpControl != null ? "zrtp" : "sdes");
 
-                if(!isVerified)
+                if(!isVerified && zrtpControl != null)
                 {
                     String toastMsg
                         = getString(R.string.service_gui_security_VERIFY_TOAST);
