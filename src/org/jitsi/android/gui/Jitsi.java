@@ -15,7 +15,6 @@ import android.view.MenuItem.OnActionExpandListener;
 import android.widget.*;
 import android.widget.SearchView.*;
 
-import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.util.Logger;
 
 import org.jitsi.*;
@@ -23,7 +22,6 @@ import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.fragment.*;
 import org.jitsi.android.gui.menu.*;
-import org.jitsi.android.gui.util.*;
 import org.jitsi.android.plugin.otr.*;
 import org.osgi.framework.*;
 
@@ -203,9 +201,6 @@ public class Jitsi
         if (Intent.ACTION_SEARCH.equals(action))
         {
             String query = intent.getStringExtra(SearchManager.QUERY);
-
-            System.err.println("QUERYYYYYYYYYYYY=========" + query);
-//            doMySearch(query);
         }
         else
         // Both show contact and show chat actions are handled here

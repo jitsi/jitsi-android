@@ -83,15 +83,15 @@ public class ActionBarStatusFragment
 
         this.globalStatusMenu = createGlobalStatusMenu();
 
-        final TextView statusView
-                = (TextView) getActivity()
-                .findViewById(R.id.actionBarStatusText);
+        final RelativeLayout actionBarView
+                = (RelativeLayout) getActivity()
+                .findViewById(R.id.actionBarView);
 
-        statusView.setOnClickListener(new View.OnClickListener()
+        actionBarView.setOnClickListener(new View.OnClickListener()
         {
             public void onClick(View v)
             {
-                globalStatusMenu.show(statusView);
+                globalStatusMenu.show(actionBarView);
                 globalStatusMenu.setAnimStyle(GlobalStatusMenu.ANIM_REFLECT);
             }
         });

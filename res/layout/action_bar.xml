@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/actionBarView"
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="fill_parent"
-    android:layout_margin="3dp">
+    android:layout_margin="3dp"
+    android:focusable="true"
+    android:clickable="true">
 
     <TextView
         android:id="@+id/actionBarText"
@@ -28,7 +31,5 @@
         android:gravity="bottom"
         android:text=""
         android:textColor="@color/white"
-        android:textStyle="normal|bold"
-        android:focusable="true"
-        android:clickable="true"/>
+        android:textStyle="normal|bold"/>
 </RelativeLayout>
