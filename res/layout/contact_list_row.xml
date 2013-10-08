@@ -38,7 +38,9 @@
             android:layout_height="fill_parent"
             android:layout_gravity="left"
             android:gravity="center_vertical"
-            android:textColor="@color/list_text_selection_color"/>
+            android:textColor="@color/list_text_selection_color"
+            android:singleLine="true"
+            android:ellipsize="end"/>
 
         <TextView
             android:id="@+id/statusMessage"
@@ -47,7 +49,9 @@
             android:layout_height="fill_parent"
             android:layout_gravity="left"
             android:gravity="center_vertical"
-            android:textColor="@color/list_details_selection_color"/>
+            android:textColor="@color/list_details_selection_color"
+            android:singleLine="true"
+            android:ellipsize="end"/>
     </LinearLayout>
 
     <LinearLayout

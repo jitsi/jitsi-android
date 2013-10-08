@@ -19,7 +19,9 @@
         android:layout_alignParentLeft="true"
         android:paddingBottom="5dp"
         android:text="@string/service_gui_ACCOUNT_ME"
-        android:gravity="left"/>
+        android:gravity="left"
+        android:singleLine="true"
+        android:ellipsize="end"/>
 
     <TextView
         android:id="@+id/actionBarStatusText"

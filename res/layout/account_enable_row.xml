@@ -42,7 +42,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/accountStatus"
-                    android:text="Offline"
+                    android:text="@string/service_gui_OFFLINE"
                     android:gravity="center_vertical"
                     android:layout_toRightOf="@+id/accountStatusIcon"
                     android:layout_marginLeft="5dp"
@@ -53,6 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/accountName"
-                android:text="sipcommunicator@jitsi.org"/>
+                android:singleLine="true"
+                android:ellipsize="end"/>
     </RelativeLayout>
 </RelativeLayout>
