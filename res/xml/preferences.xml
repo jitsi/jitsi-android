@@ -204,5 +204,10 @@
                 android:summary="@string/service_gui_settings_DNS_SUMMARY">
             <intent android:action=".android.gui.settings.DnsSettings"/>
         </PreferenceScreen>
+        <PreferenceScreen
+                android:title="@string/plugin_provisioning_PROVISIONING"
+                android:summary="@string/plugin_provisioning_PROVISIONING_SUMMARY">
+            <intent android:action=".android.gui.settings.ProvisioningSettings"/>
+        </PreferenceScreen>
     </PreferenceCategory>
 </PreferenceScreen>

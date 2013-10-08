@@ -90,4 +90,16 @@
         <item>WarnIfBogus</item>
         <item>WarnIfBogusOrUnsigned</item>
     </string-array>
+    <string-array name="pref_provisioning_method">
+        <item>None</item>
+        <item>DHCP</item>
+        <item>Bonjour</item>
+        <item>Manual</item>
+    </string-array>
+    <string-array name="pref_provisioning_method_values">
+        <item>NONE</item>
+        <item>DHCP</item>
+        <item>Bonjour</item>
+        <item>Manual</item>
+    </string-array>
 </resources>

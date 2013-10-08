@@ -55,9 +55,12 @@
         Enter group name
     </string>
     <string name="service_gui_ADD_GROUP">Create group</string>
+    <string name="service_gui_AUTHENTICATION_REJECTED">contact has rejected your authorization request.</string>
+    <string name="service_gui_AUTHENTICATION_WINDOW_TITLE">%s authentication</string>
+    <string name="service_gui_AUTHENTICATION_REQUESTED">Authentication requested</string>
+    <string name="service_gui_AUTHENTICATION_REQUESTED_SERVER">The %s server has requested your authentication.</string>
     <string name="service_gui_AUTHORIZE">Authorize</string>
     <string name="service_gui_AUTHORIZATION_ACCEPTED">contact has accepted your authorization request.</string>
-    <string name="service_gui_AUTHENTICATION_REJECTED">contact has rejected your authorization request.</string>
     <string name="service_gui_AUTHORIZATION_REQUESTED">Authorization requested</string>
     <string name="service_gui_AUTHORIZATION_REQUESTED_INFO">The %s contact requests your authorization.</string>
     <string name="service_gui_AUTHORIZATION_RESPONSE">Authorization response</string>
@@ -1053,26 +1056,60 @@
     <string name="pref_key_dns_dnssec_nameservers">net.java.sip.communicator.util.dns.DNSSEC_NAMESERVERS</string>
     <string name="pref_key_dns_dnssec_default_behaviour">net.java.sip.communicator.util.dns.DNSSEC_VALIDATION_MODE</string>
 
-    <string name="plugin.dnsconfig.DNSSEC">DNS Security (DNSSEC)</string>
-    <string name="plugin.dnsconfig.PARALLEL_DNS">Parallel DNS</string>
-    <string name="plugin.dnsconfig.border.TITLE">Backup resolver</string>
-    <string name="plugin.dnsconfig.chkBackupDnsEnabled.text">Enable parallel DNS resolving</string>
-    <string name="plugin.dnsconfig.lblBackupResolver.text">Hostname</string>
-    <string name="plugin.dnsconfig.lblBackupResolverFallbackIP.text">Fallback IP</string>
-    <string name="plugin.dnsconfig.lblBackupPort.text">Port</string>
-    <string name="plugin.dnsconfig.lblRedemption.text">Back to primary resolver</string>
-    <string name="plugin.dnsconfig.lblRedemption.description"><html>the number of prompt responses that the primary resolver needs to provide before we turn that backup off again</html></string>
-    <string name="plugin.dnsconfig.lblPatience.text">Start backup resolver after</string>
-    <string name="plugin.dnsconfig.lblPatience.description"><html>number of ms to wait for a response from primary DNS before starting the backup resolver</html></string>
-    <string name="plugin.dnsconfig.dnssec.chkEnabled">Enable DNSSEC resolver</string>
-    <string name="plugin.dnsconfig.dnssec.lblDefault">Default behavior</string>
-    <string name="plugin.dnsconfig.dnssec.chkAbsolute">Treat all domain names as absolute</string>
-    <string name="plugin.dnsconfig.dnssec.lblNameservers">Custom name servers</string>
-    <string name="plugin.dnsconfig.dnssec.lblNameserversHint"><html>Multiple servers can be delimited with a comma, e.g. 149.20.64.20, 149.20.64.21 (OARC\'s Open DNSSEC Validating Resolver)</html></string>
-    <string name="plugin.dnsconfig.dnssec.DOMAIN_NAME">Domain</string>
-    <string name="plugin.dnsconfig.dnssec.MODE">Behavior</string>
-    <string name="plugin.dnsconfig.dnssec.ENABLE_FAILED">State change failed</string>
-    <string name="plugin.dnsconfig.dnssec.ENABLE_FAILED_MSG">Change of the DNSSEC enabled state has failed.</string>
-    <string name="plugin.dnsconfig.dnssec.RESTART_WARNING"><html>Note that enabling or disabling DNSSEC disables the parallel resolver and will only take effect the next time you start Jitsi.</html></string>
+    <string name="plugin_dnsconfig_DNSSEC">DNS Security (DNSSEC)</string>
+    <string name="plugin_dnsconfig_PARALLEL_DNS">Parallel DNS</string>
+    <string name="plugin_dnsconfig_border_TITLE">Backup resolver</string>
+    <string name="plugin_dnsconfig_chkBackupDnsEnabled_text">Enable parallel DNS resolving</string>
+    <string name="plugin_dnsconfig_lblBackupResolver_text">Hostname</string>
+    <string name="plugin_dnsconfig_lblBackupResolverFallbackIP_text">Fallback IP</string>
+    <string name="plugin_dnsconfig_lblBackupPort_text">Port</string>
+    <string name="plugin_dnsconfig_lblRedemption_text">Back to primary resolver</string>
+    <string name="plugin_dnsconfig_lblRedemption_description"><html>the number of prompt responses that the primary resolver needs to provide before we turn that backup off again</html></string>
+    <string name="plugin_dnsconfig_lblPatience_text">Start backup resolver after</string>
+    <string name="plugin_dnsconfig_lblPatience_description"><html>number of ms to wait for a response from primary DNS before starting the backup resolver</html></string>
+    <string name="plugin_dnsconfig_dnssec_chkEnabled">Enable DNSSEC resolver</string>
+    <string name="plugin_dnsconfig_dnssec_lblDefault">Default behavior</string>
+    <string name="plugin_dnsconfig_dnssec_chkAbsolute">Treat all domain names as absolute</string>
+    <string name="plugin_dnsconfig_dnssec_lblNameservers">Custom name servers</string>
+    <string name="plugin_dnsconfig_dnssec_lblNameserversHint"><html>Multiple servers can be delimited with a comma, e.g. 149.20.64.20, 149.20.64.21 (OARC\'s Open DNSSEC Validating Resolver)</html></string>
+    <string name="plugin_dnsconfig_dnssec_DOMAIN_NAME">Domain</string>
+    <string name="plugin_dnsconfig_dnssec_MODE">Behavior</string>
+    <string name="plugin_dnsconfig_dnssec_ENABLE_FAILED">State change failed</string>
+    <string name="plugin_dnsconfig_dnssec_ENABLE_FAILED_MSG">Change of the DNSSEC enabled state has failed.</string>
+    <string name="plugin_dnsconfig_dnssec_RESTART_WARNING"><html>Note that enabling or disabling DNSSEC disables the parallel resolver and will only take effect the next time you start Jitsi.</html></string>
+
+    <!-- Provisioning -->
+    <string name="plugin_provisioning_PROVISIONING">Provisioning</string>
+    <string name="plugin_provisioning_PROVISIONING_SUMMARY">Configure provisioning settings</string>
+    <string name="plugin_provisioning_ENABLE_DISABLE">Enable provisioning</string>
+    <string name="plugin_provisioning_AUTO">Automatically discover a provisioning URI</string>
+    <string name="plugin_provisioning_METHOD">Provisioning method</string>
+    <string name="plugin_provisioning_DHCP">DHCP</string>
+    <string name="plugin_provisioning_DNS">DNS</string>
+    <string name="plugin_provisioning_BONJOUR">Bonjour</string>
+    <string name="plugin_provisioning_MANUAL">Manually specify a provisioning URI</string>
+    <string name="plugin_provisioning_URI">URI</string>
+    <string name="plugin_provisioning_RESTART_WARNING">Note that your changes will only take effect next time you start Jitsi!</string>
+    <string name="plugin_provisioning_UUID">UUID</string>
+    <string name="plugin_provisioning_COPYTOCLIPBOARD">Copy UUID to clipboard</string>
+    <string name="plugin_provisioning_CLIPBOARD_FAILED">Failed to copy UUID to clipboard</string>
+    <string name="plugin_provisioning_EXIT_ON_FAIL">Exit the application if the provisioning fails</string>
+    <string name="plugin_provisioning_CREDENTIALS">Last stored provisioning credentials</string>
+    <string name="plugin_provisioning_REMOVE_CREDENTIALS_MESSAGE">Are you sure you want to remove provisioning password?</string>
+    <string name="plugin_provisioning_PROV_FAILED">Provisioning failed</string>
+    <string name="plugin_provisioning_PROV_FAILED_MSG"><html>Provisioning failed. {0}! <br/>Please, try again later or contact your administrator.</html></string>
+    <string name="plugin_provisioning_FORGET_PASSWORD">Forget password</string>
+
+    <string name="pref_cat_provisioning_METHOD">pref.cat.provisioning.method</string>
+    <string name="pref_cat_provisioning_CREDENTIALS">pref.cat.provisioning.credentials</string>
+
+    <string name="pref_key_provisioning_ENABLED">pref.key.provisioning.enabled</string>
+    <string name="pref_key_provisioning_URL">net.java.sip.communicator.plugin.provisioning.URL</string>
+    <string name="pref_key_provisioning_FORGET_PASSWORD">pref.key.provisioning.forget_password</string>
+    <string name="pref_key_provisioning_USERNAME">net.java.sip.communicator.plugin.provisioning.auth.USERNAME</string>
+    <string name="pref_key_provisioning_PASSWORD">net.java.sip.communicator.plugin.provisioning.auth</string>
+    <string name="pref_key_provisioning_METHOD">net.java.sip.communicator.plugin.provisioning.METHOD</string>
+    <string name="pref_key_provisioning_UUID">net.java.sip.communicator.UUID</string>
+
 
 </resources>

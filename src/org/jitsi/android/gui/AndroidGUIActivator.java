@@ -9,6 +9,7 @@ package org.jitsi.android.gui;
 import android.content.*;
 
 import net.java.sip.communicator.service.contactlist.*;
+import net.java.sip.communicator.service.credentialsstorage.*;
 import net.java.sip.communicator.service.globaldisplaydetails.*;
 
 import net.java.sip.communicator.service.gui.*;
@@ -208,6 +209,16 @@ public class AndroidGUIActivator
     {
         return ServiceUtils.getService( bundleContext,
                                         ConfigurationService.class );
+    }
+
+    /**
+     * Returns the <tt>CredentialsStorageService</tt>.
+     * @return the <tt>CredentialsStorageService</tt>.
+     */
+    public static CredentialsStorageService getCredentialsStorageService()
+    {
+        return ServiceUtils.getService( bundleContext,
+                                        CredentialsStorageService.class );
     }
 
     /**

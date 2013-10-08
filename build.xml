@@ -243,6 +243,18 @@
             <rule pattern="org.apache.commons.codec.**"
                   result="org.jitsi.apache.commons.codec.@1"/>
         </jarjar>
+        <!-- Rename org.apache.http -->
+        <jarjar jarfile="libs/httpclient.jar">
+            <zipfileset src="lib/bundles/httpclient.jar"/>
+            <rule pattern="org.apache.http.**"
+                  result="org.jitsi.apache.http.@1"/>
+        </jarjar>
+        <jarjar jarfile="libs/httputil.jar">
+            <zipfileset src="lib/bundles/httputil.jar"/>
+            <rule pattern="org.apache.http.**"
+                  result="org.jitsi.apache.http.@1"/>
+        </jarjar>
+
 
         <!-- and finally the stubs we use for common java
          packages that are missing in android, in order to
