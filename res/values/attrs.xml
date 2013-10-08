@@ -15,8 +15,10 @@
         <attr name="intMin" format="integer" />
         <attr name="floatMax" format="float" />
         <attr name="floatMin" format="float" />
+        <attr name="editable" format="boolean" />
     </declare-styleable>
     <declare-styleable name="ConfigListPreference">
         <attr name="disableDependentsValue" format="string" />
+        <attr name="disableOnNotEqualValue" format="boolean" />
     </declare-styleable>
 </resources>

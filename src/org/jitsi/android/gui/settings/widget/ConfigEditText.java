@@ -48,6 +48,11 @@ public class ConfigEditText
      */
     private ConfigWidgetUtil configUtil = new ConfigWidgetUtil(this, true);
 
+    /**
+     * Flag indicates if this edit text field is editable.
+     */
+    private boolean editable = true;
+
     public ConfigEditText(Context context,
                           AttributeSet attrs, int defStyle)
     {
@@ -95,6 +100,9 @@ public class ConfigEditText
                     break;
                 case R.styleable.ConfigEditText_floatMin:
                     this.floatMin = new Float(attArray.getFloat(attribute, -1));
+                    break;
+                case R.styleable.ConfigEditText_editable:
+                    this.editable = attArray.getBoolean(attribute, true);
                     break;
             }
         }
@@ -164,5 +172,15 @@ public class ConfigEditText
         }
         // No checks by default
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void onClick()
+    {
+        if(editable)
+            super.onClick();
     }
 }

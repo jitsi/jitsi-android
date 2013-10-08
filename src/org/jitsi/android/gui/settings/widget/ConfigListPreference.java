@@ -28,6 +28,11 @@ public class ConfigListPreference
      * Optional attribute which contains value that disables all dependents.
      */
     private String dependentValue;
+    /**
+     * Disables dependents when current value is different than
+     * <tt>dependentValue</tt>.
+     */
+    private boolean disableOnNotEqual;
 
     public ConfigListPreference(Context context,
                                 AttributeSet attrs)
@@ -55,11 +60,14 @@ public class ConfigListPreference
 
         for(int i=0; i<attArray.getIndexCount(); i++)
         {
-            int attribute = attArray.getIndex(i);
-            switch (attribute)
+            int attrIdx = attArray.getIndex(i);
+            switch (attrIdx)
             {
                 case R.styleable.ConfigListPreference_disableDependentsValue:
-                    this.dependentValue = attArray.getString(attribute);
+                    this.dependentValue = attArray.getString(attrIdx);
+                    break;
+                case R.styleable.ConfigListPreference_disableOnNotEqualValue:
+                    this.disableOnNotEqual = attArray.getBoolean(attrIdx,false);
                     break;
             }
         }
@@ -145,7 +153,8 @@ public class ConfigListPreference
     @Override
     public boolean shouldDisableDependents()
     {
-        return super.shouldDisableDependents()
-               || (dependentValue != null && getValue().equals(dependentValue));
+        return  super.shouldDisableDependents()
+                || (dependentValue != null
+                    && disableOnNotEqual != dependentValue.equals(getValue()));
     }
 }
