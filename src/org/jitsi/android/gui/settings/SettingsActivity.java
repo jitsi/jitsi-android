@@ -10,9 +10,6 @@ import android.content.*;
 import android.os.Bundle;
 import android.preference.*;
 
-import java.util.*;
-import javax.media.*;
-
 import net.java.sip.communicator.service.replacement.*;
 import net.java.sip.communicator.service.systray.*;
 import net.java.sip.communicator.util.*;
@@ -26,7 +23,6 @@ import org.jitsi.android.util.java.awt.*;
 import org.jitsi.impl.neomedia.*;
 import org.jitsi.impl.neomedia.device.*;
 import org.jitsi.service.configuration.*;
-import org.jitsi.service.neomedia.*;
 import org.jitsi.service.osgi.*;
 
 import org.osgi.framework.*;
@@ -147,35 +143,6 @@ public class SettingsActivity
         public void onStart()
         {
             super.onStart();
-            SharedPreferences shPrefs = getPreferenceManager()
-                    .getSharedPreferences();
-
-            shPrefs.registerOnSharedPreferenceChangeListener(this);
-            shPrefs.registerOnSharedPreferenceChangeListener(summaryMapper);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void onStop()
-        {
-            SharedPreferences shPrefs = getPreferenceManager()
-                    .getSharedPreferences();
-
-            shPrefs.unregisterOnSharedPreferenceChangeListener(this);
-            shPrefs.unregisterOnSharedPreferenceChangeListener(summaryMapper);
-
-            super.onStop();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected void onOSGiConnected()
-        {
-            super.onOSGiConnected();
 
             /*ListPreference localePreference
                     = (ListPreference) findPreference(
@@ -215,6 +182,27 @@ public class SettingsActivity
 
             // Video section
             initVideoPreferences();
+
+            SharedPreferences shPrefs = getPreferenceManager()
+                    .getSharedPreferences();
+
+            shPrefs.registerOnSharedPreferenceChangeListener(this);
+            shPrefs.registerOnSharedPreferenceChangeListener(summaryMapper);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void onStop()
+        {
+            SharedPreferences shPrefs = getPreferenceManager()
+                    .getSharedPreferences();
+
+            shPrefs.unregisterOnSharedPreferenceChangeListener(this);
+            shPrefs.unregisterOnSharedPreferenceChangeListener(summaryMapper);
+
+            super.onStop();
         }
 
         /**
@@ -475,16 +463,6 @@ public class SettingsActivity
             return new Dimension(
                     DeviceConfiguration.DEFAULT_VIDEO_WIDTH,
                     DeviceConfiguration.DEFAULT_VIDEO_HEIGHT);
-        }
-
-        /**
-         * Returns all camera devices info.
-         * @return list of available cameras.
-         */
-        private List<CaptureDeviceInfo> getCameras()
-        {
-            return deviceConfig.getAvailableVideoCaptureDevices(
-                    MediaUseCase.CALL);
         }
 
         /**
