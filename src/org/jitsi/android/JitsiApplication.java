@@ -17,9 +17,11 @@ import android.os.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.*;
 
+import org.jitsi.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.LauncherActivity;
 import org.jitsi.android.gui.account.*;
+import org.jitsi.service.log.*;
 import org.jitsi.service.osgi.*;
 import org.osgi.framework.*;
 
@@ -276,5 +278,19 @@ public class JitsiApplication
             return false;
 
         return currentActivity.getClass().equals(getHomeScreenActivityClass());
+    }
+
+    /**
+     * Displays the send logs dialog.
+     */
+    public static void showSendLogsDialog()
+    {
+        LogUploadService logUpload
+                = ServiceUtils.getService(AndroidGUIActivator.bundleContext,
+                                          LogUploadService.class);
+        logUpload.sendLogs(
+                null,
+                getResString(R.string.service_gui_SEND_LOGS_SUBJECT),
+                getResString(R.string.service_gui_SEND_LOGS_TITLE));
     }
 }

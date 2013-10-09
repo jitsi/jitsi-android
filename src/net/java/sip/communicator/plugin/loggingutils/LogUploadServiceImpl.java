@@ -9,8 +9,8 @@ import android.content.*;
 import android.net.*;
 import android.os.*;
 
+import org.jitsi.android.*;
 import org.jitsi.service.log.*;
-import org.jitsi.service.osgi.*;
 
 import net.java.sip.communicator.util.*;
 
@@ -81,11 +81,7 @@ public class LogUploadServiceImpl
                 Intent.createChooser(sendIntent, title);
             chooserIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-            Context context = ServiceUtils.getService(
-                LoggingUtilsActivatorEx.bundleContext,
-                OSGiService.class);
-
-            context.startActivity(chooserIntent);
+            JitsiApplication.getGlobalContext().startActivity(chooserIntent);
         }
         catch(Exception e)
         {

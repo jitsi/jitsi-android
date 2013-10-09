@@ -14,6 +14,7 @@ import android.view.*;
 import net.java.sip.communicator.util.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.util.*;
+import org.jitsi.android.plugin.errorhandler.*;
 import org.osgi.framework.*;
 
 import java.util.*;
@@ -105,6 +106,9 @@ public class OSGiPreferenceActivity
     @Override
     protected void onCreate(android.os.Bundle savedInstanceState)
     {
+        // Hooks the exception handler to the UI thread
+        ExceptionHandler.checkAndAttachExceptionHandler();
+
         if(Build.VERSION.SDK_INT >= 11)
         {
             ActionBar actionBar = getActionBar();

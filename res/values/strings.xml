@@ -143,8 +143,10 @@
     <string name="service_gui_AWAY_STATUS">Away</string>
     <string name="service_gui_DND_STATUS">Do not disturb</string>
     <string name="service_gui_RETRY">Retry</string>
+    <string name="service_gui_SEND_LOGS_QUESTION">Jitsi has just recovered after serious crash. Do you want to send the logs ?</string>
     <string name="service_gui_ERROR">Error</string>
     <string name="service_gui_ERROR_WAS">Error was: {0}</string>
+    <string name="service_gui_WARNING">Warning</string>
     <string name="service_gui_AUTHENTICATION_FAILED">
         Authentication failed for {0}. The password you entered is not valid.
     </string>

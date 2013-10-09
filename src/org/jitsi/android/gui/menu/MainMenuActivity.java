@@ -9,15 +9,13 @@ package org.jitsi.android.gui.menu;
 import java.util.*;
 
 import net.java.sip.communicator.service.protocol.*;
-import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.account.*;
 
 import org.jitsi.*;
-import org.jitsi.android.gui.*;
+import org.jitsi.android.*;
 import org.jitsi.android.gui.account.*;
 import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.settings.*;
-import org.jitsi.service.log.*;
 
 import android.os.*;
 import android.view.*;
@@ -111,14 +109,7 @@ public class MainMenuActivity
             startActivity(SettingsActivity.class);
             return true;
         case R.id.send_logs:
-            LogUploadService logUpload
-                    = ServiceUtils.getService(
-                            AndroidGUIActivator.bundleContext,
-                            LogUploadService.class);
-            logUpload.sendLogs(
-                    null,
-                    getString(R.string.service_gui_SEND_LOGS_SUBJECT),
-                    getString(R.string.service_gui_SEND_LOGS_TITLE));
+            JitsiApplication.showSendLogsDialog();
             return true;
         default:
             return super.onOptionsItemSelected(item);

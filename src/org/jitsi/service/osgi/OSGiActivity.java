@@ -14,8 +14,10 @@ import android.os.Bundle; // disambiguation
 import android.support.v4.app.*;
 import android.view.*;
 import net.java.sip.communicator.util.*;
+import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.util.*;
+import org.jitsi.android.plugin.errorhandler.*;
 import org.osgi.framework.*;
 
 import java.util.*;
@@ -108,6 +110,9 @@ public class OSGiActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        // Hooks the exception handler to the UI thread
+        ExceptionHandler.checkAndAttachExceptionHandler();
+
         if(Build.VERSION.SDK_INT >= 11)
         {
             ActionBar actionBar = getActionBar();
@@ -209,6 +214,53 @@ public class OSGiActivity
         super.onResume();
 
         JitsiApplication.setCurrentActivity(this);
+        // If OSGi service is running check for send logs
+        if(bundleContext != null)
+        {
+            checkForSendLogsDialog();
+        }
+    }
+
+    /**
+     * Checks if the crash has occurred since the Jitsi was last started.
+     * If it's true asks the user about eventual logs report.
+     */
+    private void checkForSendLogsDialog()
+    {
+        // Checks if Jitsi has previously crashed and asks the user user
+        // about log reporting
+        if(!ExceptionHandler.hasCrashed())
+        {
+            return;
+        }
+        // Clears the crash status
+        ExceptionHandler.resetCrashedStatus();
+        // Asks the user
+        AlertDialog.Builder question = new AlertDialog.Builder(this);
+        question.setTitle(R.string.service_gui_WARNING)
+                .setMessage(getString(R.string.service_gui_SEND_LOGS_QUESTION))
+                .setPositiveButton(R.string.service_gui_YES,
+                                   new DialogInterface.OnClickListener()
+                                   {
+                                       @Override
+                                       public void onClick(DialogInterface dialog, int which)
+                                       {
+                                           dialog.dismiss();
+                                           JitsiApplication.showSendLogsDialog();
+                                       }
+                                   })
+                .setNegativeButton(R.string.service_gui_NO,
+                                   new DialogInterface.OnClickListener()
+                                   {
+                                       @Override
+                                       public void onClick(DialogInterface dialog, int which)
+                                       {
+                                           dialog.dismiss();
+                                       }
+                                   })
+                .create()
+                .show();
+
     }
 
     protected void onNewIntent(Intent intent)
@@ -277,6 +329,14 @@ public class OSGiActivity
         for(OSGiUiPart osGiFragment : osgiFrgaments)
         {
             osGiFragment.start(bundleContext);
+        }
+        // If OSGi has just started and we're on UI thread check for crash event
+        // We must be on UIThread to show the dialog and it makes no sense
+        // to show it from the background, so it will be eventually displayed
+        // from onResume()
+        if(Looper.getMainLooper() == Looper.myLooper())
+        {
+            checkForSendLogsDialog();
         }
     }
 
