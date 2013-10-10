@@ -9,6 +9,7 @@ package org.jitsi.android.gui.settings;
 import android.content.*;
 import android.os.Bundle;
 
+import android.preference.*;
 import net.java.otr4j.*;
 import net.java.sip.communicator.plugin.otr.*;
 import net.java.sip.communicator.util.*;
@@ -88,16 +89,18 @@ public class ChatSecuritySettings
 
             OtrPolicy otrPolicy = OtrActivator.scOtrEngine.getGlobalPolicy();
 
+            PreferenceScreen screen = getPreferenceScreen();
+
             PreferenceUtil.setCheckboxVal(
-                    this, P_KEY_OTR_ENABLE,
+                    screen, P_KEY_OTR_ENABLE,
                     otrPolicy.getEnableManual());
 
             PreferenceUtil.setCheckboxVal(
-                    this, P_KEY_OTR_AUTO,
+                    screen, P_KEY_OTR_AUTO,
                     otrPolicy.getEnableAlways());
 
             PreferenceUtil.setCheckboxVal(
-                    this, P_KEY_OTR_REQUIRE,
+                    screen, P_KEY_OTR_REQUIRE,
                     otrPolicy.getRequireEncryption());
 
             SharedPreferences shPrefs = getPreferenceManager()

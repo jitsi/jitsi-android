@@ -9,7 +9,6 @@ package org.jitsi.android.gui.util;
 import android.preference.*;
 
 import net.java.sip.communicator.util.*;
-import org.jitsi.android.gui.settings.*;
 
 /**
  * Utility class exposing methods to operate on <tt>Preference</tt> subclasses.
@@ -25,19 +24,18 @@ public class PreferenceUtil
 
     /**
      * Sets the <tt>CheckBoxPreference</tt> "checked" property.
-     * @param fragment the <tt>PreferenceFragment</tt> containing the
+     * @param screen the <tt>PreferenceScreen</tt> containing the
      *        <tt>CheckBoxPreference</tt> we want to edit.
      * @param prefKey preference key id from <tt>R.string</tt>.
      * @param isChecked the value we want to set to the "checked" property of
      *        <tt>CheckBoxPreference</tt>.
      */
-    static public void setCheckboxVal( PreferenceFragment fragment,
+    static public void setCheckboxVal( PreferenceScreen screen,
                                        String prefKey,
                                        boolean isChecked )
     {
         CheckBoxPreference cbPref
-                = (CheckBoxPreference) fragment
-                        .findPreference(prefKey);
+                = (CheckBoxPreference) screen.findPreference(prefKey);
         logger.debug("Setting "+isChecked+" on "+prefKey);
         cbPref.setChecked(isChecked);
     }
@@ -45,18 +43,18 @@ public class PreferenceUtil
     /**
      * Sets the text of <tt>EditTextPreference</tt> identified by given
      * preference key string.
-     * @param fragment the <tt>PreferenceFragment</tt> containing the
+     * @param screen the <tt>PreferenceScreen</tt> containing the
      *        <tt>EditTextPreference</tt> we want to edit.
      * @param prefKey preference key id from <tt>R.string</tt>.
      * @param txtValue the text value we want to set on
      *                 <tt>EditTextPreference</tt>
      */
-    public static void setEditTextVal( PreferenceFragment fragment,
+    public static void setEditTextVal( PreferenceScreen screen,
                                        String prefKey,
                                        String txtValue )
     {
         EditTextPreference cbPref
-            = (EditTextPreference) fragment.findPreference(prefKey);
+            = (EditTextPreference) screen.findPreference(prefKey);
 
         logger.debug("Setting "+txtValue+" on "+prefKey);
 
@@ -66,17 +64,17 @@ public class PreferenceUtil
     /**
      * Sets the value of <tt>ListPreference</tt> identified by given
      * preference key string.
-     * @param fragment the <tt>PreferenceFragment</tt> containing the
+     * @param screen the <tt>PreferenceScreen</tt> containing the
      *        <tt>ListPreference</tt> we want to edit.
      * @param prefKey preference key id from <tt>R.string</tt>.
      * @param value the value we want to set on <tt>ListPreference</tt>
      */
-    public static void setListVal( PreferenceFragment fragment,
+    public static void setListVal( PreferenceScreen screen,
                                        String prefKey,
                                        String value )
     {
         ListPreference lstPref
-                = (ListPreference) fragment.findPreference(prefKey);
+                = (ListPreference) screen.findPreference(prefKey);
 
         logger.debug("Setting "+value+" on "+prefKey);
 

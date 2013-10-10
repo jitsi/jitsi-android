@@ -211,11 +211,11 @@ public class SettingsActivity
         private void initMessagesPreferences()
         {
             PreferenceUtil.setCheckboxVal(
-                    this, P_KEY_LOG_CHAT_HISTORY,
+                    getPreferenceScreen(), P_KEY_LOG_CHAT_HISTORY,
                     ConfigurationUtils.isHistoryLoggingEnabled());
 
             PreferenceUtil.setCheckboxVal(
-                    this,P_KEY_SHOW_HISTORY,
+                    getPreferenceScreen(),P_KEY_SHOW_HISTORY,
                     ConfigurationUtils.isHistoryShown());
 
             EditTextPreference historySizePref
@@ -224,14 +224,14 @@ public class SettingsActivity
             updateHistorySizeSummary();
 
             PreferenceUtil.setCheckboxVal(
-                    this, P_KEY_TYPING_NOTIFICATIONS,
+                    getPreferenceScreen(), P_KEY_TYPING_NOTIFICATIONS,
                     ConfigurationUtils.isSendTypingNotifications());
 
             ConfigurationService cfg
                     = AndroidGUIActivator.getConfigurationService();
 
             PreferenceUtil.setCheckboxVal(
-                    this, P_KEY_SMILEY_REPLACEMENT,
+                    getPreferenceScreen(), P_KEY_SMILEY_REPLACEMENT,
                     cfg.getBoolean(
                             ReplacementProperty.getPropertyName("SMILEY"),
                             true));
@@ -311,11 +311,11 @@ public class SettingsActivity
         private void initCallPreferences()
         {
             PreferenceUtil.setCheckboxVal(
-                    this, P_KEY_NORMALIZE_PNUMBER,
+                    getPreferenceScreen(), P_KEY_NORMALIZE_PNUMBER,
                     ConfigurationUtils.isNormalizePhoneNumber());
 
             PreferenceUtil.setCheckboxVal(
-                    this, P_KEY_ACCEPT_ALPHA_PNUMBERS,
+                    getPreferenceScreen(), P_KEY_ACCEPT_ALPHA_PNUMBERS,
                     ConfigurationUtils.acceptPhoneNumberWithAlphaChars());
 
             this.deviceConfig

@@ -8,6 +8,7 @@ package org.jitsi.android.gui.settings;
 
 import android.content.*;
 import android.os.*;
+import android.preference.*;
 import net.java.sip.communicator.plugin.loggingutils.*;
 import org.jitsi.*;
 import org.jitsi.android.*;
@@ -105,32 +106,34 @@ public class LoggingSettings
                 = LoggingUtilsActivator.getPacketLoggingService();
             PacketLoggingConfiguration cfg = packetLogging.getConfiguration();
 
+            PreferenceScreen screen = getPreferenceScreen();
+
             PreferenceUtil.setCheckboxVal(
-                    this, P_KEY_LOG_ENABLE,
+                    screen, P_KEY_LOG_ENABLE,
                     cfg.isGlobalLoggingEnabled());
 
             PreferenceUtil.setCheckboxVal(
-                    this, P_KEY_LOG_SIP,
+                    screen, P_KEY_LOG_SIP,
                     cfg.isSipLoggingEnabled());
 
             PreferenceUtil.setCheckboxVal(
-                    this, P_KEY_LOG_XMPP,
+                    screen, P_KEY_LOG_XMPP,
                     cfg.isJabberLoggingEnabled());
 
             PreferenceUtil.setCheckboxVal(
-                    this, P_KEY_LOG_RTP,
+                    screen, P_KEY_LOG_RTP,
                     cfg.isRTPLoggingEnabled());
 
             PreferenceUtil.setCheckboxVal(
-                    this, P_KEY_LOG_ICE4J,
+                    screen, P_KEY_LOG_ICE4J,
                     cfg.isIce4JLoggingEnabled());
 
             PreferenceUtil.setEditTextVal(
-                    this, P_KEY_LOG_FILE_COUNT,
+                    screen, P_KEY_LOG_FILE_COUNT,
                     ""+cfg.getLogfileCount());
 
             PreferenceUtil.setEditTextVal(
-                    this, P_KEY_LOG_LIMIT,
+                    screen, P_KEY_LOG_LIMIT,
                     "" + (cfg.getLimit()/1000) );
 
 
