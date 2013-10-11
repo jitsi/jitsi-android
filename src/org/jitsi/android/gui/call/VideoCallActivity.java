@@ -73,6 +73,11 @@ public class VideoCallActivity
     private static final String VIDEO_FRAGMENT_TAG = "video";
 
     /**
+     * Tag name that identifies call timer fragment.
+     */
+    private static final String TIMER_FRAGMENT_TAG = "call_timer";
+
+    /**
      * The call peer adapter that gives us access to all call peer events.
      */
     private CallPeerAdapter callPeerAdapter;
@@ -81,21 +86,6 @@ public class VideoCallActivity
      * The corresponding call.
      */
     private Call call;
-
-    /**
-     * Indicates if the call timer has been started.
-     */
-    private boolean isCallTimerStarted = false;
-
-    /**
-     * The start date time of the call.
-     */
-    private Date callStartDate;
-
-    /**
-     * A timer to count call duration.
-     */
-    private Timer callDurationTimer;
 
     /**
      * The {@link CallConference} instance depicted by this <tt>CallPanel</tt>.
@@ -133,8 +123,6 @@ public class VideoCallActivity
 
         setContentView(R.layout.video_call);
 
-        callDurationTimer = new Timer();
-
         this.callIdentifier
                 = getIntent().getExtras()
                         .getString(CallManager.CALL_IDENTIFIER);
@@ -142,8 +130,11 @@ public class VideoCallActivity
         call = CallManager.getActiveCall(callIdentifier);
 
         if(call == null)
-            throw new IllegalArgumentException(
-                    "There's no call with id: "+callIdentifier);
+        {
+            logger.error("There's no call with id: "+callIdentifier);
+            finish();
+            return;
+        }
 
         callConference = call.getConference();
 
@@ -186,7 +177,10 @@ public class VideoCallActivity
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(new ProximitySensorFragment(), PROXIMITY_FRAGMENT_TAG)
+                    /* Adds the fragment that handles video display logic */
                     .add(new VideoHandlerFragment(), VIDEO_FRAGMENT_TAG)
+                    /* Adds the fragment that handles call duration logic */
+                    .add(new CallTimerFragment(), TIMER_FRAGMENT_TAG)
                     .commit();
         }
     }
@@ -203,20 +197,6 @@ public class VideoCallActivity
     {
         super.onRestoreInstanceState(savedInstanceState);
         sasToastController.onRestoreInstanceState(savedInstanceState);
-    }
-
-    /**
-     * Called when an activity is destroyed.
-     */
-    @Override
-    protected void onDestroy()
-    {
-        if(isCallTimerStarted())
-        {
-            stopCallTimer();
-        }
-
-        super.onDestroy();
     }
 
     /**
@@ -443,7 +423,6 @@ public class VideoCallActivity
         }
 
         doUpdateHoldStatus();
-        doUpdateCallDuration();
         doUpdateMuteStatus();
         updateSpeakerphoneStatus();
         initSecurityStatus();
@@ -457,6 +436,9 @@ public class VideoCallActivity
     @Override
     protected void onPause()
     {
+        if(call == null)
+            return;
+
         call.removeCallChangeListener(this);
 
         if(callPeerAdapter != null)
@@ -488,14 +470,6 @@ public class VideoCallActivity
             // TODO: fix in call notifications for sdk < 11
             logger.warn("In call notifications not supported prior SDK 11");
             return;
-        }
-
-        String inCallStr = getString(R.string.in_call_with);
-
-        Iterator<? extends CallPeer> callPeers = call.getCallPeers();
-        if(callPeers.hasNext())
-        {
-            inCallStr += " " + callPeers.next().getDisplayName();
         }
 
         CallNotificationManager.get().showCallNotification(this, callIdentifier);
@@ -553,34 +527,6 @@ public class VideoCallActivity
                 statusName.setText(stateString);
             }
         });
-    }
-
-    /**
-     * Updates the call duration string. Invoked on UI thread.
-     */
-    public void updateCallDuration()
-    {
-        runOnUiThread(new Runnable()
-        {
-            public void run()
-            {
-                doUpdateCallDuration();
-            }
-        });
-    }
-
-    /**
-     * Updates the call duration string.
-     */
-    private void doUpdateCallDuration()
-    {
-        if(callStartDate == null)
-            return;
-        String timeStr = GuiUtils.formatTime(
-                callStartDate.getTime(),
-                System.currentTimeMillis());
-        TextView callTime = (TextView) findViewById(R.id.callTime);
-        callTime.setText(timeStr);
     }
 
     public void setErrorReason(String reason) {}
@@ -852,20 +798,23 @@ public class VideoCallActivity
     }
 
     /**
+     * Gets the <tt>CallTimerFragment</tt>.
+     * @return the <tt>CallTimerFragment</tt>.
+     */
+    private CallTimerFragment getCallTimerFragment()
+    {
+        return (CallTimerFragment)
+                    getSupportFragmentManager()
+                            .findFragmentByTag(TIMER_FRAGMENT_TAG);
+    }
+
+    /**
      * Starts the timer that counts call duration.
      */
     public void startCallTimer()
     {
-        if(callStartDate == null)
-        {
-            this.callStartDate = new Date();
-        }
-
-        this.callDurationTimer
-            .schedule(new CallTimerTask(),
-                new Date(System.currentTimeMillis()), 1000);
-
-        this.isCallTimerStarted = true;
+        if(getCallTimerFragment() != null)
+            getCallTimerFragment().startCallTimer();
     }
 
     /**
@@ -873,7 +822,8 @@ public class VideoCallActivity
      */
     public void stopCallTimer()
     {
-        this.callDurationTimer.cancel();
+        if(getCallTimerFragment() != null)
+            getCallTimerFragment().stopCallTimer();
     }
 
     /**
@@ -884,7 +834,11 @@ public class VideoCallActivity
      */
     public boolean isCallTimerStarted()
     {
-        return isCallTimerStarted;
+        if(getCallTimerFragment() != null)
+        {
+            return getCallTimerFragment().isCallTimerStarted();
+        }
+        return false;
     }
 
     /**
@@ -895,24 +849,10 @@ public class VideoCallActivity
         doUpdatePadlockStatus(true, isVerified);
     }
 
-    /**
-     * Each second refreshes the time label to show to the user the exact
-     * duration of the call.
-     */
-    private class CallTimerTask
-        extends TimerTask
-    {
-        @Override
-        public void run()
-        {
-            updateCallDuration();
-        }
-    }
-
     private void addCallPeerUI(CallPeer callPeer)
     {
-        callPeerAdapter
-            = new CallPeerAdapter(callPeer, this);
+        callPeerAdapter = new CallPeerAdapter(callPeer, this);
+
         callPeer.addCallPeerListener(callPeerAdapter);
         callPeer.addCallPeerSecurityListener(callPeerAdapter);
         callPeer.addPropertyChangeListener(callPeerAdapter);
@@ -922,14 +862,7 @@ public class VideoCallActivity
                         callPeer.getState().getLocalizedStateString());
         setPeerName(callPeer.getDisplayName());
 
-        CallPeerState currentState = callPeer.getState();
-        if( (currentState == CallPeerState.CONNECTED
-             || CallPeerState.isOnHold(currentState))
-                 && !isCallTimerStarted())
-        {
-            callStartDate = new Date(callPeer.getCallDurationStartTime());
-            startCallTimer();
-        }
+        getCallTimerFragment().callPeerAdded(callPeer);
     }
 
     /**
