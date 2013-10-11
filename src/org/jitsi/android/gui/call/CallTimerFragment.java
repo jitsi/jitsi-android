@@ -100,7 +100,7 @@ public class CallTimerFragment
      */
     private void doUpdateCallDuration()
     {
-        if(callStartDate == null)
+        if(callStartDate == null || getActivity() == null)
             return;
 
         String timeStr = GuiUtils.formatTime(callStartDate.getTime(),

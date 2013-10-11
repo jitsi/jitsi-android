@@ -14,7 +14,6 @@ import android.graphics.Color;
 import android.media.*;
 import android.os.*;
 import android.support.v4.app.DialogFragment;
-import android.util.*;
 import android.view.*;
 import android.view.Menu; // Disambiguation
 import android.view.MenuItem; // Disambiguation
@@ -27,11 +26,8 @@ import org.jitsi.android.gui.controller.*;
 import org.jitsi.android.gui.fragment.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.android.gui.widgets.*;
-import org.jitsi.android.util.java.awt.*;
-import org.jitsi.impl.neomedia.jmfext.media.protocol.mediarecorder.*;
 import org.jitsi.service.neomedia.*;
 import org.jitsi.service.osgi.*;
-import org.jitsi.util.event.*;
 
 import net.java.sip.communicator.service.gui.call.*;
 import net.java.sip.communicator.service.protocol.*;
@@ -78,6 +74,17 @@ public class VideoCallActivity
     private static final String TIMER_FRAGMENT_TAG = "call_timer";
 
     /**
+     * Tag name that identifies call control buttons auto hide controller
+     * fragment.
+     */
+    private static final String AUTO_HIDE_TAG = "auto_hide";
+
+    /**
+     * The delay for hiding the call control buttons, after the call has started
+     */
+    private static final long AUTO_HIDE_DELAY = 5000;
+
+    /**
      * The call peer adapter that gives us access to all call peer events.
      */
     private CallPeerAdapter callPeerAdapter;
@@ -106,6 +113,11 @@ public class VideoCallActivity
      * The zrtp SAS verification toast controller.
      */
     private LegacyClickableToastCtrl sasToastController;
+
+    /**
+     * Auto-hide controller fragment for call control buttons.
+     */
+    private AutoHideController autoHide;
 
     /**
      * Called when the activity is starting. Initializes the corresponding
@@ -182,6 +194,12 @@ public class VideoCallActivity
                     /* Adds the fragment that handles call duration logic */
                     .add(new CallTimerFragment(), TIMER_FRAGMENT_TAG)
                     .commit();
+        }
+        else
+        {
+            // Retrieve restored auto hide fragment
+            autoHide = (AutoHideController)
+                getSupportFragmentManager().findFragmentByTag(AUTO_HIDE_TAG);
         }
     }
 
@@ -518,6 +536,9 @@ public class VideoCallActivity
     public void setPeerState(CallPeerState oldState, CallPeerState newState,
         final String stateString)
     {
+        if(newState == CallPeerState.CONNECTED)
+            ensureAutoHideFragmentAttached();
+
         runOnUiThread(new Runnable()
         {
             public void run()
@@ -527,6 +548,35 @@ public class VideoCallActivity
                 statusName.setText(stateString);
             }
         });
+    }
+
+    /**
+     * Ensures that auto hide fragment is added and started.
+     */
+    private void ensureAutoHideFragmentAttached()
+    {
+        if(autoHide != null)
+            return;
+
+        this.autoHide = AutoHideController.getInstance(R.id.buttonContainer,
+                                                       AUTO_HIDE_DELAY);
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(autoHide,AUTO_HIDE_TAG)
+                .commit();
+    }
+
+    /**
+     * Shows (or cancels) the auto hide fragment.
+     */
+    @Override
+    public void onUserInteraction()
+    {
+        super.onUserInteraction();
+
+        if(autoHide != null)
+            autoHide.show();
     }
 
     public void setErrorReason(String reason) {}
@@ -881,7 +931,7 @@ public class VideoCallActivity
     {
     }
 
-    public void updateHoldButtonState() 
+    public void updateHoldButtonState()
     {
         updateHoldStatus();
     }
