@@ -16,6 +16,10 @@
     <string name="choose_network">Choose a network</string>
     <string-array name="networks_array">
         <item>SIP</item>
+        <item>XMPP</item>
+    </string-array>
+    <string-array name="networks_array_values">
+        <item>SIP</item>
         <item>Jabber</item>
     </string-array>
     <string name="enter_name_or_number">Enter name or number</string>

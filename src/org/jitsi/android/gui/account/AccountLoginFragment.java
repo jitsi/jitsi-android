@@ -201,7 +201,13 @@ public class AccountLoginFragment
                 final EditText passwordField
                     = (EditText) content.findViewById(R.id.passwordField);
 
-                String selectedNetwork = spinner.getSelectedItem().toString();
+                // Translate network label to network value
+                String[] networkValues
+                        = getResources().getStringArray(
+                                R.array.networks_array_values);
+                String selectedNetwork
+                        = networkValues[spinner.getSelectedItemPosition()];
+
                 String login = userNameField.getText().toString();
                 String password = passwordField.getText().toString();
 
