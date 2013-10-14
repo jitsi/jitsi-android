@@ -272,6 +272,18 @@ public class ChatFragment
                 // Checks for replacements in message body
                 processReplacements(newMessage);
 
+                // TODO: plaintext tag is ignored - implement custom Spanned
+                // provider that will ignore plaintext tag
+                // (if it's really required)
+
+                // Put message body in <plaintext> tag if it's not HTML
+                //if(!newMessage.getContentType()
+                //    .equals(OperationSetBasicInstantMessaging.HTML_MIME_TYPE))
+                //{
+                //    newMessage.setMessage(
+                //        "<plaintext>"+newMessage.getMessage()+"</plaintext>");
+                //}
+
                 if (!isConsecutiveMessage(  newMessage.getContactName(),
                                             newMessage.getMessageType(),
                                             newMessage.getDate().getTime()))
@@ -283,37 +295,9 @@ public class ChatFragment
                     // Return the last message.
                     ChatMessage chatMessage = getMessage(getCount() - 1);
 
-                    // If smile is added to new message it has changed
-                    // it's content type to HTML, so we have to update it also
-                    // in previous message
-                    String newMsgContentType = newMessage.getContentType();
-
-                    if(newMsgContentType.equals(
-                            OperationSetBasicInstantMessaging.HTML_MIME_TYPE)
-                        && !chatMessage.getContentType()
-                                .equals(newMsgContentType))
-                    {
-                        // Change plain message type to html
-                        // and replace newline marks
-                        chatMessage.setContentType(newMsgContentType);
-                        chatMessage.setMessage(
-                                chatMessage.getMessage()
-                                        .replace(" \n"," <br/>"));
-                    }
-
-                    if(chatMessage.getContentType().equals(
-                            OperationSetBasicInstantMessaging.HTML_MIME_TYPE))
-                    {
-                        chatMessage.setMessage(
-                                chatMessage.getMessage() + " <br/>"
-                                        + newMessage.getMessage());
-                    }
-                    else
-                    {
-                        chatMessage.setMessage(
-                                chatMessage.getMessage() + " \n"
-                                        + newMessage.getMessage());
-                    }
+                    chatMessage.setMessage(
+                        chatMessage.getMessage() + " <br/>"
+                                + newMessage.getMessage());
                 }
             }
 
@@ -366,9 +350,6 @@ public class ChatFragment
 
                     if(!temp.equals(group0))
                     {
-                        // Change message type to HTML
-                        chatMsg.setContentType(
-                            OperationSetBasicInstantMessaging.HTML_MIME_TYPE);
                         msgBuff.append("<IMG SRC=\"");
                         msgBuff.append(temp);
                         msgBuff.append("\" BORDER=\"0\" ALT=\"");
@@ -572,19 +553,11 @@ public class ChatFragment
                             GuiUtils.formatTime(message.getDate()));
                 }
 
-                if(message.getContentType().equals(
-                        OperationSetBasicInstantMessaging.HTML_MIME_TYPE))
-                {
-                    messageViewHolder.messageView.setText(Html.fromHtml(
-                            message.getMessage(), imageGetter, null));
+                messageViewHolder.messageView.setText(
+                        Html.fromHtml(message.getMessage(), imageGetter, null));
 
-                    messageViewHolder.messageView.setMovementMethod(
-                            LinkMovementMethod.getInstance());
-                }
-                else
-                {
-                    messageViewHolder.messageView.setText(message.getMessage());
-                }
+                messageViewHolder.messageView.setMovementMethod(
+                        LinkMovementMethod.getInstance());
             }
 
             return convertView;
