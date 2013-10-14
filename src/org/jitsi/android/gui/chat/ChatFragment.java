@@ -6,8 +6,6 @@
  */
 package org.jitsi.android.gui.chat;
 
-import java.io.*;
-import java.net.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -30,7 +28,6 @@ import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.service.configuration.*;
 import org.jitsi.service.osgi.*;
-import org.jitsi.util.*;
 
 import android.graphics.drawable.*;
 import android.os.*;
@@ -255,6 +252,12 @@ public class ChatFragment
          * The type of the error message view.
          */
         final int ERROR_MESSAGE_VIEW = 3;
+
+        /**
+         * HTML image getter.
+         */
+        private final Html.ImageGetter imageGetter
+            = new HtmlImageGetter(getActivity());
 
         /**
          * Passes the message to the contained <code>ChatConversationPanel</code>
@@ -573,29 +576,7 @@ public class ChatFragment
                         OperationSetBasicInstantMessaging.HTML_MIME_TYPE))
                 {
                     messageViewHolder.messageView.setText(Html.fromHtml(
-                            message.getMessage(),
-                            // Image loader
-                            new Html.ImageGetter()
-                        {
-                            @Override
-                            public Drawable getDrawable(String source)
-                            {
-                                // Image resource id is returned here in form:
-                                // jitsi.resource://{Integer drawable id}
-                                // Example: jitsi.resource://2130837599
-                                Drawable img = getResources()
-                                        .getDrawable(
-                                                Integer.parseInt(
-                                                        source.substring(17)));
-                                if(img == null)
-                                    return null;
-
-                                img.setBounds(0, 0,
-                                              img.getIntrinsicWidth(),
-                                              img.getIntrinsicHeight());
-                                return img;
-                            }
-                        }, null));
+                            message.getMessage(), imageGetter, null));
 
                     messageViewHolder.messageView.setMovementMethod(
                             LinkMovementMethod.getInstance());
