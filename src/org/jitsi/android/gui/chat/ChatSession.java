@@ -68,10 +68,15 @@ public class ChatSession
                         FileHistoryService.class.getName()};
 
     /**
-     * The list of inserted messages by services.
+     * Messages cache used by this session.
      */
-    private final List<ChatMessageImpl> insertedMessages
-        = new ArrayList<ChatMessageImpl>();
+    private List<ChatMessage> msgCache = new LinkedList<ChatMessage>();
+
+    /**
+     * Flag indicates if the history has been cached(it must be done only once
+     * and next messages are cached through the listeners mechanism).
+     */
+    private boolean historyLoaded = false;
 
     private final List<ChatSessionListener> msgListeners
             = new ArrayList<ChatSessionListener>();
@@ -340,66 +345,79 @@ public class ChatSession
     private Collection<ChatMessage> loadHistory(Collection<Object> historyList,
                                                 int msgLimit)
     {
-        Iterator<Object> iterator = historyList.iterator();
-        ArrayList<ChatMessage> historyMsgs = new ArrayList<ChatMessage>();
-
-        while (iterator.hasNext())
+        if(!historyLoaded)
         {
-            Object o = iterator.next();
+            Iterator<Object> iterator = historyList.iterator();
+            ArrayList<ChatMessage> historyMsgs = new ArrayList<ChatMessage>();
 
-            if(o instanceof MessageDeliveredEvent)
+            while (iterator.hasNext())
             {
-                historyMsgs.add(
-                        ChatMessageImpl.getMsgForEvent(
-                                (MessageDeliveredEvent) o));
+                Object o = iterator.next();
+
+                if(o instanceof MessageDeliveredEvent)
+                {
+                    historyMsgs.add(
+                            ChatMessageImpl.getMsgForEvent(
+                                    (MessageDeliveredEvent) o));
+                }
+                else if(o instanceof MessageReceivedEvent)
+                {
+                    historyMsgs.add(
+                            ChatMessageImpl.getMsgForEvent(
+                                    (MessageReceivedEvent) o));
+                }
+                else
+                {
+                    System.err.println("Other event in history: "+o);
+                }
             }
-            else if(o instanceof MessageReceivedEvent)
+
+            msgCache = mergeMsgLists(historyMsgs, msgCache, msgLimit);
+            historyLoaded = true;
+        }
+        return msgCache;
+    }
+
+    /**
+     * Merges given lists of messages. Output list is ordered by received date.
+     * @param list1 first list to merge.
+     * @param list2 the second list to merge.
+     * @param msgLimit output list size limit.
+     * @return merged list of messages contained in given lists ordered by the
+     *         date. Output list size is limited to given <tt>msgLimit</tt>.
+     */
+    private List<ChatMessage> mergeMsgLists(List<ChatMessage> list1,
+                                            List<ChatMessage> list2,
+                                            int msgLimit)
+    {
+        List<ChatMessage> output = new LinkedList<ChatMessage>();
+        int list1Idx =list1.size()-1;
+        int list2Idx = list2.size()-1;
+
+        while(list1Idx >= 0 && list2Idx >= 0 && output.size() < msgLimit)
+        {
+            ChatMessage list1Msg = list1.get(list1Idx);
+            ChatMessage list2Msg = list2.get(list2Idx);
+
+            if(list1Msg.getDate().after(list2Msg.getDate()))
             {
-                historyMsgs.add(
-                        ChatMessageImpl.getMsgForEvent(
-                                (MessageReceivedEvent) o));
+                output.add(0, list1Msg);
+                list1Idx--;
             }
             else
             {
-                System.err.println("Other event in history: "+o);
+                output.add(0, list2Msg);
+                list2Idx--;
             }
         }
 
-        // Merge sorts history and inserted messages
-        ArrayList<ChatMessage> output = new ArrayList<ChatMessage>();
-        int historyIdx = historyMsgs.size()-1;
-        int insertedIdx = insertedMessages.size()-1;
+        // Input remaining list 1 messages
+        while(list1Idx >= 0 && output.size() < msgLimit)
+            output.add(0, list1.get(list1Idx--));
 
-        while(historyIdx >= 0
-                && insertedIdx >= 0
-                && output.size() < msgLimit)
-        {
-            ChatMessage historyMsg = historyMsgs.get(historyIdx);
-            ChatMessageImpl insertedMsg = insertedMessages.get(insertedIdx);
-
-            if(historyMsg.getDate().after(insertedMsg.getDate()))
-            {
-                output.add(0, historyMsg);
-                historyIdx--;
-            }
-            else
-            {
-                // Inserted messages have to be cloned in order to prevent
-                // original message text modification
-                output.add(0, insertedMsg.clone());
-                insertedIdx--;
-            }
-        }
-
-        // Input remaining history messages
-        while(historyIdx >= 0
-                && output.size() < msgLimit)
-            output.add(0, historyMsgs.get(historyIdx--));
-
-        // Input remaining "inserted" messages
-        while(insertedIdx >= 0
-                && output.size() < msgLimit)
-            output.add(0, insertedMessages.get(insertedIdx--).clone());
+        // Input remaining list 2 messages
+        while(list2Idx >= 0 && output.size() < msgLimit)
+            output.add(0, list2.get(list2Idx--));
 
         return output;
     }
@@ -507,10 +525,8 @@ public class ChatSession
                 = new ChatMessageImpl( contactName, date,
                                        chatMsgType, message,
                                        contentType );
-        insertedMessages.add(chatMsg);
 
-        if(insertedMessages.size() > HISTORY_LIMIT)
-            insertedMessages.remove(0);
+        cacheNextMsg(chatMsg);
 
         for(ChatSessionListener l : msgListeners)
         {
@@ -619,19 +635,44 @@ public class ChatSession
     @Override
     public void messageReceived(MessageReceivedEvent messageReceivedEvent)
     {
+        if(!metaContact.containsContact(
+                messageReceivedEvent.getSourceContact()))
+        {
+            return;
+        }
+
         for(MessageListener l : msgListeners)
         {
             l.messageReceived(messageReceivedEvent);
         }
+        cacheNextMsg(ChatMessageImpl.getMsgForEvent(messageReceivedEvent));
+    }
+
+    /**
+     * Caches next message.
+     * @param newMsg the next message to cache.
+     */
+    private void cacheNextMsg(ChatMessageImpl newMsg)
+    {
+        msgCache.add(newMsg);
+        if(msgCache.size() > HISTORY_LIMIT)
+            msgCache.remove(0);
     }
 
     @Override
     public void messageDelivered(MessageDeliveredEvent messageDeliveredEvent)
     {
+        if(!metaContact.containsContact(
+                messageDeliveredEvent.getDestinationContact()))
+        {
+            return;
+        }
+
         for(MessageListener l : msgListeners)
         {
             l.messageDelivered(messageDeliveredEvent);
         }
+        cacheNextMsg(ChatMessageImpl.getMsgForEvent(messageDeliveredEvent));
     }
 
     @Override
