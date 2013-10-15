@@ -7,15 +7,19 @@
 package org.jitsi.android.gui.chat;
 
 import java.util.*;
+import java.util.regex.*;
 
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.event.*;
+import net.java.sip.communicator.service.replacement.*;
+import net.java.sip.communicator.service.replacement.smilies.*;
 import net.java.sip.communicator.util.*;
 
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
+import org.jitsi.service.configuration.*;
 
 /**
  * The <tt>ChatMessageImpl</tt> class encapsulates message information in order
@@ -80,6 +84,12 @@ public class ChatMessageImpl
      * or <tt>null</tt> if this is a new message.
      */
     private String correctedMessageUID;
+
+    /**
+     * Field used to cache processed message body after replacements and
+     * corrections. This text is used to display the message on the screen.
+     */
+    private String cachedOutput = null;
 
     /**
      * Creates a <tt>ChatMessageImpl</tt> by specifying all parameters of the
@@ -238,7 +248,101 @@ public class ChatMessageImpl
     @Override
     public String getMessage()
     {
-        return message;
+        if(cachedOutput != null)
+            return cachedOutput;
+
+        // Process replacements
+        String output = processReplacements(message);
+
+        // Apply the "edited at" tag for corrected message
+        if(correctedMessageUID != null)
+        {
+            String editedStr = JitsiApplication.getResString(
+                    R.string.service_gui_EDITED_AT,
+                    GuiUtils.formatTime(getDate()));
+
+            output = "<i>" + output
+                         + "  <font color=\"#989898\" >("
+                         + editedStr + ")</font></i>";
+        }
+
+        cachedOutput = output;
+
+        return cachedOutput;
+    }
+
+    /**
+     * Processes message content replacement(for smileys).
+     * @param content the content to be processed.
+     * @return message content with applied replacements.
+     */
+    private String processReplacements(String content)
+    {
+        ConfigurationService cfg
+                = AndroidGUIActivator.getConfigurationService();
+
+        if(!cfg.getBoolean(
+                ReplacementProperty.getPropertyName("SMILEY"), true))
+            return content;
+
+        //boolean isEnabled
+        //= cfg.getBoolean(ReplacementProperty.REPLACEMENT_ENABLE, true);
+
+        for (Map.Entry<String, ReplacementService> entry
+                : AndroidGUIActivator.getReplacementSources().entrySet())
+        {
+            ReplacementService source = entry.getValue();
+
+            boolean isSmiley = source instanceof SmiliesReplacementService;
+
+            if(!isSmiley)
+                continue;
+
+            String sourcePattern = source.getPattern();
+            Pattern p = Pattern.compile(
+                    sourcePattern,
+                    Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+            Matcher m = p.matcher(content);
+
+            StringBuilder msgBuff = new StringBuilder();
+            int startPos = 0;
+
+            while (m.find())
+            {
+                msgBuff.append(content.substring(startPos, m.start()));
+                startPos = m.end();
+
+                String group = m.group();
+                String temp = source.getReplacement(group);
+                String group0 = m.group(0);
+
+                if(!temp.equals(group0))
+                {
+                    msgBuff.append("<IMG SRC=\"");
+                    msgBuff.append(temp);
+                    msgBuff.append("\" BORDER=\"0\" ALT=\"");
+                    msgBuff.append(group0);
+                    msgBuff.append("\"></IMG>");
+                }
+                else
+                {
+                    msgBuff.append(group);
+                }
+            }
+
+            msgBuff.append(content.substring(startPos));
+
+            /*
+             * replace the content variable with the current replaced
+             * message before next iteration
+             */
+            String msgBuffString = msgBuff.toString();
+
+            if (!msgBuffString.equals(content))
+                content = msgBuffString;
+        }
+
+        return content;
     }
 
     /**
@@ -271,18 +375,27 @@ public class ChatMessageImpl
         if(messageUID != null &&
                 messageUID.equals(consecutiveMessage.getCorrectedMessageUID()))
         {
-            // Apply the "edited at" tag and return corrected message
-            String editedStr
-                = JitsiApplication.getResString(
-                        R.string.service_gui_EDITED_AT,
-                        GuiUtils.formatTime(consecutiveMessage.getDate()));
-            consecutiveMessage.setMessage(
-                    "<i>" + consecutiveMessage.getMessage()
-                    + "  <font color=\"#989898\" >("
-                    + editedStr + ")</font></i>");
             return consecutiveMessage;
         }
         return new MergedMessage(this).mergeMessage(consecutiveMessage);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getUidForCorrection()
+    {
+        return messageUID;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getContentForCorrection()
+    {
+        return message;
     }
 
     /**

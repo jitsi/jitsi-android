@@ -74,6 +74,7 @@
     <string name="service_gui_DENY">Deny</string>
     <string name="service_gui_EDITED_AT">edited at %s</string>
     <string name="service_gui_IGNORE">Ignore</string>
+    <string name="service_gui_LAST_MSG_CORRECTION">Last message correction</string>
     <string name="service_gui_NOT_AUTHORIZED">Not authorized</string>
     <string name="service_gui_TYPE_YOUR_REQUEST">Type your request here</string>
     <string name="service_gui_REQUEST">Request</string>

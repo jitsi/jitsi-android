@@ -87,13 +87,6 @@ public interface ChatMessage
     String getMessage();
 
     /**
-     * Sets the content of the message.
-     *
-     * @param message the new content
-     */
-    void setMessage(String message);
-
-    /**
      * Returns the content type (e.g. "text", "text/html", etc.).
      *
      * @return the content type
@@ -137,4 +130,19 @@ public interface ChatMessage
      *         <tt>ChatMessage</tt> instance.
      */
     ChatMessage mergeMessage(ChatMessage consecutiveMessage);
+
+    /**
+     * Returns the UID that should be used for matching correction messages.
+     * @return the UID that should be used for matching correction messages.
+     */
+    String getUidForCorrection();
+
+    /**
+     * Returns original message content that should be given for the user to
+     * edit the correction.
+     *
+     * @return original message content that should be given for the user to
+     *         edit the correction.
+     */
+    String getContentForCorrection();
 }

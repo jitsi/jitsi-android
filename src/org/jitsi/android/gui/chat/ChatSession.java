@@ -751,6 +751,51 @@ public class ChatSession
     }
 
     /**
+     * Returns <tt>OperationSetMessageCorrection</tt> if this chat session
+     * supports message corrections and <tt>null</tt> otherwise.
+     *
+     * @return <tt>OperationSetMessageCorrection</tt> if this chat session
+     * supports message corrections and <tt>null</tt> otherwise.
+     */
+    private OperationSetMessageCorrection getOpSetMessageCorrection()
+    {
+        ProtocolProviderService pps = currentChatTransport.getProtocolProvider();
+
+        OperationSetContactCapabilities capOpSet
+                = pps.getOperationSet(OperationSetContactCapabilities.class);
+        if ( capOpSet != null
+                && capOpSet.getOperationSet(
+                        currentChatTransport,
+                        OperationSetMessageCorrection.class) == null)
+        {
+            return null;
+        }
+
+        return pps.getOperationSet(OperationSetMessageCorrection.class);
+    }
+
+    /**
+     * Corrects the message identified by given UID with new message body.
+     * @param uidToCorrect the UID of the message to correct.
+     * @param message new message body to be applied.
+     */
+    public void correctMessage(String uidToCorrect, String message)
+    {
+        try
+        {
+            OperationSetMessageCorrection mcOpSet = getOpSetMessageCorrection();
+
+            Message msg = mcOpSet.createMessage(message);
+            mcOpSet.correctMessage(currentChatTransport, msg, uidToCorrect);
+        }
+        catch(Exception e)
+        {
+            logger.error("Message correction error for UID: "
+                             + uidToCorrect + ", new content: " + message, e);
+        }
+    }
+
+    /**
      * Extends <tt>MessageListener</tt> interface in order to provide
      * notifications about injected messages without the need of event objects.
      *

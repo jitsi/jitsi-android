@@ -7,17 +7,22 @@
 package org.jitsi.android.gui.chat;
 
 import java.util.*;
-import java.util.regex.*;
 
+import android.app.*;
+import android.content.*;
+import android.graphics.drawable.*;
+import android.os.*;
 import android.text.*;
 import android.text.method.*;
+import android.view.*;
+import android.widget.*;
+import android.widget.LinearLayout.*;
+
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.globaldisplaydetails.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.event.*;
 import net.java.sip.communicator.service.protocol.globalstatus.*;
-import net.java.sip.communicator.service.replacement.*;
-import net.java.sip.communicator.service.replacement.smilies.*;
 import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.Logger;
 
@@ -26,14 +31,7 @@ import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.util.*;
-import org.jitsi.service.configuration.*;
 import org.jitsi.service.osgi.*;
-
-import android.graphics.drawable.*;
-import android.os.*;
-import android.view.*;
-import android.widget.*;
-import android.widget.LinearLayout.*;
 
 /**
  * The <tt>ChatFragment</tt> is responsible for chat interface.
@@ -136,6 +134,18 @@ public class ChatFragment
 
         chatSession = ChatSessionManager.getActiveChat(chatId);
 
+        // Sets the on message clicked listener
+        chatListView.setOnItemClickListener(
+                new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id)
+            {
+                onChatMessageClicked(position);
+            }
+        });
+
         return content;
     }
 
@@ -221,6 +231,75 @@ public class ChatFragment
         chatSession.sendMessage(message);
     }
 
+    /**
+     * Method fired when the chat message is clicked.
+     * @param position the position of clicked message.
+     */
+    private void onChatMessageClicked(int position)
+    {
+        ChatMessage chatMessage = chatListAdapter.getMessage(position);
+
+        if(chatMessage.getMessageType() != ChatMessage.OUTGOING_MESSAGE)
+            return;
+
+        // Check if it's the last outgoing message
+        if(position != chatListAdapter.getCount()-1)
+        {
+            for(int i=position+1; i<chatListAdapter.getCount(); i++)
+            {
+                if(chatListAdapter.getMessage(i).getMessageType()
+                        == ChatMessage.OUTGOING_MESSAGE)
+                {
+                    return;
+                }
+            }
+        }
+
+        String uidToCorrect = chatMessage.getUidForCorrection();
+        String content = chatMessage.getContentForCorrection();
+        if(uidToCorrect != null && content != null)
+        {
+            showCorrectMessageDialog(uidToCorrect, content);
+        }
+    }
+
+    /**
+     * Displays last message correction dialog.
+     * @param correctedMsgUID UID of the message to correct.
+     * @param content current content of corrected message.
+     */
+    private void showCorrectMessageDialog( final String correctedMsgUID,
+                                           final String content )
+    {
+        Context ctx = getActivity();
+        AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
+        alert.setTitle(R.string.service_gui_LAST_MSG_CORRECTION);
+
+        // Use an EditText view to modify message body
+        final EditText input = new EditText(ctx);
+        input.setText(content);
+        alert.setView(input);
+        alert.setPositiveButton(R.string.service_gui_OK,
+                                new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int whichButton)
+            {
+                String value = input.getText().toString();
+                chatSession.correctMessage(correctedMsgUID, value);
+            }
+        });
+        alert.setNegativeButton(R.string.service_gui_CANCEL,
+                                new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int whichButton)
+            {
+                // Canceled.
+                dialog.dismiss();
+            }
+        });
+        alert.show();
+    }
+
     class ChatListAdapter
         extends BaseAdapter
         implements  ChatSession.ChatSessionListener,
@@ -269,9 +348,6 @@ public class ChatFragment
         {
             synchronized (messages)
             {
-                // Checks for replacements in message body
-                processReplacements(newMessage);
-
                 // TODO: plaintext tag is ignored - implement custom Spanned
                 // provider that will ignore plaintext tag
                 // (if it's really required)
@@ -284,10 +360,10 @@ public class ChatFragment
                 //        "<plaintext>"+newMessage.getMessage()+"</plaintext>");
                 //}
 
-                // Return the last message.
-                ChatMessage lastMsg = null;
-                if(getCount() > 0)
-                    lastMsg = getMessage(getCount() - 1);
+                int lastMsgIdx = getLastMessageIdx(newMessage);
+                ChatMessage lastMsg = lastMsgIdx != -1
+                            ? chatListAdapter.getMessage(lastMsgIdx)
+                            : null;
 
                 if(lastMsg == null || !lastMsg.isConsecutiveMessage(newMessage))
                 {
@@ -296,7 +372,7 @@ public class ChatFragment
                 else
                 {
                     // Merge the message and replace the object in the list
-                    messages.set(getCount() - 1,
+                    messages.set(lastMsgIdx,
                                  lastMsg.mergeMessage(newMessage));
                 }
             }
@@ -305,76 +381,35 @@ public class ChatFragment
                 dataChanged();
         }
 
-        private void processReplacements(ChatMessage chatMsg)
+        /**
+         * Finds index of the message that will handle <tt>newMessage</tt>
+         * merging process(usually just the last one). If the
+         * <tt>newMessage</tt> is a correction message, then the last message
+         * of the same type will be returned.
+         *
+         * @param newMessage the next message to be merged into the adapter.
+         *
+         * @return index of the message that will handle <tt>newMessage</tt>
+         * merging process. If <tt>newMessage</tt> is a correction message,
+         * then the last message of the same type will be returned.
+         */
+        private int getLastMessageIdx(ChatMessage newMessage)
         {
-            ConfigurationService cfg
-                    = AndroidGUIActivator.getConfigurationService();
+            // If it's not a correction message then jus return the last one
+            if(newMessage.getCorrectedMessageUID() == null)
+                return chatListAdapter.getCount()-1;
 
-            if(!cfg.getBoolean(
-                    ReplacementProperty.getPropertyName("SMILEY"), true))
-                return;
-
-            //boolean isEnabled
-              //= cfg.getBoolean(ReplacementProperty.REPLACEMENT_ENABLE, true);
-
-            String msgStore = chatMsg.getMessage();
-
-            for (Map.Entry<String, ReplacementService> entry
-                    : AndroidGUIActivator.getReplacementSources().entrySet())
+            // Search for the same type
+            int msgType = newMessage.getMessageType();
+            for(int i=getCount()-1; i>= 0; i--)
             {
-                ReplacementService source = entry.getValue();
-
-                boolean isSmiley
-                        = source instanceof SmiliesReplacementService;
-
-                if(!isSmiley)
-                    continue;
-
-                String sourcePattern = source.getPattern();
-                Pattern p = Pattern.compile(
-                        sourcePattern,
-                        Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-                Matcher m = p.matcher(msgStore);
-
-                StringBuilder msgBuff = new StringBuilder();
-                int startPos = 0;
-
-                while (m.find())
+                ChatMessage candidate = getMessage(i);
+                if(candidate.getMessageType() == msgType)
                 {
-                    msgBuff.append(msgStore.substring(startPos, m.start()));
-                    startPos = m.end();
-
-                    String group = m.group();
-                    String temp = source.getReplacement(group);
-                    String group0 = m.group(0);
-
-                    if(!temp.equals(group0))
-                    {
-                        msgBuff.append("<IMG SRC=\"");
-                        msgBuff.append(temp);
-                        msgBuff.append("\" BORDER=\"0\" ALT=\"");
-                        msgBuff.append(group0);
-                        msgBuff.append("\"></IMG>");
-                    }
-                    else
-                    {
-                        msgBuff.append(group);
-                    }
+                    return i;
                 }
-
-                msgBuff.append(msgStore.substring(startPos));
-
-                    /*
-                     * replace the msgStore variable with the current replaced
-                     * message before next iteration
-                     */
-                String msgBuffString = msgBuff.toString();
-
-                if (!msgBuffString.equals(msgStore))
-                    msgStore = msgBuffString;
             }
-
-            chatMsg.setMessage(msgStore);
+            return -1;
         }
 
         /**
@@ -556,8 +591,15 @@ public class ChatFragment
                 messageViewHolder.messageView.setText(
                         Html.fromHtml(message.getMessage(), imageGetter, null));
 
-                messageViewHolder.messageView.setMovementMethod(
-                        LinkMovementMethod.getInstance());
+                // Html links are handled only for system messages, which is
+                // currently used for displaying OTR authentication dialog.
+                // Otherwise settings movement method prevent form firing
+                // on item clicked events.
+                if(message.getMessageType() == ChatMessage.SYSTEM_MESSAGE)
+                {
+                    messageViewHolder.messageView.setMovementMethod(
+                            LinkMovementMethod.getInstance());
+                }
             }
 
             return convertView;

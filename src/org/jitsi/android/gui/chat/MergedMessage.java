@@ -19,7 +19,7 @@ public class MergedMessage
     /**
      * Root message instance.
      */
-    private final ChatMessage parent;
+    private final ChatMessage root;
 
     /**
      * The list of messages consecutive to this <tt>MergedMessage</tt>.
@@ -39,13 +39,13 @@ public class MergedMessage
     /**
      * Creates new instance of <tt>MergedMessage</tt> where the given message
      * will become it's root.
-     * @param parent the root message for this merged instance.
+     * @param root the root message for this merged instance.
      */
-    public MergedMessage(ChatMessage parent)
+    public MergedMessage(ChatMessage root)
     {
-        this.parent = parent;
+        this.root = root;
 
-        date = parent.getDate();
+        date = root.getDate();
     }
 
     /**
@@ -54,7 +54,7 @@ public class MergedMessage
     @Override
     public String getContactName()
     {
-        return parent.getContactName();
+        return root.getContactName();
     }
 
     /**
@@ -63,7 +63,7 @@ public class MergedMessage
     @Override
     public String getContactDisplayName()
     {
-        return parent.getContactDisplayName();
+        return root.getContactDisplayName();
     }
 
     /**
@@ -81,7 +81,7 @@ public class MergedMessage
     @Override
     public int getMessageType()
     {
-        return parent.getMessageType();
+        return root.getMessageType();
     }
 
     /**
@@ -92,7 +92,7 @@ public class MergedMessage
     {
         if(message == null)
         {
-            message = parent.getMessage();
+            message = root.getMessage();
             // Merge the text
             for(ChatMessage ch : children)
             {
@@ -100,15 +100,6 @@ public class MergedMessage
             }
         }
         return message;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setMessage(String msg)
-    {
-        throw new UnsupportedOperationException();
     }
 
     /**
@@ -128,7 +119,7 @@ public class MergedMessage
     @Override
     public String getContentType()
     {
-        return parent.getContentType();
+        return root.getContentType();
     }
 
     /**
@@ -138,7 +129,7 @@ public class MergedMessage
      */
     public String getMessageUID()
     {
-        return parent.getMessageUID();
+        return root.getMessageUID();
     }
 
     /**
@@ -150,7 +141,7 @@ public class MergedMessage
      */
     public String getCorrectedMessageUID()
     {
-        return parent.getCorrectedMessageUID();
+        return root.getCorrectedMessageUID();
     }
 
     /**
@@ -187,6 +178,42 @@ public class MergedMessage
     }
 
     /**
+     * Returns the last child message if it has valid UID and content or
+     * the root message.
+     * @return the last child message if it has valid UID and content or
+     *         the root message.
+     */
+    ChatMessage getMessageForCorrection()
+    {
+        if(children.size() > 0)
+        {
+            ChatMessage candidate = children.get(children.size()-1);
+            if(candidate.getUidForCorrection() != null
+                    && candidate.getContentForCorrection() != null)
+                return candidate;
+        }
+        return root;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getUidForCorrection()
+    {
+        return getMessageForCorrection().getUidForCorrection();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getContentForCorrection()
+    {
+        return getMessageForCorrection().getContentForCorrection();
+    }
+
+    /**
      * Finds the message that should be corrected by given message instance.
      * @param newMsg new message to check if it is a correction for any of
      *               merged messages.
@@ -218,6 +245,6 @@ public class MergedMessage
     public boolean isConsecutiveMessage(ChatMessage nextMsg)
     {
         return findCorrectedMessage(nextMsg) != null
-                    || parent.isConsecutiveMessage(nextMsg);
+                    || root.isConsecutiveMessage(nextMsg);
     }
 }
