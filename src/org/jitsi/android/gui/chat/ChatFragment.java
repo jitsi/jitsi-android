@@ -284,20 +284,20 @@ public class ChatFragment
                 //        "<plaintext>"+newMessage.getMessage()+"</plaintext>");
                 //}
 
-                if (!isConsecutiveMessage(  newMessage.getContactName(),
-                                            newMessage.getMessageType(),
-                                            newMessage.getDate().getTime()))
+                // Return the last message.
+                ChatMessage lastMsg = null;
+                if(getCount() > 0)
+                    lastMsg = getMessage(getCount() - 1);
+
+                if(lastMsg == null || !lastMsg.isConsecutiveMessage(newMessage))
                 {
                      messages.add(newMessage);
                 }
                 else
                 {
-                    // Return the last message.
-                    ChatMessage chatMessage = getMessage(getCount() - 1);
-
-                    chatMessage.setMessage(
-                        chatMessage.getMessage() + " <br/>"
-                                + newMessage.getMessage());
+                    // Merge the message and replace the object in the list
+                    messages.set(getCount() - 1,
+                                 lastMsg.mergeMessage(newMessage));
                 }
             }
 
@@ -589,7 +589,7 @@ public class ChatFragment
             if (metaContact != null
                 && chatSession.getMetaContact().equals(metaContact))
             {
-                final ChatMessage msg = ChatMessage.getMsgForEvent(evt);
+                final ChatMessageImpl msg = ChatMessageImpl.getMsgForEvent(evt);
 
                 if (logger.isTraceEnabled())
                     logger.trace(
@@ -622,7 +622,7 @@ public class ChatFragment
             if(metaContact != null
                 && chatSession.getMetaContact().equals(metaContact))
             {
-                final ChatMessage msg = ChatMessage.getMsgForEvent(evt);
+                final ChatMessageImpl msg = ChatMessageImpl.getMsgForEvent(evt);
 
                 addMessage(msg, true);
             }
@@ -696,43 +696,6 @@ public class ChatFragment
         ImageView typingView;
         int viewType;
         int position;
-    }
-
-    /**
-     * Indicates if this is a consecutive message.
-     *
-     * @param messageContactAddress the address of the contact associated with
-     * the message
-     * @param messageType the type of the message. One of the message types
-     * defined in the <tt>ChatMessage</tt> class
-     * @param messageTime the time at which the message was received/sent
-     * @return <tt>true</tt> if the given message is a consecutive message,
-     * <tt>false</tt> - otherwise
-     */
-    private boolean isConsecutiveMessage(   String messageContactAddress,
-                                            int messageType,
-                                            long messageTime)
-    {
-        ChatMessage lastMessage = null;
-        int messageCount = chatListAdapter.getCount();
-        if (messageCount > 0)
-            lastMessage = chatListAdapter.getMessage(messageCount - 1);
-
-        if (lastMessage == null)
-            return false;
-
-        String contactAddress = lastMessage.getContactName();
-
-        if (contactAddress != null
-                && (messageType == lastMessage.getMessageType())
-                && contactAddress.equals(messageContactAddress)
-                // And if the new message is within a minute from the last one.
-                && ((messageTime - lastMessage.getDate().getTime()) < 60000))
-        {
-            return true;
-        }
-
-        return false;
     }
 
     /**

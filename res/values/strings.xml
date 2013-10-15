@@ -72,6 +72,7 @@
         In the field below enter the name of the group you would like to create.
     </string>
     <string name="service_gui_DENY">Deny</string>
+    <string name="service_gui_EDITED_AT">edited at %s</string>
     <string name="service_gui_IGNORE">Ignore</string>
     <string name="service_gui_NOT_AUTHORIZED">Not authorized</string>
     <string name="service_gui_TYPE_YOUR_REQUEST">Type your request here</string>

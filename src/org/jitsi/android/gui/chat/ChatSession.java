@@ -70,8 +70,8 @@ public class ChatSession
     /**
      * The list of inserted messages by services.
      */
-    private final List<ChatMessage> insertedMessages
-        = new ArrayList<ChatMessage>();
+    private final List<ChatMessageImpl> insertedMessages
+        = new ArrayList<ChatMessageImpl>();
 
     private final List<ChatSessionListener> msgListeners
             = new ArrayList<ChatSessionListener>();
@@ -350,12 +350,14 @@ public class ChatSession
             if(o instanceof MessageDeliveredEvent)
             {
                 historyMsgs.add(
-                        ChatMessage.getMsgForEvent((MessageDeliveredEvent) o));
+                        ChatMessageImpl.getMsgForEvent(
+                                (MessageDeliveredEvent) o));
             }
             else if(o instanceof MessageReceivedEvent)
             {
                 historyMsgs.add(
-                        ChatMessage.getMsgForEvent((MessageReceivedEvent) o));
+                        ChatMessageImpl.getMsgForEvent(
+                                (MessageReceivedEvent) o));
             }
             else
             {
@@ -373,7 +375,7 @@ public class ChatSession
                 && output.size() < msgLimit)
         {
             ChatMessage historyMsg = historyMsgs.get(historyIdx);
-            ChatMessage insertedMsg = insertedMessages.get(insertedIdx);
+            ChatMessageImpl insertedMsg = insertedMessages.get(insertedIdx);
 
             if(historyMsg.getDate().after(insertedMsg.getDate()))
             {
@@ -501,9 +503,10 @@ public class ChatSession
                            String message, String contentType)
     {
         int chatMsgType = chatTypeToChatMsgType(messageType);
-        ChatMessage chatMsg = new ChatMessage(contactName, date,
-                                              chatMsgType, message,
-                                              contentType);
+        ChatMessageImpl chatMsg
+                = new ChatMessageImpl( contactName, date,
+                                       chatMsgType, message,
+                                       contentType );
         insertedMessages.add(chatMsg);
 
         if(insertedMessages.size() > HISTORY_LIMIT)
