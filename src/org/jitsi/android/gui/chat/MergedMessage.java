@@ -197,7 +197,12 @@ public class MergedMessage
     {
         for(ChatMessage msg : children)
         {
-            if(msg.getMessageUID().equals(
+            String msgUID = msg.getMessageUID();
+            if(msgUID == null)
+            {
+                continue;
+            }
+            if(msgUID.equals(
                     newMsg.getCorrectedMessageUID()))
             {
                 return msg;

@@ -268,7 +268,8 @@ public class ChatMessageImpl
     @Override
     public ChatMessage mergeMessage(ChatMessage consecutiveMessage)
     {
-        if(messageUID.equals(consecutiveMessage.getCorrectedMessageUID()))
+        if(messageUID != null &&
+                messageUID.equals(consecutiveMessage.getCorrectedMessageUID()))
         {
             // Apply the "edited at" tag and return corrected message
             String editedStr
@@ -334,7 +335,10 @@ public class ChatMessageImpl
      */
     public boolean isConsecutiveMessage(ChatMessage nextMsg)
     {
-        if (messageUID == nextMsg.getCorrectedMessageUID()
+        boolean uidEqual = messageUID != null
+                && messageUID.equals(nextMsg.getCorrectedMessageUID());
+
+        if (uidEqual
             || contactName != null
                 && (messageType == nextMsg.getMessageType())
                 && contactName.equals(nextMsg.getContactName())
