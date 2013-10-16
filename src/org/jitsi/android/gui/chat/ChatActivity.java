@@ -99,25 +99,6 @@ public class ChatActivity
                     .add(new OtrFragment(), "otr_fragment")
                     .commit();
         }
-
-        // Handle IME send action
-        ((EditText)findViewById(R.id.chatWriteText))
-                .setOnEditorActionListener(
-                        new TextView.OnEditorActionListener()
-            {
-                @Override
-                public boolean onEditorAction(TextView v,
-                                              int actionId,
-                                              KeyEvent event)
-                {
-                    if (actionId == EditorInfo.IME_ACTION_SEND)
-                    {
-                        onSendMessageClick(v);
-                        return true;
-                    }
-                    return false;
-                }
-            });
     }
 
     /**
@@ -193,24 +174,6 @@ public class ChatActivity
         currentChatId = chatId;
 
         ChatSessionManager.setCurrentChatId(chatId);
-    }
-
-    /**
-     * Indicates the send message button has been clicked.
-     *
-     * @param v the button view
-     */
-    public void onSendMessageClick(View v)
-    {
-        TextView writeMessageView = (TextView) findViewById(R.id.chatWriteText);
-
-        final ChatSession selectedChat
-                = ChatSessionManager.getActiveChat(
-                        chatPagerAdapter.getChatId(
-                                chatPager.getCurrentItem()));
-
-        selectedChat.sendMessage(writeMessageView.getText().toString());
-        writeMessageView.setText("");
     }
 
     /**

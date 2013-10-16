@@ -297,18 +297,6 @@ public class Jitsi
         }
     }
 
-    public void onSendMessageClick(View v)
-    {
-        TextView writeMessageView = (TextView) findViewById(R.id.chatWriteText);
-
-        ChatTabletFragment chatFragment
-            = (ChatTabletFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.chatView);
-
-        chatFragment.sendMessage(writeMessageView.getText().toString());
-        writeMessageView.setText("");
-    }
-
     /**
      * Creates new start chat <tt>Intent</tt> fro given <tt>MetaContact</tt> UID
      * @param metaUID UID of the <tt>MetaContact</tt> to start chat with.

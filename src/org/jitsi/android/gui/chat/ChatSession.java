@@ -82,6 +82,18 @@ public class ChatSession
             = new ArrayList<ChatSessionListener>();
 
     /**
+     * Field used by the <tt>ChatController</tt> to keep track of last edited
+     * message content.
+     */
+    private String editedText;
+
+    /**
+     * Field used by the <tt>ChatController</tt> to remember if user was
+     * recently correcting the message.
+     */
+    private String correctionUID;
+
+    /**
      * Creates a chat session with the given <tt>MetaContact</tt>.
      *
      * @param metaContact the <tt>MetaContact</tt> we're chatting with
@@ -174,6 +186,42 @@ public class ChatSession
                                             msg);
             }
         }.start();
+    }
+
+    /**
+     * Stores recently edited message text.
+     * @param editedText recently edited message text.
+     */
+    public void setEditedText(String editedText)
+    {
+        this.editedText = editedText;
+    }
+
+    /**
+     * Returns recently edited message text.
+     * @return recently edited message text.
+     */
+    public String getEditedText()
+    {
+        return editedText;
+    }
+
+    /**
+     * Stores the UID of recently corrected message.
+     * @param correctionUID the UID of recently corrected message.
+     */
+    public void setCorrectionUID(String correctionUID)
+    {
+        this.correctionUID = correctionUID;
+    }
+
+    /**
+     * Gets the UID of recently corrected message.
+     * @return the UID of recently corrected message.
+     */
+    public String getCorrectionUID()
+    {
+        return correctionUID;
     }
 
     public void dispose()

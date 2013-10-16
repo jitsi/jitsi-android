@@ -9,7 +9,6 @@ package org.jitsi.android.gui.chat;
 import java.util.*;
 
 import android.app.*;
-import android.content.*;
 import android.graphics.drawable.*;
 import android.os.*;
 import android.text.*;
@@ -74,6 +73,20 @@ public class ChatFragment
     private LoadHistoryTask loadHistoryTask;
 
     /**
+     * Indicates that this fragment is visible to the user.
+     * This is important, because of PagerAdapter being used on phone layouts,
+     * which doesn't properly call onResume() when switched page fragment is
+     * displayed.
+     */
+    private boolean visibleToUser = false;
+
+    /**
+     * The chat controller used to handle operations like editing and sending
+     * messages used by this fragment.
+     */
+    private ChatController chatController;
+
+    /**
      * Returns the corresponding <tt>ChatSession</tt>.
      *
      * @return the corresponding <tt>ChatSession</tt>
@@ -134,19 +147,55 @@ public class ChatFragment
 
         chatSession = ChatSessionManager.getActiveChat(chatId);
 
-        // Sets the on message clicked listener
-        chatListView.setOnItemClickListener(
-                new AdapterView.OnItemClickListener()
-        {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id)
-            {
-                onChatMessageClicked(position);
-            }
-        });
-
         return content;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+        this.chatController = new ChatController(activity, this);
+    }
+
+    /**
+     * This method must be called by parent <tt>Activity</tt> or
+     * <tt>Fragment</tt> in order to register the chat controller.
+     *
+     * @param isVisible <tt>true</tt> if the fragment is now visible to
+     *                  the user.
+     * @see ChatController
+     */
+    public void setVisibleToUser(boolean isVisible)
+    {
+        logger.debug("View visible to user: " + hashCode()+" "+isVisible);
+        this.visibleToUser = isVisible;
+        checkInitController();
+    }
+
+    /**
+     * Checks for <tt>ChatController</tt> initialization. To init the controller
+     * fragment must be visible and it's View must be created.
+     *
+     * If fragment is no longer visible the controller will be uninitialized.
+     */
+    private void checkInitController()
+    {
+        if(visibleToUser && chatListView != null)
+        {
+            logger.debug("Init controller: "+hashCode());
+            chatController.onShow();
+        }
+        else if(!visibleToUser)
+        {
+            chatController.onHide();
+        }
+        else
+        {
+            logger.debug("Skipping controller init... " + hashCode());
+        }
     }
 
     /**
@@ -166,6 +215,11 @@ public class ChatFragment
 
         initAdapter();
 
+        // If added to the pager adapter for the first time it is required
+        // to check again, because it's marked visible when the Views
+        // are not created yet
+        checkInitController();
+
         chatSession.addMessageListener(chatListAdapter);
         chatSession.addContactStatusListener(chatListAdapter);
         chatSession.addTypingListener(chatListAdapter);
@@ -177,6 +231,13 @@ public class ChatFragment
         chatSession.removeMessageListener(chatListAdapter);
         chatSession.removeContactStatusListener(chatListAdapter);
         chatSession.removeTypingListener(chatListAdapter);
+
+        /*
+         * Indicates that this fragment is no longer visible,
+         * because of this call parent <tt>Activities don't have to call it
+         * in onPause().
+         */
+        setVisibleToUser(false);
 
         super.onPause();
     }
@@ -219,85 +280,6 @@ public class ChatFragment
             loadHistoryTask.cancel(true);
             loadHistoryTask = null;
         }
-    }
-
-    /**
-     * Sends the given message to the chat.
-     *
-     * @param message the message to send
-     */
-    public void sendMessage(final String message)
-    {
-        chatSession.sendMessage(message);
-    }
-
-    /**
-     * Method fired when the chat message is clicked.
-     * @param position the position of clicked message.
-     */
-    private void onChatMessageClicked(int position)
-    {
-        ChatMessage chatMessage = chatListAdapter.getMessage(position);
-
-        if(chatMessage.getMessageType() != ChatMessage.OUTGOING_MESSAGE)
-            return;
-
-        // Check if it's the last outgoing message
-        if(position != chatListAdapter.getCount()-1)
-        {
-            for(int i=position+1; i<chatListAdapter.getCount(); i++)
-            {
-                if(chatListAdapter.getMessage(i).getMessageType()
-                        == ChatMessage.OUTGOING_MESSAGE)
-                {
-                    return;
-                }
-            }
-        }
-
-        String uidToCorrect = chatMessage.getUidForCorrection();
-        String content = chatMessage.getContentForCorrection();
-        if(uidToCorrect != null && content != null)
-        {
-            showCorrectMessageDialog(uidToCorrect, content);
-        }
-    }
-
-    /**
-     * Displays last message correction dialog.
-     * @param correctedMsgUID UID of the message to correct.
-     * @param content current content of corrected message.
-     */
-    private void showCorrectMessageDialog( final String correctedMsgUID,
-                                           final String content )
-    {
-        Context ctx = getActivity();
-        AlertDialog.Builder alert = new AlertDialog.Builder(ctx);
-        alert.setTitle(R.string.service_gui_LAST_MSG_CORRECTION);
-
-        // Use an EditText view to modify message body
-        final EditText input = new EditText(ctx);
-        input.setText(content);
-        alert.setView(input);
-        alert.setPositiveButton(R.string.service_gui_OK,
-                                new DialogInterface.OnClickListener()
-        {
-            public void onClick(DialogInterface dialog, int whichButton)
-            {
-                String value = input.getText().toString();
-                chatSession.correctMessage(correctedMsgUID, value);
-            }
-        });
-        alert.setNegativeButton(R.string.service_gui_CANCEL,
-                                new DialogInterface.OnClickListener()
-        {
-            public void onClick(DialogInterface dialog, int whichButton)
-            {
-                // Canceled.
-                dialog.dismiss();
-            }
-        });
-        alert.show();
     }
 
     class ChatListAdapter

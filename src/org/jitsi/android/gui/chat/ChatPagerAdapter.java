@@ -32,6 +32,11 @@ public class ChatPagerAdapter
     private int selectedIndex = 0;
 
     /**
+     * Remembers currently displayed <tt>ChatFragment</tt>.
+     */
+    private ChatFragment primaryItem;
+
+    /**
      * Creates an instance of <tt>ChatPagerAdapter</tt> by specifying the parent
      * <tt>ChatActivity</tt> and its <tt>FragmentManager</tt>.
      *
@@ -184,5 +189,32 @@ public class ChatPagerAdapter
         {
             return chats.size();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setPrimaryItem(ViewGroup container, int position, Object object)
+    {
+        super.setPrimaryItem(container, position, object);
+
+        /**
+         * Notifies ChatFragments about their visibility state changes.
+         * This method is invoked many times with the same parameter,
+         * so we keep track of last item and notify only on changes.
+         *
+         * This is required, because normal onResume/onPause fragment cycle
+         * doesn't work as expected with pager adapter.
+         */
+        ChatFragment newPrimary = (ChatFragment) object;
+        if(newPrimary != primaryItem)
+        {
+            if(primaryItem != null)
+                primaryItem.setVisibleToUser(false);
+            if(newPrimary != null)
+                newPrimary.setVisibleToUser(true);
+        }
+        this.primaryItem = newPrimary;
     }
 }

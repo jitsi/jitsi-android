@@ -8,7 +8,6 @@ package org.jitsi.android.gui.chat;
 
 import org.jitsi.*;
 import org.jitsi.service.osgi.*;
-import org.osgi.framework.*;
 
 import android.app.*;
 import android.os.Bundle;
@@ -18,6 +17,7 @@ import android.widget.*;
 
 /**
  * @author Yana Stamcheva
+ * @author Pawel Domas
  */
 public class ChatTabletFragment
     extends OSGiFragment
@@ -81,6 +81,14 @@ public class ChatTabletFragment
         return content;
     }
 
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        // Tells the chat fragment that it's visible to the user
+        chatFragment.setVisibleToUser(true);
+    }
+
     /**
      * Creates new parametrized instance of <tt>CallContactFragment</tt>.
      *
@@ -97,25 +105,5 @@ public class ChatTabletFragment
         chatTabletFragment.setArguments(args);
 
         return chatTabletFragment;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void start(BundleContext bundleContext)
-            throws Exception
-    {
-        super.start(bundleContext);
-    }
-
-    /**
-     * Sends the given message.
-     *
-     * @param message the message to send
-     */
-    public void sendMessage(String message)
-    {
-        chatFragment.sendMessage(message);
     }
 }
