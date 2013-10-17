@@ -369,18 +369,6 @@ public class ChatFragment
         {
             synchronized (messages)
             {
-                // TODO: plaintext tag is ignored - implement custom Spanned
-                // provider that will ignore plaintext tag
-                // (if it's really required)
-
-                // Put message body in <plaintext> tag if it's not HTML
-                //if(!newMessage.getContentType()
-                //    .equals(OperationSetBasicInstantMessaging.HTML_MIME_TYPE))
-                //{
-                //    newMessage.setMessage(
-                //        "<plaintext>"+newMessage.getMessage()+"</plaintext>");
-                //}
-
                 int lastMsgIdx = getLastMessageIdx(newMessage);
                 ChatMessage lastMsg = lastMsgIdx != -1
                             ? chatListAdapter.getMessage(lastMsgIdx)

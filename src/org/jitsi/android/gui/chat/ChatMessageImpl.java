@@ -9,6 +9,7 @@ package org.jitsi.android.gui.chat;
 import java.util.*;
 import java.util.regex.*;
 
+import android.text.*;
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.event.*;
@@ -19,6 +20,7 @@ import net.java.sip.communicator.util.*;
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
+import org.jitsi.android.gui.util.*;
 import org.jitsi.service.configuration.*;
 
 /**
@@ -251,8 +253,17 @@ public class ChatMessageImpl
         if(cachedOutput != null)
             return cachedOutput;
 
+        String output = message;
+
+        // Escape HTML content
+        if(!getContentType().equals(
+                OperationSetBasicInstantMessaging.HTML_MIME_TYPE))
+        {
+            output = Html.escapeHtml(output).toString();
+        }
+
         // Process replacements
-        String output = processReplacements(message);
+        output = processReplacements(output);
 
         // Apply the "edited at" tag for corrected message
         if(correctedMessageUID != null)

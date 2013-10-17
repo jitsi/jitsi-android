@@ -7,8 +7,11 @@
 package org.jitsi.android.gui.util;
 
 import android.content.*;
+import android.content.res.*;
 import android.graphics.drawable.*;
 import android.text.*;
+
+import net.java.sip.communicator.util.*;
 
 /**
  * Utility class that implements <tt>Html.ImageGetter</tt> interface and can be
@@ -25,6 +28,12 @@ import android.text.*;
 public class HtmlImageGetter
         implements Html.ImageGetter
 {
+    /**
+     * The logger
+     */
+    private static final Logger logger
+            = Logger.getLogger(HtmlImageGetter.class);
+
     /**
      * The Android context.
      */
@@ -45,18 +54,42 @@ public class HtmlImageGetter
     @Override
     public Drawable getDrawable(String source)
     {
-        // Image resource id is returned here in form:
-        // jitsi.resource://{Integer drawable id}
-        // Example: jitsi.resource://2130837599
-        Drawable img
-            = context.getResources().getDrawable(
-                Integer.parseInt(source.substring(17)));
+        try
+        {
+            // Image resource id is returned here in form:
+            // jitsi.resource://{Integer drawable id}
+            // Example: jitsi.resource://2130837599
+            Drawable img = context
+                    .getResources()
+                    .getDrawable(
+                            Integer.parseInt(source.substring(17)));
 
-        if(img == null)
+            if(img == null)
+                return null;
+
+            img.setBounds(0, 0,
+                          img.getIntrinsicWidth(),
+                          img.getIntrinsicHeight());
+
+            return img;
+        }
+        catch(IndexOutOfBoundsException e)
+        {
+            // Invalid string format for source.substring(17)
+            logger.error("Error parsing: "+source, e);
             return null;
-
-        img.setBounds(0, 0, img.getIntrinsicWidth(), img.getIntrinsicHeight());
-
-        return img;
+        }
+        catch (NumberFormatException e)
+        {
+            // Error parsing Integer.parseInt(source.substring(17))
+            logger.error("Error parsing: "+source, e);
+            return null;
+        }
+        catch (Resources.NotFoundException e)
+        {
+            // Resource for given id is not found
+            logger.error("Error parsing: "+source, e);
+            return null;
+        }
     }
 }
