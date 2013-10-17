@@ -135,6 +135,7 @@
     <string name="service_gui_CLOSE">Close</string>
     <string name="service_gui_CLOSE_CHAT">Close chat</string>
     <string name="service_gui_CLOSE_ALL_CHATS">Close all chats</string>
+    <string name="service_gui_COPY_MESSAGE_TEXT">Copy text</string>
     <string name="service_gui_OK">Ok</string>
     <string name="service_gui_YES">Yes</string>
     <string name="service_gui_NO">No</string>

@@ -9,9 +9,11 @@ package org.jitsi.android.gui.chat;
 import java.util.*;
 
 import android.app.*;
+import android.content.*;
 import android.graphics.drawable.*;
 import android.os.*;
 import android.text.*;
+import android.text.ClipboardManager;
 import android.text.method.*;
 import android.view.*;
 import android.widget.*;
@@ -131,6 +133,9 @@ public class ChatFragment
         chatListAdapter = new ChatListAdapter();
         chatListView = (ListView) content.findViewById(R.id.chatListView);
 
+        // Registers for chat message context menu
+        registerForContextMenu(chatListView);
+
         typingView = (LinearLayout) content.findViewById(R.id.typingView);
 
         chatListView.setAdapter(chatListAdapter);
@@ -240,6 +245,40 @@ public class ChatFragment
         setVisibleToUser(false);
 
         super.onPause();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,
+                                    ContextMenu.ContextMenuInfo menuInfo)
+    {
+        super.onCreateContextMenu(menu, v,menuInfo);
+        // Creates chat message context menu
+        getActivity().getMenuInflater().inflate(R.menu.chat_msg_ctx_menu, menu);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean onContextItemSelected(MenuItem item)
+    {
+        if(item.getItemId() == R.id.copy_to_clipboard)
+        {
+            AdapterView.AdapterContextMenuInfo info
+                    = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            // Gets clicked message
+            ChatMessage clickedMsg = chatListAdapter.getMessage(info.position);
+            // Copy message content to clipboard
+            ClipboardManager clipboardManager
+                    = (ClipboardManager) getActivity()
+                    .getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboardManager.setText(clickedMsg.getContentForClipboard());
+            return true;
+        }
+        return super.onContextItemSelected(item);
     }
 
     /**

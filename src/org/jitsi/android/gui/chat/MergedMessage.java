@@ -214,6 +214,20 @@ public class MergedMessage
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getContentForClipboard()
+    {
+        StringBuffer output = new StringBuffer(root.getContentForClipboard());
+        for(ChatMessage c : children)
+        {
+            output.append("\n").append(c.getContentForClipboard());
+        }
+        return output.toString();
+    }
+
+    /**
      * Finds the message that should be corrected by given message instance.
      * @param newMsg new message to check if it is a correction for any of
      *               merged messages.

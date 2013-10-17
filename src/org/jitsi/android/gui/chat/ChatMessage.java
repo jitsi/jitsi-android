@@ -145,4 +145,12 @@ public interface ChatMessage
      *         edit the correction.
      */
     String getContentForCorrection();
+
+    /**
+     * Returns message content that should be used for copy and paste
+     * functionality.
+     * @return message content that should be used for copy and paste
+     *         functionality.
+     */
+    String getContentForClipboard();
 }

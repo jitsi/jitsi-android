@@ -399,6 +399,15 @@ public class ChatMessageImpl
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getContentForClipboard()
+    {
+        return message;
+    }
+
+    /**
      * Sets the content type of the message (e.g. "text", "text/html", etc.).
      * @param contentType the content type to set
      */
