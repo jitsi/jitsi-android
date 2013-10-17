@@ -6,12 +6,13 @@
  */
 package org.jitsi.android.gui.util;
 
-import android.content.*;
 import android.content.res.*;
 import android.graphics.drawable.*;
 import android.text.*;
 
 import net.java.sip.communicator.util.*;
+
+import org.jitsi.android.*;
 
 /**
  * Utility class that implements <tt>Html.ImageGetter</tt> interface and can be
@@ -35,20 +36,6 @@ public class HtmlImageGetter
             = Logger.getLogger(HtmlImageGetter.class);
 
     /**
-     * The Android context.
-     */
-    private final Context context;
-
-    /**
-     * Creates new instance of <tt>HtmlImageGetter</tt>.
-     * @param context the Android context that will be used to obtain resources.
-     */
-    public HtmlImageGetter(Context context)
-    {
-        this.context = context;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -59,19 +46,12 @@ public class HtmlImageGetter
             // Image resource id is returned here in form:
             // jitsi.resource://{Integer drawable id}
             // Example: jitsi.resource://2130837599
-            Drawable img = context
-                    .getResources()
-                    .getDrawable(
-                            Integer.parseInt(source.substring(17)));
+            Integer resId = Integer.parseInt(source.substring(17));
 
-            if(img == null)
-                return null;
+            // Gets application global bitmap cache
+            DrawableCache cache = JitsiApplication.getImageCache();
 
-            img.setBounds(0, 0,
-                          img.getIntrinsicWidth(),
-                          img.getIntrinsicHeight());
-
-            return img;
+            return cache.getBitmapFromMemCache(resId);
         }
         catch(IndexOutOfBoundsException e)
         {

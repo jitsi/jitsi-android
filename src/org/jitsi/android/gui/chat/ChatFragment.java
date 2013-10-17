@@ -356,8 +356,7 @@ public class ChatFragment
         /**
          * HTML image getter.
          */
-        private final Html.ImageGetter imageGetter
-            = new HtmlImageGetter(getActivity());
+        private final Html.ImageGetter imageGetter = new HtmlImageGetter();
 
         /**
          * Passes the message to the contained <code>ChatConversationPanel</code>

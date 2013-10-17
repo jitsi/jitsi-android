@@ -21,6 +21,7 @@ import org.jitsi.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.LauncherActivity;
 import org.jitsi.android.gui.account.*;
+import org.jitsi.android.gui.util.*;
 import org.jitsi.service.log.*;
 import org.jitsi.service.osgi.*;
 import org.osgi.framework.*;
@@ -54,6 +55,11 @@ public class JitsiApplication
      * The currently shown activity.
      */
     private static Activity currentActivity = null;
+
+    /**
+     * Bitmap cache instance.
+     */
+    private final DrawableCache drawableCache = new DrawableCache();
 
     /**
      * {@inheritDoc}
@@ -99,6 +105,15 @@ public class JitsiApplication
         Intent exitIntent = new Intent();
         exitIntent.setAction(ACTION_EXIT);
         sendBroadcast(exitIntent);
+    }
+
+    /**
+     * Returns global bitmap cache of the application.
+     * @return global bitmap cache of the application.
+     */
+    public static DrawableCache getImageCache()
+    {
+        return instance.drawableCache;
     }
 
     /**
