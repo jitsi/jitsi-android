@@ -328,10 +328,10 @@ public class ChatFragment
                     TypingNotificationsListener
     {
         /**
-         * The list of chat messages.
+         * The list of chat message displays.
          */
-        private final List<ChatMessage> messages
-            = new LinkedList<ChatMessage>();
+        private final List<MessageDisplay> messages
+                = new ArrayList<MessageDisplay>();
 
         /**
          * The type of the incoming message view.
@@ -375,13 +375,13 @@ public class ChatFragment
 
                 if(lastMsg == null || !lastMsg.isConsecutiveMessage(newMessage))
                 {
-                     messages.add(newMessage);
+                    messages.add(new MessageDisplay(newMessage));
                 }
                 else
                 {
-                    // Merge the message and replace the object in the list
-                    messages.set(lastMsgIdx,
-                                 lastMsg.mergeMessage(newMessage));
+                    // Merge the message and update the object in the list
+                    messages.get(lastMsgIdx)
+                            .update(lastMsg.mergeMessage(newMessage));
                 }
             }
 
@@ -446,7 +446,12 @@ public class ChatFragment
 
         ChatMessage getMessage(int pos)
         {
-            return (ChatMessage) getItem(pos);
+            return ((MessageDisplay) getItem(pos)).msg;
+        }
+
+        MessageDisplay getMessageDisplay(int pos)
+        {
+            return (MessageDisplay) getItem(pos);
         }
     
         /**
@@ -566,7 +571,7 @@ public class ChatFragment
                 messageViewHolder = (MessageViewHolder) convertView.getTag();
             }
 
-            ChatMessage message = getMessage(position);
+            MessageDisplay message = getMessageDisplay(position);
 
             if (message != null)
             {
@@ -592,21 +597,26 @@ public class ChatFragment
                     setAvatar(messageViewHolder.avatarView, avatar);
                     setStatus(messageViewHolder.statusView, status);
 
-                    messageViewHolder.timeView.setText(
-                            GuiUtils.formatTime(message.getDate()));
+                    messageViewHolder.timeView.setText(message.getDateStr());
                 }
 
-                messageViewHolder.messageView.setText(
-                        Html.fromHtml(message.getMessage(), imageGetter, null));
+                messageViewHolder.messageView.setText(message.getBody());
 
                 // Html links are handled only for system messages, which is
                 // currently used for displaying OTR authentication dialog.
                 // Otherwise settings movement method prevent form firing
                 // on item clicked events.
-                if(message.getMessageType() == ChatMessage.SYSTEM_MESSAGE)
+                int currentMsgType = message.msg.getMessageType();
+                if(messageViewHolder.msgType != currentMsgType)
                 {
-                    messageViewHolder.messageView.setMovementMethod(
-                            LinkMovementMethod.getInstance());
+                    MovementMethod movementMethod = null;
+                    if(currentMsgType == ChatMessage.SYSTEM_MESSAGE)
+                    {
+                        movementMethod = LinkMovementMethod.getInstance();
+                    }
+                    messageViewHolder
+                            .messageView
+                            .setMovementMethod(movementMethod);
                 }
             }
 
@@ -734,6 +744,78 @@ public class ChatFragment
         {
             messages.clear();
         }
+
+        /**
+         * Class used to cache processed message contents. Prevents from
+         * re-processing on each View display.
+         */
+        class MessageDisplay
+        {
+            /**
+             * Displayed <tt>ChatMessage</tt>
+             */
+            private ChatMessage msg;
+
+            /**
+             * Date string cache
+             */
+            private String dateStr;
+
+            /**
+             * Message body cache
+             */
+            private Spanned body;
+
+            /**
+             * Creates new instance of <tt>MessageDisplay</tt> that will be used
+             * for displaying given <tt>ChatMessage</tt>.
+             *
+             * @param msg the <tt>ChatMessage</tt> that will be displayed by
+             *            this instance.
+             */
+            MessageDisplay(ChatMessage msg)
+            {
+                this.msg = msg;
+            }
+
+            /**
+             * Returns formatted date string for the <tt>ChatMessage</tt>.
+             * @return formatted date string for the <tt>ChatMessage</tt>.
+             */
+            public String getDateStr()
+            {
+                if(dateStr == null)
+                {
+                    dateStr = GuiUtils.formatTime(msg.getDate());
+                }
+                return dateStr;
+            }
+
+            /**
+             * Returns <tt>Spanned</tt> message body processed for HTML tags.
+             * @return <tt>Spanned</tt> message body.
+             */
+            public Spanned getBody()
+            {
+                if(body == null)
+                {
+                    body = Html.fromHtml(msg.getMessage(), imageGetter, null);
+                }
+                return body;
+            }
+
+            /**
+             * Updates this display instance with new message causing display
+             * contents to be invalidated.
+             * @param chatMessage new message content
+             */
+            public void update(ChatMessage chatMessage)
+            {
+                dateStr = null;
+                body = null;
+                msg = chatMessage;
+            }
+        }
     }
 
     static class MessageViewHolder
@@ -746,6 +828,7 @@ public class ChatFragment
         ImageView typingView;
         int viewType;
         int position;
+        int msgType;
     }
 
     /**
