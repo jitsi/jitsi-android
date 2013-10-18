@@ -68,6 +68,22 @@ public class AndroidGUIActivator
     private static AndroidLoginRenderer loginRenderer;
 
     /**
+     * Configuration service instance.
+     */
+    private static ConfigurationService configService;
+
+    /**
+     * <tt>GlobalDisplayDetailsService</tt> instance.
+     */
+    private static GlobalDisplayDetailsService globalDisplayService;
+
+    /**
+     * Replacement services observer.
+     */
+    private static ServiceObserver<ReplacementService> replacementServices
+            = new ServiceObserver<ReplacementService>(ReplacementService.class);
+
+    /**
      * {@inheritDoc}
      */
     public void start(BundleContext bundleContext)
@@ -122,6 +138,8 @@ public class AndroidGUIActivator
         }
 
         ConfigurationUtils.loadGuiConfigurations();
+        // Start watching replacement services
+        replacementServices.start(bundleContext);
     }
 
     /**
@@ -130,6 +148,7 @@ public class AndroidGUIActivator
     public void stop(BundleContext bundleContext)
             throws Exception
     {
+        replacementServices.stop(bundleContext);
         presenceStatusHandler.stop(bundleContext);
 
         // Clears chat sessions
@@ -137,6 +156,8 @@ public class AndroidGUIActivator
 
         loginRenderer = null;
         loginManager = null;
+        configService = null;
+        globalDisplayService = null;
         AndroidGUIActivator.bundleContext = null;
     }
 
@@ -183,8 +204,13 @@ public class AndroidGUIActivator
      */
     public static GlobalDisplayDetailsService getGlobalDisplayDetailsService()
     {
-        return ServiceUtils.getService( bundleContext,
-                                        GlobalDisplayDetailsService.class);
+        if(globalDisplayService == null)
+        {
+            globalDisplayService
+                = ServiceUtils.getService( bundleContext,
+                                           GlobalDisplayDetailsService.class );
+        }
+        return globalDisplayService;
     }
 
     public static MetaHistoryService getMetaHistoryService()
@@ -207,8 +233,13 @@ public class AndroidGUIActivator
      */
     public static ConfigurationService getConfigurationService()
     {
-        return ServiceUtils.getService( bundleContext,
-                                        ConfigurationService.class );
+        if(configService == null)
+        {
+            configService
+                = ServiceUtils.getService( bundleContext,
+                                           ConfigurationService.class );
+        }
+        return configService;
     }
 
     /**
@@ -247,27 +278,8 @@ public class AndroidGUIActivator
      * @return all <tt>ReplacementService</tt> implementation obtained from the
      *         bundle context
      */
-    public static Map<String, ReplacementService> getReplacementSources()
+    public static List<ReplacementService> getReplacementSources()
     {
-        Map<String, ReplacementService> replacementSourcesMap
-                = new HashMap<String, ReplacementService>();
-
-        ServiceReference[] serRefs
-            = ServiceUtils.getServiceReferences(bundleContext,
-                                                ReplacementService.class);
-        if (serRefs != null)
-        {
-            for (int i = 0; i < serRefs.length; i++)
-            {
-                ReplacementService replacementSources =
-                    (ReplacementService) bundleContext.getService(serRefs[i]);
-
-                replacementSourcesMap.put(
-                        (String)serRefs[i]
-                                .getProperty(ReplacementService.SOURCE_NAME),
-                        replacementSources);
-            }
-        }
-        return replacementSourcesMap;
+        return replacementServices.getServices();
     }
 }

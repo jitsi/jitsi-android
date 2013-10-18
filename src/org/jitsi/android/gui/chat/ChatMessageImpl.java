@@ -20,7 +20,6 @@ import net.java.sip.communicator.util.*;
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
-import org.jitsi.android.gui.util.*;
 import org.jitsi.service.configuration.*;
 
 /**
@@ -259,7 +258,7 @@ public class ChatMessageImpl
         if(!getContentType().equals(
                 OperationSetBasicInstantMessaging.HTML_MIME_TYPE))
         {
-            output = Html.escapeHtml(output).toString();
+            output = Html.escapeHtml(output);
         }
 
         // Process replacements
@@ -299,11 +298,9 @@ public class ChatMessageImpl
         //boolean isEnabled
         //= cfg.getBoolean(ReplacementProperty.REPLACEMENT_ENABLE, true);
 
-        for (Map.Entry<String, ReplacementService> entry
-                : AndroidGUIActivator.getReplacementSources().entrySet())
+        for (ReplacementService source
+                : AndroidGUIActivator.getReplacementSources())
         {
-            ReplacementService source = entry.getValue();
-
             boolean isSmiley = source instanceof SmiliesReplacementService;
 
             if(!isSmiley)
@@ -354,16 +351,6 @@ public class ChatMessageImpl
         }
 
         return content;
-    }
-
-    /**
-     * Sets the content of the message.
-     * 
-     * @param message the new content
-     */
-    public void setMessage(String message)
-    {
-        this.message = message;
     }
 
     /**
