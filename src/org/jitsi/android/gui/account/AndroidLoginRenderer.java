@@ -9,6 +9,7 @@ package org.jitsi.android.gui.account;
 import java.beans.*;
 
 import android.content.*;
+import android.graphics.drawable.*;
 
 import org.jitsi.*;
 import org.jitsi.android.*;
@@ -19,6 +20,7 @@ import org.jitsi.android.gui.util.*;
 import org.jitsi.android.gui.util.event.*;
 import org.jitsi.service.osgi.*;
 
+import net.java.sip.communicator.service.globaldisplaydetails.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.event.*;
 import net.java.sip.communicator.util.*;
@@ -65,10 +67,35 @@ public class AndroidLoginRenderer
     private final AuthorizationHandlerImpl authorizationHandler;
 
     /**
+     * Cached global status value
+     */
+    private PresenceStatus globalStatus;
+
+    /**
      * List of global status listeners.
      */
     private EventListenerList<PresenceStatus> globalStatusListeners
             = new EventListenerList<PresenceStatus>();
+
+    /**
+     * Caches avatar image to track the changes
+     */
+    private byte[] localAvatarRaw;
+
+    /**
+     * Local avatar drawable
+     */
+    private Drawable localAvatar;
+
+    /**
+     * Caches local status to track the changes
+     */
+    private byte[] localStatusRaw;
+
+    /**
+     * Local status drawable
+     */
+    private Drawable localStatusDrawable;
 
     /**
      * Creates an instance of <tt>AndroidLoginRenderer</tt> by specifying the
@@ -299,8 +326,13 @@ public class AndroidLoginRenderer
      */
     public PresenceStatus getGlobalStatus()
     {
-        return AndroidGUIActivator.getGlobalStatusService()
-                .getGlobalPresenceStatus();
+        if(globalStatus == null)
+        {
+            globalStatus
+                = AndroidGUIActivator
+                        .getGlobalStatusService().getGlobalPresenceStatus();
+        }
+        return globalStatus;
     }
 
     /**
@@ -355,6 +387,54 @@ public class AndroidLoginRenderer
     {
         // Only if the GUI is active (bundle context will be null on shutdown)
         if(AndroidGUIActivator.bundleContext != null)
+        {
+            // Invalidate local status image
+            localStatusRaw = null;
+            // Invalidate global status
+            globalStatus = null;
             globalStatusListeners.notifyEventListeners(getGlobalStatus());
+        }
+    }
+
+    /**
+     * Returns the local user avatar drawable.
+     *
+     * @return the local user avatar drawable.
+     */
+    public Drawable getLocalAvatarDrawable()
+    {
+        GlobalDisplayDetailsService displayDetailsService
+                = AndroidGUIActivator.getGlobalDisplayDetailsService();
+
+        byte[] avatarImage = displayDetailsService.getGlobalDisplayAvatar();
+        // Re-create drawable only if avatar has changed
+        if(avatarImage != localAvatarRaw)
+        {
+            localAvatarRaw = avatarImage;
+            localAvatar
+                = avatarImage != null
+                        ? AndroidImageUtil.drawableFromBytes(avatarImage)
+                        : null;
+        }
+        return localAvatar;
+    }
+
+    /**
+     * Returns the local user status drawable.
+     *
+     * @return the local user status drawable
+     */
+    synchronized public Drawable getLocalStatusDrawable()
+    {
+        byte[] statusImage = StatusUtil.getContactStatusIcon(getGlobalStatus());
+        if(statusImage != localStatusRaw)
+        {
+            localStatusRaw = statusImage;
+            localStatusDrawable
+                = localStatusRaw != null
+                        ? AndroidImageUtil.drawableFromBytes(statusImage)
+                        : null;
+        }
+        return localStatusDrawable;
     }
 }

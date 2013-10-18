@@ -44,7 +44,7 @@ public class ChatSession
      *
      * TODO: use history settings instead of constant
      */
-    private static final int HISTORY_LIMIT = 10;
+    private static final int HISTORY_LIMIT = 100;
     /**
      * The chat identifier.
      */

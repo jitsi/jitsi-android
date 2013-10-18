@@ -30,8 +30,10 @@ import net.java.sip.communicator.util.Logger;
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
+import org.jitsi.android.gui.account.*;
 import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.util.*;
+import org.jitsi.android.gui.util.event.EventListener;
 import org.jitsi.service.osgi.*;
 
 /**
@@ -87,6 +89,20 @@ public class ChatFragment
      * messages used by this fragment.
      */
     private ChatController chatController;
+
+    /**
+     * Refresh avatar and globals status display on change.
+     */
+    private EventListener<PresenceStatus> globalStatusListener
+            = new EventListener<PresenceStatus>()
+    {
+        @Override
+        public void onChangeEvent(PresenceStatus eventObject)
+        {
+            if(chatListAdapter != null)
+                chatListAdapter.localAvatarOrStatusChanged();
+        }
+    };
 
     /**
      * Returns the corresponding <tt>ChatSession</tt>.
@@ -190,12 +206,18 @@ public class ChatFragment
     {
         if(visibleToUser && chatListView != null)
         {
-            logger.debug("Init controller: "+hashCode());
+            logger.debug("Init controller: " + hashCode());
             chatController.onShow();
+            // Also register global status listener
+            AndroidGUIActivator.getLoginRenderer()
+                    .addGlobalStatusListener(globalStatusListener);
         }
         else if(!visibleToUser)
         {
             chatController.onHide();
+            // Also remove global status listener
+            AndroidGUIActivator.getLoginRenderer()
+                    .removeGlobalStatusListener(globalStatusListener);
         }
         else
         {
@@ -578,24 +600,7 @@ public class ChatFragment
                 if(messageViewHolder.viewType == INCOMING_MESSAGE_VIEW
                         || messageViewHolder.viewType == OUTGOING_MESSAGE_VIEW)
                 {
-                    Drawable avatar = null;
-                    Drawable status = null;
-                    if (messageViewHolder.viewType == INCOMING_MESSAGE_VIEW)
-                    {
-                        avatar = ContactListAdapter.getAvatarDrawable(
-                            chatSession.getMetaContact());
-
-                        status = ContactListAdapter.getStatusDrawable(
-                            chatSession.getMetaContact());
-                    }
-                    else if (messageViewHolder.viewType == OUTGOING_MESSAGE_VIEW)
-                    {
-                        avatar = getLocalAvatarDrawable();
-                        status = getLocalStatusDrawable();
-                    }
-
-                    setAvatar(messageViewHolder.avatarView, avatar);
-                    setStatus(messageViewHolder.statusView, status);
+                    updateStatusAndAvatarView(messageViewHolder);
 
                     messageViewHolder.timeView.setText(message.getDateStr());
                 }
@@ -621,6 +626,34 @@ public class ChatFragment
             }
 
             return convertView;
+        }
+
+        /**
+         * Updates status and avatar views on given <tt>MessageViewHolder</tt>.
+         * @param viewHolder the <tt>MessageViewHolder</tt> to update.
+         */
+        private void updateStatusAndAvatarView(MessageViewHolder viewHolder)
+        {
+            Drawable avatar = null;
+            Drawable status = null;
+            if (viewHolder.viewType == INCOMING_MESSAGE_VIEW)
+            {
+                avatar = ContactListAdapter.getAvatarDrawable(
+                        chatSession.getMetaContact());
+
+                status = ContactListAdapter.getStatusDrawable(
+                        chatSession.getMetaContact());
+            }
+            else if (viewHolder.viewType == OUTGOING_MESSAGE_VIEW)
+            {
+                AndroidLoginRenderer loginRenderer
+                        = AndroidGUIActivator.getLoginRenderer();
+                avatar = loginRenderer.getLocalAvatarDrawable();
+                status = loginRenderer.getLocalStatusDrawable();
+            }
+
+            setAvatar(viewHolder.avatarView, avatar);
+            setStatus(viewHolder.statusView, status);
         }
 
         private void dataChanged()
@@ -743,6 +776,26 @@ public class ChatFragment
         public void removeAllMessages()
         {
             messages.clear();
+        }
+
+        /**
+         * Updates all avatar and status on outgoing messages rows.
+         */
+        public void localAvatarOrStatusChanged()
+        {
+            runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    for(int i=0; i<chatListView.getChildCount(); i++)
+                    {
+                        View row = chatListView.getChildAt(i);
+                        updateStatusAndAvatarView(
+                                (MessageViewHolder) row.getTag());
+                    }
+                }
+            });
         }
 
         /**
