@@ -153,6 +153,10 @@ public class ChatController
     {
         ChatFragment.ChatListAdapter chatListAdapter
                 = chatFragment.getChatListAdapter();
+
+        // Position must be aligned to the number of header views included
+        position -= ((ListView)adapter).getHeaderViewsCount();
+
         ChatMessage chatMessage = chatListAdapter.getMessage(position);
 
         if(chatMessage.getMessageType() != ChatMessage.OUTGOING_MESSAGE)

@@ -9,7 +9,7 @@
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:stackFromBottom="true"
-        android:transcriptMode="alwaysScroll"
+        android:transcriptMode="normal"
         android:layout_weight="1"/>
 
     <LinearLayout

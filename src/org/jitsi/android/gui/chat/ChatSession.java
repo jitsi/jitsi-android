@@ -39,12 +39,10 @@ public class ChatSession
     private final static Logger logger = Logger.getLogger(ChatSession.class);
 
     /**
-     * Number of history messages returned from loadHistory call.
-     * Used to limit number of stored system messages.
-     *
-     * TODO: use history settings instead of constant
+     * Number of history messages to be returned from loadHistory call.
+     * Limits the amount of messages being loaded at one time.
      */
-    private static final int HISTORY_LIMIT = 100;
+    private static final int HISTORY_CHUNK_SIZE = 30;
     /**
      * The chat identifier.
      */
@@ -73,6 +71,11 @@ public class ChatSession
     private List<ChatMessage> msgCache = new LinkedList<ChatMessage>();
 
     /**
+     * Synchronization root for messages cache.
+     */
+    private final Object cacheLock = new Object();
+
+    /**
      * Flag indicates if the history has been cached(it must be done only once
      * and next messages are cached through the listeners mechanism).
      */
@@ -92,7 +95,6 @@ public class ChatSession
      * recently correcting the message.
      */
     private String correctionUID;
-
     /**
      * Creates a chat session with the given <tt>MetaContact</tt>.
      *
@@ -367,8 +369,15 @@ public class ChatSession
      *
      * @return a collection of last messages.
      */
-    public Collection<ChatMessage> getHistory()
+    public Collection<ChatMessage> getHistory(boolean init)
     {
+        // If chat is initializing and we have cached messages including history
+        // then just return the cache
+        if(init && historyLoaded)
+        {
+            return msgCache;
+        }
+
         final MetaHistoryService metaHistory
             = AndroidGUIActivator.getMetaHistoryService();
 
@@ -376,54 +385,84 @@ public class ChatSession
         // here. The history could be "disabled" from the user
         // through one of the configuration forms.
         if (metaHistory == null)
-            return null;
+            return msgCache;
 
-        return loadHistory(
-                    metaHistory.findLast(
-                        chatHistoryFilter,
-                        metaContact,
-                        HISTORY_LIMIT), HISTORY_LIMIT);
-    }
-
-    /**
-     * Process history messages.
-     *
-     * @param historyList the collection of messages coming from history
-     */
-    private Collection<ChatMessage> loadHistory(Collection<Object> historyList,
-                                                int msgLimit)
-    {
+        Collection<Object> history;
         if(!historyLoaded)
         {
-            Iterator<Object> iterator = historyList.iterator();
-            ArrayList<ChatMessage> historyMsgs = new ArrayList<ChatMessage>();
-
-            while (iterator.hasNext())
-            {
-                Object o = iterator.next();
-
-                if(o instanceof MessageDeliveredEvent)
-                {
-                    historyMsgs.add(
-                            ChatMessageImpl.getMsgForEvent(
-                                    (MessageDeliveredEvent) o));
-                }
-                else if(o instanceof MessageReceivedEvent)
-                {
-                    historyMsgs.add(
-                            ChatMessageImpl.getMsgForEvent(
-                                    (MessageReceivedEvent) o));
-                }
-                else
-                {
-                    System.err.println("Other event in history: "+o);
-                }
-            }
-
-            msgCache = mergeMsgLists(historyMsgs, msgCache, msgLimit);
-            historyLoaded = true;
+            history = metaHistory.findLast(chatHistoryFilter,
+                                           metaContact,
+                                           HISTORY_CHUNK_SIZE);
         }
-        return msgCache;
+        else
+        {
+            ChatMessage oldest = null;
+            synchronized (msgCache)
+            {
+                 oldest = msgCache.get(0);
+            }
+            history = metaHistory.findByEndDate(chatHistoryFilter,
+                                                metaContact,
+                                                oldest.getDate());
+        }
+
+        // Convert events into messages
+        Iterator<Object> iterator = history.iterator();
+        ArrayList<ChatMessage> historyMsgs = new ArrayList<ChatMessage>();
+
+        while (iterator.hasNext())
+        {
+            Object o = iterator.next();
+
+            if(o instanceof MessageDeliveredEvent)
+            {
+                historyMsgs.add(
+                        ChatMessageImpl.getMsgForEvent(
+                                (MessageDeliveredEvent) o));
+            }
+            else if(o instanceof MessageReceivedEvent)
+            {
+                historyMsgs.add(
+                        ChatMessageImpl.getMsgForEvent(
+                                (MessageReceivedEvent) o));
+            }
+            else
+            {
+                System.err.println("Other event in history: "+o);
+            }
+        }
+
+        // TODO: this trimming is highly not optimal
+        // add method findByEndDate with results limit to fix
+        if(historyMsgs.size() > HISTORY_CHUNK_SIZE)
+        {
+            //Trim the output
+            ArrayList<ChatMessage> trimmed
+                = new ArrayList<ChatMessage>(HISTORY_CHUNK_SIZE);
+
+            for(int i=historyMsgs.size()-1;
+                trimmed.size()!= HISTORY_CHUNK_SIZE; i--)
+            {
+                trimmed.add(0, historyMsgs.get(i));
+            }
+            historyMsgs = trimmed;
+        }
+
+        synchronized (msgCache)
+        {
+            if(!historyLoaded)
+            {
+                msgCache = mergeMsgLists(historyMsgs, msgCache, -1);
+                historyLoaded = true;
+                return msgCache;
+            }
+            else
+            {
+                // Add messages to the cache
+                msgCache.addAll(0, historyMsgs);
+                return historyMsgs;
+            }
+        }
     }
 
     /**
@@ -438,8 +477,11 @@ public class ChatSession
                                             List<ChatMessage> list2,
                                             int msgLimit)
     {
+        if(msgLimit == -1)
+            msgLimit = Integer.MAX_VALUE;
+
         List<ChatMessage> output = new LinkedList<ChatMessage>();
-        int list1Idx =list1.size()-1;
+        int list1Idx = list1.size()-1;
         int list2Idx = list2.size()-1;
 
         while(list1Idx >= 0 && list2Idx >= 0 && output.size() < msgLimit)
@@ -574,11 +616,14 @@ public class ChatSession
                                        chatMsgType, message,
                                        contentType );
 
-        cacheNextMsg(chatMsg);
-
-        for(ChatSessionListener l : msgListeners)
+        synchronized (cacheLock)
         {
-            l.messageAdded(chatMsg);
+            cacheNextMsg(chatMsg);
+
+            for(ChatSessionListener l : msgListeners)
+            {
+                l.messageAdded(chatMsg);
+            }
         }
     }
 
@@ -688,12 +733,14 @@ public class ChatSession
         {
             return;
         }
-
-        for(MessageListener l : msgListeners)
+        synchronized (cacheLock)
         {
-            l.messageReceived(messageReceivedEvent);
+            for(MessageListener l : msgListeners)
+            {
+                l.messageReceived(messageReceivedEvent);
+            }
+            cacheNextMsg(ChatMessageImpl.getMsgForEvent(messageReceivedEvent));
         }
-        cacheNextMsg(ChatMessageImpl.getMsgForEvent(messageReceivedEvent));
     }
 
     /**
@@ -703,7 +750,7 @@ public class ChatSession
     private void cacheNextMsg(ChatMessageImpl newMsg)
     {
         msgCache.add(newMsg);
-        if(msgCache.size() > HISTORY_LIMIT)
+        if(msgCache.size() > HISTORY_CHUNK_SIZE)
             msgCache.remove(0);
     }
 
@@ -716,11 +763,14 @@ public class ChatSession
             return;
         }
 
-        for(MessageListener l : msgListeners)
+        synchronized (cacheLock)
         {
-            l.messageDelivered(messageDeliveredEvent);
+            for(MessageListener l : msgListeners)
+            {
+                l.messageDelivered(messageDeliveredEvent);
+            }
+            cacheNextMsg(ChatMessageImpl.getMsgForEvent(messageDeliveredEvent));
         }
-        cacheNextMsg(ChatMessageImpl.getMsgForEvent(messageDeliveredEvent));
     }
 
     @Override

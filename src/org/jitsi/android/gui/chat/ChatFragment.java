@@ -6,6 +6,7 @@
  */
 package org.jitsi.android.gui.chat;
 
+import java.text.*;
 import java.util.*;
 
 import android.app.*;
@@ -65,6 +66,23 @@ public class ChatFragment
      * The chat list view representing the chat.
      */
     private ListView chatListView;
+
+    /**
+     * List header used to display progress bar when history is being loaded.
+     */
+    private View header;
+
+    /**
+     * Remembers first visible view to scroll the list after new portion of
+     * history messages is added.
+     */
+    public int scrollFirstVisible;
+
+    /**
+     * Remembers top position to add to the scrolling offset after new portion
+     * of history messages is added.
+     */
+    public int scrollTopOffset;
 
     /**
      * The chat typing view.
@@ -149,6 +167,12 @@ public class ChatFragment
         chatListAdapter = new ChatListAdapter();
         chatListView = (ListView) content.findViewById(R.id.chatListView);
 
+        // Inflates and adds the header, hidden by default
+        this.header = inflater.inflate(R.layout.progressbar,
+                                       chatListView, false);
+        header.setVisibility(View.GONE);
+        chatListView.addHeaderView(header);
+
         // Registers for chat message context menu
         registerForContextMenu(chatListView);
 
@@ -157,6 +181,40 @@ public class ChatFragment
         chatListView.setAdapter(chatListAdapter);
 
         chatListView.setSelector(R.drawable.contact_list_selector);
+
+        chatListView.setOnScrollListener(new AbsListView.OnScrollListener()
+        {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState)
+            {
+                // Detects event when user scrolls to the top of the list
+                if(scrollState == 0)
+                {
+                    if(chatListView.getChildAt(0).getTop()==0)
+                    {
+                        // Loads some more history
+                        // if there's no loading task in progress
+                        if(loadHistoryTask == null)
+                        {
+                            loadHistoryTask = new LoadHistoryTask();
+                            loadHistoryTask.execute();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem,
+                                 int visibleItemCount, int totalItemCount)
+            {
+                // Remembers scrolling position to restore after new history
+                // messages are loaded
+                scrollFirstVisible = firstVisibleItem;
+                View firstVisible = view.getChildAt(0);
+                scrollTopOffset
+                        = firstVisible != null ? firstVisible.getTop() : 0;
+            }
+        });
 
         // Chat intent handling
         Bundle arguments = getArguments();
@@ -291,8 +349,10 @@ public class ChatFragment
         {
             AdapterView.AdapterContextMenuInfo info
                     = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            // Clicked position must be aligned to list headers count
+            int position = info.position - chatListView.getHeaderViewsCount();
             // Gets clicked message
-            ChatMessage clickedMsg = chatListAdapter.getMessage(info.position);
+            ChatMessage clickedMsg = chatListAdapter.getMessage(position);
             // Copy message content to clipboard
             ClipboardManager clipboardManager
                     = (ClipboardManager) getActivity()
@@ -376,6 +436,11 @@ public class ChatFragment
         final int ERROR_MESSAGE_VIEW = 3;
 
         /**
+         * Counter used to generate row ids.
+         */
+        private long idGenerator=0;
+
+        /**
          * HTML image getter.
          */
         private final Html.ImageGetter imageGetter = new HtmlImageGetter();
@@ -408,7 +473,47 @@ public class ChatFragment
             }
 
             if(update)
-                dataChanged();
+            {
+                runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        chatListAdapter.notifyDataSetChanged();
+                        // List must be scrolled manually, when
+                        // android:transcriptMode="normal" is set
+                        chatListView.setSelection(chatListAdapter.getCount());
+                    }
+                });
+            }
+        }
+
+        /**
+         * Inserts given <tt>Collection</tt> of <tt>ChatMessage</tt> at
+         * the beginning of the list.
+         *
+         * @param collection the collection of <tt>ChatMessage</tt> to prepend.
+         */
+        public void prependMessages(Collection<ChatMessage> collection)
+        {
+            List<MessageDisplay> newMsgs = new ArrayList<MessageDisplay>();
+            Iterator<ChatMessage> iterator = collection.iterator();
+            MessageDisplay previous = null;
+            while(iterator.hasNext())
+            {
+                ChatMessage next = iterator.next();
+                if(previous == null || !previous.msg.isConsecutiveMessage(next))
+                {
+                    previous = new MessageDisplay(next);
+                    newMsgs.add(previous);
+                }
+                else
+                {
+                    // Merge the message and update the object in the list
+                    previous.update(previous.msg.mergeMessage(next));
+                }
+            }
+            messages.addAll(0, newMsgs);
         }
 
         /**
@@ -481,7 +586,7 @@ public class ChatFragment
          */
         public long getItemId(int pos)
         {
-            return pos;
+            return messages.get(pos).id;
         }
 
         public int getViewTypeCount()
@@ -656,17 +761,6 @@ public class ChatFragment
             setStatus(viewHolder.statusView, status);
         }
 
-        private void dataChanged()
-        {
-            runOnUiThread(new Runnable()
-            {
-                public void run()
-                {
-                    notifyDataSetChanged();
-                }
-            });
-        }
-
         @Override
         public void messageDelivered(final MessageDeliveredEvent evt)
         {
@@ -805,6 +899,10 @@ public class ChatFragment
         class MessageDisplay
         {
             /**
+             * Row identifier.
+             */
+            private final long id;
+            /**
              * Displayed <tt>ChatMessage</tt>
              */
             private ChatMessage msg;
@@ -829,6 +927,7 @@ public class ChatFragment
             MessageDisplay(ChatMessage msg)
             {
                 this.msg = msg;
+                this.id = idGenerator++;
             }
 
             /**
@@ -839,7 +938,10 @@ public class ChatFragment
             {
                 if(dateStr == null)
                 {
-                    dateStr = GuiUtils.formatTime(msg.getDate());
+                    Date date = msg.getDate();
+                    dateStr = GuiUtils.formatDate(date)
+                            + " " + GuiUtils.formatTime(date);
+
                 }
                 return dateStr;
             }
@@ -891,10 +993,25 @@ public class ChatFragment
     private class LoadHistoryTask
         extends AsyncTask<Void, Void, Collection<ChatMessage>>
     {
+        /**
+         * Remembers adapter size before new messages were added.
+         */
+        private int preSize;
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+
+            header.setVisibility(View.VISIBLE);
+
+            this.preSize = chatListAdapter.getCount();
+        }
+
         @Override
         protected Collection<ChatMessage> doInBackground(Void... params)
         {
-            return chatSession.getHistory();
+            return chatSession.getHistory(preSize == 0);
         }
 
         @Override
@@ -902,16 +1019,15 @@ public class ChatFragment
         {
             super.onPostExecute(result);
 
-            chatListAdapter.removeAllMessages();
+            chatListAdapter.prependMessages(result);
 
-            Iterator<ChatMessage> iterator = result.iterator();
+            header.setVisibility(View.GONE);
+            chatListAdapter.notifyDataSetChanged();
+            int loaded = chatListAdapter.getCount() - preSize;
+            int scrollTo = loaded + scrollFirstVisible;
+            chatListView.setSelectionFromTop(scrollTo, scrollTopOffset);
 
-            while (iterator.hasNext())
-            {
-                chatListAdapter.addMessage(iterator.next(), false);
-            }
-
-            chatListAdapter.dataChanged();
+            loadHistoryTask = null;
         }
     }
 

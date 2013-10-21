@@ -274,6 +274,19 @@
     <string name="plugin_otr_activator_sessionfinished">{0} has ended his/her private conversation with you; you should do the same.</string>
     <string name="plugin_otr_activator_sessionlost">Private conversation with {0} lost.</string>
     <!-- From resources.properties -->
+    <string name="service_gui_JANUARY">Jan</string>
+    <string name="service_gui_FEBRUARY">Feb</string>
+    <string name="service_gui_MARCH">Mar</string>
+    <string name="service_gui_APRIL">Apr</string>
+    <string name="service_gui_MAY">May</string>
+    <string name="service_gui_JUNE">Jun</string>
+    <string name="service_gui_JULY">Jul</string>
+    <string name="service_gui_AUGUST">Aug</string>
+    <string name="service_gui_SEPTEMBER">Sep</string>
+    <string name="service_gui_OCTOBER">Oct</string>
+    <string name="service_gui_NOVEMBER">Nov</string>
+    <string name="service_gui_DECEMBER">Dec</string>
+
     <string name="service_gui_NOT_IN_CONTACT_LIST_GROUP_NAME">NotInContactList</string>
     <string name="service_gui_CONNECTED_STATUS">Connected</string>
     <string name="service_gui_CONNECTING_STATUS">Connecting</string>
