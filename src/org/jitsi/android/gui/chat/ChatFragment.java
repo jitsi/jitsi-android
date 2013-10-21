@@ -1047,24 +1047,22 @@ public class ChatFragment
         {
             super.onPostExecute(result);
 
-            for (int i = 0;
-                i <= chatListView.getLastVisiblePosition(); i++)
+            for (int i = 0; i < chatListView.getChildCount(); i++)
             {
-                RelativeLayout chatRowView
-                    = (RelativeLayout) chatListView.getChildAt(
-                        i - chatListView.getFirstVisiblePosition());
+                View chatRowView = chatListView.getChildAt(i);
 
-                if (chatRowView != null
-                    && chatListAdapter.getItemViewType(i)
+                MessageViewHolder viewHolder
+                    = (MessageViewHolder) chatRowView.getTag();
+
+                if (viewHolder != null
+                    && viewHolder.viewType
                         == chatListAdapter.INCOMING_MESSAGE_VIEW)
                 {
                     Drawable status = ContactListAdapter
                         .getStatusDrawable(
                             chatSession.getMetaContact());
 
-                    ImageView statusView
-                        = (ImageView) chatRowView
-                            .findViewById(R.id.incomingStatusIcon);
+                    ImageView statusView = viewHolder.statusView;
 
                     setStatus(statusView, status);
                 }
