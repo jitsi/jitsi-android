@@ -136,25 +136,6 @@ public class ChatSessionManager
     }
 
     /**
-     * Returns active <tt>ChatSession</tt> for given <tt>Contact</tt>.
-     * @param contact the <tt>Contact</tt> for which we want to find active
-     *                session.
-     * @return active <tt>ChatSession</tt> for given <tt>Contact</tt>.
-     */
-    public synchronized static ChatSession getActiveChat(Contact contact)
-    {
-        MetaContactListService metaContactList
-            = ServiceUtils.getService(
-                    AndroidGUIActivator.bundleContext,
-                    MetaContactListService.class);
-
-        MetaContact metaContact
-            = metaContactList.findMetaContactByContact(contact);
-
-        return getActiveChat(metaContact);
-    }
-
-    /**
      * Returns the <tt>ChatSession</tt> corresponding to the given
      * <tt>MetaContact</tt>.
      *
@@ -166,11 +147,8 @@ public class ChatSessionManager
     public synchronized static ChatSession getActiveChat(
             MetaContact metaContact)
     {
-        Iterator<ChatSession> chatSessions = activeChats.values().iterator();
-
-        while (chatSessions.hasNext())
+        for (ChatSession chatSession : activeChats.values())
         {
-            ChatSession chatSession = chatSessions.next();
             if (chatSession.getMetaContact().equals(metaContact))
                 return chatSession;
         }
@@ -195,16 +173,6 @@ public class ChatSessionManager
     public synchronized static List<Chat> getActiveChats()
     {
         return new LinkedList<Chat>(activeChats.values());
-    }
-
-    /**
-     * Returns the number of currently active calls.
-     *
-     * @return the number of currently active calls.
-     */
-    public synchronized static int getActiveChatCount()
-    {
-        return activeChats.size();
     }
 
     /**
@@ -423,5 +391,26 @@ public class ChatSessionManager
         chatListeners.clear();
         currentChatListeners.clear();
         activeChats.clear();
+    }
+
+    /**
+     * Removes all chat session for given <tt>protocolProvider</tt>.
+     * @param protocolProvider protocol provider for which all chat sessions
+     *                         will be removed.
+     */
+    public synchronized static void removeAllChatsForProvider(
+            ProtocolProviderService protocolProvider)
+    {
+        ArrayList<ChatSession> toBeRemoved = new ArrayList<ChatSession>();
+        for(ChatSession chat : activeChats.values())
+        {
+            if(chat.getMetaContact()
+                    .getContactsForProvider(protocolProvider) != null)
+            {
+                toBeRemoved.add(chat);
+            }
+        }
+        for(ChatSession chat : toBeRemoved)
+            removeActiveChat(chat);
     }
 }

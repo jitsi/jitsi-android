@@ -96,7 +96,7 @@ public class ContactListAdapter
      * Indicates if we're in an extended chat interface where the chat is shown
      * on the right of the contact list.
      */
-    private boolean isExtendedChat;
+    private boolean isExtendedChat = AndroidUtils.isTablet();
 
     /**
      * Creates the contact list adapter.
@@ -139,15 +139,17 @@ public class ContactListAdapter
      */
     public void dispose()
     {
-        if(contactListService != null)
-            contactListService.removeMetaContactListListener(this);
+        if(contactListService == null)
+            return;
+
+        contactListService.removeMetaContactListListener(this);
 
         removeContacts(contactListService.getRoot());
     }
 
     /**
      * Indicates if the adapter has been already initialized.
-     * @return
+     * @return <tt>true</tt> if the adapter has been already initialized.
      */
     boolean isInitialized()
     {
@@ -610,6 +612,12 @@ public class ContactListAdapter
                 = (ImageView) contactView
                     .findViewById(R.id.contactStatusIcon);
 
+            if(statusView == null)
+            {
+                logger.warn("No status view found for "+metaContact);
+                return;
+            }
+
             setStatus(statusView, metaContact);
         }
     }
@@ -1003,7 +1011,7 @@ public class ContactListAdapter
                 = (ImageView) convertView
                     .findViewById(R.id.buttonSeparatorView);
             contactViewHolder.callButtonLayout
-                = (View) convertView.findViewById(R.id.callButtonLayout);
+                = convertView.findViewById(R.id.callButtonLayout);
             contactViewHolder.groupPosition = groupPosition;
             contactViewHolder.contactPosition = childPosition;
 
@@ -1033,8 +1041,6 @@ public class ContactListAdapter
                 {
                     contactViewHolder.selectedBgView
                         .setVisibility(View.VISIBLE);
-                    contactViewHolder.selectedBgView
-                        .getLayoutParams().height = 30;
                 }
             }
             else
@@ -1045,9 +1051,7 @@ public class ContactListAdapter
                 if (isExtendedChat)
                 {
                     contactViewHolder.selectedBgView
-                        .setVisibility(View.INVISIBLE);
-                    contactViewHolder.selectedBgView
-                        .getLayoutParams().height = 0;
+                        .setVisibility(View.GONE);
                 }
             }
 
@@ -1359,10 +1363,7 @@ public class ContactListAdapter
             MetaContact metaContact,
             Class<? extends OperationSet> opSetClass)
     {
-        Contact defaultContact
-            = metaContact.getDefaultContact(opSetClass);
-
-        return (defaultContact != null) ? true : false;
+        return metaContact.getDefaultContact(opSetClass) != null;
     }
 
     /**
@@ -1479,7 +1480,6 @@ public class ContactListAdapter
     private static class GroupViewHolder
     {
         TextView displayName;
-        int position;
     }
 
     /**

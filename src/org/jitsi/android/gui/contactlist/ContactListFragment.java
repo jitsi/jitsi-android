@@ -34,12 +34,6 @@ public class ContactListFragment
                 OnGroupClickListener
 {
     /**
-     * The logger.
-     */
-    private final static Logger logger
-            = Logger.getLogger(ContactListFragment.class);
-
-    /**
      * The <tt>MetaContactListService</tt> giving access to the contact list
      * content.
      */
@@ -152,6 +146,12 @@ public class ContactListFragment
         if(AndroidUtils.isTablet())
         {
             ChatSessionManager.setCurrentChatId(currentChatId);
+            // Check if current session wasn't removed
+            // while this fragment was hidden
+            ChatSession session
+                = ChatSessionManager.getActiveChat(currentChatId);
+            if(session == null)
+                closeCurrentChat();
         }
     }
 
@@ -415,7 +415,8 @@ public class ContactListFragment
     /**
      * Starts the chat activity for the given metaContact.
      *
-     * @param metaContact
+     * @param metaContact <tt>MetaContact</tt> for which chat activity will be
+     *                    started.
      */
     public void startChatActivity(MetaContact metaContact)
     {
@@ -467,22 +468,26 @@ public class ContactListFragment
         currentChatId = null;
         ChatSessionManager.setCurrentChatId(currentChatId);
 
-        View chatExtendedView = getActivity().findViewById(R.id.chatView);
-        if (chatExtendedView != null)
-        {
-            FragmentManager fragmentManager
-                = getActivity().getSupportFragmentManager();
-            fragmentManager
-                    .beginTransaction()
-                    .remove(fragmentManager.findFragmentById(R.id.chatView))
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
-                    .commit();
-        }
+        if (!AndroidUtils.isTablet())
+            return;
+
+        FragmentManager fragmentManager
+            = getActivity().getSupportFragmentManager();
+
+        Fragment chatFragment = fragmentManager.findFragmentById(R.id.chatView);
+        if(chatFragment == null)
+            return;
+
+        fragmentManager
+                .beginTransaction()
+                .remove(chatFragment)
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                .commit();
     }
 
     /**
-     * 
-     * @param query
+     * Filters contact list for given <tt>query</tt>.
+     * @param query the query string that will be used for filtering contacts.
      */
     public void filterContactList(String query)
     {

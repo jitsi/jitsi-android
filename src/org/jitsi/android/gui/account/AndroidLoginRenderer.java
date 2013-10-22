@@ -16,6 +16,7 @@ import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.authorization.*;
 import org.jitsi.android.gui.call.*;
+import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.android.gui.util.event.*;
 import org.jitsi.service.osgi.*;
@@ -171,6 +172,9 @@ public class AndroidLoginRenderer
             presenceOpSet.removeProviderPresenceStatusListener(
                     androidPresenceListener);
         }
+
+        // Removes all chat session for unregistered provider
+        ChatSessionManager.removeAllChatsForProvider(protocolProvider);
     }
 
     /**

@@ -97,7 +97,7 @@
         android:id="@+id/selectedBackgroundIcon"
         android:src="@drawable/chatarrow"
         android:layout_width="wrap_content"
-        android:layout_height="0dip"
+        android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
         android:visibility="invisible"/>
