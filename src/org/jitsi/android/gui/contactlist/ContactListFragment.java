@@ -211,10 +211,6 @@ public class ContactListFragment
         {
             createContactCtxMenu(menu, inflater, group, child);
         }
-        else
-        {
-            return;
-        }
     }
 
     /**
@@ -233,6 +229,12 @@ public class ContactListFragment
         // Remembers clicked contact
         clickedContact
                 = ((MetaContact) contactListAdapter.getChild(group, child));
+
+        // Checks if close chats options should be visible
+        boolean closeChatsVisible
+                = ChatSessionManager.getActiveChat(clickedContact) != null;
+        menu.findItem(R.id.close_chat).setVisible(closeChatsVisible);
+        menu.findItem(R.id.close_all_chats).setVisible(closeChatsVisible);
 
         // Checks if the re-request authorization item should be visible
         Contact contact = clickedContact.getDefaultContact();
@@ -276,23 +278,30 @@ public class ContactListFragment
     @Override
     public boolean onContextItemSelected(MenuItem item)
     {
-        if(item.getItemId() == R.id.re_request_auth
-                && clickedContact != null)
+        switch(item.getItemId())
         {
-            requestAuthorization(clickedContact.getDefaultContact());
-            return true;
+            case R.id.re_request_auth:
+                if(clickedContact != null)
+                    requestAuthorization(clickedContact.getDefaultContact());
+                return true;
+            case R.id.remove_contact:
+                MetaContactListManager.removeMetaContact(clickedContact);
+                return true;
+            case R.id.remove_group:
+                MetaContactListManager.removeMetaContactGroup(clickedGroup);
+                return true;
+            case R.id.close_chat:
+                ChatSessionManager.removeActiveChat(
+                        ChatSessionManager.getActiveChat(clickedContact));
+                closeCurrentChat();
+                contactListAdapter.notifyDataSetChanged();
+                return true;
+            case R.id.close_all_chats:
+                ChatSessionManager.removeAllActiveChats();
+                closeCurrentChat();
+                contactListAdapter.notifyDataSetChanged();
+                return true;
         }
-        else if(item.getItemId() == R.id.remove_contact)
-        {
-            MetaContactListManager.removeMetaContact(clickedContact);
-            return true;
-        }
-        else if(item.getItemId() == R.id.remove_group)
-        {
-            MetaContactListManager.removeMetaContactGroup(clickedGroup);
-            return true;
-        }
-
         return super.onContextItemSelected(item);
     }
 
@@ -447,6 +456,27 @@ public class ContactListFragment
             chatIntent.putExtra(ChatSessionManager.CHAT_IDENTIFIER,
                                 currentChat.getChatId());
             getActivity().startActivity(chatIntent);
+        }
+    }
+
+    /**
+     * Closes currently opened chat and it's chat fragment.
+     */
+    private void closeCurrentChat()
+    {
+        currentChatId = null;
+        ChatSessionManager.setCurrentChatId(currentChatId);
+
+        View chatExtendedView = getActivity().findViewById(R.id.chatView);
+        if (chatExtendedView != null)
+        {
+            FragmentManager fragmentManager
+                = getActivity().getSupportFragmentManager();
+            fragmentManager
+                    .beginTransaction()
+                    .remove(fragmentManager.findFragmentById(R.id.chatView))
+                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
+                    .commit();
         }
     }
 
