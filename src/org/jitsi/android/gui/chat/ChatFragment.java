@@ -885,8 +885,13 @@ public class ChatFragment
                     for(int i=0; i<chatListView.getChildCount(); i++)
                     {
                         View row = chatListView.getChildAt(i);
-                        updateStatusAndAvatarView(
-                                (MessageViewHolder) row.getTag());
+
+                        MessageViewHolder viewHolder
+                                = (MessageViewHolder) row.getTag();
+                        if(viewHolder == null)
+                            continue;
+
+                        updateStatusAndAvatarView(viewHolder);
                     }
                 }
             });
