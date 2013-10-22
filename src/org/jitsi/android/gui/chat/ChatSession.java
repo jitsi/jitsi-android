@@ -401,9 +401,9 @@ public class ChatSession
             {
                  oldest = msgCache.get(0);
             }
-            history = metaHistory.findByEndDate(chatHistoryFilter,
-                                                metaContact,
-                                                oldest.getDate());
+            history = metaHistory.findLastMessagesBefore(
+                    chatHistoryFilter, metaContact,
+                    oldest.getDate(), HISTORY_CHUNK_SIZE);
         }
 
         // Convert events into messages
@@ -430,22 +430,6 @@ public class ChatSession
             {
                 System.err.println("Other event in history: "+o);
             }
-        }
-
-        // TODO: this trimming is highly not optimal
-        // add method findByEndDate with results limit to fix
-        if(historyMsgs.size() > HISTORY_CHUNK_SIZE)
-        {
-            //Trim the output
-            ArrayList<ChatMessage> trimmed
-                = new ArrayList<ChatMessage>(HISTORY_CHUNK_SIZE);
-
-            for(int i=historyMsgs.size()-1;
-                trimmed.size()!= HISTORY_CHUNK_SIZE; i--)
-            {
-                trimmed.add(0, historyMsgs.get(i));
-            }
-            historyMsgs = trimmed;
         }
 
         synchronized (cacheLock)
@@ -750,8 +734,6 @@ public class ChatSession
     private void cacheNextMsg(ChatMessageImpl newMsg)
     {
         msgCache.add(newMsg);
-        if(msgCache.size() > HISTORY_CHUNK_SIZE)
-            msgCache.remove(0);
     }
 
     @Override
