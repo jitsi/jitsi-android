@@ -8,25 +8,30 @@ package org.jitsi.android.gui.chat;
 
 import android.app.*;
 import android.content.*;
+import android.text.*;
 import android.view.*;
 import android.view.inputmethod.*;
 import android.widget.*;
 
+import net.java.sip.communicator.service.protocol.*;
+import net.java.sip.communicator.util.*;
+
 import org.jitsi.*;
-import org.jitsi.util.*;
+import org.jitsi.util.Logger;
 
 /**
  * Class is used to separate the logic of message editing process from
- * <tt>ChatFragment</tt>. It handles last messages correction, editing and
- * sending messages. It also restores edit state when the chat fragment is
- * showed back.
+ * <tt>ChatFragment</tt>. It handles last messages correction, editing,
+ * sending messages and typing notifications. It also restores edit state when
+ * the chat fragment is showed back.
  *
  * @author Pawel Domas
  */
 public class ChatController
     implements AdapterView.OnItemClickListener,
                TextView.OnEditorActionListener,
-               View.OnClickListener
+               View.OnClickListener,
+               TextWatcher
 {
     /**
      * The logger.
@@ -60,6 +65,18 @@ public class ChatController
      * Chat session used by this controller and it' parent chat fragment.
      */
     private ChatSession session;
+    /**
+     * Typing state control thread that goes down from typing to stopped state.
+     */
+    private TypingControl typingCtrlThread;
+    /**
+     * Current typing state.
+     */
+    private int typingState = OperationSetTypingNotifications.STATE_STOPPED;
+    /**
+     * The time when for the last time STATE_TYPING has been sent.
+     */
+    private long lastTypingSent;
 
     /**
      * Creates new instance of <tt>ChatController</tt>.
@@ -79,6 +96,9 @@ public class ChatController
      */
     public void onShow()
     {
+        if(isAttached)
+            return;
+
         logger.debug("Controller attached to " + chatFragment.hashCode());
 
         this.session = chatFragment.getChatSession();
@@ -91,6 +111,10 @@ public class ChatController
         msgEdit.setOnEditorActionListener(this);
         // Restore edited text
         msgEdit.setText(chatFragment.getChatSession().getEditedText());
+
+        // Register text watcher if session allows typing notifications
+        if(session.allowsTypingNotifications())
+            msgEdit.addTextChangedListener(this);
 
         // Gets the cancel correction button and hooks on click action
         this.cancelBtn = parent.findViewById(R.id.cancelCorrectionBtn);
@@ -114,6 +138,14 @@ public class ChatController
             return;
         isAttached = false;
 
+        // Remove text listener
+        msgEdit.removeTextChangedListener(this);
+        // Finish typing state ctrl thread
+        if(typingCtrlThread != null)
+        {
+            typingCtrlThread.cancel();
+            typingCtrlThread = null;
+        }
         // Store edited text in session
         session.setEditedText(msgEdit.getText().toString());
     }
@@ -242,5 +274,163 @@ public class ChatController
         msgEdit.setBackgroundColor(parent.getResources().getColor(bgColorId));
 
         cancelBtn.setVisibility(correction ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count,
+                                  int after){ }
+    @Override
+    public void afterTextChanged(Editable s){ }
+
+    /**
+     * Updates typing state.
+     *
+     * {@inheritDoc}
+     */
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count)
+    {
+        if (ConfigurationUtils.isSendTypingNotifications())
+        {
+            if(s.length() == 0)
+            {
+                return;
+            }
+
+            if (typingState != OperationSetTypingNotifications.STATE_TYPING)
+            {
+                setNewTypingState(OperationSetTypingNotifications.STATE_TYPING);
+            }
+
+            // Start or restart typing state control thread
+            if(typingCtrlThread == null)
+            {
+                typingCtrlThread = new TypingControl();
+                typingCtrlThread.start();
+            }
+            else
+            {
+                typingCtrlThread.refreshTyping();
+            }
+        }
+    }
+
+    /**
+     * Sets new typing state. Remembers when <tt>STATE_TYPING</tt> was set for
+     * the last time.
+     * @param newState new typing state to set.
+     */
+    private void setNewTypingState(int newState)
+    {
+        if(session.sendTypingNotification(newState))
+        {
+            if(newState == OperationSetTypingNotifications.STATE_TYPING)
+            {
+                lastTypingSent = System.currentTimeMillis();
+            }
+            typingState = newState;
+        }
+    }
+
+    /**
+     * The thread lowers typing state from typing to stopped state. When
+     * <tt>refreshTyping</tt> is called checks for eventual typing state
+     * refresh.
+     */
+    class TypingControl
+        extends Thread
+    {
+        boolean restart;
+
+        boolean cancel;
+
+        @Override
+        public void run()
+        {
+            while(typingState != OperationSetTypingNotifications.STATE_STOPPED)
+            {
+                restart = false;
+                int newState;
+                long delay;
+
+                switch (typingState)
+                {
+                    case OperationSetTypingNotifications.STATE_TYPING:
+                        newState = OperationSetTypingNotifications.STATE_PAUSED;
+                        delay = 2000;
+                        break;
+                    default:
+                        newState = OperationSetTypingNotifications.STATE_STOPPED;
+                        delay = 3000;
+                        break;
+                }
+
+                synchronized (this)
+                {
+                    try
+                    {
+                        // Waits the delay
+                        this.wait(delay);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        throw new RuntimeException(e);
+                    }
+                }
+                if(cancel)
+                {
+                    setNewTypingState(
+                            OperationSetTypingNotifications.STATE_STOPPED);
+                    break;
+                }
+                else if(restart)
+                {
+                    if((System.currentTimeMillis()- lastTypingSent) > 5000)
+                    {
+                        // Refresh typing notification every 5 sec of typing
+                        newState = OperationSetTypingNotifications.STATE_TYPING;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+                // Post new state
+                setNewTypingState(newState);
+            }
+            typingCtrlThread = null;
+        }
+
+        /**
+         * Restarts thread's control loop.
+         */
+        void refreshTyping()
+        {
+            synchronized (this)
+            {
+                restart = true;
+                this.notify();
+            }
+        }
+
+        /**
+         * Cancels and joins the thread.
+         */
+        void cancel()
+        {
+            synchronized (this)
+            {
+                cancel = true;
+                this.notify();
+            }
+            try
+            {
+                this.join();
+            }
+            catch (InterruptedException e)
+            {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

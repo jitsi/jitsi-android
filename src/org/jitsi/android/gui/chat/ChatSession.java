@@ -396,8 +396,8 @@ public class ChatSession
         }
         else
         {
-            ChatMessage oldest = null;
-            synchronized (msgCache)
+            ChatMessage oldest;
+            synchronized (cacheLock)
             {
                  oldest = msgCache.get(0);
             }
@@ -448,7 +448,7 @@ public class ChatSession
             historyMsgs = trimmed;
         }
 
-        synchronized (msgCache)
+        synchronized (cacheLock)
         {
             if(!historyLoaded)
             {
@@ -891,6 +891,60 @@ public class ChatSession
             logger.error("Message correction error for UID: "
                              + uidToCorrect + ", new content: " + message, e);
         }
+    }
+
+    /**
+     * Returns <code>true</code> if this chat session supports typing
+     * notifications, otherwise returns <code>false</code>.
+     *
+     * @return <code>true</code> if this chat session supports typing
+     * notifications, otherwise returns <code>false</code>.
+     */
+    public boolean allowsTypingNotifications()
+    {
+        Object tnOpSet = currentChatTransport.getProtocolProvider()
+                .getOperationSet(OperationSetTypingNotifications.class);
+
+        return tnOpSet != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean sendTypingNotification(int typingState)
+    {
+        // If this chat transport does not support sms messaging we do
+        // nothing here.
+        if (!allowsTypingNotifications())
+            return false;
+
+        ProtocolProviderService protocolProvider
+            = currentChatTransport.getProtocolProvider();
+        OperationSetTypingNotifications tnOperationSet
+            = protocolProvider.getOperationSet(
+                OperationSetTypingNotifications.class);
+
+        // if protocol is not registered or contact is offline don't
+        // try to send typing notifications
+        if(protocolProvider.isRegistered()
+                && currentChatTransport.getPresenceStatus().getStatus()
+                >= PresenceStatus.ONLINE_THRESHOLD)
+        {
+            try
+            {
+                tnOperationSet.sendTypingNotification(
+                    currentChatTransport, typingState);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.error("Failed to send typing notifications.", ex);
+
+                return false;
+            }
+        }
+
+        return false;
     }
 
     /**
