@@ -698,10 +698,11 @@ public class ChatSession
         String contactDisplayName = metaContact.getDisplayName().trim();
 
         int atIndex = contactDisplayName.indexOf("@");
-        int spaceIndex = contactDisplayName.indexOf(" ");
 
         if (atIndex > -1)
             contactDisplayName = contactDisplayName.substring(0, atIndex);
+
+        int spaceIndex = contactDisplayName.indexOf(" ");
 
         if (spaceIndex > -1)
             contactDisplayName = contactDisplayName.substring(0, spaceIndex);
