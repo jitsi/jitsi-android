@@ -187,7 +187,8 @@ public class ChatController
                 = chatFragment.getChatListAdapter();
 
         // Position must be aligned to the number of header views included
-        position -= ((ListView)adapter).getHeaderViewsCount();
+        int headersCount = ((ListView)adapter).getHeaderViewsCount();
+        position -= headersCount;
 
         ChatMessage chatMessage = chatListAdapter.getMessage(position);
 
@@ -224,6 +225,10 @@ public class ChatController
                     .getSystemService(Context.INPUT_METHOD_SERVICE);
             inputMethodManager.showSoftInput(msgEdit,
                                              InputMethodManager.SHOW_IMPLICIT);
+            // Select corrected message
+            // TODO: it doesn't work when keyboard is displayed
+            // for the first time
+            adapter.setSelection(position + headersCount);
         }
     }
 

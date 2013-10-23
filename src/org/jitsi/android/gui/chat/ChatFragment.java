@@ -6,7 +6,6 @@
  */
 package org.jitsi.android.gui.chat;
 
-import java.text.*;
 import java.util.*;
 
 import android.app.*;
@@ -21,10 +20,8 @@ import android.widget.*;
 import android.widget.LinearLayout.*;
 
 import net.java.sip.communicator.service.contactlist.*;
-import net.java.sip.communicator.service.globaldisplaydetails.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.event.*;
-import net.java.sip.communicator.service.protocol.globalstatus.*;
 import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.Logger;
 
@@ -342,6 +339,7 @@ public class ChatFragment
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("deprecation")
     @Override
     public boolean onContextItemSelected(MenuItem item)
     {
@@ -453,6 +451,7 @@ public class ChatFragment
          */
         public void addMessage( ChatMessage newMessage, boolean update)
         {
+            final int msgIdx;
             synchronized (messages)
             {
                 int lastMsgIdx = getLastMessageIdx(newMessage);
@@ -463,12 +462,14 @@ public class ChatFragment
                 if(lastMsg == null || !lastMsg.isConsecutiveMessage(newMessage))
                 {
                     messages.add(new MessageDisplay(newMessage));
+                    msgIdx = messages.size()-1;
                 }
                 else
                 {
                     // Merge the message and update the object in the list
                     messages.get(lastMsgIdx)
                             .update(lastMsg.mergeMessage(newMessage));
+                    msgIdx = lastMsgIdx;
                 }
             }
 
@@ -482,7 +483,8 @@ public class ChatFragment
                         chatListAdapter.notifyDataSetChanged();
                         // List must be scrolled manually, when
                         // android:transcriptMode="normal" is set
-                        chatListView.setSelection(chatListAdapter.getCount());
+                        chatListView.setSelection(
+                                msgIdx + chatListView.getHeaderViewsCount());
                     }
                 });
             }
@@ -865,14 +867,6 @@ public class ChatFragment
         }
 
         /**
-         * Removes all messages from the adapter
-         */
-        public void removeAllMessages()
-        {
-            messages.clear();
-        }
-
-        /**
          * Updates all avatar and status on outgoing messages rows.
          */
         public void localAvatarOrStatusChanged()
@@ -982,12 +976,10 @@ public class ChatFragment
     {
         ImageView avatarView;
         ImageView statusView;
-        ImageView typeIndicator;
         TextView messageView;
         TextView timeView;
         ImageView typingView;
         int viewType;
-        int position;
         int msgType;
     }
 
@@ -1073,41 +1065,6 @@ public class ChatFragment
                 }
             }
         }
-    }
-
-    /**
-     * Returns the local user avatar drawable.
-     *
-     * @return the local user avatar drawable
-     */
-    private static Drawable getLocalAvatarDrawable()
-    {
-        GlobalDisplayDetailsService displayDetailsService
-            = AndroidGUIActivator.getGlobalDisplayDetailsService();
-
-        byte[] avatarImage = displayDetailsService.getGlobalDisplayAvatar();
-
-        if (avatarImage != null)
-            return AndroidImageUtil.drawableFromBytes(avatarImage);
-
-        return null;
-    }
-
-    /**
-     * Returns the local user status drawable.
-     *
-     * @return the local user status drawable
-     */
-    private static Drawable getLocalStatusDrawable()
-    {
-        GlobalStatusService globalStatusService
-            = AndroidGUIActivator.getGlobalStatusService();
-
-        byte[] statusImage
-            = StatusUtil.getContactStatusIcon(
-                globalStatusService.getGlobalPresenceStatus());
-
-        return AndroidImageUtil.drawableFromBytes(statusImage);
     }
 
     /**

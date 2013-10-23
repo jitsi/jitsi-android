@@ -18,6 +18,16 @@
         android:background="@color/blue"
         android:layout_margin="0dp">
 
+        <ImageButton android:id="@+id/cancelCorrectionBtn"
+            android:src="@drawable/cancel_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:background="@color/blue"
+            android:layout_margin="2dp"
+            android:padding="3dp"
+            android:visibility="gone"
+            />
         <EditText
             android:id="@+id/chatWriteText"
             android:layout_width="0dp"
@@ -32,16 +42,6 @@
             android:imeOptions="actionSend"
             android:singleLine="true"
             android:textCursorDrawable="@null"/>
-        <ImageButton android:id="@+id/cancelCorrectionBtn"
-            android:src="@drawable/send_message"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:background="@color/blue"
-            android:layout_margin="2dp"
-            android:padding="3dp"
-            android:visibility="gone"
-            />
         <ImageButton android:id="@+id/sendMessageButton"
             android:src="@drawable/send_message"
             android:layout_width="wrap_content"
