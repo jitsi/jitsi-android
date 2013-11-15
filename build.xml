@@ -322,6 +322,12 @@
         </exec>
     </target>
 
+    <target name="adb-uninstall">
+        <exec executable="${sdk.dir}/platform-tools/adb" >
+            <arg line=" uninstall org.jitsi"/>
+        </exec>
+    </target>
+
     <!-- install and starts jitsi apk -->
     <target name="adb-install-and-run" depends="adb-install">
         <exec executable="${sdk.dir}/platform-tools/adb" >
