@@ -600,4 +600,18 @@ public class AndroidUIServiceImpl
     {
         return AndroidGUIActivator.getLoginManager();
     }
+
+    @Override
+    public void openChatRoomWindow(
+            net.java.sip.communicator.service.muc.ChatRoomWrapper chatRoomWrapper)
+    {
+        // TODO: not implemented
+    }
+
+    @Override
+    public void closeChatRoomWindow(
+            net.java.sip.communicator.service.muc.ChatRoomWrapper chatRoomWrapper)
+    {
+        // TODO: not implemented
+    }
 }

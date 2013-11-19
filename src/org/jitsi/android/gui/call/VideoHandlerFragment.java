@@ -143,7 +143,7 @@ public class VideoHandlerFragment
         // Makes the preview display draggable on the screen
         previewDisplay.setOnTouchListener(new SimpleDragController());
 
-        this.call = ((CallRenderer)activity).getCall();
+        this.call = ((VideoCallActivity)activity).getCall();
     }
 
     @Override

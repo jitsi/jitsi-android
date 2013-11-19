@@ -57,6 +57,9 @@
 	<lib name="msghistory.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/libs/msghistory.jar!/"/>
 	</lib>
+	<lib name="muc.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libs/muc.jar!/"/>
+	</lib>
 	<lib name="netaddr.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/libs/netaddr.jar!/"/>
 	</lib>

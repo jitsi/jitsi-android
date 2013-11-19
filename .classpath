@@ -25,6 +25,7 @@
 	<classpathentry kind="lib" path="libs/libjitsi.jar"/>
 	<classpathentry kind="lib" path="libs/metahistory.jar"/>
 	<classpathentry kind="lib" path="libs/msghistory.jar"/>
+	<classpathentry kind="lib" path="libs/muc.jar"/>
 	<classpathentry kind="lib" path="libs/netaddr.jar"/>
 	<classpathentry kind="lib" path="libs/notification-service.jar"/>
 	<classpathentry kind="lib" path="libs/notification-wiring.jar"/>

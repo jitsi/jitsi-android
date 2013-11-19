@@ -193,6 +193,28 @@ public class OSGiServiceImpl
                     name);
         }
 
+        // Set log dir location to PNAME_SC_HOME_DIR_LOCATION
+        if (System.getProperty(ConfigurationService.PNAME_SC_LOG_DIR_LOCATION)
+                == null)
+        {
+            String homeDir = System.getProperty(
+                    ConfigurationService.PNAME_SC_HOME_DIR_LOCATION, null);
+
+            System.setProperty(
+                ConfigurationService.PNAME_SC_LOG_DIR_LOCATION, homeDir);
+        }
+        // Set cache dir location to Context.getCacheDir()
+        if (System.getProperty(ConfigurationService.PNAME_SC_CACHE_DIR_LOCATION)
+                == null)
+        {
+            File cacheDir = service.getCacheDir();
+            String location = cacheDir.getParentFile().getAbsolutePath();
+
+            System.setProperty(
+                ConfigurationService.PNAME_SC_CACHE_DIR_LOCATION,
+                location);
+        }
+
         /*
          * Set the System property user.home as well because it may be relied
          * upon (e.g. FMJ).
