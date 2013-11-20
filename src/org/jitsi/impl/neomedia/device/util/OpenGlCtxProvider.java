@@ -16,19 +16,19 @@ import android.view.*;
  *
  * @author Pawel Domas
  */
-public class OpenGLCtxProvider
+public class OpenGlCtxProvider
     extends ViewDependentProvider<OpenGLContext>
     implements TextureView.SurfaceTextureListener
 {
     OpenGLContext context;
 
     /**
-     * Creates new isnatnce of <tt>OpenGLCtxProvider</tt>.
+     * Creates new instance of <tt>OpenGlCtxProvider</tt>.
      *
      * @param textureView the <tt>TextureView</tt> used for drawing and context
      *                    creation.
      */
-    public OpenGLCtxProvider(TextureView textureView)
+    public OpenGlCtxProvider(TextureView textureView)
     {
         super(textureView);
         textureView.setSurfaceTextureListener(this);

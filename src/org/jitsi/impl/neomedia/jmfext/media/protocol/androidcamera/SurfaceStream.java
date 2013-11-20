@@ -61,7 +61,7 @@ public class SurfaceStream
     /**
      * Render context provider used to draw the preview.
      */
-    public static OpenGLCtxProvider ctxProvider;
+    public static OpenGlCtxProvider ctxProvider;
 
     /**
      * Creates new instance of <tt>SurfaceStream</tt>.

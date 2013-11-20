@@ -33,6 +33,6 @@ public class VideoHandlerFragmentAPI18
 
         //surfaceTexture.setOpaque(false);
 
-        SurfaceStream.ctxProvider = new OpenGLCtxProvider(surfaceTexture);
+        SurfaceStream.ctxProvider = new OpenGlCtxProvider(surfaceTexture);
     }
 }
