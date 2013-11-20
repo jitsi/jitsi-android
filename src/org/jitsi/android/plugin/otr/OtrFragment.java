@@ -6,6 +6,7 @@
  */
 package org.jitsi.android.plugin.otr;
 
+import android.content.*;
 import android.view.*;
 
 import net.java.otr4j.*;
@@ -13,12 +14,17 @@ import net.java.otr4j.session.*;
 
 import net.java.sip.communicator.plugin.otr.*;
 import net.java.sip.communicator.service.contactlist.*;
+import net.java.sip.communicator.service.gui.*;
 import net.java.sip.communicator.service.protocol.*;
 
 import org.jitsi.*;
+import org.jitsi.android.*;
 import org.jitsi.android.gui.chat.*;
+import org.jitsi.android.gui.settings.*;
 import org.jitsi.android.gui.util.event.*;
 import org.jitsi.service.osgi.*;
+
+import java.net.*;
 
 /**
  * Fragment when added to <tt>Activity</tt> will display the padlock allowing
@@ -336,5 +342,28 @@ public class OtrFragment
     public MenuItem getPadlock()
     {
         return menu.findItem(R.id.otr_padlock);
+    }
+
+    /**
+     * Listens for show history popup link
+     */
+    public static class ShowHistoryLinkListener
+        implements ChatLinkClickedListener
+    {
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void chatLinkClicked(URI uri)
+        {
+            if(uri.getPath().equals("/showHistoryPopupMenu"))
+            {
+                // Display settings
+                Context ctx = JitsiApplication.getGlobalContext();
+                Intent settings = new Intent(ctx, SettingsActivity.class);
+                settings.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                ctx.startActivity(settings);
+            }
+        }
     }
 }

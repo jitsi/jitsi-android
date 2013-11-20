@@ -273,6 +273,45 @@
     <string name="plugin_otr_activator_sessionstared">Private conversation with {0} started.</string>
     <string name="plugin_otr_activator_sessionfinished">{0} has ended his/her private conversation with you; you should do the same.</string>
     <string name="plugin_otr_activator_sessionlost">Private conversation with {0} lost.</string>
+    <string name="plugin_otr_activator_historyon">
+        {0} is recording this conversation on your device.
+        You can &lt;a href=\"jitsi://{1}/{2}\">turn off chat history here&lt;/a>.
+    </string>
+    <string name="plugin_otr_activator_historyoff">
+        {0} is NOT recording this conversation.
+        You can &lt;a href=\"jitsi://{1}/{2}\">activate chat history here&lt;/a>.
+    </string>
+    <string name="plugin_otr_activator_sessionfinishederror">
+        Your message was not sent. Please end your private conversation with {0}.
+    </string>
+    <string name="plugin_otr_activator_smpaborted">
+        {0} has aborted the authentication process.
+    </string>
+    <string name="plugin_otr_activator_smperror">
+        An error occurred in the authentication process.
+    </string>
+    <string name="plugin_otr_activator_unencryptedmsgreceived">
+        The message was received unencrypted.
+    </string>
+    <string name="plugin_otr_activator_unreadablemsgreceived">
+        {0} sent you an unreadable encrypted message.
+    </string>
+    <string name="plugin_otr_activator_requireencryption">
+        Your message was not sent. Private messaging is required.
+    </string>
+    <string name="plugin_otr_activator_unreadablemsgreply">
+        You sent {0} an unreadable encrypted message.
+        Please end your private conversation with {1} or refresh it.
+    </string>
+    <string name="plugin_otr_activator_fallbackmessage">
+        &lt;span style="font-weight: bold;">{0} is trying to initiate an encrypted
+        &lt;a href="http://en.wikipedia.org/wiki/Off-the-Record_Messaging">
+        Off-The-Record conversation&lt;/a> with you.
+        However, your software does not support
+        Off-The-Record messaging. For more information see
+        &lt;a href="http://en.wikipedia.org/wiki/Off-the-Record_Messaging">
+        http://en.wikipedia.org/wiki/Off-the-Record_Messaging&lt;/a>&lt;/span>
+    </string>
     <!-- From resources.properties -->
     <string name="service_gui_JANUARY">Jan</string>
     <string name="service_gui_FEBRUARY">Feb</string>

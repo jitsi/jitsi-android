@@ -28,6 +28,7 @@ import org.jitsi.android.gui.account.*;
 import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.gui.login.*;
 import org.jitsi.android.gui.util.*;
+import org.jitsi.android.plugin.otr.*;
 import org.jitsi.service.configuration.*;
 import org.jitsi.service.resources.*;
 
@@ -140,6 +141,10 @@ public class AndroidGUIActivator
         ConfigurationUtils.loadGuiConfigurations();
         // Start watching replacement services
         replacementServices.start(bundleContext);
+
+        // Register show history settings OTR link listener
+        ChatSessionManager.addChatLinkListener(
+                new OtrFragment.ShowHistoryLinkListener());
     }
 
     /**
