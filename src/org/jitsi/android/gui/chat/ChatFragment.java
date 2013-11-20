@@ -741,8 +741,8 @@ public class ChatFragment
          */
         private void updateStatusAndAvatarView(MessageViewHolder viewHolder)
         {
-            Drawable avatar = null;
-            Drawable status = null;
+            Drawable avatar;
+            Drawable status;
             if (viewHolder.viewType == INCOMING_MESSAGE_VIEW)
             {
                 avatar = ContactListAdapter.getAvatarDrawable(
@@ -757,6 +757,12 @@ public class ChatFragment
                         = AndroidGUIActivator.getLoginRenderer();
                 avatar = loginRenderer.getLocalAvatarDrawable();
                 status = loginRenderer.getLocalStatusDrawable();
+            }
+            else
+            {
+                // Avatar and status are present only in outgoing or incoming
+                // message views
+                return;
             }
 
             setAvatar(viewHolder.avatarView, avatar);
