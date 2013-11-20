@@ -12,6 +12,7 @@ import android.os.*;
 import net.java.sip.communicator.service.notification.*;
 
 import org.jitsi.android.*;
+import org.jitsi.android.gui.util.*;
 
 /**
  * Android implementation of {@link VibrateNotificationHandler}.
@@ -52,7 +53,7 @@ public class VibrateHandlerImpl
      */
     private boolean hasVibrator()
     {
-        if(Build.VERSION.SDK_INT >= 11)
+        if(AndroidUtils.hasAPI(11))
         {
             return vibratorService != null && vibratorService.hasVibrator();
         }

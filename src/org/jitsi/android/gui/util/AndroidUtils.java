@@ -42,6 +42,14 @@ public class AndroidUtils
     private static final Logger logger = Logger.getLogger(AndroidUtils.class);
 
     /**
+     * Api level constant. Change it here to simulate lower api on new devices.
+     *
+     * All API level decisions should be done based on {@link #hasAPI(int)} call
+     * result.
+     */
+    private static final int API_LEVEL = Build.VERSION.SDK_INT;
+
+    /**
      * Shows an alert dialog for the given context and a title given by
      * <tt>titleId</tt> and message given by <tt>messageId</tt>.
      *
@@ -302,6 +310,20 @@ public class AndroidUtils
                     >= Configuration.SCREENLAYOUT_SIZE_LARGE;
     }
 
+    /**
+     * Returns <tt>true</tt> if this device supports at least given API level.
+     * @param minApiLevel API level value to check
+     * @return <tt>true</tt> if this device supports at least given API level.
+     */
+    public static boolean hasAPI(int minApiLevel)
+    {
+        return API_LEVEL >= minApiLevel;
+    }
+
+    /**
+     * Returns <tt>true</tt> if current <tt>Thread</tt> is UI thread.
+     * @return <tt>true</tt> if current <tt>Thread</tt> is UI thread.
+     */
     public static boolean isUIThread()
     {
         return Looper.getMainLooper().getThread() == Thread.currentThread();

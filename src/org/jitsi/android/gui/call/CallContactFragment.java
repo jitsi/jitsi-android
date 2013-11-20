@@ -8,17 +8,13 @@ package org.jitsi.android.gui.call;
 
 import java.util.*;
 
-import android.os.*;
 import android.os.Bundle;
 import net.java.sip.communicator.service.protocol.*;
-import net.java.sip.communicator.service.protocol.AccountManager;
-
 import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.account.*;
 import net.java.sip.communicator.util.call.*;
 
 import org.jitsi.*;
-import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.service.osgi.*;
 import org.osgi.framework.*;
@@ -194,7 +190,7 @@ public class CallContactFragment
     private void showCallViaMenu(View v, final String destination)
     {
         // PopupMenu not supported prior 11
-        if(Build.VERSION.SDK_INT < 11)
+        if(!AndroidUtils.hasAPI(11))
             return;
 
         PopupMenu popup = new PopupMenu(getActivity(), v);

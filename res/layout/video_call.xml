@@ -22,6 +22,13 @@
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="80dp"
         android:visibility="gone"/>
+    <SurfaceView
+            android:id="@+id/remoteDisplay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:visibility="gone"/>
 
     <LinearLayout
             android:layout_width="wrap_content"

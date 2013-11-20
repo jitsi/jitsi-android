@@ -113,7 +113,7 @@ public class OSGiActivity
         // Hooks the exception handler to the UI thread
         ExceptionHandler.checkAndAttachExceptionHandler();
 
-        if(Build.VERSION.SDK_INT >= 11)
+        if(AndroidUtils.hasAPI(11))
         {
             ActionBar actionBar = getActionBar();
             if(actionBar != null)

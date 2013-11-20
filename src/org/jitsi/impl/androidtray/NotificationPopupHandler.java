@@ -261,7 +261,7 @@ public class NotificationPopupHandler
         PopupMessage msg = notificationMap.get(notificationId);
         if(msg == null)
         {
-            logger.debug("Notification for id: "
+            logger.warn("Notification for id: "
                                  + notificationId + " already removed");
             return;
         }

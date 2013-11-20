@@ -7,7 +7,6 @@
 package org.jitsi.impl.neomedia.jmfext.media.protocol.mediarecorder;
 
 import java.io.*;
-import java.lang.reflect.*;
 import java.util.*;
 
 import javax.media.*;
@@ -17,20 +16,18 @@ import javax.media.protocol.*;
 
 import org.jitsi.android.*;
 import org.jitsi.android.util.java.awt.*;
-import org.jitsi.impl.neomedia.device.*;
 import net.java.sip.communicator.util.*;
 
 import org.jitsi.impl.neomedia.codec.*;
 import org.jitsi.impl.neomedia.codec.video.h264.*;
+import org.jitsi.impl.neomedia.device.util.*;
 import org.jitsi.impl.neomedia.jmfext.media.protocol.*;
 import org.jitsi.service.neomedia.codec.*;
 
 import android.hardware.*;
 import android.media.*;
 import android.net.*;
-import android.os.*;
 import android.os.Process;
-import android.util.*;
 import android.view.*;
 
 /**
@@ -115,13 +112,6 @@ public class DataSource
     private static final String UNSUPPORTEDBOXSIZE_IOEXCEPTION_MESSAGE
         = "UNSUPPORTED_BOX_SIZE";
 
-    /**
-     * The <tt>Camera</tt> instances opened by the <tt>DataSource</tt>
-     * instances indexed by their IDs.
-     */
-    private static final SparseArray<Camera> cameras
-        = new SparseArray<Camera>();
-
     private static final Map<String, DataSource> dataSources
         = new HashMap<String, DataSource>();
 
@@ -186,11 +176,6 @@ public class DataSource
      * <tt>Buffer</tt>s are to be increased. 
      */
     private long videoFrameInterval;
-
-    /**
-     * Holds the default preview surface provider
-     */
-    private static PreviewSurfaceProvider surfaceProvider;
 
     /**
      * The picture and sequence parameter set for video.
@@ -386,9 +371,8 @@ public class DataSource
                 }
 
                 // Adjust preview display orientation
-                int rotation
-                        = getCameraDisplayRotation(
-                        camera, surfaceProvider.getDisplayRotation());
+                int rotation = CameraUtils.getCameraDisplayRotation(
+                        AndroidCamera.getCameraId(getLocator()));
                 camera.setDisplayOrientation(rotation);
 
                 Format[] streamFormats = getStreamFormats();
@@ -563,7 +547,8 @@ public class DataSource
          */
         mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
 
-        Surface previewSurface = surfaceProvider.obtainPreviewSurface();
+        Surface previewSurface
+                = CameraUtils.obtainPreviewSurface().getSurface();
         if(previewSurface == null)
         {
             logger.error(
@@ -774,70 +759,7 @@ public class DataSource
 
                 this.camera = null;
 
-                /*
-                 * Because Camera#release() takes more than 20 seconds on
-                 * Android 4.0 during tests, perform it into a dedicated thread
-                 * and #getCamera(MediaLocator) will wait for it to get released
-                 * before it initializes a new Camera instance.
-                 */
-                synchronized (cameras)
-                {
-                    try
-                    {
-                        if (cameras.indexOfValue(camera) < 0)
-                        {
-                            camera.stopPreview();
-                            surfaceProvider.onPreviewSurfaceReleased();
-                            camera.release();                            
-                        }
-                        else
-                        {
-                            Thread cameraReleaseThread
-                                = new Thread()
-                                {
-                                    @Override
-                                    public void run()
-                                    {
-                                        synchronized (cameras)
-                                        {
-                                            try
-                                            {
-                                                int cameraIndex
-                                                    = cameras.indexOfValue(
-                                                            camera);
-
-                                                try
-                                                {
-                                                    camera.stopPreview();
-                                                    surfaceProvider
-                                                      .onPreviewSurfaceReleased();
-                                                    camera.release();
-                                                }
-                                                finally
-                                                {
-                                                    cameras.removeAt(
-                                                            cameraIndex);
-                                                }
-                                            }
-                                            finally
-                                            {
-                                                cameras.notifyAll();
-                                            }
-                                        }
-                                    }
-                                };
-
-                            cameraReleaseThread.setDaemon(true);
-                            cameraReleaseThread.setName(
-                                    Camera.class.getName() + ".release()");
-                            cameraReleaseThread.start();
-                        }
-                    }
-                    finally
-                    {
-                        cameras.notifyAll();
-                    }
-                }
+                CameraUtils.releaseCamera(camera);
             }
         }
     }
@@ -854,116 +776,7 @@ public class DataSource
     private Camera getCamera()
         throws IOException
     {
-        return getCamera(getLocator());
-    }
-
-    /**
-     * Gets a <tt>Camera</tt> instance which corresponds to a specific
-     * <tt>MediaLocator</tt>.
-     *
-     * @param locator the <tt>MediaLocator</tt> specifying/describing the
-     * <tt>Camera</tt> instance to get
-     * @return a <tt>Camera</tt> instance which corresponds to the specified
-     * <tt>MediaLocator</tt>
-     * @throws IOException if an I/O error occurs while getting the
-     * <tt>Camera</tt> instance
-     */
-    private static Camera getCamera(MediaLocator locator)
-        throws IOException
-    {
-        Camera camera = null;
-
-        if (locator != null)
-        {
-            String remainder = locator.getRemainder();
-            int facing;
-
-            if (MediaRecorderSystem.CAMERA_FACING_BACK.equalsIgnoreCase(
-                    remainder))
-                facing = Camera.CameraInfo.CAMERA_FACING_BACK;
-            else if (MediaRecorderSystem.CAMERA_FACING_FRONT.equalsIgnoreCase(
-                    remainder))
-                facing = Camera.CameraInfo.CAMERA_FACING_FRONT;
-            else
-                facing = Camera.CameraInfo.CAMERA_FACING_BACK;
-
-            int cameraCount = Camera.getNumberOfCameras();
-            Camera.CameraInfo cameraInfo = null;
-
-            for (int cameraId = 0; cameraId < cameraCount; cameraId++)
-            {
-                if (cameraInfo == null)
-                    cameraInfo = new Camera.CameraInfo();
-                Camera.getCameraInfo(cameraId, cameraInfo);
-                if (cameraInfo.facing == facing)
-                {
-                    synchronized (cameras)
-                    {
-                        /*
-                         * Because Camera#release() takes more than 20 seconds
-                         * on Android 4.0 during tests, #doStop() performs it
-                         * into a dedicated thread. Wait for it to get released
-                         * before initializing a new Camera instance.
-                         */
-                        boolean interrupted = false;
-
-                        while (cameras.get(cameraId) != null)
-                        {
-                            try
-                            {
-                                cameras.wait();
-                            }
-                            catch (InterruptedException ie)
-                            {
-                                interrupted = true;
-                            }
-                        }
-                        if (interrupted)
-                            Thread.currentThread().interrupt();
-
-                        camera = Camera.open(cameraId);
-                        if (camera != null)
-                            cameras.put(cameraId, camera);
-                    }
-
-                    /*
-                     * Tell the Camera that the intent of the application is to
-                     * record video, not to take still pictures in order to
-                     * enable MediaRecorder to start faster and with fewer
-                     * glitches on output.
-                     */
-                    try
-                    {
-                        Method setRecordingHint
-                            = Camera.Parameters.class.getMethod(
-                                    "setRecordingHint",
-                                    Boolean.class);
-                        Camera.Parameters params = camera.getParameters();
-
-                        setRecordingHint.invoke(
-                                params,
-                                Boolean.TRUE);
-                        camera.setParameters(params);
-                    }
-                    catch (IllegalAccessException iae)
-                    {
-                        // Ignore because we only tried to set a hint.
-                    }
-                    catch (IllegalArgumentException iae)
-                    {
-                    }
-                    catch (InvocationTargetException ite)
-                    {
-                    }
-                    catch (NoSuchMethodException nsme)
-                    {
-                    }
-
-                    break;
-                }
-            }
-        }
-        return camera;
+        return CameraUtils.getCamera(getLocator());
     }
 
     private static String getNextDataSourceKey()
@@ -1559,17 +1372,6 @@ public class DataSource
     }
 
     /**
-     * Sets the {@link PreviewSurfaceProvider} that will be used with camera
-     * 
-     * @param provider the surface provider to set
-     */
-    public static void setPreviewSurfaceProvider(
-            PreviewSurfaceProvider provider)
-    {
-        surfaceProvider = provider;
-    }
-
-    /**
      * Attempts to set the <tt>Format</tt> to be reported by the
      * <tt>FormatControl</tt> of a <tt>PushBufferStream</tt> at a specific
      * zero-based index in the list of streams of this
@@ -1815,87 +1617,5 @@ public class DataSource
             if (transferHandler != null)
                 transferHandler.transferData(this);
         }
-    }
-
-    /**
-     * Calculates camera preview orientation value for the
-     * {@link Display}'s <tt>rotation</tt> in degrees.
-     * @param camera the <tt>Camera</tt> for which we are calculating
-     *        the rotation.
-     * @param rotation current {@link Display} rotation value.
-     * @return camera preview orientation value in degrees that can be used to
-     *         adjust the preview using method
-     *         {@link Camera#setDisplayOrientation(int)}.
-     */
-    public static int getCameraDisplayRotation(Camera camera,
-                                               int rotation)
-    {
-        int cameraId = cameras.keyAt(cameras.indexOfValue(camera));
-        Camera.CameraInfo info = new Camera.CameraInfo();
-        Camera.getCameraInfo(cameraId, info);
-
-        int degrees = 0;
-        switch (rotation)
-        {
-            case Surface.ROTATION_0: degrees = 0; break;
-            case Surface.ROTATION_90: degrees = 90; break;
-            case Surface.ROTATION_180: degrees = 180; break;
-            case Surface.ROTATION_270: degrees = 270; break;
-        }
-
-        int facing = info.facing;
-
-        int result;
-        if (facing == Camera.CameraInfo.CAMERA_FACING_FRONT)
-        {
-            result = (info.orientation + degrees) % 360;
-            result = (360 - result) % 360;  // compensate the mirror
-        }
-        else
-        {
-            // back-facing
-            result = (info.orientation - degrees + 360) % 360;
-        }
-        return result;
-    }
-
-    /**
-     * It's a workaround which allows not changing
-     * the OperationSetVideoTelephony and related APIs.<br/>
-     * Preview surface is required before {@link Camera} is
-     * started and because of that {@link org.jitsi.util.event.VideoEvent}s
-     * are no use as they occur to late for start and to early for stop
-     * operations. This interface defines methods to obtain and release
-     * the surface in synchronization with <tt>Camera</tt> object state.
-     *
-     * @author Pawel Domas
-     */
-    public static interface PreviewSurfaceProvider
-    {
-
-        /**
-         * Method is called before <tt>Camera</tt> is started and shall return
-         * non <tt>null</tt> {@link Surface} instance.
-         *
-         * @return {@link Surface} instance that will be used for local video
-         *  preview
-         */
-        public Surface obtainPreviewSurface();
-
-        /**
-         * Method is called when <tt>Camera</tt> is stopped and it's safe to
-         * release the {@link Surface} object.
-         */
-        public void onPreviewSurfaceReleased();
-
-        /**
-         * Should return current {@link Display} rotation as defined in
-         * {@link android.view.Display#getRotation()}.
-         *
-         * @return current {@link Display} rotation as one of values:
-         *         {@link Surface#ROTATION_0}, {@link Surface#ROTATION_90},
-         *         {@link Surface#ROTATION_180}, {@link Surface#ROTATION_270}.
-         */
-        public int getDisplayRotation();
     }
 }

@@ -13,9 +13,9 @@ import javax.media.control.*;
 
 import android.media.*;
 import android.media.audiofx.*;
-import android.os.*;
 
 import android.os.Process;
+import org.jitsi.android.gui.util.*;
 import org.jitsi.impl.neomedia.device.*;
 import org.jitsi.impl.neomedia.jmfext.media.protocol.*;
 import net.java.sip.communicator.util.*;
@@ -201,7 +201,7 @@ public class DataSource
      * Implements an audio <tt>PullBufferStream</tt> using {@link AudioRecord}.
      */
     private static class AudioRecordStream
-        extends AbstractPullBufferStream
+        extends AbstractPullBufferStream<DataSource>
     {
         /**
          * The <tt>android.media.AudioRecord</tt> which does the actual
@@ -346,7 +346,7 @@ public class DataSource
          */
         private void configureEffects()
         {
-            if(Build.VERSION.SDK_INT < 16)
+            if(!AndroidUtils.hasAPI(16))
                 return;
 
             AudioSystem audioSystem

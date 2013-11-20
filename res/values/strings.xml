@@ -915,6 +915,10 @@
     <!-- Video settings -->
     <string name="pref_cat_settings_video">pref.cat.settings.video</string>
     <string name="service_gui_settings_VIDEO">Video</string>
+    <!-- Video system -->
+    <string name="pref_key_video_system">pref.key.video.video_system</string>
+    <string name="service_gui_settings_SYSTEM_ANDROIDCAMERA">AndroidCamera</string>
+    <string name="service_gui_settings_SYSTEM_MEDIARECORDER">MediaRecorder</string>
     <!-- Camera used -->
     <string name="pref_key_video_camera">pref.key.video.camera</string>
     <string name="service_gui_settings_CAMERA">Camera</string>
@@ -923,6 +927,40 @@
     <string name="service_gui_settings_BACK_CAMERA">Back camera</string>
     <string name="service_gui_settings_USE_FRONT_CAMERA">Use front camera</string>
     <string name="service_gui_settings_USE_BACK_CAMERA">Use back camera</string>
+    <!-- Hardware codecs -->
+    <string name="service_gui_settings_MEDIA_CODEC_LIST">
+        MediaCodecs
+    </string>
+    <string name="service_gui_settings_MEDIA_CODEC_LIST_SUMMARY">
+        List of built-in media encoders/decoders
+    </string>
+    <string name="pref_key_video_media_codec_list">
+        pref.key.video.media_codec_list
+    </string>
+    <string name="service_gui_settings_HW_ENCODE">
+        Use hardware encoding
+    </string>
+    <string name="pref_key_video_hw_encode">
+        org.jitsi.impl.neomedia.android.hw_encode
+    </string>
+    <string name="service_gui_settings_DIRECT_SURFACE_ENCODE">
+        Use direct surface encoding (restart required)
+    </string>
+    <string name="pref_key_video_surface_encode">
+        org.jitsi.impl.neomedia.android.surface_encode
+    </string>
+    <string name="service_gui_settings_HW_DECODE">
+        Use hardware decoding (restart required)
+    </string>
+    <string name="pref_key_video_hw_decode">
+        org.jitsi.impl.neomedia.android.hw_decode
+    </string>
+    <string name="service_gui_settings_DIRECT_SURFACE_DECODE">
+        Use direct surface decoding (restart required)
+    </string>
+    <string name="pref_key_video_surface_decode">
+        org.jitsi.impl.neomedia.android.surface_decode
+    </string>
     <!-- Video encodings -->
     <string name="service_gui_settings_VIDEO_CODECS_TITLE">Video codecs</string>
     <string name="service_gui_settings_VIDEO_CODECS_SUMMARY">Adjust video encodings</string>

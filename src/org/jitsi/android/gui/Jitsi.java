@@ -9,7 +9,6 @@ package org.jitsi.android.gui;
 import android.app.*;
 import android.content.*;
 import android.os.Bundle; // disambiguation
-import android.os.*;
 import android.view.*;
 import android.view.MenuItem.OnActionExpandListener;
 import android.widget.*;
@@ -22,6 +21,7 @@ import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.fragment.*;
 import org.jitsi.android.gui.menu.*;
+import org.jitsi.android.gui.util.*;
 import org.jitsi.android.plugin.otr.*;
 import org.osgi.framework.*;
 
@@ -90,7 +90,7 @@ public class Jitsi
         if(savedInstanceState == null)
         {
             // Inserts ActionBar functionality
-            if(Build.VERSION.SDK_INT >= 11)
+            if(AndroidUtils.hasAPI(11))
             {
                 getSupportFragmentManager()
                         .beginTransaction()
@@ -129,7 +129,7 @@ public class Jitsi
         MenuItem searchItem = menu.findItem(R.id.search);
 
         // OnActionExpandListener not supported prior API 14
-        if(Build.VERSION.SDK_INT >= 14)
+        if(AndroidUtils.hasAPI(14))
         {
             searchItem.setOnActionExpandListener(new OnActionExpandListener()
             {
@@ -147,7 +147,7 @@ public class Jitsi
             });
         }
 
-        if(Build.VERSION.SDK_INT >= 11)
+        if(AndroidUtils.hasAPI(11))
         {
             SearchView searchView = (SearchView) searchItem.getActionView();
             searchView.setSearchableInfo(

@@ -13,6 +13,7 @@ import android.os.*;
 import android.provider.*;
 import net.java.sip.communicator.service.contactsource.*;
 import org.jitsi.android.*;
+import org.jitsi.android.gui.util.*;
 
 import java.util.*;
 import java.util.regex.*;
@@ -29,7 +30,7 @@ public class AndroidContactSource
      * Key for display name varies on Android versions
      */
     private final static String DISPLAY_NAME_COLUMN
-            = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB
+            = AndroidUtils.hasAPI(Build.VERSION_CODES.HONEYCOMB)
                     ? ContactsContract.Contacts.DISPLAY_NAME_PRIMARY
                     : ContactsContract.Contacts.DISPLAY_NAME;
 

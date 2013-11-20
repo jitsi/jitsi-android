@@ -167,7 +167,7 @@ public class VideoCallActivity
                             }
                         };
 
-        if(Build.VERSION.SDK_INT >= 11)
+        if(AndroidUtils.hasAPI(11))
         {
             sasToastController
                     = new ClickableToastController( toastView,
@@ -182,15 +182,25 @@ public class VideoCallActivity
 
         if(savedInstanceState == null)
         {
+            VideoHandlerFragment videoFragment;
+            if(AndroidUtils.hasAPI(18))
+            {
+                videoFragment = new VideoHandlerFragmentAPI18();
+            }
+            else
+            {
+                videoFragment = new VideoHandlerFragment();
+            }
+
             /**
-             * Adds fragment that turns on and off the screen when proximity sensor
-             * detects FAR/NEAR distance.
+             * Adds fragment that turns on and off the screen when proximity
+             * sensor detects FAR/NEAR distance.
              */
             getSupportFragmentManager()
                     .beginTransaction()
                     .add(new ProximitySensorFragment(), PROXIMITY_FRAGMENT_TAG)
                     /* Adds the fragment that handles video display logic */
-                    .add(new VideoHandlerFragment(), VIDEO_FRAGMENT_TAG)
+                    .add(videoFragment, VIDEO_FRAGMENT_TAG)
                     /* Adds the fragment that handles call duration logic */
                     .add(new CallTimerFragment(), TIMER_FRAGMENT_TAG)
                     .commit();
@@ -483,7 +493,7 @@ public class VideoCallActivity
      */
     private void leaveNotification()
     {
-        if(Build.VERSION.SDK_INT < 11)
+        if(!AndroidUtils.hasAPI(11))
         {
             // TODO: fix in call notifications for sdk < 11
             logger.warn("In call notifications not supported prior SDK 11");
@@ -501,7 +511,7 @@ public class VideoCallActivity
     public void setPeerName(final String name)
     {
         // ActionBar is not support prior 3.0
-        if(Build.VERSION.SDK_INT < 11)
+        if(!AndroidUtils.hasAPI(11))
             return;
 
         runOnUiThread(new Runnable()

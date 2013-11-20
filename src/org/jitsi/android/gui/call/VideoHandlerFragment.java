@@ -7,23 +7,21 @@
 package org.jitsi.android.gui.call;
 
 import android.app.*;
+import android.hardware.*;
 import android.os.*;
-import android.os.Handler;
 import android.util.*;
 import android.view.*;
 import android.widget.*;
 
-import net.java.sip.communicator.service.gui.call.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.call.*;
 
 import org.jitsi.*;
 import org.jitsi.android.gui.controller.*;
-import org.jitsi.android.gui.settings.util.*;
 import org.jitsi.android.util.java.awt.*;
-import org.jitsi.impl.neomedia.device.*;
-import org.jitsi.impl.neomedia.jmfext.media.protocol.mediarecorder.*;
+import org.jitsi.impl.neomedia.codec.video.*;
+import org.jitsi.impl.neomedia.device.util.*;
 import org.jitsi.service.neomedia.*;
 import org.jitsi.service.osgi.*;
 import org.jitsi.util.event.*;
@@ -42,7 +40,7 @@ public class VideoHandlerFragment
     /**
      * The logger
      */
-    private final static Logger logger
+    protected final static Logger logger
             = Logger.getLogger(VideoHandlerFragment.class);
 
     /**
@@ -74,7 +72,7 @@ public class VideoHandlerFragment
     /**
      * The preview surface state handler
      */
-    private CameraPreviewSurfaceHandler previewSurfaceHandler;
+    private PreviewSurfaceProvider previewSurfaceHandler;
 
     /**
      * Stores the current local video state in case this <tt>Activity</tt> is
@@ -96,6 +94,15 @@ public class VideoHandlerFragment
      * The thread that switches the camera.
      */
     private Thread cameraSwitchThread;
+
+    /**
+     * Surface provider used for displaying remote video in hw decoding mode.
+     */
+    private PreviewSurfaceProvider remoteSurfaceHandler;
+    /**
+     * Remote video view.
+     */
+    private SurfaceView remoteVideo;
 
     /**
      * Creates new instance of <tt>VideoHandlerFragment</tt>.
@@ -131,11 +138,9 @@ public class VideoHandlerFragment
         });
 
         // Creates and registers surface handler for events
-        this.previewSurfaceHandler = new CameraPreviewSurfaceHandler();
-        org.jitsi.impl.neomedia.jmfext.media
-                .protocol.mediarecorder.DataSource
-                .setPreviewSurfaceProvider(previewSurfaceHandler);
-        previewDisplay.getHolder().addCallback(previewSurfaceHandler);
+        this.previewSurfaceHandler
+            = new PreviewSurfaceProvider(activity, previewDisplay);
+        CameraUtils.setPreviewSurfaceProvider(previewSurfaceHandler);
 
         // Preview display will be displayed on top of remote video
         previewDisplay.setZOrderMediaOverlay(true);
@@ -144,6 +149,13 @@ public class VideoHandlerFragment
         previewDisplay.setOnTouchListener(new SimpleDragController());
 
         this.call = ((VideoCallActivity)activity).getCall();
+
+        this.remoteVideo
+                = (SurfaceView) activity.findViewById(R.id.remoteDisplay);
+        this.remoteSurfaceHandler
+                = new PreviewSurfaceProvider(activity, remoteVideo);
+
+        AndroidDecoder.renderSurfaceProvider = remoteSurfaceHandler;
     }
 
     @Override
@@ -167,7 +179,6 @@ public class VideoHandlerFragment
         else
         {
             logger.error("There aren't any peers in the call");
-            return;
         }
     }
 
@@ -201,7 +212,9 @@ public class VideoHandlerFragment
              * Otherwise media recorder will crash on invalid preview surface.
              */
             setLocalVideoEnabled(false);
-            previewSurfaceHandler.ensureCameraClosed();
+            previewSurfaceHandler.waitForObjectRelease();
+            //TODO: release object on rotation ?
+            //remoteSurfaceHandler.waitForObjectRelease();
         }
     }
 
@@ -223,10 +236,21 @@ public class VideoHandlerFragment
     {
         super.onCreateOptionsMenu(menu, inflater);
 
-        // Check if this device supports two cameras
-        AndroidCamera[] cameras = AndroidCamera.getCameras();
-        if(cameras.length != 2)
+        AndroidCamera currentCamera = AndroidCamera.getSelectedCameraDevInfo();
+        if(currentCamera == null)
+        {
             return;
+        }
+
+        // Check for camera with other facing from current system
+        int otherFacing
+            = currentCamera.getCameraFacing() == AndroidCamera.FACING_BACK
+                ? AndroidCamera.FACING_FRONT
+                : AndroidCamera.FACING_BACK;
+        if(AndroidCamera.getCameraFromCurrentDeviceSystem(otherFacing) == null)
+        {
+            return;
+        }
 
         inflater.inflate(R.menu.camera_menu, menu);
         this.menu = menu;
@@ -242,9 +266,12 @@ public class VideoHandlerFragment
         if(menu == null)
             return;
 
-        String currentDevice = AndroidCamera.getSelectedCameraDevName();
+        AndroidCamera currentCamera = AndroidCamera.getSelectedCameraDevInfo();
+        boolean isFrontCamera
+            = currentCamera.getCameraFacing() == AndroidCamera.FACING_FRONT;
+
         String displayName
-            = currentDevice.contains(MediaRecorderSystem.CAMERA_FACING_FRONT)
+            = isFrontCamera
                     ? getString(R.string.service_gui_settings_USE_BACK_CAMERA)
                     : getString(R.string.service_gui_settings_USE_FRONT_CAMERA);
 
@@ -266,28 +293,23 @@ public class VideoHandlerFragment
                 = getString(R.string.service_gui_settings_USE_FRONT_CAMERA);
             String newTitle;
 
-            AndroidCamera[] cameras = AndroidCamera.getCameras();
-            final String newDeviceName;
+            final AndroidCamera newDevice;
 
             if(item.getTitle().equals(back))
             {
                 // Switch to back camera
-                newDeviceName
-                    = cameras[0].getDeviceName().contains(
-                        MediaRecorderSystem.CAMERA_FACING_BACK)
-                            ? cameras[0].getDeviceName()
-                            : cameras[1].getDeviceName();
+                newDevice
+                    = AndroidCamera.getCameraFromCurrentDeviceSystem(
+                            Camera.CameraInfo.CAMERA_FACING_BACK);
                 // Set opposite title
                 newTitle = front;
             }
             else
             {
                 // Switch to front camera
-                newDeviceName
-                    = cameras[0].getDeviceName().contains(
-                        MediaRecorderSystem.CAMERA_FACING_FRONT)
-                            ? cameras[0].getDeviceName()
-                            : cameras[1].getDeviceName();
+                newDevice
+                    = AndroidCamera.getCameraFromCurrentDeviceSystem(
+                            Camera.CameraInfo.CAMERA_FACING_FRONT);
                 // Set opposite title
                 newTitle = back;
             }
@@ -299,7 +321,7 @@ public class VideoHandlerFragment
                 @Override
                 public void run()
                 {
-                    AndroidCamera.setSelectedCamera(newDeviceName);
+                    AndroidCamera.setSelectedCamera(newDevice.getLocator());
                     // Keep track of created threads
                     cameraSwitchThread = null;
                 }
@@ -716,9 +738,7 @@ public class VideoHandlerFragment
         if(previewDisplay == null)
             return false;
 
-        return (previewDisplay.getVisibility() != View.VISIBLE)
-                ? false
-                : true;
+        return previewDisplay.getVisibility() == View.VISIBLE;
     }
 
     /**
@@ -727,155 +747,8 @@ public class VideoHandlerFragment
      */
     public void ensureCameraClosed()
     {
-        previewSurfaceHandler.ensureCameraClosed();
-    }
-
-    /**
-     * The class exposes methods for managing preview surface state which must
-     * be synchronized with currently used {@link android.hardware.Camera}
-     * state.<br/>
-     * The surface must be present before the camera is started and for this
-     * purpose {@link #obtainPreviewSurface()} method shall be used.
-     * <br/>
-     * When the call is ended, before the <tt>Activity</tt> is finished we
-     * should ensure that the camera has been stopped(which is done by video
-     * telephony internals), so we should wait for it to be disposed by
-     * invoking method {@link #ensureCameraClosed()}. It will block current
-     * <tt>Thread</tt> until it happens or an <tt>Exception</tt> will be thrown
-     * if timeout occurs.
-     * <br/>
-     * It's a workaround which allows not changing the
-     * OperationSetVideoTelephony and related APIs.
-     *
-     * @see DataSource.PreviewSurfaceProvider
-     *
-     */
-    private class CameraPreviewSurfaceHandler
-            implements DataSource.PreviewSurfaceProvider,
-                       SurfaceHolder.Callback
-    {
-
-        /**
-         * Timeout for dispose surface operation
-         */
-        private static final long REMOVAL_TIMEOUT=10000L;
-
-        /**
-         * Timeout for create surface operation
-         */
-        private static final long CREATE_TIMEOUT=10000L;
-
-        /**
-         * Pointer to the <tt>Surface</tt> used for preview
-         */
-        private Surface previewSurface;
-
-        /**
-         * Blocks until the {@link android.hardware.Camera} is stopped and
-         * {@link #previewDisplay} is hidden, or throws an <tt>Exception</tt>
-         * if timeout occurs.
-         */
-        synchronized void ensureCameraClosed()
-        {
-            // If local video is visible wait until camera will be closed
-            if(previewSurface != null)
-            {
-                try
-                {
-                    synchronized (this)
-                    {
-                        this.wait(REMOVAL_TIMEOUT);
-                        if(previewSurface != null)
-                        {
-                            throw new RuntimeException(
-                                    "Timeout waiting for"
-                                            + " preview surface removal");
-                        }
-                    }
-                }
-                catch (InterruptedException e)
-                {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        /**
-         * Blocks until {@link #previewDisplay} is shown and the surface is
-         * created or throws en <tt>Exception</tt> if timeout occurs.
-         *
-         * @return created <tt>Surface</tt> that shall be used for local camera
-         * preview
-         */
-        synchronized public Surface obtainPreviewSurface()
-        {
-            setLocalVideoPreviewVisible(true);
-            if(this.previewSurface == null)
-            {
-                try
-                {
-                    this.wait(CREATE_TIMEOUT);
-                    if(previewSurface == null)
-                    {
-                        throw new RuntimeException(
-                                "Timeout waiting for surface");
-                    }
-                }
-                catch (InterruptedException e)
-                {
-                    throw new RuntimeException(e);
-                }
-            }
-            return previewSurface;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public int getDisplayRotation()
-        {
-            return getActivity().getWindowManager()
-                    .getDefaultDisplay().getRotation();
-        }
-
-        /**
-         * Hides the local video preview component causing the <tt>Surface</tt>
-         * to be destroyed.
-         */
-        public void onPreviewSurfaceReleased()
-        {
-            setLocalVideoPreviewVisible(false);
-            releasePreviewSurface();
-        }
-
-        /**
-         * Releases the preview surface and notifies all threads waiting on
-         * the lock.
-         */
-        synchronized private void releasePreviewSurface()
-        {
-            if(previewSurface == null)
-                return;
-
-            this.previewSurface = null;
-            this.notifyAll();
-        }
-
-        synchronized public void surfaceCreated(SurfaceHolder holder)
-        {
-            this.previewSurface = holder.getSurface();
-            this.notifyAll();
-        }
-
-        public void surfaceChanged( SurfaceHolder surfaceHolder,
-                                    int i, int i2, int i3 )
-        {
-
-        }
-
-        synchronized public void surfaceDestroyed(SurfaceHolder holder)
-        {
-            releasePreviewSurface();
-        }
+        previewSurfaceHandler.waitForObjectRelease();
+        //TODO: remote display must be released too
+        //remoteSurfaceHandler.waitForObjectRelease();
     }
 }

@@ -566,6 +566,8 @@ public class FrameworkImpl
                 }
 
                 framework.setState(RESOLVED);
+                // Kills the process to clear static fields before next restart
+                System.exit(0);
             }
         }
             .start();

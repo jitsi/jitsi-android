@@ -22,10 +22,13 @@ import org.jitsi.android.gui.util.*;
 import org.jitsi.android.util.java.awt.*;
 import org.jitsi.impl.neomedia.*;
 import org.jitsi.impl.neomedia.device.*;
+import org.jitsi.impl.neomedia.device.util.*;
 import org.jitsi.service.configuration.*;
 import org.jitsi.service.osgi.*;
 
 import org.osgi.framework.*;
+
+import javax.media.*;
 
 /**
  * <tt>Activity</tt> implements Jitsi settings.
@@ -77,6 +80,15 @@ public class SettingsActivity
     // Video settings
     static private final String P_KEY_VIDEO_CAMERA
         = JitsiApplication.getResString(R.string.pref_key_video_camera);
+    // Hardware encoding(API16)
+    static private final String P_KEY_VIDEO_HW_ENCODE
+            = JitsiApplication.getResString(R.string.pref_key_video_hw_encode);
+    // Direct surface encoding(hw encoding required and API18)
+    //static private final String P_KEY_VIDEO_DIRECT_SURFACE
+    // = JitsiApplication.getResString(R.string.pref_key_video_surface_encode);
+    // Hardware decoding(API16)
+    static private final String P_KEY_VIDEO_HW_DECODE
+            = JitsiApplication.getResString(R.string.pref_key_video_hw_decode);
     // Video resolutions
     static private final String P_KEY_VIDEO_RES
         = JitsiApplication.getResString(R.string.pref_key_video_resolution);
@@ -336,7 +348,7 @@ public class SettingsActivity
             for(int i=0; i<cameras.length; i++)
             {
                 names[i] = cameras[i].getName();
-                values[i] = cameras[i].getDeviceName();
+                values[i] = cameras[i].getLocator().toString();
             }
 
             ListPreference cameraList
@@ -345,21 +357,25 @@ public class SettingsActivity
             cameraList.setEntryValues(values);
 
             // Get camera from configuration
-            cameraList.setValue(AndroidCamera.getSelectedCameraDevName());
+            AndroidCamera currentCamera
+                = AndroidCamera.getSelectedCameraDevInfo();
+            cameraList.setValue(currentCamera.getLocator().toString());
+
+            updateHwCodecStatus(currentCamera);
 
             // Resolutions
-            String[] resolutionValues
-                = new String[MediaRecorderSystem.SUPPORTED_SIZES.length+1];
+            int resCount = CameraUtils.PREFERRED_SIZES.length;
+            String[] resolutionValues = new String[resCount+1];
 
             // Auto resolution entry
             String autoResStr
                     = getString(R.string.service_gui_settings_AUTO_RESOLUTION);
             resolutionValues[0] = autoResStr;
 
-            for(int i=0; i<resolutionValues.length-1; i++)
+            for(int i=0; i < resolutionValues.length-1; i++)
             {
                 resolutionValues[i+1]
-                        = resToStr(MediaRecorderSystem.SUPPORTED_SIZES[i]);
+                        = resToStr(CameraUtils.PREFERRED_SIZES[i]);
             }
 
             ListPreference resList
@@ -493,6 +509,27 @@ public class SettingsActivity
             denoisePref.setEnabled( hasDenoiseFeature );
             denoisePref.setChecked( hasDenoiseFeature
                                     && audioSystem.isDenoise() );
+        }
+
+        /**
+         * Updates preferences enabled status based on selected camera device.
+         * @param selectedCamera currently selected camera device.
+         */
+        private void updateHwCodecStatus(AndroidCamera selectedCamera)
+        {
+            if(!AndroidUtils.hasAPI(16))
+                return;
+
+            // MediaCodecs only work with AndroidCameraSystem(at least for now)
+            boolean enableMediaCodecs
+                = selectedCamera != null
+                    && DeviceSystem.LOCATOR_PROTOCOL_ANDROIDCAMERA
+                            .equals(selectedCamera.getCameraProtocol());
+
+            findPreference(P_KEY_VIDEO_HW_ENCODE)
+                    .setEnabled(enableMediaCodecs);
+            findPreference(P_KEY_VIDEO_HW_DECODE)
+                    .setEnabled(enableMediaCodecs);
         }
 
         /**
@@ -635,9 +672,11 @@ public class SettingsActivity
             {
                 // Camera
                 String cameraName
-                        = shPreferences.getString(P_KEY_VIDEO_CAMERA, null);
+                    = shPreferences.getString(P_KEY_VIDEO_CAMERA, null);
 
-                AndroidCamera.setSelectedCamera(cameraName);
+                updateHwCodecStatus(
+                    AndroidCamera.setSelectedCamera(
+                            new MediaLocator(cameraName)));
             }
             else if(key.equals(P_KEY_VIDEO_RES))
             {

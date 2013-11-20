@@ -6,8 +6,11 @@
  */
 package org.jitsi.android.gui.util;
 
+import android.os.*;
 import android.view.*;
 import android.widget.*;
+
+import net.java.sip.communicator.util.*;
 
 /**
  * Utility class that encapsulates common operations on some <tt>View</tt> types.
@@ -16,6 +19,11 @@ import android.widget.*;
  */
 public class ViewUtil
 {
+    /**
+     * The logger
+     */
+    private final static Logger logger = Logger.getLogger(ViewUtil.class);
+
     /**
      * Sets given <tt>text</tt> on the <tt>TextView</tt> identified by the
      * <tt>id</tt>. The <tt>TextView</tt> must be inside <tt>container</tt> view
@@ -143,5 +151,35 @@ public class ViewUtil
         {
             view.setEnabled(isEnabled);
         }
+    }
+
+    /**
+     * Sets given <tt>view</tt> visibility state using it's handler.
+     * @param view the view which visibility state will be changed.
+     * @param visible new visibility state o set.
+     */
+    public static void setViewVisible(final View view, final boolean visible)
+    {
+        final int newState = visible ? View.VISIBLE : View.GONE;
+        if(view.getVisibility() == newState)
+        {
+            return;
+        }
+
+        Handler viewHandler = view.getHandler();
+        if(viewHandler == null)
+        {
+            logger.warn("Handler not available for view "+view);
+            return;
+        }
+
+        viewHandler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                view.setVisibility(newState);
+            }
+        });
     }
 }

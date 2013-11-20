@@ -12,10 +12,16 @@ import java.util.List;
 
 import javax.media.*;
 
-import net.java.sip.communicator.util.*;
+import android.content.res.*;
 import android.hardware.*;
+
+import net.java.sip.communicator.util.*;
+
+import org.jitsi.*;
+import org.jitsi.android.*;
 import org.jitsi.android.util.java.awt.*;
 import org.jitsi.impl.neomedia.codec.video.h264.*;
+import org.jitsi.impl.neomedia.device.util.*;
 import org.jitsi.impl.neomedia.format.*;
 import org.jitsi.service.neomedia.*;
 import org.jitsi.service.neomedia.codec.*;
@@ -24,6 +30,7 @@ import org.jitsi.service.neomedia.codec.*;
  * Discovers and registers <tt>MediaRecorder</tt> capture devices with FMJ.
  *
  * @author Lyubomir Marinov
+ * @author Pawel Domas
  */
 public class MediaRecorderSystem
     extends DeviceSystem
@@ -45,25 +52,7 @@ public class MediaRecorderSystem
      */
     private static final String LOCATOR_PROTOCOL = LOCATOR_PROTOCOL_MEDIARECORDER;
 
-    /**
-     * The list of sizes from which the first supported by the respective
-     * {@link Camera} is to be chosen as the size of the one and only
-     * <tt>Format</tt> supported by the associated <tt>mediarecorder</tt>
-     * <tt>CaptureDevice</tt>.
-     */
-    private static final Dimension[] PREFERRED_SIZES
-        = new Dimension[]
-                {
-                    new Dimension(176, 144),
-                    new Dimension(352, 288),
-                    new Dimension(320, 240),
-//                    new Dimension(704, 576),
-                    new Dimension(640, 480)
-                };
-
-
-    public static Dimension[] SUPPORTED_SIZES
-            = new Dimension[]{};
+    public static Dimension[] SUPPORTED_SIZES = new Dimension[]{};
 
     /**
      * Initializes a new <tt>MediaRecorderSystem</tt> instance which discovers
@@ -80,35 +69,9 @@ public class MediaRecorderSystem
 
     /**
      * Constructs a <tt>String</tt> representation of a specific
-     * <tt>Iterable</tt> of <tt>Camera.Size</tt>s. The elements of the specified
-     * <tt>Iterable</tt> are delimited by &quot;, &quot;. The method has been
-     * introduced because the <tt>Camera.Size</tt> class does not provide a
-     * <tt>String</tt> representation which contains the <tt>width</tt> and the
-     * <tt>height</tt> in human-readable form.
-     *
-     * @param sizes the <tt>Iterable</tt> of <tt>Camera.Size</tt>s which is to
-     * be represented as a human-readable <tt>String</tt>
-     * @return the human-readable <tt>String</tt> representation of the
-     * specified <tt>sizes</tt>
-     */
-    private static String cameraSizesToString(Iterable<Camera.Size> sizes)
-    {
-        StringBuilder s = new StringBuilder();
-
-        for (Camera.Size size : sizes)
-        {
-            if (s.length() != 0)
-                s.append(", ");
-            s.append(size.width).append('x').append(size.height);
-        }
-        return s.toString();
-    }
-
-    /**
-     * Constructs a <tt>String</tt> representation of a specific
      * <tt>Iterable</tt> of <tt>Dimension</tt>s. The elements of the specified
      * <tt>Iterable</tt> are delimited by &quot;, &quot;. The method has been
-     * introduced to match {@link #cameraSizesToString(Iterable)}.
+     * introduced to match {@link CameraUtils#cameraSizesToString(Iterable)}.
      *
      * @param sizes the <tt>Iterable</tt> of <tt>Dimension</tt>s which is to be
      * represented as a human-readable <tt>String</tt>
@@ -164,8 +127,12 @@ public class MediaRecorderSystem
             // Pick up the preferred sizes which is supported by the Camera.
             Camera camera = Camera.open(cameraId);
             List<Dimension> sizes
-                = new ArrayList<Dimension>(PREFERRED_SIZES.length);
-            String locatorString = LOCATOR_PROTOCOL + ":" + facing;
+                = new ArrayList<Dimension>(CameraUtils.PREFERRED_SIZES.length);
+
+            // Locator protocol contains camera id and it's facing
+            MediaLocator locator
+                = AndroidCamera.constructLocator(
+                        LOCATOR_PROTOCOL, cameraId, cameraInfo);
 
             try
             {
@@ -186,22 +153,24 @@ public class MediaRecorderSystem
                     {
                         logger.debug(
                                 "Preview sizes supported by "
-                                    + locatorString
+                                    + locator
                                     + ": "
-                                    + cameraSizesToString(supportedSizes));
+                                    + CameraUtils.cameraSizesToString(
+                                            supportedSizes));
                     }
                 }
                 else if (logger.isDebugEnabled())
                 {
                     logger.debug(
                             "Video sizes supported by "
-                                + locatorString
+                                + locator
                                 + ": "
-                                + cameraSizesToString(supportedSizes));
+                                + CameraUtils.cameraSizesToString(
+                                        supportedSizes));
                 }
                 if (supportedSizes != null)
                 {
-                    for (Dimension preferredSize : PREFERRED_SIZES)
+                    for (Dimension preferredSize : CameraUtils.PREFERRED_SIZES)
                     {
                         for (Camera.Size supportedSize : supportedSizes)
                         {
@@ -217,7 +186,7 @@ public class MediaRecorderSystem
                     {
                         logger.debug(
                                 "Sizes supported by "
-                                    + locatorString
+                                    + locator
                                     + ": "
                                     + dimensionsToString(sizes));
                     }
@@ -254,11 +223,15 @@ public class MediaRecorderSystem
                                     "1"));
             }
 
-            CaptureDeviceInfo device
-                = new CaptureDeviceInfo(
-                        locatorString,
-                        new MediaLocator(locatorString),
-                        formats);
+            // Create display name
+            Resources res = JitsiApplication.getAppResources();
+            String name = facing.equals(CAMERA_FACING_FRONT)
+                    ? res.getString(R.string.service_gui_settings_FRONT_CAMERA)
+                    : res.getString(R.string.service_gui_settings_BACK_CAMERA);
+            name += " (MediaRecorder)";
+
+            AndroidCamera device
+                = new AndroidCamera(name, locator, formats);
 
             // XXX Prefer the front-facing camera over the back-facing one.
             if (cameraInfo.facing == Camera.CameraInfo.CAMERA_FACING_FRONT)

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--<PreferenceCategory
+        android:title="@string/service_gui_settings_GENERAL"
+        android:key="@string/pref_cat_settings_general" >
+        <ListPreference
+                android:title="@string/service_gui_settings_LOCALE"
+                android:key="@string/pref_key_locale"
+                />
+    </PreferenceCategory>-->
+
+    <!-- Message settings -->
+    <PreferenceCategory
+            android:title="@string/service_gui_settings_MSG"
+            android:key="@string/pref_cat_settings_msg" >
+        <!-- Group messages in one window -->
+        <!--<CheckBoxPreference
+                android:title="@string/service_gui_settings_MULTICHAT_WINDOW"
+                android:key="@string/pref_key_multichat_window"
+                android:summaryOn="@string/service_gui_settings_MULTICHAT_ON"
+                android:summaryOff="@string/service_gui_settings_MULTICHAT_OFF"
+                />-->
+        <!-- Log chat history -->
+        <CheckBoxPreference
+            android:title="@string/service_gui_settings_HISTORY_LOGGING"
+            android:key="@string/pref_key_history_logging"
+            android:summaryOn="@string/service_gui_settings_HISTORY_LOG_ON"
+            android:summaryOff="@string/service_gui_settings_HISTORY_LOG_OFF"
+            />
+        <!-- Show x recent messages in new chats -->
+        <CheckBoxPreference
+            android:title="@string/service_gui_settings_SHOW_HISTORY"
+            android:key="@string/pref_key_show_history"
+            android:summaryOn="@string/service_gui_settings_ENABLED_STR"
+            android:summaryOff="@string/service_gui_settings_DISABLED_STR"
+            />
+        <EditTextPreference
+            android:title="@string/service_gui_settings_CHAT_HISTORY_SIZE"
+            android:dialogMessage="@string/service_gui_settings_CHAT_HISTORY_DLG_TITLE"
+            android:key="@string/pref_key_chat_history_size"
+            android:dependency="@string/pref_key_show_history"
+            android:inputType="number"
+            />
+        <!-- Tell others when we are writing to them -->
+        <CheckBoxPreference
+            android:title="@string/service_gui_settings_TYPING_NOTIFICATIONS"
+            android:key="@string/pref_key_typing_notifications"
+            android:summaryOn="@string/service_gui_settings_ENABLED_STR"
+            android:summaryOff="@string/service_gui_settings_DISABLED_STR"
+            />
+        <!-- Smiley replacement -->
+        <CheckBoxPreference
+            android:title="@string/plugin_chatconfig_replacement_ENABLE_SMILEY_STATUS"
+            android:key="@string/pref_key_smiley_replacement"
+            android:summaryOn="@string/service_gui_settings_ENABLED_STR"
+            android:summaryOff="@string/service_gui_settings_DISABLED_STR"
+            />
+        <!-- Use task bar / dock alerts on incoming calls and chats
+            not implemented on Android
+        <CheckBoxPreference
+                android:title="@string/service_gui_settings_CHAT_ALERTS"
+                android:key="@string/pref_key_chat_alerts"
+                android:summaryOn="@string/service_gui_settings_ENABLED_STR"
+                android:summaryOff="@string/service_gui_settings_DISABLED_STR"
+                />-->
+    </PreferenceCategory>
+    <!-- Notifications -->
+    <PreferenceCategory
+            android:title="@string/service_gui_settings_NOTIFICATIONS"
+            android:key="@string/pref_cat_settings_notifications" >
+        <!-- Popup notifications type -->
+        <ListPreference
+            android:title="@string/service_gui_settings_POPUP_HANDLER"
+            android:key="@string/pref_key_popup_handler"
+            />
+        <!-- Events -->
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_EVENTS_TITLE"
+                android:summary="@string/service_gui_settings_EVENTS_SUMMARY">
+            <intent android:action=".android.gui.settings.NotificationsSettings"/>
+        </PreferenceScreen>
+    </PreferenceCategory>
+    <PreferenceCategory
+            android:title="@string/service_gui_settings_CALL"
+            android:key="@string/pref_cat_settings_call" >
+        <CheckBoxPreference
+                android:title="@string/service_gui_settings_NORMALIZE_NUMBER"
+                android:key="@string/pref_key_normalize_pnumber"
+                android:summaryOn="@string/service_gui_settings_NORMALIZE_ON"
+                android:summaryOff="@string/service_gui_settings_NORMALIZE_OFF"
+                />
+        <CheckBoxPreference
+                android:title="@string/service_gui_settings_ALLOW_ALPHA_PNUMBER"
+                android:key="@string/pref_key_accept_alpha_pnumbers"
+                android:summaryOn="@string/service_gui_settings_ALLOW_ALPHA_ON"
+                android:summaryOff="@string/service_gui_settings_ALLOW_ALPHA_OFF"
+                />
+    </PreferenceCategory>
+    <PreferenceCategory
+            android:title="@string/service_gui_settings_AUDIO"
+            android:key="@string/pref_cat_settings_audio">
+        <CheckBoxPreference
+                android:title="@string/service_gui_settings_ECHO_CANCEL"
+                android:key="@string/pref_key_audio_echo_cancel"
+                android:summaryOn="@string/service_gui_settings_ECHO_CANCEL_ON"
+                android:summaryOff="@string/service_gui_settings_ECHO_CANCEL_OFF"
+                />
+        <CheckBoxPreference
+                android:title="@string/service_gui_settings_DENOISE"
+                android:key="@string/pref_key_audio_denoise"
+                android:summaryOn="@string/service_gui_settings_DENOISE_ON"
+                android:summaryOff="@string/service_gui_settings_DENOISE_OFF"
+                />
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_AUDIO_CODECS_TITLE"
+                android:summary="@string/service_gui_settings_AUDIO_CODECS_SUMMARY">
+            <intent android:action=".android.gui.settings.EncodingSettings">
+                <extra android:name="media_type" android:value="media_type.AUDIO" />
+            </intent>
+        </PreferenceScreen>
+    </PreferenceCategory>
+    <PreferenceCategory
+            android:title="@string/service_gui_settings_VIDEO"
+            android:key="@string/pref_cat_settings_video">
+        <ListPreference
+                android:title="@string/service_gui_settings_CAMERA"
+                android:key="@string/pref_key_video_camera"
+                />
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_VIDEO_CODECS_TITLE"
+                android:summary="@string/service_gui_settings_VIDEO_CODECS_SUMMARY">
+            <intent android:action=".android.gui.settings.EncodingSettings">
+                <extra android:name="media_type" android:value="media_type.VIDEO" />
+            </intent>
+        </PreferenceScreen>
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_MEDIA_CODEC_LIST"
+                android:summary="@string/service_gui_settings_MEDIA_CODEC_LIST_SUMMARY">
+            <intent android:action=".android.gui.settings.MediaCodecList"/>
+        </PreferenceScreen>
+        <org.jitsi.android.gui.settings.widget.ConfigCheckBox
+                android:title="@string/service_gui_settings_HW_ENCODE"
+                android:key="@string/pref_key_video_hw_encode"
+                android:defaultValue="true"
+                />
+        <org.jitsi.android.gui.settings.widget.ConfigCheckBox
+                android:title="@string/service_gui_settings_DIRECT_SURFACE_ENCODE"
+                android:key="@string/pref_key_video_surface_encode"
+                android:dependency="@string/pref_key_video_hw_encode"
+                android:defaultValue="true"
+                />
+        <org.jitsi.android.gui.settings.widget.ConfigCheckBox
+                android:title="@string/service_gui_settings_HW_DECODE"
+                android:key="@string/pref_key_video_hw_decode"
+                android:defaultValue="false"
+                />
+        <org.jitsi.android.gui.settings.widget.ConfigCheckBox
+                android:title="@string/service_gui_settings_DIRECT_SURFACE_DECODE"
+                android:key="@string/pref_key_video_surface_decode"
+                android:dependency="@string/pref_key_video_hw_decode"
+                android:defaultValue="true"
+                />
+        <ListPreference
+                android:title="@string/service_gui_settings_VIDEO_RESOLUTION"
+                android:key="@string/pref_key_video_resolution" />
+        <CheckBoxPreference
+                android:title="@string/service_gui_settings_VIDEO_FRAME_RATE"
+                android:key="@string/pref_key_video_limit_fps"
+                android:summaryOff="@string/service_gui_settings_LIMIT_FPS_OFF"
+                android:summaryOn="@string/service_gui_settings_LIMIT_FPS_ON"
+                />
+        <EditTextPreference
+                android:title="@string/service_gui_settings_VIDEO_TARGET_FPS"
+                android:dialogMessage="@string/service_gui_settings_VIDEO_FPS_DESC"
+                android:key="@string/pref_key_video_target_fps"
+                android:dependency="@string/pref_key_video_limit_fps"
+                android:inputType="number"
+                />
+        <EditTextPreference
+                android:title="@string/service_gui_settings_VIDEO_MAX_BANDWIDTH"
+                android:key="@string/pref_key_video_max_bandwidth"
+                android:inputType="number"
+                />
+        <EditTextPreference
+                android:title="@string/service_gui_settings_VIDEO_BITRATE"
+                android:key="@string/pref_key_video_bitrate"
+                android:inputType="number"
+                />
+    </PreferenceCategory>
+    <PreferenceCategory
+            android:title="@string/service_gui_settings_SECURITY"
+            android:key="@string/pref_cat_settings_security">
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_CHAT_SECURITY_TITLE"
+                android:summary="@string/service_gui_settings_CHAT_SECURITY_SUMMARY">
+            <intent android:action=".android.gui.settings.ChatSecuritySettings"/>
+        </PreferenceScreen>
+    </PreferenceCategory>
+    <PreferenceCategory
+            android:title="@string/service_gui_settings_ADVANCED"
+            android:key="@string/pref_cat_settings_advanced">
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_OPUS"
+                android:summary="@string/service_gui_settings_OPUS_SUMMARY">
+            <intent android:action=".android.gui.settings.OpusSettings"/>
+        </PreferenceScreen>
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_SILK"
+                android:summary="@string/service_gui_settings_SILK_SUMMARY">
+            <intent android:action=".android.gui.settings.SilkSettings"/>
+        </PreferenceScreen>
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_SIP"
+                android:summary="@string/service_gui_settings_SIP_SUMMARY">
+            <intent android:action=".android.gui.settings.SipSettings"/>
+        </PreferenceScreen>
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_LOGGING_TITLE"
+                android:summary="@string/service_gui_settings_LOGGING_SUMMARY">
+            <intent android:action=".android.gui.settings.LoggingSettings"/>
+        </PreferenceScreen>
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_PROXY"
+                android:summary="@string/service_gui_settings_PROXY_SUMMARY">
+            <intent android:action=".android.gui.settings.ProxySettings"/>
+        </PreferenceScreen>
+        <PreferenceScreen
+                android:title="@string/service_gui_settings_DNS"
+                android:summary="@string/service_gui_settings_DNS_SUMMARY">
+            <intent android:action=".android.gui.settings.DnsSettings"/>
+        </PreferenceScreen>
+        <PreferenceScreen
+                android:title="@string/plugin_provisioning_PROVISIONING"
+                android:summary="@string/plugin_provisioning_PROVISIONING_SUMMARY">
+            <intent android:action=".android.gui.settings.ProvisioningSettings"/>
+        </PreferenceScreen>
+    </PreferenceCategory>
+</PreferenceScreen>

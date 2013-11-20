@@ -7,7 +7,6 @@
 package org.jitsi.impl.neomedia.device;
 
 import android.media.audiofx.*;
-import android.os.*;
 
 import java.io.*;
 import java.util.*;
@@ -15,6 +14,7 @@ import java.util.*;
 import javax.media.*;
 import javax.media.format.AudioFormat;
 
+import org.jitsi.android.gui.util.*;
 import org.jitsi.impl.neomedia.jmfext.media.renderer.audio.*;
 import org.jitsi.service.neomedia.codec.*;
 
@@ -24,6 +24,7 @@ import org.jitsi.service.neomedia.codec.*;
  *
  * @author Lyubomir Marinov
  */
+@SuppressWarnings("unused")
 public class AudioRecordSystem
     extends AudioSystem
 {
@@ -53,7 +54,7 @@ public class AudioRecordSystem
     public static int getFeatureSet()
     {
         int featureSet = FEATURE_NOTIFY_AND_PLAYBACK_DEVICES;
-        if(Build.VERSION.SDK_INT >= 16)
+        if(AndroidUtils.hasAPI(16))
         {
             if(AcousticEchoCanceler.isAvailable())
             {

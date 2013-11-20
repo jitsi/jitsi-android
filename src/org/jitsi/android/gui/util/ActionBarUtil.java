@@ -6,8 +6,6 @@
  */
 package org.jitsi.android.gui.util;
 
-import android.os.*;
-
 import android.app.*;
 import android.content.*;
 import android.graphics.drawable.*;
@@ -35,7 +33,7 @@ public class ActionBarUtil
      */
     public static void setTitle(Activity a, CharSequence title)
     {
-        if(Build.VERSION.SDK_INT < 11)
+        if(!AndroidUtils.hasAPI(11))
             return;
 
         ActionBar actionBar = a.getActionBar();
@@ -58,7 +56,7 @@ public class ActionBarUtil
      */
     public static void setSubtitle(Activity a, String subtitle)
     {
-        if(Build.VERSION.SDK_INT < 11)
+        if(!AndroidUtils.hasAPI(11))
             return;
 
         TextView actionBarText
@@ -84,7 +82,7 @@ public class ActionBarUtil
                 AndroidImageUtil.drawableFromBytes(avatar));
 
         // setLogo not supported prior API 14
-        if(Build.VERSION.SDK_INT >= 14)
+        if(AndroidUtils.hasAPI(14))
         {
             a.getActionBar().setLogo(avatarDrawable);
         }
@@ -106,7 +104,7 @@ public class ActionBarUtil
                 AndroidImageUtil.drawableFromBytes(statusIcon));
 
         // setLogo not supported prior API 14
-        if(Build.VERSION.SDK_INT >= 14)
+        if(AndroidUtils.hasAPI(14))
         {
             a.getActionBar().setLogo(avatarDrawable);
         }
