@@ -32,6 +32,7 @@ import android.widget.*;
 /**
  * 
  * @author Yana Stamcheva
+ * @author Pawel Domas
  */
 public class ContactListAdapter
     extends BaseExpandableListAdapter
@@ -167,6 +168,46 @@ public class ContactListAdapter
 
         for (int position = 1; position <= count; position++)
             contactListView.expandGroup(position - 1);
+    }
+
+    /**
+     * Get group contact list from original contact list.
+     * @param groupIndex contact group index.
+     * @return group contact list from original contact list.
+     */
+    private TreeSet<MetaContact> getOriginalCList(int groupIndex)
+    {
+        if(groupIndex >= 0 && groupIndex < originalContacts.size())
+        {
+            return originalContacts.get(groupIndex);
+        }
+        else
+        {
+            logger.warn("Get original contact list for idx: " + groupIndex
+                                + ", list size: " + originalContacts.size(),
+                        new Throwable());
+            return null;
+        }
+    }
+
+    /**
+     * Get group contact list from filtered contact list.
+     * @param groupIndex contact group index.
+     * @return group contact list from filtered contact list.
+     */
+    private TreeSet<MetaContact> getContactList(int groupIndex)
+    {
+        if(groupIndex >= 0 && groupIndex < contacts.size())
+        {
+            return contacts.get(groupIndex);
+        }
+        else
+        {
+            logger.warn("Get contact list for idx: " + groupIndex
+                                + ", list size: " + contacts.size(),
+                        new Throwable());
+            return null;
+        }
     }
 
     /**
@@ -308,7 +349,7 @@ public class ContactListAdapter
                     }
 
                     TreeSet<MetaContact> origContactList
-                        = originalContacts.get(groupIndex);
+                        = getOriginalCList(groupIndex);
 
                     if (origContactList != null
                         && getChildIndex(origContactList, metaContact) < 0)
@@ -317,7 +358,7 @@ public class ContactListAdapter
                     }
 
                     TreeSet<MetaContact> contactList
-                        = contacts.get(groupIndex);
+                        = getContactList(groupIndex);
 
                     if (isMatchingQuery
                         && contactList != null
@@ -387,7 +428,7 @@ public class ContactListAdapter
                     if (origGroupIndex >= 0)
                     {
                         TreeSet<MetaContact> origContactList
-                            = originalContacts.get(origGroupIndex);
+                            = getOriginalCList(origGroupIndex);
 
                         origContactList.remove(metaContact);
 
@@ -400,7 +441,7 @@ public class ContactListAdapter
                     if (groupIndex >= 0)
                     {
                         TreeSet<MetaContact> contactList
-                            = contacts.get(origGroupIndex);
+                            = getContactList(groupIndex);
 
                         contactList.remove(metaContact);
 
@@ -469,7 +510,8 @@ public class ContactListAdapter
                         return;
 
                     int contactIndex
-                        = getChildIndex(contacts.get(groupIndex), metaContact);
+                        = getChildIndex( getContactList(groupIndex),
+                                         metaContact );
 
                     if (contactIndex >= 0)
                         updateDisplayName(groupIndex, contactIndex);
@@ -525,7 +567,8 @@ public class ContactListAdapter
                         return;
 
                     int contactIndex
-                        = getChildIndex(contacts.get(groupIndex), metaContact);
+                        = getChildIndex( getContactList(groupIndex),
+                                         metaContact );
 
                     if (contactIndex >= 0)
                         updateAvatar(groupIndex, contactIndex, metaContact);
@@ -580,7 +623,8 @@ public class ContactListAdapter
                         return;
 
                     int contactIndex
-                        = getChildIndex(contacts.get(groupIndex), metaContact);
+                        = getChildIndex( getContactList(groupIndex),
+                                         metaContact );
 
                     if (contactIndex >= 0)
                         updateStatus(groupIndex, contactIndex, metaContact);
@@ -840,7 +884,7 @@ public class ContactListAdapter
                     if (origGroupIndex >= 0)
                     {
                         TreeSet<MetaContact> contactList
-                                = originalContacts.get(groupIndex);
+                                = getOriginalCList(origGroupIndex);
 
                         if (contactList != null)
                         {
@@ -854,7 +898,7 @@ public class ContactListAdapter
                     if (groupIndex >= 0)
                     {
                         TreeSet<MetaContact> contactList
-                                = contacts.get(groupIndex);
+                                = getContactList(groupIndex);
 
                         if (contactList != null)
                         {
@@ -919,7 +963,7 @@ public class ContactListAdapter
                 return null;
 
             Iterator<MetaContact> contactList
-                = contacts.get(groupPosition).iterator();
+                = getContactList(groupPosition).iterator();
             int i = 0;
             while (contactList.hasNext())
             {
@@ -1199,7 +1243,7 @@ public class ContactListAdapter
     {
         synchronized (dataLock)
         {
-            return contacts.get(groupPosition).size();
+            return getContactList(groupPosition).size();
         }
     }
 
@@ -1546,7 +1590,7 @@ public class ContactListAdapter
                 int groupIndex = originalGroups.indexOf(metaGroup);
 
                 TreeSet<MetaContact> contactList
-                    = originalContacts.get(groupIndex);
+                    = getOriginalCList(groupIndex);
 
                 TreeSet<MetaContact> filteredList
                     = new TreeSet<MetaContact>();
