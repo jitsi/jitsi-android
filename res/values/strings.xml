@@ -6,7 +6,7 @@
     <string name="stop_osgi_framework">Stop OSGi Framework</string>
     <string name="in_call_with">In call with </string>
     <string name="settings">Settings</string>
-    <string name="username">username</string>
+    <string name="username_hint">username@example.com</string>
     <string name="username_label">Username:</string>
     <string name="password">password</string>
     <string name="password_label">Password:</string>

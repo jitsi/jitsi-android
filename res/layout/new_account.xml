@@ -20,7 +20,7 @@
         <EditText
             android:id="@+id/usernameField"
             style="@style/JitsiLoginTextView"
-            android:hint="@string/username"
+            android:hint="@string/username_hint"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/item_height"
             android:padding="10dp"
