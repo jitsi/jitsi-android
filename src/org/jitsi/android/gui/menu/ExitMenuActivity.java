@@ -6,10 +6,12 @@
  */
 package org.jitsi.android.gui.menu;
 
+import android.os.*;
 import android.view.*;
 
 import org.jitsi.*;
 import org.jitsi.android.*;
+import org.jitsi.android.gui.*;
 import org.jitsi.service.osgi.*;
 
 /**
@@ -20,6 +22,22 @@ import org.jitsi.service.osgi.*;
 public abstract class ExitMenuActivity
     extends OSGiActivity
 {
+    @Override
+    protected void onCreate(Bundle savedInstanceState)
+    {
+        // Context is null on restore from recent apps after Jitsi was closed
+        // using exit option. This is caused by System.exit(0) called on exit
+        // which clears all static fields(VM shutdown) including
+        // AndroidGUIActivator.bundleContext.
+        if(AndroidGUIActivator.bundleContext == null)
+        {
+            finish();
+            startActivity(JitsiApplication.getHomeIntent());
+        }
+
+        super.onCreate(savedInstanceState);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {

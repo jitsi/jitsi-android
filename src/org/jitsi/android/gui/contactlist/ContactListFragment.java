@@ -72,6 +72,11 @@ public class ContactListFragment
                                 ViewGroup container,
                                 Bundle savedInstanceState)
     {
+        if(AndroidGUIActivator.bundleContext == null)
+        {
+            return null;
+        }
+
         View content = inflater.inflate( R.layout.contact_list,
                                          container,
                                          false);
