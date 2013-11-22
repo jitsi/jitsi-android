@@ -8,13 +8,19 @@ package org.jitsi.service.osgi;
 
 import android.app.*;
 import android.content.res.*;
+import android.content.*;
 import android.support.v4.app.*;
+import android.os.*;
+
+import net.java.sip.communicator.util.*;
+
 import org.jitsi.*;
 import org.jitsi.android.*;
+import org.jitsi.android.gui.*;
 import org.jitsi.impl.osgi.*;
+import org.jitsi.service.configuration.*;
 
-import android.content.*;
-import android.os.*;
+import java.beans.*;
 
 /**
  * Implements an Android {@link Service} which (automatically) starts and stops
@@ -29,6 +35,19 @@ public class OSGiService
      * The ID of Jitsi notification icon
      */
     private static int GENERAL_NOTIFICATION_ID = R.string.app_name;
+
+    /**
+     * Name of config property that indicates whether foreground icon should be
+     * displayed.
+     */
+    private static final String SHOW_ICON_PROPERTY_NAME
+            = "org.jitsi.android.show_icon";
+
+    /**
+     * Indicates that Jitsi is running in foreground mode and it's icon is
+     * constantly displayed.
+     */
+    private static boolean running_foreground = false;
 
     /**
      * Indicates if the service has been started and general notification
@@ -76,16 +95,55 @@ public class OSGiService
     {
         int result = impl.onStartCommand(intent, flags, startId);
 
-        startForegroundService();
-
         return result;
+    }
+
+    /**
+     * Method called by OSGi impl when start command completes.
+     */
+    public void onOSGiStarted()
+    {
+        if(isIconEnabled())
+        {
+            showIcon();
+        }
+        getConfig().addPropertyChangeListener(
+                SHOW_ICON_PROPERTY_NAME,
+                new PropertyChangeListener()
+                {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent event)
+                    {
+                        if(isIconEnabled())
+                        {
+                            showIcon();
+                        }
+                        else
+                        {
+                            hideIcon();
+                        }
+                    }
+                });
+        serviceStarted = true;
+    }
+
+    private ConfigurationService getConfig()
+    {
+        return ServiceUtils.getService(
+                AndroidGUIActivator.bundleContext,
+                ConfigurationService.class);
+    }
+
+    private boolean isIconEnabled()
+    {
+        return getConfig().getBoolean(SHOW_ICON_PROPERTY_NAME, true);
     }
 
     /**
      * Start the service in foreground and creates shows general notification
      * icon.
      */
-    private void startForegroundService()
+    private void showIcon()
     {
         //The intent to launch when the user clicks the expanded notification
         Intent intent
@@ -110,8 +168,7 @@ public class OSGiService
         notice.flags |= Notification.FLAG_NO_CLEAR;
 
         this.startForeground(GENERAL_NOTIFICATION_ID, notice);
-        
-        serviceStarted = true;
+        running_foreground = true;
     }
 
     /**
@@ -120,7 +177,16 @@ public class OSGiService
     public void stopForegroundService()
     {
         serviceStarted = false;
-        stopForeground(true);
+        hideIcon();
+    }
+
+    private void hideIcon()
+    {
+        if(running_foreground)
+        {
+            stopForeground(true);
+            running_foreground = false;
+        }
     }
 
     /**
@@ -132,11 +198,10 @@ public class OSGiService
      */
     public static int getGeneralNotificationId()
     {
-        if(serviceStarted)
+        if(serviceStarted && running_foreground)
         {
             return GENERAL_NOTIFICATION_ID;
         }
         return -1;
     }
-    
 }

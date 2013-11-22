@@ -301,6 +301,8 @@ public class OSGiServiceImpl
             {
                 OSGiServiceImpl.this.framework = framework;
             }
+
+            service.onOSGiStarted();
         }
 
         /**

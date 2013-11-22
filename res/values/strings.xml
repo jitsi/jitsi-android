@@ -919,6 +919,9 @@
     <string name="plugin_notificationconfig_playback_sound">Sound on playback device</string>
     <string name="plugin_notificationconfig_vibration">Vibration</string>
 
+    <!-- Jitsi icon -->
+    <string name="pref_key_show_jitsi_icon">org.jitsi.android.show_icon</string>
+    <string name="service_gui_settings_SHOW_ICON">Display Jitsi icon</string>
     <!-- Locale -->
     <string name="pref_key_locale">pref.key.locale</string>
     <string name="service_gui_settings_LOCALE">Interface language</string>

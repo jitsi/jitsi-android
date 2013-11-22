@@ -2,14 +2,19 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!--<PreferenceCategory
+    <PreferenceCategory
         android:title="@string/service_gui_settings_GENERAL"
         android:key="@string/pref_cat_settings_general" >
-        <ListPreference
+        <!--<ListPreference
                 android:title="@string/service_gui_settings_LOCALE"
                 android:key="@string/pref_key_locale"
-                />
-    </PreferenceCategory>-->
+                />-->
+        <org.jitsi.android.gui.settings.widget.ConfigCheckBox
+            android:title="@string/service_gui_settings_SHOW_ICON"
+            android:key="@string/pref_key_show_jitsi_icon"
+            android:defaultValue="true"
+            />
+    </PreferenceCategory>
 
     <!-- Message settings -->
     <PreferenceCategory
