@@ -79,6 +79,11 @@ public class AndroidGUIActivator
     private static GlobalDisplayDetailsService globalDisplayService;
 
     /**
+     * <tt>MetaContactListService</tt> cached instance.
+     */
+    private static MetaContactListService metaContactList;
+
+    /**
      * Replacement services observer.
      */
     private static ServiceObserver<ReplacementService> replacementServices
@@ -163,6 +168,7 @@ public class AndroidGUIActivator
         loginManager = null;
         configService = null;
         globalDisplayService = null;
+        metaContactList = null;
         AndroidGUIActivator.bundleContext = null;
     }
 
@@ -184,8 +190,12 @@ public class AndroidGUIActivator
      */
     public static MetaContactListService getContactListService()
     {
-        return ServiceUtils.getService( bundleContext,
-                                        MetaContactListService.class);
+        if(metaContactList == null)
+        {
+            metaContactList = ServiceUtils.getService(
+                bundleContext, MetaContactListService.class);
+        }
+        return metaContactList;
     }
 
     /**

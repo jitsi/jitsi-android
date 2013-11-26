@@ -71,7 +71,7 @@ public class MetaContactListManager
                 ctx,
                 ctx.getString(R.string.service_gui_REMOVE),
                 message,
-                ctx.getString(R.string.service_gui_REMOVE_CONTACT),
+                ctx.getString(R.string.service_gui_REMOVE_GROUP),
                 new DialogActivity.DialogListener()
                 {
                     @Override

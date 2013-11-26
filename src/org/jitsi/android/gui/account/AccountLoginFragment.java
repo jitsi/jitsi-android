@@ -8,22 +8,16 @@ package org.jitsi.android.gui.account;
 
 import java.util.*;
 
-import net.java.sip.communicator.service.gui.*;
 import net.java.sip.communicator.service.protocol.*;
-import net.java.sip.communicator.util.*;
 
 import org.jitsi.*;
-import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.service.osgi.*;
-import org.jitsi.service.resources.*;
-import org.osgi.framework.*;
 
 import android.accounts.*;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.*;
-import android.content.*;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.*;
@@ -40,16 +34,6 @@ public class AccountLoginFragment
     extends OSGiFragment
 {
     /**
-     * The osgi bundle context.
-     */
-    private BundleContext bundleContext;
-
-    /**
-     * The resource management service.
-     */
-    private static ResourceManagementService resourcesService;
-
-    /**
      * The username property name.
      */
     public static final String ARG_USERNAME = "Username";
@@ -64,28 +48,6 @@ public class AccountLoginFragment
      * login and password.
      */
     private AccountLoginListener loginListener;
-
-    /**
-     * Starts this osgi activity.
-     *
-     * @param bundleContext the osgi <tt>BundleContext</tt>
-     * @throws Exception
-     */
-    public synchronized void start(BundleContext bundleContext)
-        throws Exception
-    {
-        super.start(bundleContext);
-
-        /*
-         * If there are unit tests to be run, do not run anything else and just
-         * perform the unit tests.
-         */
-        if (System.getProperty(
-                "net.java.sip.communicator.slick.runner.TEST_LIST") != null)
-            return;
-
-        this.bundleContext = bundleContext;
-    }
 
     /**
      * {@inheritDoc}
@@ -117,25 +79,6 @@ public class AccountLoginFragment
     }
 
     /**
-     * Returns the <tt>ResourceManagementService</tt>, through which we will
-     * access all resources.
-     *
-     * @return the <tt>ResourceManagementService</tt>, through which we will
-     * access all resources.
-     */
-    private ResourceManagementService getResourceService()
-    {
-        if (resourcesService == null)
-        {
-            resourcesService
-                = ServiceUtils.getService(
-                        bundleContext,
-                        ResourceManagementService.class);
-        }
-        return resourcesService;
-    }
-
-    /**
      *  {@inheritDoc}
      */
     @Override
@@ -150,9 +93,8 @@ public class AccountLoginFragment
                 = ArrayAdapter.createFromResource(
                         getActivity(),
                         R.array.networks_array,
-                        android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(
-                android.R.layout.simple_spinner_dropdown_item);
+                        R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(R.layout.dropdown_spinner_item);
 
         spinner.setAdapter(adapter);
 
@@ -237,10 +179,8 @@ public class AccountLoginFragment
                             getString(R.string.ACCOUNT_TYPE));
 
         final Bundle extraData = new Bundle();
-        Iterator<String> propKeys = accountProps.keySet().iterator();
-        while (propKeys.hasNext())
+        for (String key : accountProps.keySet())
         {
-            String key = propKeys.next();
             extraData.putString(key, accountProps.get(key));
         }
 

@@ -811,7 +811,58 @@ public class ContactListAdapter
         if (logger.isDebugEnabled())
             logger.debug("CONTACT MOVED: " + evt.getSourceMetaContact());
 
-        invalidateViews();
+        MetaContactGroup oldParent = evt.getOldParent();
+        MetaContactGroup newParent = evt.getNewParent();
+        synchronized (dataLock)
+        {
+            // Modify original group
+            int oldGroupIdx = originalGroups.indexOf(oldParent);
+            int newGroupIdx = originalGroups.indexOf(newParent);
+            if(oldGroupIdx < 0 || newGroupIdx < 0)
+            {
+                logger.error("Move group error - original list, srcGroupIdx: "
+                    + oldGroupIdx + ", dstGroupIdx: " + newGroupIdx);
+            }
+            else
+            {
+                TreeSet<MetaContact> srcGroup
+                        = getOriginalCList(oldGroupIdx);
+                if(srcGroup != null)
+                {
+                    srcGroup.remove(evt.getSourceMetaContact());
+                }
+                TreeSet<MetaContact> dstGroup
+                        = getOriginalCList(newGroupIdx);
+                if(dstGroup != null)
+                {
+                    dstGroup.add(evt.getSourceMetaContact());
+                }
+            }
+            // Move search results group
+            oldGroupIdx = groups.indexOf(oldParent);
+            newGroupIdx = groups.indexOf(newParent);
+            if(oldGroupIdx < 0 || newGroupIdx < 0)
+            {
+                logger.error("Move group error, srcGroupIdx: "
+                    + oldGroupIdx + ", dstGroupIdx: " + newGroupIdx);
+            }
+            else
+            {
+                TreeSet<MetaContact> srcGroup
+                        = getContactList(oldGroupIdx);
+                if(srcGroup != null)
+                {
+                    srcGroup.remove(evt.getSourceMetaContact());
+                }
+                TreeSet<MetaContact> dstGroup
+                        = getContactList(newGroupIdx);
+                if(dstGroup != null)
+                {
+                    dstGroup.add(evt.getSourceMetaContact());
+                }
+            }
+        }
+        dataChanged();
     }
 
     /**

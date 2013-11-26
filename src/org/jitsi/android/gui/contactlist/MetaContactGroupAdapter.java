@@ -38,70 +38,127 @@ public class MetaContactGroupAdapter
     private static final Object ADD_NEW_OBJECT = new Object();
 
     /**
+     * Drop down item layout
+     */
+    private int dropDownLayout;
+
+    /**
+     * Item layout
+     */
+    private int itemLayout;
+
+    /**
+     * Instance of used <tt>AdapterView</tt>.
+     */
+    private AdapterView adapterView;
+
+    /**
      * Creates new instance of <tt>MetaContactGroupAdapter</tt>.
      * It will be filled with all currently available <tt>MetaContactGroup</tt>.
      *
      * @param parent the parent <tt>Activity</tt>.
+     * @param adapterViewId id of the <tt>AdapterView</tt>.
+     * @param includeRoot <tt>true</tt> if "No group" item should be included
+     * @param includeCreate <tt>true</tt> if "Create group" item should be
+     *                      included
      */
-    public MetaContactGroupAdapter(Activity parent, int adapterViewId)
+    public MetaContactGroupAdapter(Activity parent, int adapterViewId,
+                                   boolean includeRoot, boolean includeCreate)
     {
-        super(parent,getAllContactGroups(adapterViewId != -1).iterator());
+        super( parent,
+               getAllContactGroups(includeRoot, includeCreate).iterator() );
 
         if(adapterViewId != -1)
             init(adapterViewId);
+    }
+    /**
+     * Creates new instance of <tt>MetaContactGroupAdapter</tt>.
+     * It will be filled with all currently available <tt>MetaContactGroup</tt>.
+     *
+     * @param parent the parent <tt>Activity</tt>.
+     * @param adapterView the <tt>AdapterView</tt> that will be used.
+     * @param includeRoot <tt>true</tt> if "No group" item should be included
+     * @param includeCreate <tt>true</tt> if "Create group" item should be
+     *                      included
+     */
+    public MetaContactGroupAdapter(Activity parent, AdapterView adapterView,
+                                   boolean includeRoot, boolean includeCreate)
+    {
+        super( parent,
+               getAllContactGroups(includeRoot, includeCreate).iterator() );
+
+        init(adapterView);
     }
 
     private void init(int adapterViewId)
     {
         AdapterView aView
-            = (AdapterView) getParentActivity().findViewById(adapterViewId);
+                = (AdapterView) getParentActivity().findViewById(adapterViewId);
+
+        init(aView);
+    }
+
+    private void init(AdapterView aView)
+    {
+        this.adapterView = aView;
+
+        this.dropDownLayout = android.R.layout.simple_spinner_dropdown_item;
+
+        this.itemLayout = android.R.layout.simple_spinner_item;
 
         // Handle add new group action
         aView.setOnItemSelectedListener(
                 new AdapterView.OnItemSelectedListener()
-        {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view,
-                                       int position,
-                                       long id)
-            {
-                Object item = parent.getAdapter().getItem(position);
-                if (item == MetaContactGroupAdapter.ADD_NEW_OBJECT)
                 {
-                    AddGroupDialog.showCreateGroupDialog(
-                            getParentActivity(),
-                            new EventListener<MetaContactGroup>()
-                            {
-                                @Override
-                                public void onChangeEvent(
-                                        MetaContactGroup newGroup)
-                                {
-                                    onNewGroupCreated(newGroup);
-                                }
-                            });
-                }
-            }
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view,
+                                               int position,
+                                               long id)
+                    {
+                        Object item = parent.getAdapter().getItem(position);
+                        if (item == MetaContactGroupAdapter.ADD_NEW_OBJECT)
+                        {
+                            AddGroupDialog.showCreateGroupDialog(
+                                    getParentActivity(),
+                                    new EventListener<MetaContactGroup>()
+                                    {
+                                        @Override
+                                        public void onChangeEvent(
+                                                MetaContactGroup newGroup)
+                                        {
+                                            onNewGroupCreated(newGroup);
+                                        }
+                                    });
+                        }
+                    }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent){ }
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent){ }
 
-        });
+                });
     }
 
     /**
      * Returns the list of all currently available <tt>MetaContactGroup</tt>.
+     * @param includeRoot indicates whether "No group" item should be included
+     *                    in the list.
      * @param includeCreateNew indicates whether "create new group" item should
      *                         be included in the list.
      * @return the list of all currently available <tt>MetaContactGroup</tt>.
      */
-    private static List<Object> getAllContactGroups(boolean includeCreateNew)
+    private static List<Object> getAllContactGroups(boolean includeRoot,
+                                                    boolean includeCreateNew)
     {
         MetaContactListService contactListService
                 = AndroidGUIActivator.getContactListService();
 
         MetaContactGroup root = contactListService.getRoot();
         ArrayList<Object> merge = new ArrayList<Object>();
-        merge.add(root);
+        if(includeRoot)
+        {
+            merge.add(root);
+        }
+
         Iterator<MetaContactGroup> mcg = root.getSubgroups();
         while(mcg.hasNext())
         {
@@ -123,9 +180,7 @@ public class MetaContactGroupAdapter
                            Object item, ViewGroup parent,
                            LayoutInflater inflater)
     {
-        int rowResId = isDropDown
-                ? android.R.layout.simple_spinner_dropdown_item
-                : android.R.layout.simple_spinner_item;
+        int rowResId = isDropDown ? dropDownLayout : itemLayout;
 
         View rowView = inflater.inflate(rowResId, parent, false);
 
@@ -160,14 +215,28 @@ public class MetaContactGroupAdapter
         if(newGroup == null)
             return;
 
-        final Spinner groupSpinner
-                = (Spinner) getParentActivity()
-                        .findViewById(R.id.selectGroupSpinner);
-
         int pos = getCount()-1;
         insert(pos, newGroup);
 
-        groupSpinner.setSelection(pos);
+        adapterView.setSelection(pos);
         notifyDataSetChanged();
+    }
+
+    /**
+     * Sets drop down item layout resource id.
+     * @param dropDownLayout the drop down item layout resource id to set.
+     */
+    public void setDropDownLayout(int dropDownLayout)
+    {
+        this.dropDownLayout = dropDownLayout;
+    }
+
+    /**
+     * Sets item layout resource id.
+     * @param itemLayout the item layout resource id to set.
+     */
+    public void setItemLayout(int itemLayout)
+    {
+        this.itemLayout = itemLayout;
     }
 }

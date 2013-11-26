@@ -87,7 +87,8 @@ public class AuthorizationRequestedDialog
         contactGroupSpinner.setAdapter(
                 new MetaContactGroupAdapter(
                         this,
-                        R.id.selectGroupSpinner));
+                        R.id.selectGroupSpinner,
+                        true, true));
 
         CompoundButton addToContactsCb
                 = (CompoundButton) findViewById(R.id.addToContacts);
@@ -138,6 +139,7 @@ public class AuthorizationRequestedDialog
      * Method fired when user accept the request.
      * @param v the button's <tt>View</tt>
      */
+    @SuppressWarnings("unused")
     public void onAcceptClicked(View v)
     {
         responseCode = AuthorizationResponse.ACCEPT;
@@ -149,6 +151,7 @@ public class AuthorizationRequestedDialog
      * Method fired when reject button is clicked.
      * @param v the button's <tt>View</tt>
      */
+    @SuppressWarnings("unused")
     public void onRejectClicked(View v)
     {
         responseCode = AuthorizationResponse.REJECT;
@@ -160,6 +163,7 @@ public class AuthorizationRequestedDialog
      * Method fired when ignore button is clicked.
      * @param v the button's <tt>View</tt>
      */
+    @SuppressWarnings("unused")
     public void onIgnoreClicked(View v)
     {
         finish();

@@ -34,6 +34,12 @@ public class ContactListFragment
                 OnGroupClickListener
 {
     /**
+     * The logger
+     */
+    private final static Logger logger
+        = Logger.getLogger(ContactListFragment.class);
+
+    /**
      * The <tt>MetaContactListService</tt> giving access to the contact list
      * content.
      */
@@ -243,10 +249,21 @@ public class ContactListFragment
 
         // Checks if the re-request authorization item should be visible
         Contact contact = clickedContact.getDefaultContact();
+        if(contact == null)
+        {
+            logger.warn("No default contact for: "+clickedContact);
+            return;
+        }
+
+        ProtocolProviderService pps = contact.getProtocolProvider();
+        if(pps == null)
+        {
+            logger.warn("No protocol provider found for: "+contact);
+            return;
+        }
 
         OperationSetExtendedAuthorizations authOpSet
-                = contact.getProtocolProvider().getOperationSet(
-                OperationSetExtendedAuthorizations.class);
+            = pps.getOperationSet(OperationSetExtendedAuthorizations.class);
 
         boolean reRequestVisible = false;
 
@@ -291,6 +308,15 @@ public class ContactListFragment
                 return true;
             case R.id.remove_contact:
                 MetaContactListManager.removeMetaContact(clickedContact);
+                return true;
+            case R.id.move_contact:
+                // Show move contact dialog
+                FragmentTransaction ft
+                    = getFragmentManager().beginTransaction();
+                ft.addToBackStack(null);
+                DialogFragment newFragment
+                    = MoveToGroupDialog.getInstance(clickedContact);
+                newFragment.show(ft, "dialog");
                 return true;
             case R.id.remove_group:
                 MetaContactListManager.removeMetaContactGroup(clickedGroup);

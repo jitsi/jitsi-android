@@ -10,6 +10,9 @@
     <item android:id="@+id/re_request_auth"
           android:title="@string/service_gui_RE_REQUEST_AUTHORIZATION">
     </item>
+    <item android:id="@+id/move_contact"
+          android:title="@string/service_gui_MOVE_TO_GROUP">
+    </item>
     <item android:id="@+id/remove_contact"
           android:title="@string/service_gui_REMOVE_CONTACT">
     </item>

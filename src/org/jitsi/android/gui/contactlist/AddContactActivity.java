@@ -22,8 +22,6 @@ import org.jitsi.R;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.account.*;
 import org.jitsi.android.gui.util.*;
-import org.jitsi.android.gui.util.event.*;
-import org.jitsi.android.gui.util.event.EventListener;
 import org.jitsi.service.osgi.*;
 
 /**
@@ -39,16 +37,6 @@ public class AddContactActivity
      */
     private final static Logger logger
             = Logger.getLogger(AddContactActivity.class);
-
-    /**
-     * Spinner adapter that displays accounts list.
-     */
-    private AccountsListAdapter accountsAdapter;
-
-    /**
-     * Spinner adapter that displays meta contact groups.
-     */
-    private MetaContactGroupAdapter contactGroupAdapter;
 
     /**
      * {@inheritDoc}
@@ -103,11 +91,12 @@ public class AddContactActivity
             }
         }
 
-        this.accountsAdapter
+        AccountsListAdapter accountsAdapter
                 = new AccountsListAdapter( this,
                                            R.layout.select_account_row,
                                            R.layout.select_account_dropdown,
-                                           accounts, true, false);
+                                           accounts,
+                                           true, false);
         accountsSpiner.setAdapter(accountsAdapter);
 
         // if we have only select account option and only one account
@@ -125,8 +114,12 @@ public class AddContactActivity
     {
         Spinner groupSpinner = (Spinner) findViewById(R.id.selectGroupSpinner);
 
-        this.contactGroupAdapter
-            = new MetaContactGroupAdapter(this, R.id.selectGroupSpinner);
+        MetaContactGroupAdapter contactGroupAdapter
+            = new MetaContactGroupAdapter( this, R.id.selectGroupSpinner,
+                                           true, true );
+
+        contactGroupAdapter.setItemLayout(R.layout.simple_spinner_item);
+        contactGroupAdapter.setDropDownLayout(R.layout.dropdown_spinner_item);
 
         groupSpinner.setAdapter(contactGroupAdapter);
     }
@@ -135,6 +128,7 @@ public class AddContactActivity
      * Method fired when "add" button is clicked.
      * @param v add button's <tt>View</tt>
      */
+    @SuppressWarnings("unused")
     public void onAddClicked(View v)
     {
         Spinner accountsSpiner
