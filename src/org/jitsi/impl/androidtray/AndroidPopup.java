@@ -92,12 +92,16 @@ public class AndroidPopup
             // Generate separate notification
             id = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
 
+            String group = popupMessage.getGroup();
             // Set message icon
-            if(AndroidNotifications.MESSAGE_GROUP
-                    .equals(popupMessage.getGroup()))
+            if(AndroidNotifications.MESSAGE_GROUP.equals(group))
             {
 
-                this.smallIcon = R.drawable.callmessage;
+                this.smallIcon = R.drawable.incoming_message;
+            }
+            else if(AndroidNotifications.CALL_GROUP.equals(group))
+            {
+                this.smallIcon = R.drawable.missed_call;
             }
         }
         // Extract contained contact if any
@@ -138,6 +142,8 @@ public class AndroidPopup
     public boolean isChatRelated(ChatSession session)
     {
         return contact != null
+            && AndroidNotifications.MESSAGE_GROUP.equals(
+                popupMessage.getGroup())
             && session.getMetaContact().containsContact(contact);
     }
 
@@ -270,7 +276,34 @@ public class AndroidPopup
             builder.setLargeIcon(iconBmp);
         }
 
+        // Build inbox style
+        NotificationCompat.InboxStyle inboxStyle
+                = new NotificationCompat.InboxStyle();
+        onBuildInboxStyle(inboxStyle);
+        builder.setStyle(inboxStyle);
+
         return builder;
+    }
+
+    /**
+     * Method fired when large notification view using <tt>InboxStyle</tt> is
+     * being built.
+     * @param inboxStyle the inbox style instance used for building large
+     *                   notification view.
+     */
+    protected void onBuildInboxStyle(NotificationCompat.InboxStyle inboxStyle)
+    {
+        inboxStyle.addLine(popupMessage.getMessage());
+        // Summary
+        if(contact != null)
+        {
+            ProtocolProviderService pps = contact.getProtocolProvider();
+            if(pps != null)
+            {
+                inboxStyle.setSummaryText(
+                        pps.getAccountID().getDisplayName());
+            }
+        }
     }
 
     /**

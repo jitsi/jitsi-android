@@ -8,7 +8,6 @@ package org.jitsi.android.gui.account;
 
 import java.beans.*;
 
-import android.content.*;
 import android.graphics.drawable.*;
 
 import org.jitsi.*;
@@ -42,11 +41,6 @@ public class AndroidLoginRenderer
     private final static Logger logger 
             = Logger.getLogger(AndroidLoginRenderer.class);
     
-    /**
-     * The android application context.
-     */
-    private final Context androidContext;
-
     /**
      * The <tt>CallListener</tt>.
      */
@@ -102,16 +96,12 @@ public class AndroidLoginRenderer
      * Creates an instance of <tt>AndroidLoginRenderer</tt> by specifying the
      * current <tt>Context</tt>.
      *
-     * @param appContext the current android application context
      * @param defaultSecurityAuthority the security authority that will be used
      *        by this login renderer
      */
-    public AndroidLoginRenderer( Context appContext,
-                                 SecurityAuthority defaultSecurityAuthority )
+    public AndroidLoginRenderer( SecurityAuthority defaultSecurityAuthority )
     {
-        this.androidContext = appContext;
-
-        androidCallListener = new AndroidCallListener(appContext);
+        androidCallListener = new AndroidCallListener();
 
         securityAuthority = defaultSecurityAuthority;
 
@@ -216,7 +206,7 @@ public class AndroidLoginRenderer
 
         showStatusNotification(
             protocolProvider,
-            androidContext.getString(R.string.service_gui_ONLINE),
+            JitsiApplication.getResString(R.string.service_gui_ONLINE),
             date);
 
         updateGlobalStatus();
@@ -237,13 +227,13 @@ public class AndroidLoginRenderer
         AccountID accountID = protocolProvider.getAccountID();
 
         AndroidUtils.showAlertConfirmDialog(
-            androidContext,
-            androidContext.getString(R.string.service_gui_ERROR),
-            androidContext.getString(
+            JitsiApplication.getGlobalContext(),
+            JitsiApplication.getResString(R.string.service_gui_ERROR),
+            JitsiApplication.getResString(
                 R.string.service_gui_CONNECTION_FAILED_MSG,
                 accountID.getUserID(),
                 accountID.getService()),
-            androidContext.getString(R.string.service_gui_RETRY),
+            JitsiApplication.getResString(R.string.service_gui_RETRY),
             new DialogActivity.DialogListener()
             {
                 public boolean onConfirmClicked(DialogActivity dialog)
@@ -297,9 +287,9 @@ public class AndroidLoginRenderer
         }
 
         AndroidUtils.updateGeneralNotification(
-            androidContext,
+            JitsiApplication.getGlobalContext(),
             notificationID,
-            androidContext.getString(R.string.app_name),
+            JitsiApplication.getResString(R.string.app_name),
             protocolProvider.getAccountID().getAccountAddress()
                 + " " + status,
             date,

@@ -8,7 +8,6 @@ package org.jitsi.impl.androidtray;
 
 import android.support.v4.app.*;
 import net.java.sip.communicator.service.systray.*;
-import org.jitsi.android.plugin.notificationwiring.*;
 
 import java.util.*;
 
@@ -90,24 +89,20 @@ public class AndroidMergedPopup
         // Set number of events
         builder.setNumber(1+mergedPopups.size());
 
-        NotificationCompat.InboxStyle inboxStyle
-                = new NotificationCompat.InboxStyle();
+        return builder;
+    }
 
-        inboxStyle.addLine(super.getMessage());
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void onBuildInboxStyle(NotificationCompat.InboxStyle inboxStyle)
+    {
+        super.onBuildInboxStyle(inboxStyle);
+
         for(AndroidPopup popup : mergedPopups)
         {
             inboxStyle.addLine(popup.getMessage());
         }
-
-        // Summary
-        if(AndroidNotifications.MESSAGE_GROUP
-                .equals(popupMessage.getGroup()))
-        {
-            inboxStyle.setSummaryText(contact.getDisplayName());
-        }
-
-        builder.setStyle(inboxStyle);
-
-        return builder;
     }
 }

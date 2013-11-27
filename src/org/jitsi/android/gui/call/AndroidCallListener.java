@@ -9,11 +9,19 @@ package org.jitsi.android.gui.call;
 import android.content.*;
 
 import android.media.*;
+import net.java.sip.communicator.service.notification.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.event.*;
+import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.call.*;
+
+import org.jitsi.*;
 import org.jitsi.android.*;
+import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.util.*;
+import org.jitsi.android.plugin.notificationwiring.*;
+
+import java.util.*;
 
 /**
  * A utility implementation of the {@link CallListener} interface which delivers
@@ -22,12 +30,13 @@ import org.jitsi.android.gui.util.*;
  * @author Yana Stamcheva
  */
 public class AndroidCallListener
-    implements  CallListener
+    implements  CallListener,
+                CallChangeListener
 {
     /**
      * The application context.
      */
-    private final Context appContext;
+    private final Context appContext = JitsiApplication.getGlobalContext();
 
     /*
      * Flag stores speakerphone status to be restored to initial value once
@@ -36,14 +45,10 @@ public class AndroidCallListener
     private Boolean speakerPhoneBeforeCall;
 
     /**
-     * Creates an instance of <tt>AndroidCallListener</tt>
-     *
-     * @param appContext the android application context
+     * Caches <tt>Call</tt> contacts that will be used in missed call
+     * notification since they are no longer available after call has ended.
      */
-    public AndroidCallListener(Context appContext)
-    {
-        this.appContext = appContext;
-    }
+    private Map<Call, Contact> callContacts = new HashMap<Call, Contact>();
 
     /**
      * {@inheritDoc}
@@ -53,6 +58,8 @@ public class AndroidCallListener
     public void callEnded(CallEvent ev)
     {
         onCallEvent(ev);
+
+        ev.getSourceCall().removeCallChangeListener(this);
     }
 
     /**
@@ -63,6 +70,15 @@ public class AndroidCallListener
     public void incomingCallReceived(CallEvent ev)
     {
         onCallEvent(ev);
+
+        ev.getSourceCall().addCallChangeListener(this);
+
+        //Caches the contact for missed call notification
+        Contact contact = CallUIUtils.getCallee(ev.getSourceCall());
+        if(contact != null)
+        {
+            callContacts.put(ev.getSourceCall(), contact);
+        }
     }
 
     /**
@@ -115,8 +131,7 @@ public class AndroidCallListener
     {
         AudioManager audioManager = JitsiApplication.getAudioManager();
 
-        this.speakerPhoneBeforeCall
-                = new Boolean(audioManager.isSpeakerphoneOn());
+        this.speakerPhoneBeforeCall = audioManager.isSpeakerphoneOn();
     }
 
     /**
@@ -140,6 +155,8 @@ public class AndroidCallListener
     public void outgoingCallCreated(CallEvent ev)
     {
         onCallEvent(ev);
+
+        ev.getSourceCall().addCallChangeListener(this);
     }
 
     /**
@@ -181,16 +198,6 @@ public class AndroidCallListener
     }
 
     /**
-     * Starts the call activity after a call has finished.
-     *
-     * @param evt the <tt>CallEvent</tt> that notified us
-     */
-    private void startHomeActivity(final CallEvent evt)
-    {
-        appContext.startActivity(JitsiApplication.getHomeIntent());
-    }
-
-    /**
      * Starts the video call activity when a call has been started.
      *
      * @param evt the <tt>CallEvent</tt> that notified us
@@ -204,5 +211,67 @@ public class AndroidCallListener
                         callIdentifier);
         videoCall.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         appContext.startActivity(videoCall);
+    }
+
+    @Override
+    public void callPeerAdded(CallPeerEvent callPeerEvent){ }
+
+    @Override
+    public void callPeerRemoved(CallPeerEvent callPeerEvent){ }
+
+    @Override
+    public void callStateChanged(CallChangeEvent evt)
+    {
+        if (evt.getNewValue().equals(CallState.CALL_ENDED))
+        {
+            if(evt.getOldValue().equals(CallState.CALL_INITIALIZATION))
+            {
+                if(evt.getCause() != null
+                        && evt.getCause().getReasonCode() !=
+                        CallPeerChangeEvent.NORMAL_CALL_CLEARING)
+                {
+                    // Missed call
+                    fireMissedCallNotification(evt);
+                }
+            }
+            // Remove cached contact
+            callContacts.remove(evt.getSourceCall());
+        }
+    }
+
+    /**
+     * Fires missed call notification for given <tt>CallChangeEvent</tt>.
+     * @param evt the <tt>CallChangeEvent</tt> that describes missed call.
+     */
+    private void fireMissedCallNotification(CallChangeEvent evt)
+    {
+        NotificationService notificationService
+            = ServiceUtils.getService(AndroidGUIActivator.bundleContext,
+                                      NotificationService.class);
+
+        Contact contact = callContacts.get(evt.getSourceCall());
+        if(contact == null)
+        {
+            return;
+        }
+
+        Map<String,Object> extras = new HashMap<String,Object>();
+        extras.put(
+                NotificationData.POPUP_MESSAGE_HANDLER_TAG_EXTRA,
+                contact);
+
+        byte[] contactIcon = contact.getImage();
+
+        Date when = new Date();
+
+        notificationService.fireNotification(
+                AndroidNotifications.MISSED_CALL,
+                JitsiApplication.getResString(
+                        R.string.service_gui_MISSED_CALLS_TOOL_TIP),
+                contact.getDisplayName()
+                        +" "+GuiUtils.formatTime(when)
+                        +" "+GuiUtils.formatDate(when),
+                contactIcon,
+                extras);
     }
 }

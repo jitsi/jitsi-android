@@ -16,6 +16,7 @@ import net.java.sip.communicator.util.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.chat.*;
+import org.jitsi.android.plugin.notificationwiring.*;
 
 /**
  * Android system tray implementation. Makes use of status bar notifications to
@@ -146,6 +147,13 @@ public class SystrayServiceImpl
          */
         public void popupMessageClicked(SystrayPopupMessageEvent evt)
         {
+            Object src = evt.getSource();
+            PopupMessage message = null;
+            if(src instanceof PopupMessage)
+            {
+                message = (PopupMessage) evt.getSource();
+            }
+
             Object tag = evt.getTag();
             if(tag instanceof Contact)
             {
@@ -159,18 +167,32 @@ public class SystrayServiceImpl
                     return;
                 }
 
-                Context ctx = JitsiApplication.getGlobalContext();
-                Intent chat = ChatSessionManager.getChatIntent(metaContact);
-                ctx.startActivity(chat);
+                Intent targetIntent;
+                String group = message != null ? message.getGroup() : null;
+
+                if(AndroidNotifications.MESSAGE_GROUP.equals(group))
+                {
+                    targetIntent
+                        = ChatSessionManager.getChatIntent(metaContact);
+                }
+                else
+                {
+                    // TODO: add call history intent here
+                    targetIntent = null;
+                }
+
+                if(targetIntent != null)
+                {
+                    JitsiApplication
+                        .getGlobalContext().startActivity(targetIntent);
+                }
 
                 return;
             }
 
             // Displays popup message details when the notification is clicked
-            Object src = evt.getSource();
-            if(src instanceof PopupMessage)
+            if(message != null)
             {
-                PopupMessage message = (PopupMessage) evt.getSource();
                 DialogActivity.showDialog(
                         JitsiApplication.getGlobalContext(),
                         message.getMessageTitle(),

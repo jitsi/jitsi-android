@@ -37,6 +37,11 @@ public class AndroidNotifications
     public static final String CALL_GROUP = "call";
 
     /**
+     * Missed call event.
+     */
+    public static final String MISSED_CALL = "missed_call";
+
+    /**
      * {@inheritDoc}
      */
     public void start(BundleContext bundleContext)
@@ -73,6 +78,15 @@ public class AndroidNotifications
         notificationService.removeEventNotificationAction(
                 NotificationManager.INCOMING_CALL,
                 NotificationAction.ACTION_POPUP_MESSAGE);
+
+        // Missed call
+        notificationService.registerDefaultNotificationForEvent(
+                MISSED_CALL,
+                new PopupMessageNotificationAction(
+                        null, // No default message
+                        -1,  // Notification hide timeout
+                        CALL_GROUP
+                ));
 
         // Incoming message
         notificationService.registerDefaultNotificationForEvent(

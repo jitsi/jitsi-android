@@ -100,6 +100,21 @@ public class CallUIUtils
     }
 
     /**
+     * Finds first <tt>Contact</tt> for given <tt>Call</tt>.
+     * @param call the call to check for <tt>Contact</tt>.
+     * @return first <tt>Contact</tt> for given <tt>Call</tt>.
+     */
+    public static Contact getCallee(Call call)
+    {
+        Iterator<? extends CallPeer> peersIter = call.getCallPeers();
+        if(peersIter.hasNext())
+        {
+            return peersIter.next().getContact();
+        }
+        return null;
+    }
+
+    /**
      * A informative text to show for the peer. If display name is missing
      * return the address.
      * @param peer the peer.

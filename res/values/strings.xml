@@ -168,6 +168,7 @@
     <string name="service_gui_VIDEO_CALL">Video call</string>
     <string name="service_gui_CONTACTS">Contacts</string>
     <string name="service_gui_ENTER_NAME_OR_NUMBER">Enter name or number</string>
+    <string name="service_gui_MISSED_CALLS_TOOL_TIP">Missed calls from:</string>
     <string name="service_gui_MOVE">Move</string>
     <string name="service_gui_MOVE_SUBCONTACT">Move contact</string>
     <string name="service_gui_MOVE_SUBCONTACT_MSG">

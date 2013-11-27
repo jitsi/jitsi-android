@@ -102,8 +102,7 @@ public class AndroidGUIActivator
         SecurityAuthority secuirtyAuthority
                 = new AndroidSecurityAuthority(androidContext);
 
-        loginRenderer
-                = new AndroidLoginRenderer(androidContext, secuirtyAuthority);
+        loginRenderer = new AndroidLoginRenderer(secuirtyAuthority);
 
         loginManager = new LoginManager(loginRenderer);
 
