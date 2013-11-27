@@ -7,23 +7,20 @@
 package org.jitsi.impl.androidtray;
 
 import android.app.*;
-import android.content.*;
-import android.media.*;
 import android.support.v4.app.*;
 
 import java.util.*;
 
-import net.java.sip.communicator.service.contactlist.*;
-import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.systray.*;
 import net.java.sip.communicator.service.systray.event.*;
 import net.java.sip.communicator.util.*;
 
 import org.jitsi.*;
 import org.jitsi.android.*;
-import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.chat.*;
+import org.jitsi.android.gui.util.*;
 import org.jitsi.android.gui.util.event.EventListener;
+import org.jitsi.service.osgi.*;
 
 /**
  * Displays popup messages as Android status bar notifications.
@@ -41,21 +38,16 @@ public class NotificationPopupHandler
             = Logger.getLogger(NotificationPopupHandler.class);
 
     /**
-     * Map caches <tt>PopupMessage</tt>s to be used for creating events. Value
+     * Map of currently displayed <tt>AndroidPopup</tt>s. Value
      * is removed when corresponding notification is clicked or discarded.
      */
-    private Map<Integer, PopupMessage> notificationMap
-            = new HashMap<Integer, PopupMessage>();
+    private Map<Integer, AndroidPopup> notificationMap
+            = new HashMap<Integer, AndroidPopup>();
 
     /**
-     * Map of popup timeout handlers.
+     * Id of Jitsi icon notification
      */
-    private Map<Integer, Timer> timeoutHandlers = new HashMap<Integer, Timer>();
-
-    /**
-     * Maps <tt>PopupMessage</tt> tags to notification ids.
-     */
-    private Map<Object, Integer> tagToNotificationMap = new HashMap<Object, Integer>();
+    private int generalNotificationId = -1;
 
     /**
      * Creates new instance of <tt>NotificationPopupHandler</tt>.
@@ -81,16 +73,18 @@ public class NotificationPopupHandler
             if(openChat == null)
                 return;
 
-            Integer notificationId
-                    = tagToNotificationMap.get(openChat.getMetaContact());
-
-            if(notificationId != null)
+            List<AndroidPopup> chatPopups = new ArrayList<AndroidPopup>();
+            for(AndroidPopup popup : notificationMap.values())
             {
-                // Clears the notification
-                JitsiApplication
-                        .getNotificationManager().cancel(notificationId);
-                // removes data related to this notification
-                removeNotification(notificationId);
+                if(popup.isChatRelated(openChat))
+                {
+                    chatPopups.add(popup);
+                    break;
+                }
+            }
+            for(AndroidPopup chatPopup : chatPopups)
+            {
+                removeNotification(chatPopup.getId());
             }
         }
     };
@@ -100,57 +94,27 @@ public class NotificationPopupHandler
      */
     public void showPopupMessage(PopupMessage popupMessage)
     {
-        Context ctx = JitsiApplication.getGlobalContext();
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(ctx)
-                        .setSmallIcon(R.drawable.notificationicon)
-                        .setContentTitle(popupMessage.getMessageTitle())
-                        .setContentText(popupMessage.getMessage())
-                        .setAutoCancel(true)// will be cancelled once clciked
-                        .setSound( // also play default sound
-                                RingtoneManager.getDefaultUri(
-                                RingtoneManager.TYPE_NOTIFICATION));
 
-        int nId = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
+        AndroidPopup newPopup = null;
 
-        Object tag = popupMessage.getTag();
-        // Check if it's message notification
-        if(tag != null)
+        // Check or existing notifications
+        for(AndroidPopup popup : notificationMap.values())
         {
-            if(tag instanceof Contact)
+            AndroidPopup merge = popup.tryMerge(popupMessage);
+            if(merge != null)
             {
-                // Converts contact to meta contact
-                tag = getMetaContact((Contact)tag);
-
-                if(tag == null)
-                {
-                    logger.error(
-                            "No meta contact found for " + tag
-                            + ", there will be no notification displayed.");
-                    return;
-                }
-
-                ChatSession chat
-                        = ChatSessionManager.getActiveChat((MetaContact) tag);
-
-                if(chat != null && chat.isChatFocused())
-                {
-                    logger.info("Skipping chat notification, "
-                                + "because the chat is focused");
-                    return;
-                }
-            }
-
-            Integer prevId = tagToNotificationMap.get(tag);
-            if(prevId != null)
-            {
-                nId = prevId;
-            }
-            else
-            {
-                tagToNotificationMap.put(tag, nId);
+                newPopup = merge;
+                break;
             }
         }
+
+        if(newPopup == null)
+        {
+            newPopup = AndroidPopup.createNew(this, popupMessage);
+        }
+
+        NotificationCompat.Builder builder = newPopup.buildNotification();
+        int nId = newPopup.getId();
 
         // Registers click intent
         builder.setContentIntent(
@@ -176,53 +140,33 @@ public class NotificationPopupHandler
 
         // post the notification
         JitsiApplication.getNotificationManager().notify(nId, builder.build());
-
-        // handle discard timeout
-        if(timeoutHandlers.containsKey(nId))
-        {
-            logger.debug("Removing timeout from notification: "+nId);
-
-            timeoutHandlers.get(nId).cancel();
-            timeoutHandlers.remove(nId);
-        }
-        long timeout = popupMessage.getTimeout();
-        if(timeout > 0)
-        {
-            logger.debug("Setting timeout "+timeout+" on notification: "+nId);
-
-            final int finalId = nId;
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask()
-            {
-                @Override
-                public void run()
-                {
-                    // Cancels and removes the notification
-                    JitsiApplication.getNotificationManager().cancel(finalId);
-                    removeNotification(finalId);
-                }
-            }, timeout);
-            timeoutHandlers.put(nId, timer);
-        }
+        newPopup.onPost();
 
         // caches the notification until clicked or cleared
-        notificationMap.put(nId, popupMessage);
+        notificationMap.put(nId, newPopup);
     }
 
     /**
-     * Converts given <tt>Contact</tt> to <tt>MetaContact</tt>.
-     * @param contact the <tt>Contact</tt> that will be converted into
-     *                <tt>MetaContact</tt>
-     * @return <tt>MetaContact</tt> for given <tt>Contact</tt>
+     * Returns id of general notification that is bound to Jitsi icon.
+     * @return id of general notification that is bound to Jitsi icon.
      */
-    private MetaContact getMetaContact(Contact contact)
+    int getGeneralNotificationId()
     {
-        MetaContactListService metaContactList
-                = ServiceUtils.getService(
-                AndroidGUIActivator.bundleContext,
-                MetaContactListService.class);
+        int serviceIcondId = OSGiService.getGeneralNotificationId();
 
-        return metaContactList.findMetaContactByContact(contact);
+        // Use service icon if available
+        if(serviceIcondId != -1 && generalNotificationId != serviceIcondId)
+        {
+            this.generalNotificationId = serviceIcondId;
+        }
+
+        // There is not service icon available
+        if(generalNotificationId == -1)
+        {
+            generalNotificationId
+                = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
+        }
+        return generalNotificationId;
     }
 
     /**
@@ -233,7 +177,8 @@ public class NotificationPopupHandler
     void fireNotificationClicked(int notificationId)
     {
         logger.debug("Notification clicked: " + notificationId);
-        PopupMessage msg = notificationMap.get(notificationId);
+        PopupMessage msg
+            = notificationMap.get(notificationId).getPopupMessage();
         firePopupMessageClicked(
                 new SystrayPopupMessageEvent(msg, msg.getTag()) );
 
@@ -258,8 +203,14 @@ public class NotificationPopupHandler
      */
     private void removeNotification(int notificationId)
     {
-        PopupMessage msg = notificationMap.get(notificationId);
-        if(msg == null)
+        if(notificationId == OSGiService.getGeneralNotificationId())
+        {
+            AndroidUtils.clearGeneralNotification(
+                    JitsiApplication.getGlobalContext());
+        }
+
+        AndroidPopup popup = notificationMap.get(notificationId);
+        if(popup == null)
         {
             logger.warn("Notification for id: "
                                  + notificationId + " already removed");
@@ -267,24 +218,8 @@ public class NotificationPopupHandler
         }
 
         logger.debug("Removing notification: " + notificationId);
-
-        // Remove timeout handler
-        Timer timeoutHandler = timeoutHandlers.get(notificationId);
-        if(timeoutHandler != null)
-        {
-            timeoutHandler.cancel();
-        }
-
+        popup.removeNotification();
         notificationMap.remove(notificationId);
-
-        Object tag = msg.getTag();
-        if(tag instanceof Contact)
-        {
-            // Converts tag to meta contact
-            tag = getMetaContact((Contact)tag);
-        }
-
-        tagToNotificationMap.remove(tag);
     }
 
     /**
@@ -295,21 +230,11 @@ public class NotificationPopupHandler
         // Removes active chat listener
         ChatSessionManager.removeCurrentChatListener(activeChatListener);
 
-        NotificationManager notifyManager
-                = JitsiApplication.getNotificationManager();
-
-        for(int notificationId : notificationMap.keySet())
-            notifyManager.cancel(notificationId);
-
-        notificationMap.clear();
-        tagToNotificationMap.clear();
-
-        // Cancels timeout handlers
-        for(Timer t : timeoutHandlers.values())
+        for(AndroidPopup popup : notificationMap.values())
         {
-            t.cancel();
+            popup.removeNotification();
         }
-        timeoutHandlers.clear();
+        notificationMap.clear();
     }
 
     /**
@@ -330,5 +255,14 @@ public class NotificationPopupHandler
     public String toString()
     {
         return JitsiApplication.getResString(R.string.impl_popup_status_bar);
+    }
+
+    /**
+     * Method called by <tt>AndroidPopup</tt> to signal the timeout.
+     * @param popup <tt>AndroidPopup</tt> on which timeout event has occurred.
+     */
+    public void onTimeout(AndroidPopup popup)
+    {
+        removeNotification(popup.getId());
     }
 }

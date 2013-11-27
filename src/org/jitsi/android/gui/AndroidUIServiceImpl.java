@@ -271,7 +271,7 @@ public class AndroidUIServiceImpl
      */
     public Chat getChat(Contact contact, String escapedMessageID)
     {
-        return null;
+        return getChat(contact);
     }
 
     /**

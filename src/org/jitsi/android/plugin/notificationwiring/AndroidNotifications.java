@@ -22,6 +22,21 @@ public class AndroidNotifications
     implements BundleActivator
 {
     /**
+     * Default group that will use Jitsi icon for notifications
+     */
+    public static final String DEFAULT_GROUP = null;
+
+    /**
+     * Message notifications group.
+     */
+    public static final String MESSAGE_GROUP = "message";
+
+    /**
+     * Calls notification group.
+     */
+    public static final String CALL_GROUP = "call";
+
+    /**
      * {@inheritDoc}
      */
     public void start(BundleContext bundleContext)
@@ -59,12 +74,21 @@ public class AndroidNotifications
                 NotificationManager.INCOMING_CALL,
                 NotificationAction.ACTION_POPUP_MESSAGE);
 
+        // Incoming message
+        notificationService.registerDefaultNotificationForEvent(
+                NotificationManager.INCOMING_MESSAGE,
+                new PopupMessageNotificationAction(
+                        null, // No default message
+                        -1,  // Notification hide timeout
+                        MESSAGE_GROUP
+                ));
         // Proactive notifications
         notificationService.registerDefaultNotificationForEvent(
                 NotificationManager.PROACTIVE_NOTIFICATION,
                 new PopupMessageNotificationAction(
                         null, // No default message
-                        7000  // Notification hide timeout
+                        7000,  // Notification hide timeout
+                        DEFAULT_GROUP // displayed on Jitsi icon
                 ));
 
         // Remove not-used events
