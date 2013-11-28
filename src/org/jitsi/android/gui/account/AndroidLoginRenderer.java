@@ -281,7 +281,7 @@ public class AndroidLoginRenderer
         int notificationID = OSGiService.getGeneralNotificationId();
         if(notificationID == -1)
         {
-            logger.warn("Failed to display status notification because" +
+            logger.debug("Not displaying status notification because" +
                     " there's no global notification icon available.");
             return;
         }
