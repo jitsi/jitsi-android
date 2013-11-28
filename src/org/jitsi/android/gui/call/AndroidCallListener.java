@@ -28,11 +28,18 @@ import java.util.*;
  * the <tt>CallEvent</tt>s to the AWT event dispatching thread.
  *
  * @author Yana Stamcheva
+ * @author Pawel Domas
  */
 public class AndroidCallListener
     implements  CallListener,
                 CallChangeListener
 {
+    /**
+     * The logger.
+     */
+    private final static Logger logger
+        = Logger.getLogger(AndroidCallListener.class);
+
     /**
      * The application context.
      */
@@ -43,12 +50,6 @@ public class AndroidCallListener
      * the call has ended.
      */
     private Boolean speakerPhoneBeforeCall;
-
-    /**
-     * Caches <tt>Call</tt> contacts that will be used in missed call
-     * notification since they are no longer available after call has ended.
-     */
-    private Map<Call, Contact> callContacts = new HashMap<Call, Contact>();
 
     /**
      * {@inheritDoc}
@@ -72,13 +73,6 @@ public class AndroidCallListener
         onCallEvent(ev);
 
         ev.getSourceCall().addCallChangeListener(this);
-
-        //Caches the contact for missed call notification
-        Contact contact = CallUIUtils.getCallee(ev.getSourceCall());
-        if(contact != null)
-        {
-            callContacts.put(ev.getSourceCall(), contact);
-        }
     }
 
     /**
@@ -155,8 +149,6 @@ public class AndroidCallListener
     public void outgoingCallCreated(CallEvent ev)
     {
         onCallEvent(ev);
-
-        ev.getSourceCall().addCallChangeListener(this);
     }
 
     /**
@@ -222,9 +214,9 @@ public class AndroidCallListener
     @Override
     public void callStateChanged(CallChangeEvent evt)
     {
-        if (evt.getNewValue().equals(CallState.CALL_ENDED))
+        if (CallState.CALL_ENDED.equals(evt.getNewValue()))
         {
-            if(evt.getOldValue().equals(CallState.CALL_INITIALIZATION))
+            if(CallState.CALL_INITIALIZATION.equals(evt.getOldValue()))
             {
                 if(evt.getCause() != null
                         && evt.getCause().getReasonCode() !=
@@ -234,8 +226,6 @@ public class AndroidCallListener
                     fireMissedCallNotification(evt);
                 }
             }
-            // Remove cached contact
-            callContacts.remove(evt.getSourceCall());
         }
     }
 
@@ -249,9 +239,10 @@ public class AndroidCallListener
             = ServiceUtils.getService(AndroidGUIActivator.bundleContext,
                                       NotificationService.class);
 
-        Contact contact = callContacts.get(evt.getSourceCall());
+        Contact contact = evt.getCause().getSourceCallPeer().getContact();
         if(contact == null)
         {
+            logger.warn("No contact found - missed call notification skipped");
             return;
         }
 
