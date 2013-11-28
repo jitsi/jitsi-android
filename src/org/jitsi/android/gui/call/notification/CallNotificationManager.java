@@ -16,8 +16,7 @@ import net.java.sip.communicator.util.call.*;
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.call.*;
-import org.jitsi.android.gui.util.*;
-import org.jitsi.service.osgi.*;
+import org.jitsi.impl.androidtray.*;
 
 import java.util.*;
 
@@ -45,7 +44,7 @@ public class CallNotificationManager
     /**
      * Returns call control notifications manager.
      *
-     * @return the {@CallNotificationManager}.
+     * @return the <tt>CallNotificationManager</tt>.
      */
     public static CallNotificationManager get()
     {
@@ -102,7 +101,7 @@ public class CallNotificationManager
                 = (NotificationManager) ctx.getSystemService(
                         Context.NOTIFICATION_SERVICE);
 
-        int id = OSGiService.getGeneralNotificationId();
+        int id = SystrayServiceImpl.getGeneralNotificationId();
         mNotificationManager.notify(id, notification);
 
         CtrlNotificationThread notificationHandler
@@ -118,9 +117,7 @@ public class CallNotificationManager
 
             public void callPeerRemoved(CallPeerEvent evt)
             {
-                stopNotification(
-                        JitsiApplication.getGlobalContext(),
-                        callID);
+                stopNotification(callID);
             }
 
             public void callStateChanged(CallChangeEvent evt)
@@ -182,18 +179,18 @@ public class CallNotificationManager
     /**
      * Stops the notification running for the call identified by given
      * <tt>callId</tt>.
-     * @param ctx Android context.
      * @param callId the ID of the call managed by {@link CallManager}.
      */
-    public synchronized void stopNotification(Context ctx, String callId)
+    public synchronized void stopNotification(String callId)
     {
         CtrlNotificationThread notificationHandler = handlersMap.get(callId);
         if(notificationHandler != null)
         {
             notificationHandler.stop();
             handlersMap.remove(callId);
-
-            AndroidUtils.clearGeneralNotification(ctx);
+            // Remove the notification
+            JitsiApplication.getNotificationManager()
+                .cancel(notificationHandler.id);
         }
     }
 

@@ -17,6 +17,7 @@ import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.plugin.notificationwiring.*;
+import org.jitsi.service.osgi.*;
 
 /**
  * Android system tray implementation. Makes use of status bar notifications to
@@ -32,6 +33,11 @@ public class SystrayServiceImpl
      */
     private static final Logger logger
             = Logger.getLogger(SystrayServiceImpl.class);
+
+    /**
+     * Id of Jitsi icon notification
+     */
+    private static int generalNotificationId = -1;
 
     /**
      * Popup message handler.
@@ -130,6 +136,29 @@ public class SystrayServiceImpl
                 //TODO: set envelope icon here
                 break;
         }
+    }
+
+    /**
+     * Returns id of general notification that is bound to Jitsi icon.
+     * @return id of general notification that is bound to Jitsi icon.
+     */
+    public static int getGeneralNotificationId()
+    {
+        int serviceIcondId = OSGiService.getGeneralNotificationId();
+
+        // Use service icon if available
+        if(serviceIcondId != -1 && generalNotificationId != serviceIcondId)
+        {
+            generalNotificationId = serviceIcondId;
+        }
+
+        // There is not service icon available
+        if(generalNotificationId == -1)
+        {
+            generalNotificationId
+                = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
+        }
+        return generalNotificationId;
     }
 
     /**

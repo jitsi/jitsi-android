@@ -13,6 +13,8 @@ import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.call.*;
 import org.jitsi.*;
 
+import java.util.*;
+
 /**
  * Class runs the thread that updates call control notification.
  *
@@ -48,7 +50,7 @@ class CtrlNotificationThread
     /**
      * The notification ID.
      */
-    private final int id;
+    final int id;
     /**
      * The call that is controlled by notification.
      */
@@ -90,18 +92,25 @@ class CtrlNotificationThread
 
     private void notificationLoop()
     {
-        long callStartDate
-                = call.getCallPeers().next().getCallDurationStartTime();
-
         while(run)
         {
             logger.trace("Running control notification thread " + hashCode());
 
-            notification.contentView.setTextViewText(
-                    R.id.call_duration,
-                    GuiUtils.formatTime(
-                            callStartDate,
-                            System.currentTimeMillis()));
+            // Call duration timer
+            long callStartDate = CallPeer.CALL_DURATION_START_TIME_UNKNOWN;
+            Iterator<? extends CallPeer> peers = call.getCallPeers();
+            if(peers.hasNext())
+            {
+                callStartDate = peers.next().getCallDurationStartTime();
+            }
+            if(callStartDate != CallPeer.CALL_DURATION_START_TIME_UNKNOWN)
+            {
+                notification.contentView.setTextViewText(
+                        R.id.call_duration,
+                        GuiUtils.formatTime(
+                                callStartDate,
+                                System.currentTimeMillis()));
+            }
 
             boolean isMute = CallManager.isMute(call);
             notification.contentView.setInt(

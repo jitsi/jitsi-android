@@ -45,11 +45,6 @@ public class NotificationPopupHandler
             = new HashMap<Integer, AndroidPopup>();
 
     /**
-     * Id of Jitsi icon notification
-     */
-    private int generalNotificationId = -1;
-
-    /**
      * Creates new instance of <tt>NotificationPopupHandler</tt>.
      * Registers as active chat listener.
      */
@@ -144,29 +139,6 @@ public class NotificationPopupHandler
 
         // caches the notification until clicked or cleared
         notificationMap.put(nId, newPopup);
-    }
-
-    /**
-     * Returns id of general notification that is bound to Jitsi icon.
-     * @return id of general notification that is bound to Jitsi icon.
-     */
-    int getGeneralNotificationId()
-    {
-        int serviceIcondId = OSGiService.getGeneralNotificationId();
-
-        // Use service icon if available
-        if(serviceIcondId != -1 && generalNotificationId != serviceIcondId)
-        {
-            this.generalNotificationId = serviceIcondId;
-        }
-
-        // There is not service icon available
-        if(generalNotificationId == -1)
-        {
-            generalNotificationId
-                = (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
-        }
-        return generalNotificationId;
     }
 
     /**

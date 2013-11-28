@@ -429,8 +429,7 @@ public class VideoCallActivity
         // Clears the in call notification
         if(CallNotificationManager.get().isNotificationRunning(callIdentifier))
         {
-            CallNotificationManager.get()
-                    .stopNotification(this, callIdentifier);
+            CallNotificationManager.get().stopNotification(callIdentifier);
 
         }
         // Registers as the call state listener

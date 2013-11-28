@@ -86,7 +86,7 @@ public class AndroidPopup
         if(popupMessage.getGroup() == null)
         {
             // By default all notifications share Jitsi icon
-            id = handler.getGeneralNotificationId();
+            id = SystrayServiceImpl.getGeneralNotificationId();
         }
         else
         {
