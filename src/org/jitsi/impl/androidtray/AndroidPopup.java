@@ -8,6 +8,7 @@ package org.jitsi.impl.androidtray;
 
 import android.app.*;
 import android.content.*;
+import android.content.res.*;
 import android.graphics.*;
 import android.support.v4.app.*;
 
@@ -15,7 +16,7 @@ import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.systray.*;
 import net.java.sip.communicator.util.*;
 
-import org.jitsi.*;
+import org.jitsi.R;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.gui.util.*;
@@ -269,18 +270,48 @@ public class AndroidPopup
                         .setVibrate(new long[]{}) // no vibration
                         .setSound(null); // no sound
 
-        byte[] icon = popupMessage.getIcon();
-        if(icon != null)
+        // Big view comes with API11
+        if(AndroidUtils.hasAPI(11))
         {
-            Bitmap iconBmp = AndroidImageUtil.bitmapFromBytes(icon);
-            builder.setLargeIcon(iconBmp);
-        }
+            Resources res = JitsiApplication.getAppResources();
 
-        // Build inbox style
-        NotificationCompat.InboxStyle inboxStyle
+            // Preferred size
+            int prefWidth = (int) res.getDimension(
+                android.R.dimen.notification_large_icon_width);
+            int prefHeight = (int) res.getDimension(
+                android.R.dimen.notification_large_icon_height);
+
+            // Use popup icon if any
+            Bitmap iconBmp = null;
+            byte[] icon = popupMessage.getIcon();
+            if(icon != null)
+            {
+                iconBmp = AndroidImageUtil.scaledBitmapFromBytes(
+                    icon, prefWidth, prefHeight);
+            }
+
+            // Set default avatar
+            if(iconBmp == null)
+            {
+                iconBmp = AndroidImageUtil.scaledBitmapFromResource(
+                    res, R.drawable.avatar, prefWidth, prefHeight);
+            }
+
+            if( iconBmp.getWidth() > prefWidth
+                || iconBmp.getHeight() > prefHeight)
+            {
+                iconBmp = Bitmap.createScaledBitmap(
+                    iconBmp, prefWidth, prefHeight, true);
+            }
+
+            builder.setLargeIcon(iconBmp);
+
+            // Build inbox style
+            NotificationCompat.InboxStyle inboxStyle
                 = new NotificationCompat.InboxStyle();
-        onBuildInboxStyle(inboxStyle);
-        builder.setStyle(inboxStyle);
+            onBuildInboxStyle(inboxStyle);
+            builder.setStyle(inboxStyle);
+        }
 
         return builder;
     }

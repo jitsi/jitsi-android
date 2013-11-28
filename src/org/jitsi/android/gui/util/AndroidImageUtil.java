@@ -6,8 +6,10 @@
  */
 package org.jitsi.android.gui.util;
 
+import android.content.res.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
+import org.jitsi.android.*;
 
 /**
  * Class containing utility methods for Android's Displayable and Bitmap
@@ -25,9 +27,8 @@ public class AndroidImageUtil
     {
         if(imageBlob != null)
         {
-            Bitmap icon = BitmapFactory.decodeByteArray(
-                    imageBlob, 0, imageBlob.length);
-            return icon;
+            return BitmapFactory.decodeByteArray(
+                imageBlob, 0, imageBlob.length);
         }
         return null;
     }
@@ -46,7 +47,7 @@ public class AndroidImageUtil
         if(bmp == null)
             return null;
 
-        return new BitmapDrawable(bmp);
+        return new BitmapDrawable(JitsiApplication.getAppResources(), bmp);
     }
 
     /**
@@ -62,12 +63,101 @@ public class AndroidImageUtil
                                                     int width,
                                                     int height)
     {
-        Bitmap bmp = bitmapFromBytes(imageBytes);
+        Bitmap bmp = scaledBitmapFromBytes(imageBytes, width, height);
 
         if(bmp == null)
             return null;
 
-        return new BitmapDrawable(
-            Bitmap.createScaledBitmap(bmp, width, height, true));
+        return new BitmapDrawable(JitsiApplication.getAppResources(), bmp);
+    }
+
+    /**
+     * Creates a <tt>Bitmap</tt> from the given image byte array and scales
+     * it to the given <tt>width</tt> and <tt>height</tt>.
+     *
+     * @param imageBytes the raw image data
+     * @param reqWidth the width to which to scale the image
+     * @param reqHeight the height to which to scale the image
+     * @return the newly created <tt>Bitmap</tt>
+     */
+    static public Bitmap scaledBitmapFromBytes(
+        byte[] imageBytes, int reqWidth, int reqHeight)
+    {
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeByteArray(
+            imageBytes, 0, imageBytes.length, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(
+            options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeByteArray(
+            imageBytes, 0, imageBytes.length, options);
+    }
+
+    /**
+     * Calculates <tt>options.inSampleSize</tt> for requested width and height.
+     * @param options the <tt>Options</tt> object that contains image
+     *                <tt>outWidth</tt> and <tt>outHeight</tt>.
+     * @param reqWidth requested width.
+     * @param reqHeight requested height.
+     * @return <tt>options.inSampleSize</tt> for requested width and height.
+     */
+    private static int calculateInSampleSize(
+        BitmapFactory.Options options, int reqWidth, int reqHeight)
+    {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth)
+        {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2
+            // and keeps both height and width larger than the requested height
+            // and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth)
+            {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
+    /**
+     * Decodes <tt>Bitmap</tt> identified by given <tt>resId</tt> scaled to
+     * requested width and height.
+     * @param res the <tt>Resources</tt> object.
+     * @param resId bitmap resource id.
+     * @param reqWidth requested width.
+     * @param reqHeight requested height.
+     * @return  <tt>Bitmap</tt> identified by given <tt>resId</tt> scaled to
+     *          requested width and height.
+     */
+    public static Bitmap scaledBitmapFromResource(
+        Resources res, int resId, int reqWidth, int reqHeight)
+    {
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeResource(res, resId, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(
+            options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeResource(res, resId, options);
     }
 }
