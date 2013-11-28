@@ -77,7 +77,8 @@
                     android:label="@string/app_name">
         </activity>
         <activity android:name=".android.gui.chat.ChatActivity"
-                    android:label="@string/app_name">
+                  android:label="@string/app_name"
+                  android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity android:name=".android.plugin.otr.OtrAuthenticateDialog"
                   android:label="@string/app_name"
