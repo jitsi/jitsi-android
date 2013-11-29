@@ -941,7 +941,7 @@ public class ContactListAdapter
                         {
                             originalContacts.remove(contactList);
                             originalContacts.add(
-                                    groupIndex,
+                                    origGroupIndex,
                                     new TreeSet<MetaContact>(contactList));
                         }
                     }
