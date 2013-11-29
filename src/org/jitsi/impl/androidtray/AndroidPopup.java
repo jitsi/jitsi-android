@@ -291,20 +291,23 @@ public class AndroidPopup
             }
 
             // Set default avatar
-            if(iconBmp == null)
+            if(iconBmp == null && contact != null)
             {
                 iconBmp = AndroidImageUtil.scaledBitmapFromResource(
                     res, R.drawable.avatar, prefWidth, prefHeight);
             }
 
-            if( iconBmp.getWidth() > prefWidth
-                || iconBmp.getHeight() > prefHeight)
+            if(iconBmp != null)
             {
-                iconBmp = Bitmap.createScaledBitmap(
-                    iconBmp, prefWidth, prefHeight, true);
-            }
+                if(iconBmp.getWidth() > prefWidth
+                    || iconBmp.getHeight() > prefHeight)
+                {
+                    iconBmp = Bitmap.createScaledBitmap(
+                        iconBmp, prefWidth, prefHeight, true);
+                }
 
-            builder.setLargeIcon(iconBmp);
+                builder.setLargeIcon(iconBmp);
+            }
 
             // Build inbox style
             NotificationCompat.InboxStyle inboxStyle
