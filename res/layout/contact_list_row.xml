@@ -25,11 +25,12 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/avatarLayout"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="8dip">
+        android:layout_marginLeft="8dip"
+        android:layout_toLeftOf="@+id/callButtonLayout">
 
         <TextView
             android:id="@+id/displayName"
@@ -103,17 +104,21 @@
         android:visibility="invisible"/>
 
     <LinearLayout
+        android:id="@+id/rightShadowTop"
         android:layout_width="7dip"
         android:layout_height="fill_parent"
         android:layout_above="@id/selectedBackgroundIcon"
         android:layout_alignParentRight="true"
-        android:background="@drawable/chatseparator"/>
+        android:background="@drawable/chatseparator"
+        android:visibility="invisible"/>
 
     <LinearLayout
+        android:id="@+id/rightShadowBottom"
         android:layout_width="7dip"
         android:layout_height="fill_parent"
         android:layout_below="@id/selectedBackgroundIcon"
         android:layout_alignParentRight="true"
-        android:background="@drawable/chatseparator"/>
+        android:background="@drawable/chatseparator"
+        android:visibility="invisible"/>
 
 </RelativeLayout>

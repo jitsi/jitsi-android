@@ -1087,6 +1087,15 @@ public class ContactListAdapter
                                             parent,
                                             false);
 
+            if (isExtendedChat)
+            {
+                // Show shadows on the right side for tablet layout
+                ViewUtil.ensureVisible(
+                    convertView, R.id.rightShadowTop, true);
+                ViewUtil.ensureVisible(
+                    convertView, R.id.rightShadowBottom, true);
+            }
+
             contactViewHolder = new ContactViewHolder();
             contactViewHolder.displayName
                 = (TextView) convertView.findViewById(R.id.displayName);
