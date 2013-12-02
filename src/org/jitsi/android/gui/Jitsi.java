@@ -193,14 +193,17 @@ public class Jitsi
 
         if(savedInstanceState != null)
         {
-            // The Activity is being restored so fragments have been already
-            // added
+            // Restores the contact list fragment
+            contactListFragment
+                = (ContactListFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.contactListFragment);
             return;
         }
 
         if (Intent.ACTION_SEARCH.equals(action))
         {
             String query = intent.getStringExtra(SearchManager.QUERY);
+            logger.warn("Search intent not handled for query: "+query);
         }
         else
         // Both show contact and show chat actions are handled here
@@ -243,9 +246,6 @@ public class Jitsi
 
     public void filterContactList(String query)
     {
-        if (contactListFragment == null)
-            return;
-
         contactListFragment.filterContactList(query);
     }
 
