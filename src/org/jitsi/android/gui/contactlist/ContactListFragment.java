@@ -6,11 +6,16 @@
  */
 package org.jitsi.android.gui.contactlist;
 
+import android.app.*;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.*;
 
-import org.jitsi.*;
+import org.jitsi.R;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.chat.*;
@@ -19,7 +24,6 @@ import org.jitsi.service.osgi.*;
 
 import android.content.*;
 import android.os.Bundle;
-import android.support.v4.app.*;
 import android.view.*;
 import android.widget.*;
 import android.widget.ExpandableListView.OnChildClickListener;
@@ -38,12 +42,6 @@ public class ContactListFragment
      */
     private final static Logger logger
         = Logger.getLogger(ContactListFragment.class);
-
-    /**
-     * The <tt>MetaContactListService</tt> giving access to the contact list
-     * content.
-     */
-    private MetaContactListService contactListService;
 
     /**
      * The adapter containing list data.
@@ -70,6 +68,58 @@ public class ContactListFragment
      */
     private String currentChatId;
 
+    private static final String TAB1 = "Contacts";
+
+    private static final String TAB2 = "History";
+
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+        if(!AndroidUtils.hasAPI(11))
+            return;
+
+        // Install tabs
+        final ActionBar actionBar = getActivity().getActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        // Create a tab listener that is called when the user changes tabs.
+        ActionBar.TabListener tabListener = new ActionBar.TabListener()
+        {
+
+            @Override
+            public void onTabSelected(ActionBar.Tab tab,
+                                      android.app.FragmentTransaction ft)
+            {
+                logger.error("TAB SELECTED: "+tab);
+            }
+
+            @Override
+            public void onTabUnselected(ActionBar.Tab tab,
+                                        android.app.FragmentTransaction ft)
+            {
+                logger.error("TAB UNSELECTED: "+tab);
+            }
+
+            @Override
+            public void onTabReselected(ActionBar.Tab tab,
+                                        android.app.FragmentTransaction ft)
+            {
+                logger.error("TAB RESELECTED: "+tab);
+            }
+        };
+
+        // Add 3 tabs, specifying the tab's text and TabListener
+        actionBar.addTab(
+            actionBar.newTab()
+                .setText(TAB1)
+                .setTabListener(tabListener));
+        actionBar.addTab(
+            actionBar.newTab()
+                .setText(TAB2)
+                .setTabListener(tabListener));
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -87,9 +137,10 @@ public class ContactListFragment
                                          container,
                                          false);
 
-        this.contactListService
-                = ServiceUtils.getService( AndroidGUIActivator.bundleContext,
-                                           MetaContactListService.class);
+        MetaContactListService contactListService
+            = ServiceUtils.getService(
+                AndroidGUIActivator.bundleContext,
+                MetaContactListService.class);
 
         contactListView = (ExpandableListView) content
                 .findViewById(R.id.contactListView);

@@ -85,7 +85,7 @@ public class Jitsi
 
         setContentView(R.layout.main_view);
 
-        boolean isTablet = findViewById(R.id.chatView) != null;
+        boolean isTablet = AndroidUtils.isTablet();
 
         if(savedInstanceState == null)
         {
