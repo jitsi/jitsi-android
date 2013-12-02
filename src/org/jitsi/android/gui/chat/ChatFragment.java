@@ -222,6 +222,7 @@ public class ChatFragment
             throw new IllegalArgumentException();
 
         chatSession = ChatSessionManager.getActiveChat(chatId);
+        chatSession.addMessageListener(chatListAdapter);
 
         return content;
     }
@@ -302,7 +303,6 @@ public class ChatFragment
         // are not created yet
         checkInitController();
 
-        chatSession.addMessageListener(chatListAdapter);
         chatSession.addContactStatusListener(chatListAdapter);
         chatSession.addTypingListener(chatListAdapter);
     }
@@ -310,7 +310,6 @@ public class ChatFragment
     @Override
     public void onPause()
     {
-        chatSession.removeMessageListener(chatListAdapter);
         chatSession.removeContactStatusListener(chatListAdapter);
         chatSession.removeTypingListener(chatListAdapter);
 
@@ -391,6 +390,8 @@ public class ChatFragment
             logger.debug("DETACH CHAT FRAGMENT: " + this);
 
         super.onDetach();
+
+        chatSession.removeMessageListener(chatListAdapter);
 
         chatListAdapter = null;
 
