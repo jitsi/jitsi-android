@@ -29,6 +29,12 @@ import org.osgi.framework.*;
  *       onCreate and OnDestroy commands. Maybe there is still some reference
  *       to OSGI service being held at that time ?
  *
+ * TODO: Prevent from recreating this Activity on startup
+ *       On startup when this Activity is recreated it will also destroy
+ *       OSGiService which is currently not handled properly. Options specified
+ *       in AndroidManifest.xml should cover most cases for now:
+ *       android:configChanges="keyboardHidden|orientation|screenSize"
+ *
  * @author Pawel Domas
  */
 public class LauncherActivity
