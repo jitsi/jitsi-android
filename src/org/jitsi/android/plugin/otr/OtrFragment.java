@@ -21,7 +21,6 @@ import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.gui.settings.*;
-import org.jitsi.android.gui.util.event.*;
 import org.jitsi.service.osgi.*;
 
 import java.net.*;
@@ -35,25 +34,12 @@ import java.net.*;
  */
 public class OtrFragment
     extends OSGiFragment
+    implements ChatSessionManager.CurrentChatListener
 {
     /**
      * Menu instance used to control the padlock.
      */
     private Menu menu;
-
-    /**
-     * Active chat session listener. Updates the padlock when active
-     * chat is switched.
-     */
-    private EventListener<String> activeChatListener
-            = new EventListener<String>()
-    {
-        @Override
-        public void onChangeEvent(String eventObject)
-        {
-            setCurrentChatSession(eventObject);
-        }
-    };
 
     /**
      * Creates new instance of <tt>OtrFragment</tt>.
@@ -83,7 +69,7 @@ public class OtrFragment
         OtrActivator.scOtrEngine.addListener(scOtrEngineListener);
         OtrActivator.scOtrKeyManager.addListener(scOtrKeyManagerListener);
 
-        ChatSessionManager.addCurrentChatListener(activeChatListener);
+        ChatSessionManager.addCurrentChatListener(this);
 
         setCurrentChatSession(ChatSessionManager.getCurrentChatId());
     }
@@ -94,7 +80,7 @@ public class OtrFragment
     @Override
     public void onPause()
     {
-        ChatSessionManager.removeCurrentChatListener(activeChatListener);
+        ChatSessionManager.removeCurrentChatListener(this);
 
         OtrActivator.scOtrEngine.removeListener(scOtrEngineListener);
         OtrActivator.scOtrKeyManager.removeListener(scOtrKeyManagerListener);
@@ -342,6 +328,12 @@ public class OtrFragment
     public MenuItem getPadlock()
     {
         return menu.findItem(R.id.otr_padlock);
+    }
+
+    @Override
+    public void onCurrentChatChanged(String chatId)
+    {
+        setCurrentChatSession(chatId);
     }
 
     /**

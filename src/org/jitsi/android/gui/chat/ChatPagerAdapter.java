@@ -11,6 +11,8 @@ import java.util.*;
 import android.support.v4.app.*;
 import android.support.v4.view.*;
 import android.view.*;
+import net.java.sip.communicator.service.gui.*;
+import net.java.sip.communicator.service.gui.event.*;
 
 /**
  * A pager adapter used to display active chats.
@@ -20,16 +22,17 @@ import android.view.*;
  */
 public class ChatPagerAdapter
     extends FragmentStatePagerAdapter
+    implements ChatListener
 {
     /**
      * The list of contained chat session ids.
      */
-    private List<String> chats = new LinkedList<String>();
+    private final List<String> chats;
 
     /**
-     * The currently selected chat index.
+     * Parent <tt>ChatActivity</tt>.
      */
-    private int selectedIndex = 0;
+    private final ChatActivity parent;
 
     /**
      * Remembers currently displayed <tt>ChatFragment</tt>.
@@ -42,45 +45,23 @@ public class ChatPagerAdapter
      *
      * @param fm the parent <tt>FragmentManager</tt>
      */
-    public ChatPagerAdapter(FragmentManager fm)
+    public ChatPagerAdapter(FragmentManager fm, ChatActivity parent)
     {
         super(fm);
 
-        initChats();
-    }
-
-    /**
-     * Initializes open chats.
-     */
-    private void initChats()
-    {
         this.chats = ChatSessionManager.getActiveChatsIDs();
+        this.parent = parent;
 
-        for(int index=0; index<chats.size(); index++)
-        {
-            if (ChatSessionManager.getCurrentChatId().equals(chats.get(index)))
-                selectedIndex = index;
-        }
+        ChatSessionManager.addChatListener(this);
     }
 
     /**
-     * Returns the currently selected chat index.
-     *
-     * @return the currently selected chat index
+     * Releases resources used by this instance. Once called this instance is
+     * considered invalid.
      */
-    public int getSelectedIndex()
+    public void dispose()
     {
-        return selectedIndex;
-    }
-
-    /**
-     * Sets the currently selected chat index.
-     *
-     * @param index the currently selected chat index
-     */
-    public void setSelectedIndex(int index)
-    {
-        selectedIndex = index;
+        ChatSessionManager.removeChatListener(this);
     }
 
     /**
@@ -98,6 +79,27 @@ public class ChatPagerAdapter
 
             return chats.get(pos);
         }
+    }
+
+    /**
+     * Returns index of the <tt>ChatSession</tt> in this adapter identified by
+     * given <tt>sessionId</tt>.
+     * @param sessionId chat session identifier.
+     * @return index of the <tt>ChatSession</tt> in this adapter identified by
+     *         given <tt>sessionId</tt>.
+     */
+    public int getChatIdx(String sessionId)
+    {
+        if(sessionId == null)
+            return -1;
+
+        for(int i=0; i < chats.size(); i++)
+        {
+            if(getChatId(i).equals(sessionId))
+                return i;
+        }
+
+        return -1;
     }
 
     /**
@@ -171,10 +173,7 @@ public class ChatPagerAdapter
     @Override
     public Object instantiateItem(ViewGroup container, final int position)
     {
-        ChatFragment chatFragment
-            = (ChatFragment) super.instantiateItem(container, position);
-
-        return chatFragment;
+        return super.instantiateItem(container, position);
     }
 
     /**
@@ -216,5 +215,35 @@ public class ChatPagerAdapter
                 newPrimary.setVisibleToUser(true);
         }
         this.primaryItem = newPrimary;
+    }
+
+    @Override
+    public void chatClosed(final Chat chat)
+    {
+        parent.runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                removeChatSession(((ChatSession)chat).getChatId());
+            }
+        });
+    }
+
+    @Override
+    public void chatCreated(final Chat chat)
+    {
+        parent.runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                synchronized (chats)
+                {
+                    chats.add(((ChatSession)chat).getChatId());
+                    notifyDataSetChanged();
+                }
+            }
+        });
     }
 }

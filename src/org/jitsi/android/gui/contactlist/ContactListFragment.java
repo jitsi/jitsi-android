@@ -14,7 +14,6 @@ import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.chat.*;
-import org.jitsi.android.gui.util.*;
 import org.jitsi.service.osgi.*;
 
 import android.content.*;
@@ -66,11 +65,6 @@ public class ContactListFragment
     private MetaContactGroup clickedGroup;
 
     /**
-     * Stores current chat id, when the activity is paused.
-     */
-    private String currentChatId;
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -110,39 +104,7 @@ public class ContactListFragment
             contactListAdapter.initAdapterData(contactListService);
         }
 
-        // If we have stored state use savedInstanceState bundle
-        // or the arguments otherwise
-        Bundle state
-                = savedInstanceState != null
-                    ? savedInstanceState : getArguments();
-        if(state != null)
-        {
-            String intentChatId
-                    = state.getString(ChatSessionManager.CHAT_IDENTIFIER);
-            if(intentChatId != null)
-            {
-                selectChatSession(
-                        ChatSessionManager.getActiveChat(intentChatId));
-            }
-        }
-
         return content;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onPause()
-    {
-        super.onPause();
-
-        // Manages current chat id only on tablet layout
-        if(AndroidUtils.isTablet())
-        {
-            currentChatId = ChatSessionManager.getCurrentChatId();
-            ChatSessionManager.setCurrentChatId(null);
-        }
     }
 
     /**
@@ -153,28 +115,8 @@ public class ContactListFragment
     {
         super.onResume();
 
-        // Manages current chat id only on tablet layout
-        if(AndroidUtils.isTablet())
-        {
-            ChatSessionManager.setCurrentChatId(currentChatId);
-            // Check if current session wasn't removed
-            // while this fragment was hidden
-            ChatSession session
-                = ChatSessionManager.getActiveChat(currentChatId);
-            if(session == null)
-                closeCurrentChat();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onSaveInstanceState(Bundle outState)
-    {
-        outState.putString(ChatSessionManager.CHAT_IDENTIFIER, currentChatId);
-
-        super.onSaveInstanceState(outState);
+        // Update active chats
+        contactListAdapter.invalidateViews();
     }
 
     /**
@@ -451,69 +393,17 @@ public class ContactListFragment
      */
     public void startChatActivity(MetaContact metaContact)
     {
-        ChatSession chatSession
-                = (ChatSession) ChatSessionManager.findChatForContact(
-                                    metaContact.getDefaultContact(), true);
+        Intent chatIntent = ChatSessionManager.getChatIntent(metaContact);
 
-        selectChatSession(chatSession);
+        getActivity().startActivity(chatIntent);
     }
 
     /**
-     * Selects current chat session. Depends on the current layout new chat
-     * fragment will be selected or new <tt>ChatActivity</tt> will be started.
-     *
-     * @param currentChat current chat session to be selected.
+     * Closes currently opened chat.
      */
-    private void selectChatSession(ChatSession currentChat)
+    protected void closeCurrentChat()
     {
-        currentChatId = currentChat.getChatId();
-
-        ChatSessionManager.setCurrentChatId(currentChatId);
-
-        View chatExtendedView = getActivity().findViewById(R.id.chatView);
-
-        if (chatExtendedView != null)
-        {
-            ChatTabletFragment chatTabletFragment
-                    = ChatTabletFragment.newInstance(currentChat.getChatId());
-            getActivity().getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.chatView, chatTabletFragment)
-                    .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-                    .commit();
-        }
-        else
-        {
-            Intent chatIntent = new Intent(getActivity(), ChatActivity.class);
-            chatIntent.putExtra(ChatSessionManager.CHAT_IDENTIFIER,
-                                currentChat.getChatId());
-            getActivity().startActivity(chatIntent);
-        }
-    }
-
-    /**
-     * Closes currently opened chat and it's chat fragment.
-     */
-    private void closeCurrentChat()
-    {
-        currentChatId = null;
-        ChatSessionManager.setCurrentChatId(currentChatId);
-
-        if (!AndroidUtils.isTablet())
-            return;
-
-        FragmentManager fragmentManager
-            = getActivity().getSupportFragmentManager();
-
-        Fragment chatFragment = fragmentManager.findFragmentById(R.id.chatView);
-        if(chatFragment == null)
-            return;
-
-        fragmentManager
-                .beginTransaction()
-                .remove(chatFragment)
-                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE)
-                .commit();
+        ChatSessionManager.setCurrentChatId(null);
     }
 
     /**

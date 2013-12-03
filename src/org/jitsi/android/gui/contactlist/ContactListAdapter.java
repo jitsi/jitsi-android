@@ -474,14 +474,13 @@ public class ContactListAdapter
     /**
      * Refreshes the list view.
      */
-    private void invalidateViews()
+    void invalidateViews()
     {
         if (contactListFragment == null
-            || contactListFragment.getActivity() == null
             || contactListView == null)
             return;
 
-        contactListFragment.getActivity().runOnUiThread(new Runnable()
+        contactListFragment.runOnUiThread(new Runnable()
         {
             public void run()
             {
@@ -795,8 +794,7 @@ public class ContactListAdapter
         if (logger.isDebugEnabled())
             logger.debug("CONTACT REMOVED: " + evt.getSourceMetaContact());
 
-        removeContact( evt.getParentGroup(),
-                    evt.getSourceMetaContact());
+        removeContact(evt.getParentGroup(), evt.getSourceMetaContact());
 
         dataChanged();
     }

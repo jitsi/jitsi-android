@@ -253,7 +253,8 @@ public class ChatSession
      */
     public void addMessageListener(ChatSessionListener l)
     {
-        msgListeners.add(l);
+        if(!msgListeners.contains(l))
+            msgListeners.add(l);
     }
 
     /**
@@ -388,7 +389,7 @@ public class ChatSession
             return msgCache;
 
         Collection<Object> history;
-        if(!historyLoaded)
+        if(msgCache.size() == 0)
         {
             history = metaHistory.findLast(chatHistoryFilter,
                                            metaContact,
@@ -432,12 +433,13 @@ public class ChatSession
             }
         }
 
+        historyLoaded = true;
+
         synchronized (cacheLock)
         {
-            if(!historyLoaded)
+            if(msgCache.size() > 0)
             {
                 msgCache = mergeMsgLists(historyMsgs, msgCache, -1);
-                historyLoaded = true;
                 return msgCache;
             }
             else

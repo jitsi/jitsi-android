@@ -19,7 +19,6 @@ import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.gui.util.*;
-import org.jitsi.android.gui.util.event.EventListener;
 import org.jitsi.service.osgi.*;
 
 /**
@@ -29,6 +28,7 @@ import org.jitsi.service.osgi.*;
  */
 public class NotificationPopupHandler
     extends AbstractPopupMessageHandler
+    implements ChatSessionManager.CurrentChatListener
 {
 
     /**
@@ -50,39 +50,8 @@ public class NotificationPopupHandler
      */
     public NotificationPopupHandler()
     {
-        ChatSessionManager.addCurrentChatListener(activeChatListener);
+        ChatSessionManager.addCurrentChatListener(this);
     }
-
-    /**
-     * Listens for currently active chat and clear notifications related to it.
-     */
-    private EventListener<String> activeChatListener
-            = new EventListener<String>()
-    {
-        @Override
-        public void onChangeEvent(String chatKey)
-        {
-            // Clears chat notification related to currently opened chat
-            ChatSession openChat = ChatSessionManager.getActiveChat(chatKey);
-
-            if(openChat == null)
-                return;
-
-            List<AndroidPopup> chatPopups = new ArrayList<AndroidPopup>();
-            for(AndroidPopup popup : notificationMap.values())
-            {
-                if(popup.isChatRelated(openChat))
-                {
-                    chatPopups.add(popup);
-                    break;
-                }
-            }
-            for(AndroidPopup chatPopup : chatPopups)
-            {
-                removeNotification(chatPopup.getId());
-            }
-        }
-    };
 
     /**
      * {@inheritDoc}
@@ -151,6 +120,13 @@ public class NotificationPopupHandler
         logger.debug("Notification clicked: " + notificationId);
         PopupMessage msg
             = notificationMap.get(notificationId).getPopupMessage();
+
+        if(msg == null)
+        {
+            logger.error("No popup message found for "+notificationId);
+            return;
+        }
+
         firePopupMessageClicked(
                 new SystrayPopupMessageEvent(msg, msg.getTag()) );
 
@@ -200,7 +176,7 @@ public class NotificationPopupHandler
     void dispose()
     {
         // Removes active chat listener
-        ChatSessionManager.removeCurrentChatListener(activeChatListener);
+        ChatSessionManager.removeCurrentChatListener(this);
 
         for(AndroidPopup popup : notificationMap.values())
         {
@@ -236,5 +212,32 @@ public class NotificationPopupHandler
     public void onTimeout(AndroidPopup popup)
     {
         removeNotification(popup.getId());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onCurrentChatChanged(String chatId)
+    {
+        // Clears chat notification related to currently opened chat
+        ChatSession openChat = ChatSessionManager.getActiveChat(chatId);
+
+        if(openChat == null)
+            return;
+
+        List<AndroidPopup> chatPopups = new ArrayList<AndroidPopup>();
+        for(AndroidPopup popup : notificationMap.values())
+        {
+            if(popup.isChatRelated(openChat))
+            {
+                chatPopups.add(popup);
+                break;
+            }
+        }
+        for(AndroidPopup chatPopup : chatPopups)
+        {
+            removeNotification(chatPopup.getId());
+        }
     }
 }

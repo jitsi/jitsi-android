@@ -15,12 +15,11 @@ import org.jitsi.android.gui.util.*;
 import org.jitsi.android.plugin.otr.*;
 import org.jitsi.service.osgi.*;
 
+import android.content.*;
 import android.os.*;
 import android.support.v4.view.*;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.*;
-import android.view.inputmethod.*;
-import android.widget.*;
 
 /**
  * The <tt>ChatActivity</tt> containing chat related interface.
@@ -64,28 +63,10 @@ public class ChatActivity
 
         setContentView(R.layout.chat);
 
-        String chatId;
-
-        if(savedInstanceState != null)
-        {
-            chatId = savedInstanceState
-                    .getString(ChatSessionManager.CHAT_IDENTIFIER);
-        }
-        else
-        {
-            chatId = getIntent()
-                    .getStringExtra(ChatSessionManager.CHAT_IDENTIFIER);
-        }
-
-        if(chatId == null)
-            throw new RuntimeException("Missing chat identifier extra");
-
-        setCurrentChatId(chatId);
-
         // Instantiate a ViewPager and a PagerAdapter.
         chatPager = (ViewPager) findViewById(R.id.chatPager);
         chatPagerAdapter
-            = new ChatPagerAdapter(getSupportFragmentManager());
+            = new ChatPagerAdapter(getSupportFragmentManager(), this);
         chatPager.setAdapter(chatPagerAdapter);
         chatPager.setOffscreenPageLimit(4);
 
@@ -99,6 +80,52 @@ public class ChatActivity
                     .add(new OtrFragment(), "otr_fragment")
                     .commit();
         }
+
+        handleIntent(getIntent(), savedInstanceState);
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+
+        if(chatPagerAdapter != null)
+            chatPagerAdapter.dispose();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+
+        handleIntent(intent, null);
+    }
+
+    private void handleIntent(Intent intent, Bundle savedInstanceState)
+    {
+        String chatId;
+
+        if(savedInstanceState != null)
+        {
+            chatId = savedInstanceState
+                .getString(ChatSessionManager.CHAT_IDENTIFIER);
+        }
+        else
+        {
+            chatId = intent
+                .getStringExtra(ChatSessionManager.CHAT_IDENTIFIER);
+        }
+
+        if(chatId == null)
+            throw new RuntimeException("Missing chat identifier extra");
+
+        setCurrentChatId(chatId);
+
+        // Synchronize chat page
+        chatPager.setCurrentItem(chatPagerAdapter.getChatIdx(chatId));
     }
 
     /**
@@ -113,11 +140,9 @@ public class ChatActivity
     {
         super.onResume();
 
-        chatPager.setCurrentItem(chatPagerAdapter.getSelectedIndex());
-
         ChatSessionManager.setCurrentChatId(currentChatId);
 
-        setSelectedChat();
+        displaySelectedChatInfo();
     }
 
     /**
@@ -177,6 +202,21 @@ public class ChatActivity
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event)
+    {
+        // Close the activity when back button is pressed
+        if(keyCode == KeyEvent.KEYCODE_BACK)
+        {
+            finish();
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
+    }
+
+    /**
      * Invoked when the options menu is created. Creates our own options menu
      * from the corresponding xml.
      *
@@ -228,9 +268,8 @@ public class ChatActivity
             else
             {
                 int pos = chatPager.getCurrentItem();
-                chatPagerAdapter.setSelectedIndex(pos);
                 setCurrentChatId(chatPagerAdapter.getChatId(pos));
-                setSelectedChat();
+                displaySelectedChatInfo();
             }
             return true;
 
@@ -248,6 +287,10 @@ public class ChatActivity
     public void onPageScrollStateChanged(int state) {}
 
     /**
+     * Caches last index to prevent from propagating too many events.
+     */
+    private int lastSelectedIdx = -1;
+    /**
      * Indicates a page has been scrolled. Sets the current chat.
      *
      * @param pos the new selected position
@@ -260,11 +303,11 @@ public class ChatActivity
     {
         // Updates only when "pos" value changes, as there are too many
         // notifications fired when the page is scrolled
-        if(chatPagerAdapter.getSelectedIndex() != pos)
+        if(lastSelectedIdx != pos)
         {
-            chatPagerAdapter.setSelectedIndex(pos);
             setCurrentChatId(chatPagerAdapter.getChatId(pos));
-            setSelectedChat();
+            displaySelectedChatInfo();
+            lastSelectedIdx = pos;
         }
     }
 
@@ -274,7 +317,7 @@ public class ChatActivity
     /**
      * Sets the selected chat.
      */
-    private void setSelectedChat()
+    private void displaySelectedChatInfo()
     {
         MetaContact metaContact = ChatSessionManager.getActiveChat(
             ChatSessionManager.getCurrentChatId()).getMetaContact();

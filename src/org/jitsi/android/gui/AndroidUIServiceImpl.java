@@ -258,7 +258,7 @@ public class AndroidUIServiceImpl
      */
     public Chat getChat(Contact contact)
     {
-        return ChatSessionManager.findChatForContact(contact, true);
+        return ChatSessionManager.findChatForContact(contact, false);
     }
 
     /**

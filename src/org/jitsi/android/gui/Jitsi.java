@@ -220,7 +220,14 @@ public class Jitsi
      */
     private void showContactsFragment(Intent intent)
     {
-        contactListFragment = new ContactListFragment();
+        if(AndroidUtils.isTablet())
+        {
+            contactListFragment = new TabletContactListFragment();
+        }
+        else
+        {
+            contactListFragment = new ContactListFragment();
+        }
 
         String chatId
                 = intent.getStringExtra(
@@ -295,21 +302,6 @@ public class Jitsi
                         + accountLoginIntent.getDataString());
                 }
         }
-    }
-
-    /**
-     * Creates new start chat <tt>Intent</tt> fro given <tt>MetaContact</tt> UID
-     * @param metaUID UID of the <tt>MetaContact</tt> to start chat with.
-     * @return new chat <tt>Intent</tt> for given <tt>MetaContact</tt> UID.
-     */
-    public static Intent getChatIntent(Context context, String metaUID)
-    {
-        Intent chatIntent = new Intent(context, Jitsi.class);
-        chatIntent.setAction(ACTION_SHOW_CHAT);
-        chatIntent.putExtra(CONTACT_EXTRA, metaUID);
-        chatIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        return chatIntent;
     }
 
     /**

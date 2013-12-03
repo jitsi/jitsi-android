@@ -19,8 +19,6 @@ import net.java.sip.communicator.util.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.util.*;
-import org.jitsi.android.gui.util.event.*;
-import org.jitsi.android.gui.util.event.EventListener;
 
 /**
  * The <tt>ChatSessionManager</tt> managing active chat sessions.
@@ -55,8 +53,8 @@ public class ChatSessionManager
     /**
      * The list of active chats.
      */
-    private static final EventListenerList<String> currentChatListeners
-            = new EventListenerList<String>();
+    private static final List<CurrentChatListener> currentChatListeners
+            = new ArrayList<CurrentChatListener>();
 
     /**
      * The list of chat link listeners.
@@ -115,7 +113,9 @@ public class ChatSessionManager
         }
         else
         {
-            for(ChatSession chat : activeChats.values())
+            ArrayList<ChatSession> sessions
+                = new ArrayList<ChatSession>(activeChats.values());
+            for(ChatSession chat : sessions)
             {
                 removeActiveChat(chat);
             }
@@ -190,8 +190,11 @@ public class ChatSessionManager
             logger.debug("Current chat with: "
                                  + currChat.getMetaContact().getDisplayName());
 
-        // Notifies about active session switch
-        currentChatListeners.notifyEventListeners(chatId);
+        // Notifies about new current chat session
+        for(CurrentChatListener l : currentChatListeners)
+        {
+            l.onCurrentChatChanged(chatId);
+        }
     }
 
     /**
@@ -219,7 +222,8 @@ public class ChatSessionManager
      */
     public synchronized static void addChatListener(ChatListener listener)
     {
-        chatListeners.add(listener);
+        if(!chatListeners.contains(listener))
+            chatListeners.add(listener);
     }
 
     /**
@@ -256,21 +260,24 @@ public class ChatSessionManager
     }
 
     /**
-     * Adds given listener to the current chat listeners list.
-     * @param l the listener to add to the current chat listeners list.
+     * Adds given listener to current chat listeners list.
+     * @param l the listener to add to current chat listeners list.
      */
-    public static void addCurrentChatListener(EventListener<String> l)
+    public synchronized static void addCurrentChatListener(
+        CurrentChatListener l)
     {
-        currentChatListeners.addEventListener(l);
+        if(!currentChatListeners.contains(l))
+            currentChatListeners.add(l);
     }
 
     /**
-     * Removes given listener form the current chat listeners list.
-     * @param l the listener to remove fro the current chat listeners list.
+     * Removes given listener form current chat listeners list.
+     * @param l the listener to remove from current chat listeners list.
      */
-    public static void removeCurrentChatListener(EventListener<String> l)
+    public synchronized static void removeCurrentChatListener(
+        CurrentChatListener l)
     {
-        currentChatListeners.removeEventListener(l);
+        currentChatListeners.remove(l);
     }
 
     /**
@@ -412,5 +419,18 @@ public class ChatSessionManager
         }
         for(ChatSession chat : toBeRemoved)
             removeActiveChat(chat);
+    }
+
+    /**
+     * Interface used to listen for currently visible chat session changes.
+     */
+    public interface CurrentChatListener
+    {
+        /**
+         * Fired when currently visible chat session changes
+         * @param chatId id of current chat session or <tt>null</tt> if there is
+         *               no chat currently displayed.
+         */
+        void onCurrentChatChanged(String chatId);
     }
 }
