@@ -7,10 +7,10 @@
 package org.jitsi.android.gui.util;
 
 import android.app.*;
-import android.content.*;
 import android.graphics.drawable.*;
 import android.widget.*;
 import org.jitsi.R;
+import org.jitsi.android.*;
 
 /**
  * The <tt>ActionBarUtil</tt> provides utility methods for setting action bar
@@ -33,7 +33,7 @@ public class ActionBarUtil
      */
     public static void setTitle(Activity a, CharSequence title)
     {
-        if(!AndroidUtils.hasAPI(11))
+        if(!AndroidUtils.hasAPI(11) || a == null)
             return;
 
         ActionBar actionBar = a.getActionBar();
@@ -75,16 +75,18 @@ public class ActionBarUtil
     public static void setAvatar(Activity a, byte[] avatar)
     {
         if (avatarDrawable == null)
-            avatarDrawable = getDefaultAvatarIcon(a);
+            avatarDrawable = getDefaultAvatarIcon();
 
         avatarDrawable
             .setDrawableByLayerId(R.id.avatarDrawable,
                 AndroidImageUtil.drawableFromBytes(avatar));
 
         // setLogo not supported prior API 14
-        if(AndroidUtils.hasAPI(14))
+        if(AndroidUtils.hasAPI(14) && a != null)
         {
-            a.getActionBar().setLogo(avatarDrawable);
+            ActionBar actionBar = a.getActionBar();
+            if(actionBar != null)
+                actionBar.setLogo(avatarDrawable);
         }
     }
 
@@ -97,7 +99,7 @@ public class ActionBarUtil
     public static void setStatus(Activity a, byte[] statusIcon)
     {
         if (avatarDrawable == null)
-            avatarDrawable = getDefaultAvatarIcon(a);
+            avatarDrawable = getDefaultAvatarIcon();
 
         avatarDrawable
             .setDrawableByLayerId(R.id.contactStatusDrawable,
@@ -113,12 +115,11 @@ public class ActionBarUtil
     /**
      * Returns the default avatar {@link Drawable}
      *
-     * @param context current application {@link Context}
      * @return the default avatar {@link Drawable}
      */
-    private static LayerDrawable getDefaultAvatarIcon(Context context)
+    private static LayerDrawable getDefaultAvatarIcon()
     {
-        return (LayerDrawable) context.getResources()
+        return (LayerDrawable) JitsiApplication.getAppResources()
             .getDrawable(R.drawable.avatar_layer_drawable);
     }
 }

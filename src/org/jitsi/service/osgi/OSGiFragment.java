@@ -7,7 +7,7 @@
 package org.jitsi.service.osgi;
 
 import android.app.*;
-import android.support.v4.app.*;
+import android.os.*;
 import android.support.v4.app.Fragment;
 
 import net.java.sip.communicator.util.*;
@@ -66,21 +66,21 @@ public class OSGiFragment
     }
 
     /**
-     * Tries to run given <tt>action</tt> on the UI thread.
-     * If there's no <tt>Activity</tt> available warning will be logged.
+     * Convenience method for running code on UI thread looper(instead of
+     * getActivity().runOnUIThread()). It is never guaranteed that
+     * <tt>getActivity()</tt> will return not <tt>null</tt> value, hence it must
+     * be checked in the <tt>action</tt>.
      *
      * @param action <tt>Runnable</tt> action to execute on UI thread.
      */
     public void runOnUiThread(Runnable action)
     {
-        FragmentActivity activity = getActivity();
-        if(activity == null)
+        if(Looper.myLooper() == Looper.getMainLooper())
         {
-            logger.warn("Called runOnUiThread when Activity was null!",
-                        new Throwable());
+            action.run();
             return;
         }
-
-        activity.runOnUiThread(action);
+        // Post action to the ui looper
+        OSGiActivity.uiHandler.post(action);
     }
 }

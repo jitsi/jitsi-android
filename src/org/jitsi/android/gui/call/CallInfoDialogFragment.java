@@ -9,7 +9,6 @@ package org.jitsi.android.gui.call;
 
 import android.content.res.*;
 import android.os.*;
-import android.support.v4.app.*;
 import android.view.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.media.*;

@@ -36,6 +36,11 @@ public class OSGiActivity
      */
     private final static Logger logger = Logger.getLogger(OSGiActivity.class);
 
+    /**
+     * UI thread handler
+     */
+    public final static Handler uiHandler = new Handler(Looper.getMainLooper());
+
     private BundleActivator bundleActivator;
 
     private BundleContext bundleContext;

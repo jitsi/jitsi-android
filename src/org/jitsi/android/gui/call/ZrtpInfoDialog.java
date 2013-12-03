@@ -8,7 +8,6 @@ package org.jitsi.android.gui.call;
 
 import android.app.*;
 import android.os.*;
-import android.support.v4.app.DialogFragment;
 import android.view.*;
 import android.widget.*;
 import net.java.sip.communicator.service.protocol.*;

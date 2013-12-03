@@ -458,11 +458,7 @@ public class ContactListAdapter
      */
     private void dataChanged()
     {
-        if (contactListFragment == null
-            || contactListFragment.getActivity() == null)
-            return;
-
-        contactListFragment.getActivity().runOnUiThread(new Runnable()
+        contactListFragment.runOnUiThread(new Runnable()
         {
             public void run()
             {
