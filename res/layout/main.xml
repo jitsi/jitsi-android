@@ -16,12 +16,4 @@
         android:layout_margin="@dimen/screen_padding"
         android:paddingBottom="80dp"/>
 
-    <ProgressBar
-            android:id="@+id/loadingBar"
-            android:indeterminate="true"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_centerHorizontal="true"
-            android:layout_alignBottom="@id/loadingImage"
-            style="@android:style/Widget.ProgressBar"/>
 </RelativeLayout>
