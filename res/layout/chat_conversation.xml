@@ -16,7 +16,7 @@
         android:id="@+id/typingView"
         android:orientation="horizontal"
         android:layout_width="wrap_content"
-        android:layout_height="30dip"
+        android:layout_height="20dip"
         android:layout_margin="0dp"
         android:layout_gravity="center"
         android:visibility="invisible">
@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
-            style="@style/MediumFont"
+            style="@style/SmallFont"
             android:textColor="@color/blue"/>
 
         <ImageView

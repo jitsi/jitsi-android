@@ -39,9 +39,10 @@
             android:background="@color/white"
             android:textColor="@color/black"
             android:textColorHighlight="@color/white"
-            android:imeOptions="actionSend"
+            android:imeOptions="actionSend|flagNoExtractUi"
             android:singleLine="true"
             android:textCursorDrawable="@null"/>
+
         <ImageButton android:id="@+id/sendMessageButton"
             android:src="@drawable/send_message"
             android:layout_width="wrap_content"
