@@ -256,18 +256,37 @@ public class ContactListFragment
                 MetaContactListManager.removeMetaContactGroup(clickedGroup);
                 return true;
             case R.id.close_chat:
-                ChatSessionManager.removeActiveChat(
-                        ChatSessionManager.getActiveChat(clickedContact));
-                closeCurrentChat();
-                contactListAdapter.notifyDataSetChanged();
+                ChatSession clickedChat
+                    = ChatSessionManager.getActiveChat(clickedContact);
+                if(clickedChat != null)
+                {
+                    onCloseChat(clickedChat);
+                }
                 return true;
             case R.id.close_all_chats:
-                ChatSessionManager.removeAllActiveChats();
-                closeCurrentChat();
-                contactListAdapter.notifyDataSetChanged();
+                onCloseAllChats();
                 return true;
         }
         return super.onContextItemSelected(item);
+    }
+
+    /**
+     * Method fired when given chat is being closed.
+     * @param closedChat closed <tt>ChatSession</tt>.
+     */
+    protected void onCloseChat(ChatSession closedChat)
+    {
+        ChatSessionManager.removeActiveChat(closedChat);
+        contactListAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Method fired when all chats are being closed.
+     */
+    protected void onCloseAllChats()
+    {
+        ChatSessionManager.removeAllActiveChats();
+        contactListAdapter.notifyDataSetChanged();
     }
 
     /**
@@ -399,14 +418,6 @@ public class ContactListFragment
         Intent chatIntent = ChatSessionManager.getChatIntent(metaContact);
 
         getActivity().startActivity(chatIntent);
-    }
-
-    /**
-     * Closes currently opened chat.
-     */
-    protected void closeCurrentChat()
-    {
-        ChatSessionManager.setCurrentChatId(null);
     }
 
     /**

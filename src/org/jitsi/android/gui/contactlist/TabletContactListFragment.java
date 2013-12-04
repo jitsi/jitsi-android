@@ -145,7 +145,7 @@ public class TabletContactListFragment
         ChatSession session
             = ChatSessionManager.getActiveChat(currentChatId);
         if(session == null)
-            closeCurrentChat();
+            hideChatFragment();
     }
 
     /**
@@ -174,12 +174,37 @@ public class TabletContactListFragment
     }
 
     /**
-     * Closes currently opened chat and it's chat fragment.
+     * {@inheritDoc}
      */
-    protected void closeCurrentChat()
+    @Override
+    protected void onCloseChat(ChatSession closedChat)
     {
-        super.closeCurrentChat();
+        super.onCloseChat(closedChat);
 
+        if(closedChat.getChatId().equals(currentChatId))
+        {
+            hideChatFragment();
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void onCloseAllChats()
+    {
+        super.onCloseAllChats();
+
+        hideChatFragment();
+    }
+
+    /**
+     * Hides chat fragment and notifies <tt>ChatSessionManager</tt> that there
+     * is no chat currently visible.
+     */
+    private void hideChatFragment()
+    {
+        ChatSessionManager.setCurrentChatId(null);
         currentChatId = null;
 
         FragmentManager fragmentManager

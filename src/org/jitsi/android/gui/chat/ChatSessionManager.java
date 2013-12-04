@@ -187,13 +187,20 @@ public class ChatSessionManager
         logger.debug("Current chat id: " + chatId);
         ChatSession currChat = getActiveChat(currentChatId);
         if(currChat != null)
+        {
             logger.debug("Current chat with: "
                                  + currChat.getMetaContact().getDisplayName());
+        }
+        else
+        {
+            logger.debug("Chat for id: "+chatId+" no longer exists");
+            currentChatId = null;
+        }
 
         // Notifies about new current chat session
         for(CurrentChatListener l : currentChatListeners)
         {
-            l.onCurrentChatChanged(chatId);
+            l.onCurrentChatChanged(currentChatId);
         }
     }
 
