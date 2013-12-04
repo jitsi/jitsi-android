@@ -9,6 +9,7 @@ package org.jitsi.android.gui.contactlist;
 import android.os.*;
 import android.support.v4.app.*;
 import android.view.*;
+import android.widget.*;
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.util.*;
 import org.jitsi.*;
@@ -92,6 +93,29 @@ public class TabletContactListFragment
             .replace(R.id.chatView, chatTabletFragment)
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit();
+
+        // Select current chat contact
+        MetaContact chatContact = currentChat.getMetaContact();
+
+        int groupIndex
+            = contactListAdapter.getGroupIndex(
+                    chatContact.getParentMetaContactGroup());
+        if(groupIndex < 0)
+        {
+            logger.warn("No group found for chat contact: " + chatContact);
+            return;
+        }
+
+        int contactIndex
+            = contactListAdapter.getChildIndex(groupIndex, chatContact);
+        if(contactIndex < 0)
+        {
+            logger.warn(chatContact + " not found in group " + groupIndex);
+            return;
+        }
+
+        ExpandableListView contactListView = getContactListView();
+        contactListView.setSelectedChild(groupIndex, contactIndex, true);
     }
 
     /**

@@ -6,6 +6,15 @@
  */
 package org.jitsi.android.gui.contactlist;
 
+import android.annotation.*;
+import android.content.*;
+import android.os.*;
+import android.support.v4.app.*;
+import android.view.*;
+import android.widget.*;
+import android.widget.ExpandableListView.OnChildClickListener;
+import android.widget.ExpandableListView.OnGroupClickListener;
+
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.*;
@@ -14,15 +23,8 @@ import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.chat.*;
+import org.jitsi.android.gui.util.*;
 import org.jitsi.service.osgi.*;
-
-import android.content.*;
-import android.os.Bundle;
-import android.support.v4.app.*;
-import android.view.*;
-import android.widget.*;
-import android.widget.ExpandableListView.OnChildClickListener;
-import android.widget.ExpandableListView.OnGroupClickListener;
 
 /**
  *
@@ -39,20 +41,14 @@ public class ContactListFragment
         = Logger.getLogger(ContactListFragment.class);
 
     /**
-     * The <tt>MetaContactListService</tt> giving access to the contact list
-     * content.
-     */
-    private MetaContactListService contactListService;
-
-    /**
      * The adapter containing list data.
      */
-    private ContactListAdapter contactListAdapter;
+    protected ContactListAdapter contactListAdapter;
 
     /**
      * The contact list view.
      */
-    private ExpandableListView contactListView;
+    protected ExpandableListView contactListView;
 
     /**
      * Stores last clicked <tt>MetaContact</tt>.
@@ -81,10 +77,6 @@ public class ContactListFragment
                                          container,
                                          false);
 
-        this.contactListService
-                = ServiceUtils.getService( AndroidGUIActivator.bundleContext,
-                                           MetaContactListService.class);
-
         contactListView = (ExpandableListView) content
                 .findViewById(R.id.contactListView);
 
@@ -101,7 +93,7 @@ public class ContactListFragment
         // initialize the adapter.
         if (!contactListAdapter.isInitialized())
         {
-            contactListAdapter.initAdapterData(contactListService);
+            contactListAdapter.initAdapterData();
         }
 
         return content;
@@ -374,13 +366,24 @@ public class ContactListFragment
      *
      * @return <tt>true</tt> if the group click action has been performed
      */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public boolean onGroupClick(ExpandableListView parent, View v,
         int groupPosition, long id)
     {
         if (contactListView.isGroupExpanded(groupPosition))
             contactListView.collapseGroup(groupPosition);
         else
-            contactListView.expandGroup(groupPosition, true);
+        {
+            // Expand animation is supported since API14
+            if(AndroidUtils.hasAPI(14))
+            {
+                contactListView.expandGroup(groupPosition, true);
+            }
+            else
+            {
+                contactListView.expandGroup(groupPosition);
+            }
+        }
 
         return true;
     }

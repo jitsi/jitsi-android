@@ -117,13 +117,12 @@ public class ContactListAdapter
 
     /**
      * Initializes the adapter data.
-     *
-     * @param clService the <tt>MetaContactListService</tt>, which is the
-     * back end of this adapter
      */
-    void initAdapterData(MetaContactListService clService)
+    void initAdapterData()
     {
-        contactListService = clService;
+        contactListService = ServiceUtils.getService(
+            AndroidGUIActivator.bundleContext,
+            MetaContactListService.class);
 
         addContacts(contactListService.getRoot());
 
@@ -1039,6 +1038,29 @@ public class ContactListAdapter
         }
 
         return -1;
+    }
+
+    /**
+     * Finds group index for given <tt>MetaContactGroup</tt>.
+     * @param group the group for which we need the index.
+     * @return index of given <tt>MetaContactGroup</tt> or -1 if not found
+     */
+    int getGroupIndex(MetaContactGroup group)
+    {
+        return groups.indexOf(group);
+    }
+
+    /**
+     * Finds <tt>MetaContact</tt> index in <tt>MetaContactGroup</tt> identified
+     * by given <tt>groupIndex</tt>.
+     * @param groupIndex index of group we want to search.
+     * @param contact the <tt>MetaContact</tt> to find inside the group.
+     * @return index of <tt>MetaContact</tt> inside group identified by given
+     *         group index.
+     */
+    int getChildIndex(int groupIndex, MetaContact contact)
+    {
+        return getChildIndex(getContactList(groupIndex), contact);
     }
 
     /**
