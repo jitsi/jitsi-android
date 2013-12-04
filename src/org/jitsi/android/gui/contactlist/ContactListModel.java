@@ -6,19 +6,23 @@
  */
 package org.jitsi.android.gui.contactlist;
 
+import android.os.*;
+import android.os.Handler;
+
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.contactlist.event.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.event.*;
 
+import org.jitsi.service.osgi.*;
 import org.jitsi.util.Logger;
 
 import java.util.*;
 
 /**
  * Contact list model is responsible for caching current contact list obtained
- * from contact sources. It applies contact source filters which result in
- * different output model.
+ * from contact sources.(It will apply contact source filters which result in
+ * different output model).
  *
  * @author Pawel Domas
  */
@@ -32,16 +36,20 @@ public class ContactListModel
     private final Logger logger = Logger.getLogger(ContactListAdapter.class);
 
     /**
-     * Synchronization root for data model.
+     * UI thread handler used to call all operations that access data model.
+     * This guarantees that it's accessed from the single thread.
      */
-    final Object dataLock = new Object();
+    private final Handler uiHandler = OSGiActivity.uiHandler;
 
     /**
      * The current filter query.
      */
     private String currentQuery;
 
-    private final ContactListAdapter contactListAdapter;
+    /**
+     * Adapter used to display this contact list.
+     */
+    private ContactListAdapter contactListAdapter;
 
     /**
      * The list of contact list groups
@@ -69,13 +77,17 @@ public class ContactListModel
      */
     private MetaContactListService contactListService;
 
-    public ContactListModel(ContactListAdapter contactListAdapter)
+    public ContactListModel()
     {
         this.originalContacts = new LinkedList<TreeSet<MetaContact>>();
         this.contacts = new LinkedList<TreeSet<MetaContact>>();
         this.originalGroups = new LinkedList<MetaContactGroup>();
         this.groups = new LinkedList<MetaContactGroup>();
-        this.contactListAdapter = contactListAdapter;
+    }
+
+    public void setAdapter(ContactListAdapter adapter)
+    {
+        this.contactListAdapter = adapter;
     }
 
     /**
@@ -107,16 +119,23 @@ public class ContactListModel
     }
 
     /**
+     * Assert that current thread is the UI thread.
+     */
+    private void assertUIThread()
+    {
+        assert Thread.currentThread() == Looper.getMainLooper().getThread();
+    }
+
+    /**
      * Returns the group at the given <tt>groupPosition</tt>.
      *
      * @param groupPosition the index of the group
      */
     public Object getGroup(int groupPosition)
     {
-        synchronized (dataLock)
-        {
-            return groups.get(groupPosition);
-        }
+        assertUIThread();
+
+        return groups.get(groupPosition);
     }
 
     /**
@@ -124,10 +143,9 @@ public class ContactListModel
      */
     public int getGroupCount()
     {
-        synchronized (dataLock)
-        {
-            return groups.size();
-        }
+        assertUIThread();
+
+        return groups.size();
     }
 
     /**
@@ -139,10 +157,9 @@ public class ContactListModel
      */
     public int getChildrenCount(int groupPosition)
     {
-        synchronized (dataLock)
-        {
-            return getContactList(groupPosition).size();
-        }
+        assertUIThread();
+
+        return getContactList(groupPosition).size();
     }
 
     /**
@@ -186,33 +203,50 @@ public class ContactListModel
     }
 
     /**
+     * Finds group index for given <tt>MetaContactGroup</tt>.
+     * @param group the group for which we need the index.
+     * @return index of given <tt>MetaContactGroup</tt> or -1 if not found
+     */
+    int getGroupIndex(MetaContactGroup group)
+    {
+        return groups.indexOf(group);
+    }
+
+    /**
+     * Finds <tt>MetaContact</tt> index in <tt>MetaContactGroup</tt> identified
+     * by given <tt>groupIndex</tt>.
+     * @param groupIndex index of group we want to search.
+     * @param contact the <tt>MetaContact</tt> to find inside the group.
+     * @return index of <tt>MetaContact</tt> inside group identified by given
+     *         group index.
+     */
+    int getChildIndex(int groupIndex, MetaContact contact)
+    {
+        return getChildIndex(getContactList(groupIndex), contact);
+    }
+
+    /**
      * Adds all child contacts for the given <tt>group</tt>.
      *
      * @param group the group, which child contacts to add
      */
     private void addContacts(final MetaContactGroup group)
     {
-        contactListAdapter.runOnUiThread(new Runnable()
+        addGroup(group);
+
+        Iterator<MetaContact> childContacts
+            = group.getChildContacts();
+
+        while (childContacts.hasNext())
         {
-            public void run()
-            {
-                addGroup(group, false);
+            addContact(group, childContacts.next());
+        }
 
-                Iterator<MetaContact> childContacts
-                    = group.getChildContacts();
-
-                while (childContacts.hasNext())
-                {
-                    addContact(group, childContacts.next());
-                }
-
-                Iterator<MetaContactGroup> subGroups = group.getSubgroups();
-                while (subGroups.hasNext())
-                {
-                    addContacts(subGroups.next());
-                }
-            }
-        });
+        Iterator<MetaContactGroup> subGroups = group.getSubgroups();
+        while (subGroups.hasNext())
+        {
+            addContacts(subGroups.next());
+        }
     }
 
     /**
@@ -223,71 +257,50 @@ public class ContactListModel
      */
     private void removeContacts(final MetaContactGroup group)
     {
-        contactListAdapter.runOnUiThread(new Runnable()
+        removeGroup(group);
+
+        Iterator<MetaContact> childContacts
+            = group.getChildContacts();
+
+        while (childContacts.hasNext())
         {
-            public void run()
-            {
-                removeGroup(group, false);
+            removeContact(group, childContacts.next());
+        }
 
-                Iterator<MetaContact> childContacts
-                    = group.getChildContacts();
-
-                while (childContacts.hasNext())
-                {
-                    removeContact(group, childContacts.next());
-                }
-
-                Iterator<MetaContactGroup> subGroups = group.getSubgroups();
-                while (subGroups.hasNext())
-                {
-                    removeContacts(subGroups.next());
-                }
-            }
-        });
+        Iterator<MetaContactGroup> subGroups = group.getSubgroups();
+        while (subGroups.hasNext())
+        {
+            removeContacts(subGroups.next());
+        }
     }
 
     /**
      * Adds the given <tt>group</tt> to this list.
      *
      * @param group the <tt>MetaContactGroup</tt> to add
-     * @param isSynchronized indicates if the call to this method is already
-     * synchronized
      */
-    private void addGroup(  final MetaContactGroup group,
-                            final boolean isSynchronized)
+    private void addGroup(final MetaContactGroup group)
     {
-        contactListAdapter.runOnUiThread(new Runnable()
+        if (originalGroups.indexOf(group) < 0)
         {
-            public void run()
-            {
-                if (!isSynchronized)
-                    synchronized (dataLock)
-                    {
-                        addGroup(group, true);
-                    }
+            originalGroups.add(group);
 
-                if (originalGroups.indexOf(group) < 0)
-                {
-                    originalGroups.add(group);
+            TreeSet<MetaContact> originalChildren
+                = new TreeSet<MetaContact>();
 
-                    TreeSet<MetaContact> originalChildren
-                        = new TreeSet<MetaContact>();
+            originalContacts.add(originalChildren);
+        }
 
-                    originalContacts.add(originalChildren);
-                }
+        if (isMatching(group, currentQuery)
+            && groups.indexOf(group) < 0)
+        {
+            groups.add(group);
 
-                if (isMatching(group, currentQuery)
-                    && groups.indexOf(group) < 0)
-                {
-                    groups.add(group);
+            TreeSet<MetaContact> children
+                = new TreeSet<MetaContact>();
 
-                    TreeSet<MetaContact> children
-                        = new TreeSet<MetaContact>();
-
-                    contacts.add(children);
-                }
-            }
-        });
+            contacts.add(children);
+        }
     }
 
     /**
@@ -301,81 +314,59 @@ public class ContactListModel
     {
         addContactStatusListener(metaContact, this);
 
-        contactListAdapter.runOnUiThread(new Runnable()
+        int origGroupIndex = originalGroups.indexOf(metaGroup);
+
+        int groupIndex = groups.indexOf(metaGroup);
+
+        boolean isMatchingQuery
+            = isMatching(metaContact, currentQuery);
+
+        if (origGroupIndex < 0
+            || (isMatchingQuery && groupIndex < 0))
         {
-            public void run()
-            {
-                synchronized (dataLock)
-                {
-                    int origGroupIndex = originalGroups.indexOf(metaGroup);
+            addGroup(metaGroup);
 
-                    int groupIndex = groups.indexOf(metaGroup);
+            // Update -1 index to new value, after group is added
+            groupIndex = groups.indexOf(metaGroup);
+        }
 
-                    boolean isMatchingQuery
-                        = isMatching(metaContact, currentQuery);
+        TreeSet<MetaContact> origContactList
+            = getOriginalCList(groupIndex);
 
-                    if (origGroupIndex < 0
-                        || (isMatchingQuery && groupIndex < 0))
-                    {
-                        addGroup(metaGroup, true);
+        if (origContactList != null
+            && getChildIndex(origContactList, metaContact) < 0)
+        {
+            origContactList.add(metaContact);
+        }
 
-                        // Update -1 index to new value, after group is added
-                        groupIndex = groups.indexOf(metaGroup);
-                    }
+        TreeSet<MetaContact> contactList
+            = getContactList(groupIndex);
 
-                    TreeSet<MetaContact> origContactList
-                        = getOriginalCList(groupIndex);
-
-                    if (origContactList != null
-                        && getChildIndex(origContactList, metaContact) < 0)
-                    {
-                        origContactList.add(metaContact);
-                    }
-
-                    TreeSet<MetaContact> contactList
-                        = getContactList(groupIndex);
-
-                    if (isMatchingQuery
-                        && contactList != null
-                        && getChildIndex(contactList, metaContact) < 0)
-                    {
-                        contactList.add(metaContact);
-                    }
-                }
-            }
-        });
+        if (isMatchingQuery
+            && contactList != null
+            && getChildIndex(contactList, metaContact) < 0)
+        {
+            contactList.add(metaContact);
+        }
     }
 
-    private void removeGroup(   final MetaContactGroup metaGroup,
-                                final boolean isSynchronized)
+    private void removeGroup(final MetaContactGroup metaGroup)
     {
-        contactListAdapter.runOnUiThread(new Runnable()
+        int origGroupIndex = originalGroups.indexOf(metaGroup);
+
+        if (origGroupIndex >= 0)
         {
-            public void run()
-            {
-                if (!isSynchronized)
-                    synchronized (dataLock)
-                    {
-                        removeGroup(metaGroup, true);
-                    }
+            originalContacts.remove(origGroupIndex);
+            originalGroups.remove(metaGroup);
+        }
 
-                int origGroupIndex = originalGroups.indexOf(metaGroup);
+        int groupIndex = groups.indexOf(metaGroup);
 
-                if (origGroupIndex >= 0)
-                {
-                    originalContacts.remove(origGroupIndex);
-                    originalGroups.remove(metaGroup);
-                }
-
-                int groupIndex = groups.indexOf(metaGroup);
-
-                if (groupIndex >= 0)
-                {
-                    contacts.remove(groupIndex);
-                    groups.remove(metaGroup);
-                }
-            }
-        });
+        if (groupIndex >= 0)
+        {
+            contacts.remove(groupIndex);
+            groups.remove(metaGroup);
+        }
     }
 
     /**
@@ -391,41 +382,32 @@ public class ContactListModel
     {
         removeContactStatusListener(metaContact, this);
 
-        contactListAdapter.runOnUiThread(new Runnable()
+        int origGroupIndex = originalGroups.indexOf(metaGroup);
+
+        // Remove the contact from the original list.
+        if (origGroupIndex >= 0)
         {
-            public void run()
-            {
-                synchronized (dataLock)
-                {
-                    int origGroupIndex = originalGroups.indexOf(metaGroup);
+            TreeSet<MetaContact> origContactList
+                = getOriginalCList(origGroupIndex);
 
-                    // Remove the contact from the original list.
-                    if (origGroupIndex >= 0)
-                    {
-                        TreeSet<MetaContact> origContactList
-                            = getOriginalCList(origGroupIndex);
+            origContactList.remove(metaContact);
 
-                        origContactList.remove(metaContact);
+            if (origContactList.size() <= 0)
+                removeGroup(metaGroup);
+        }
 
-                        if (origContactList.size() <= 0)
-                            removeGroup(metaGroup, true);
-                    }
+        // Remove the contact from the filtered list.
+        int groupIndex = groups.indexOf(metaGroup);
+        if (groupIndex >= 0)
+        {
+            TreeSet<MetaContact> contactList
+                = getContactList(groupIndex);
 
-                    // Remove the contact from the filtered list.
-                    int groupIndex = groups.indexOf(metaGroup);
-                    if (groupIndex >= 0)
-                    {
-                        TreeSet<MetaContact> contactList
-                            = getContactList(groupIndex);
+            contactList.remove(metaContact);
 
-                        contactList.remove(metaContact);
-
-                        if (contactList.size() <= 0)
-                            removeGroup(metaGroup, true);
-                    }
-                }
-            }
-        });
+            if (contactList.size() <= 0)
+                removeGroup(metaGroup);
+        }
     }
 
     /**
@@ -435,28 +417,19 @@ public class ContactListModel
      */
     private void updateDisplayName(final MetaContact metaContact)
     {
-        contactListAdapter.runOnUiThread(new Runnable()
-        {
-            public void run()
-            {
-                synchronized (dataLock)
-                {
-                    int groupIndex = groups.indexOf(
-                        metaContact.getParentMetaContactGroup());
+        int groupIndex = groups.indexOf(
+            metaContact.getParentMetaContactGroup());
 
-                    if (groupIndex < 0)
-                        return;
+        if (groupIndex < 0)
+            return;
 
-                    int contactIndex
-                        = getChildIndex(getContactList(groupIndex),
-                                        metaContact);
+        int contactIndex
+            = getChildIndex(getContactList(groupIndex),
+                            metaContact);
 
-                    if (contactIndex >= 0)
-                        contactListAdapter
-                            .updateDisplayName(groupIndex, contactIndex);
-                }
-            }
-        });
+        if (contactIndex >= 0)
+            contactListAdapter
+                .updateDisplayName(groupIndex, contactIndex);
     }
 
     /**
@@ -466,28 +439,18 @@ public class ContactListModel
      */
     private void updateAvatar(final MetaContact metaContact)
     {
-        contactListAdapter.runOnUiThread(new Runnable()
-        {
-            public void run()
-            {
-                synchronized (dataLock)
-                {
-                    int groupIndex = groups.indexOf(
-                        metaContact.getParentMetaContactGroup());
+        int groupIndex = groups.indexOf(
+            metaContact.getParentMetaContactGroup());
 
-                    if (groupIndex < 0)
-                        return;
+        if (groupIndex < 0)
+            return;
 
-                    int contactIndex
-                        = getChildIndex(getContactList(groupIndex),
-                                        metaContact);
+        int contactIndex
+            = getChildIndex(getContactList(groupIndex), metaContact);
 
-                    if (contactIndex >= 0)
-                        contactListAdapter.
-                            updateAvatar(groupIndex, contactIndex, metaContact);
-                }
-            }
-        });
+        if (contactIndex >= 0)
+            contactListAdapter.
+                updateAvatar(groupIndex, contactIndex, metaContact);
     }
 
     /**
@@ -497,28 +460,18 @@ public class ContactListModel
      */
     private void updateStatus(final MetaContact metaContact)
     {
-        contactListAdapter.runOnUiThread(new Runnable()
-        {
-            public void run()
-            {
-                synchronized (dataLock)
-                {
-                    int groupIndex = groups.indexOf(
-                        metaContact.getParentMetaContactGroup());
+        int groupIndex = groups.indexOf(
+            metaContact.getParentMetaContactGroup());
 
-                    if (groupIndex < 0)
-                        return;
+        if (groupIndex < 0)
+            return;
 
-                    int contactIndex
-                        = getChildIndex(getContactList(groupIndex),
-                                        metaContact);
+        int contactIndex
+            = getChildIndex(getContactList(groupIndex), metaContact);
 
-                    if (contactIndex >= 0)
-                        contactListAdapter.
-                            updateStatus(groupIndex, contactIndex, metaContact);
-                }
-            }
-        });
+        if (contactIndex >= 0)
+            contactListAdapter.
+                updateStatus(groupIndex, contactIndex, metaContact);
     }
 
     /**
@@ -526,15 +479,23 @@ public class ContactListModel
      *
      * @param evt the <tt>MetaContactEvent</tt> that notified us
      */
-    public void metaContactAdded(MetaContactEvent evt)
+    public void metaContactAdded(final MetaContactEvent evt)
     {
-        if (logger.isDebugEnabled())
-            logger.debug("CONTACT ADDED: " + evt.getSourceMetaContact());
+        uiHandler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (logger.isDebugEnabled())
+                    logger.debug(
+                        "CONTACT ADDED: " + evt.getSourceMetaContact());
 
-        addContact( evt.getParentGroup(),
-                    evt.getSourceMetaContact());
+                addContact(evt.getParentGroup(),
+                           evt.getSourceMetaContact());
 
-        contactListAdapter.dataChanged();
+                contactListAdapter.dataChanged();
+            }
+        });
     }
 
     /**
@@ -542,12 +503,20 @@ public class ContactListModel
      *
      * @param evt the <tt>MetaContactEvent</tt> that notified us
      */
-    public void metaContactRenamed(MetaContactRenamedEvent evt)
+    public void metaContactRenamed(final MetaContactRenamedEvent evt)
     {
-        if (logger.isDebugEnabled())
-            logger.debug("CONTACT RENAMED: " + evt.getSourceMetaContact());
+        uiHandler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (logger.isDebugEnabled())
+                    logger.debug("CONTACT RENAMED: "
+                                     + evt.getSourceMetaContact());
 
-        updateDisplayName(evt.getSourceMetaContact());
+                updateDisplayName(evt.getSourceMetaContact());
+            }
+        });
     }
 
     /**
@@ -556,12 +525,19 @@ public class ContactListModel
      *
      * @param evt the <tt>MetaContactEvent</tt> that notified us
      */
-    public void protoContactAdded(ProtoContactEvent evt)
+    public void protoContactAdded(final ProtoContactEvent evt)
     {
-        if (logger.isDebugEnabled())
-            logger.debug("PROTO CONTACT ADDED: " + evt.getNewParent());
+        uiHandler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (logger.isDebugEnabled())
+                    logger.debug("PROTO CONTACT ADDED: " + evt.getNewParent());
 
-        updateStatus(evt.getNewParent());
+                updateStatus(evt.getNewParent());
+            }
+        });
     }
 
     /**
@@ -569,13 +545,20 @@ public class ContactListModel
      *
      * @param evt the <tt>MetaContactEvent</tt> that notified us
      */
-    public void protoContactModified(ProtoContactEvent evt)
+    public void protoContactModified(final ProtoContactEvent evt)
     {
-        if (logger.isDebugEnabled())
-            logger.debug("PROTO CONTACT MODIFIED: "
-                             + evt.getProtoContact().getAddress());
+        uiHandler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (logger.isDebugEnabled())
+                    logger.debug("PROTO CONTACT MODIFIED: "
+                                     + evt.getProtoContact().getAddress());
 
-        contactListAdapter.invalidateViews();
+                contactListAdapter.invalidateViews();
+            }
+        });
     }
 
     /**
@@ -584,13 +567,20 @@ public class ContactListModel
      *
      * @param evt the <tt>MetaContactEvent</tt> that notified us
      */
-    public void protoContactRemoved(ProtoContactEvent evt)
+    public void protoContactRemoved(final ProtoContactEvent evt)
     {
-        if (logger.isDebugEnabled())
-            logger.debug("PROTO CONTACT REMOVED: "
-                             + evt.getProtoContact().getAddress());
+        uiHandler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (logger.isDebugEnabled())
+                    logger.debug("PROTO CONTACT REMOVED: "
+                                     + evt.getProtoContact().getAddress());
 
-        updateStatus(evt.getOldParent());
+                updateStatus(evt.getOldParent());
+            }
+        });
     }
 
     /**
@@ -598,14 +588,21 @@ public class ContactListModel
      *
      * @param evt the <tt>MetaContactEvent</tt> that notified us
      */
-    public void protoContactMoved(ProtoContactEvent evt)
+    public void protoContactMoved(final ProtoContactEvent evt)
     {
-        if (logger.isDebugEnabled())
-            logger.debug("PROTO CONTACT MOVED: "
-                             + evt.getProtoContact().getAddress());
+        uiHandler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (logger.isDebugEnabled())
+                    logger.debug("PROTO CONTACT MOVED: "
+                                     + evt.getProtoContact().getAddress());
 
-        updateStatus(evt.getOldParent());
-        updateStatus(evt.getNewParent());
+                updateStatus(evt.getOldParent());
+                updateStatus(evt.getNewParent());
+            }
+        });
     }
 
     /**
@@ -613,15 +610,23 @@ public class ContactListModel
      *
      * @param evt the <tt>MetaContactEvent</tt> that notified us
      */
-    public void metaContactRemoved(MetaContactEvent evt)
+    public void metaContactRemoved(final MetaContactEvent evt)
     {
-        if (logger.isDebugEnabled())
-            logger.debug("CONTACT REMOVED: " + evt.getSourceMetaContact());
+        uiHandler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (logger.isDebugEnabled())
+                    logger.debug("CONTACT REMOVED: "
+                                     + evt.getSourceMetaContact());
 
-        removeContact( evt.getParentGroup(),
-                       evt.getSourceMetaContact());
+                removeContact( evt.getParentGroup(),
+                               evt.getSourceMetaContact());
 
-        contactListAdapter.dataChanged();
+                contactListAdapter.dataChanged();
+            }
+        });
     }
 
     /**
@@ -629,63 +634,68 @@ public class ContactListModel
      *
      * @param evt the <tt>MetaContactEvent</tt> that notified us
      */
-    public void metaContactMoved(MetaContactMovedEvent evt)
+    public void metaContactMoved(final MetaContactMovedEvent evt)
     {
-        if (logger.isDebugEnabled())
-            logger.debug("CONTACT MOVED: " + evt.getSourceMetaContact());
-
-        MetaContactGroup oldParent = evt.getOldParent();
-        MetaContactGroup newParent = evt.getNewParent();
-        synchronized (dataLock)
+        uiHandler.post(new Runnable()
         {
-            // Modify original group
-            int oldGroupIdx = originalGroups.indexOf(oldParent);
-            int newGroupIdx = originalGroups.indexOf(newParent);
-            if(oldGroupIdx < 0 || newGroupIdx < 0)
+            @Override
+            public void run()
             {
-                logger.error("Move group error - original list, srcGroupIdx: "
-                                 + oldGroupIdx + ", dstGroupIdx: " + newGroupIdx);
-            }
-            else
-            {
-                TreeSet<MetaContact> srcGroup
-                    = getOriginalCList(oldGroupIdx);
-                if(srcGroup != null)
+                if (logger.isDebugEnabled())
+                    logger.debug("CONTACT MOVED: "
+                                     + evt.getSourceMetaContact());
+
+                MetaContactGroup oldParent = evt.getOldParent();
+                MetaContactGroup newParent = evt.getNewParent();
+                // Modify original group
+                int oldGroupIdx = originalGroups.indexOf(oldParent);
+                int newGroupIdx = originalGroups.indexOf(newParent);
+                if (oldGroupIdx < 0 || newGroupIdx < 0)
                 {
-                    srcGroup.remove(evt.getSourceMetaContact());
-                }
-                TreeSet<MetaContact> dstGroup
-                    = getOriginalCList(newGroupIdx);
-                if(dstGroup != null)
+                    logger.error(
+                        "Move group error - original list, srcGroupIdx: "
+                            + oldGroupIdx + ", dstGroupIdx: " + newGroupIdx);
+                } else
                 {
-                    dstGroup.add(evt.getSourceMetaContact());
+                    TreeSet<MetaContact> srcGroup
+                        = getOriginalCList(oldGroupIdx);
+                    if (srcGroup != null)
+                    {
+                        srcGroup.remove(evt.getSourceMetaContact());
+                    }
+                    TreeSet<MetaContact> dstGroup
+                        = getOriginalCList(newGroupIdx);
+                    if (dstGroup != null)
+                    {
+                        dstGroup.add(evt.getSourceMetaContact());
+                    }
                 }
-            }
-            // Move search results group
-            oldGroupIdx = groups.indexOf(oldParent);
-            newGroupIdx = groups.indexOf(newParent);
-            if(oldGroupIdx < 0 || newGroupIdx < 0)
-            {
-                logger.error("Move group error, srcGroupIdx: "
-                                 + oldGroupIdx + ", dstGroupIdx: " + newGroupIdx);
-            }
-            else
-            {
-                TreeSet<MetaContact> srcGroup
-                    = getContactList(oldGroupIdx);
-                if(srcGroup != null)
+                // Move search results group
+                oldGroupIdx = groups.indexOf(oldParent);
+                newGroupIdx = groups.indexOf(newParent);
+                if (oldGroupIdx < 0 || newGroupIdx < 0)
                 {
-                    srcGroup.remove(evt.getSourceMetaContact());
-                }
-                TreeSet<MetaContact> dstGroup
-                    = getContactList(newGroupIdx);
-                if(dstGroup != null)
+                    logger.error(
+                        "Move group error, srcGroupIdx: "
+                            + oldGroupIdx + ", dstGroupIdx: " + newGroupIdx);
+                } else
                 {
-                    dstGroup.add(evt.getSourceMetaContact());
+                    TreeSet<MetaContact> srcGroup
+                        = getContactList(oldGroupIdx);
+                    if (srcGroup != null)
+                    {
+                        srcGroup.remove(evt.getSourceMetaContact());
+                    }
+                    TreeSet<MetaContact> dstGroup
+                        = getContactList(newGroupIdx);
+                    if (dstGroup != null)
+                    {
+                        dstGroup.add(evt.getSourceMetaContact());
+                    }
                 }
+                contactListAdapter.dataChanged();
             }
-        }
-        contactListAdapter.dataChanged();
+        });
     }
 
     /**
@@ -693,14 +703,22 @@ public class ContactListModel
      *
      * @param evt the <tt>MetaContactEvent</tt> that notified us
      */
-    public void metaContactGroupAdded(MetaContactGroupEvent evt)
+    public void metaContactGroupAdded(final MetaContactGroupEvent evt)
     {
-        if (logger.isDebugEnabled())
-            logger.debug("GROUP ADDED: " + evt.getSourceMetaContactGroup());
+        uiHandler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (logger.isDebugEnabled())
+                    logger.debug("GROUP ADDED: "
+                                     + evt.getSourceMetaContactGroup());
 
-        addContacts(evt.getSourceMetaContactGroup());
+                addContacts(evt.getSourceMetaContactGroup());
 
-        contactListAdapter.dataChanged();
+                contactListAdapter.dataChanged();
+            }
+        });
     }
 
     /**
@@ -722,14 +740,22 @@ public class ContactListModel
      *
      * @param evt the <tt>MetaContactEvent</tt> that notified us
      */
-    public void metaContactGroupRemoved(MetaContactGroupEvent evt)
+    public void metaContactGroupRemoved(final MetaContactGroupEvent evt)
     {
-        if (logger.isDebugEnabled())
-            logger.debug("GROUP REMOVED: " + evt.getSourceMetaContactGroup());
+        uiHandler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (logger.isDebugEnabled())
+                    logger.debug("GROUP REMOVED: "
+                                     + evt.getSourceMetaContactGroup());
 
-        removeGroup(evt.getSourceMetaContactGroup(), false);
+                removeGroup(evt.getSourceMetaContactGroup());
 
-        contactListAdapter.dataChanged();
+                contactListAdapter.dataChanged();
+            }
+        });
     }
 
     /**
@@ -740,50 +766,47 @@ public class ContactListModel
      */
     public void childContactsReordered(final MetaContactGroupEvent evt)
     {
-        contactListAdapter.runOnUiThread(new Runnable()
+        uiHandler.post(new Runnable()
         {
             public void run()
             {
-                synchronized (dataLock)
+                if (logger.isDebugEnabled())
+                    logger.debug("CHILD CONTACTS REORDERED: "
+                                     + evt.getSourceMetaContactGroup());
+
+                MetaContactGroup group = evt.getSourceMetaContactGroup();
+
+                int origGroupIndex = originalGroups.indexOf(group);
+                int groupIndex = groups.indexOf(group);
+
+                if (origGroupIndex >= 0)
                 {
-                    if (logger.isDebugEnabled())
-                        logger.debug("CHILD CONTACTS REORDERED: "
-                                         + evt.getSourceMetaContactGroup());
+                    TreeSet<MetaContact> contactList
+                        = getOriginalCList(origGroupIndex);
 
-                    MetaContactGroup group = evt.getSourceMetaContactGroup();
-
-                    int origGroupIndex = originalGroups.indexOf(group);
-                    int groupIndex = groups.indexOf(group);
-
-                    if (origGroupIndex >= 0)
+                    if (contactList != null)
                     {
-                        TreeSet<MetaContact> contactList
-                            = getOriginalCList(origGroupIndex);
-
-                        if (contactList != null)
-                        {
-                            originalContacts.remove(contactList);
-                            originalContacts.add(
-                                origGroupIndex,
-                                new TreeSet<MetaContact>(contactList));
-                        }
+                        originalContacts.remove(contactList);
+                        originalContacts.add(
+                            origGroupIndex,
+                            new TreeSet<MetaContact>(contactList));
                     }
-
-                    if (groupIndex >= 0)
-                    {
-                        TreeSet<MetaContact> contactList
-                            = getContactList(groupIndex);
-
-                        if (contactList != null)
-                        {
-                            contacts.remove(contactList);
-                            contacts.add(groupIndex,
-                                         new TreeSet<MetaContact>(contactList));
-                        }
-                    }
-
-                    contactListAdapter.dataChanged();
                 }
+
+                if (groupIndex >= 0)
+                {
+                    TreeSet<MetaContact> contactList
+                        = getContactList(groupIndex);
+
+                    if (contactList != null)
+                    {
+                        contacts.remove(contactList);
+                        contacts.add(groupIndex,
+                                     new TreeSet<MetaContact>(contactList));
+                    }
+                }
+
+                contactListAdapter.dataChanged();
             }
         });
     }
@@ -809,18 +832,26 @@ public class ContactListModel
      * @param evt the <tt>MetaContactEvent</tt> that notified us
      */
     public void metaContactAvatarUpdated(
-        MetaContactAvatarUpdateEvent evt)
+        final MetaContactAvatarUpdateEvent evt)
     {
-        if (logger.isDebugEnabled())
-            logger.debug("META CONTACT AVATAR UPDATED: "
-                             + evt.getSourceMetaContact());
+        uiHandler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (logger.isDebugEnabled())
+                    logger.debug("META CONTACT AVATAR UPDATED: "
+                                     + evt.getSourceMetaContact());
 
-        updateAvatar(evt.getSourceMetaContact());
+                updateAvatar(evt.getSourceMetaContact());
+            }
+        });
     }
 
     /**
      * Returns the contained object on the given <tt>groupPosition</tt> and
      * <tt>childPosition</tt>.
+     * Note that this method must be called on UI thread.
      *
      * @param groupPosition the index of the group
      * @param childPosition the index of the child
@@ -829,26 +860,25 @@ public class ContactListModel
      */
     public MetaContact getChild(int groupPosition, int childPosition)
     {
-        synchronized (dataLock)
-        {
-            if (contacts.size() <= 0)
-                return null;
+        assertUIThread();
 
-            Iterator<MetaContact> contactList
-                = getContactList(groupPosition).iterator();
-            int i = 0;
-            while (contactList.hasNext())
-            {
-                MetaContact metaContact = contactList.next();
-                if (i == childPosition)
-                {
-                    return metaContact;
-                }
-                i++;
-            }
-
+        if (contacts.size() <= 0)
             return null;
+
+        Iterator<MetaContact> contactList
+            = getContactList(groupPosition).iterator();
+        int i = 0;
+        while (contactList.hasNext())
+        {
+            MetaContact metaContact = contactList.next();
+            if (i == childPosition)
+            {
+                return metaContact;
+            }
+            i++;
         }
+
+        return null;
     }
 
     private int getChildIndex(  TreeSet<MetaContact> contactList,
@@ -870,11 +900,14 @@ public class ContactListModel
 
     /**
      * Filters list data to match the given <tt>query</tt>.
+     * Note that this method must be called on UI thread.
      *
      * @param query the query we'd like to match
      */
     public void filterData(final String query)
     {
+        assertUIThread();
+
         currentQuery = query.toLowerCase();
 
         groups.clear();
@@ -958,7 +991,8 @@ public class ContactListModel
     /**
      * Checks if the given <tt>metaGroup</tt> is matching the current filter. A
      * group is matching the current filter only if it contains at least one
-     * child <tt>MetaContact</tt>, which is matching the current filter.
+     * child <tt>MetaContact</tt>, which is matching the current filter.<br/>
+     * Note that this method must be called on UI thread.
      *
      * @param metaGroup the <tt>MetaContactGroup</tt> to check
      * @param query the query string to check for matches
@@ -967,6 +1001,9 @@ public class ContactListModel
      */
     public boolean isMatching(MetaContactGroup metaGroup, String query)
     {
+        // This method must be run on UI thread
+        assertUIThread();
+
         if (query == null || query.length() <= 0)
             return true;
 
@@ -984,19 +1021,27 @@ public class ContactListModel
 
     @Override
     public void contactPresenceStatusChanged(
-        ContactPresenceStatusChangeEvent event)
+        final ContactPresenceStatusChangeEvent event)
     {
-        Contact sourceContact = event.getSourceContact();
+        uiHandler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Contact sourceContact = event.getSourceContact();
 
-        if (logger.isDebugEnabled())
-            logger.debug("Contact presence status changed: "
-                             + sourceContact.getAddress());
+                if (logger.isDebugEnabled())
+                    logger.debug("Contact presence status changed: "
+                                     + sourceContact.getAddress());
 
-        MetaContact metaContact
-            = contactListService.findMetaContactByContact(sourceContact);
+                MetaContact metaContact
+                    = contactListService
+                    .findMetaContactByContact(sourceContact);
 
-        if (metaContact != null)
-            updateStatus(metaContact);
+                if (metaContact != null)
+                    updateStatus(metaContact);
+            }
+        });
     }
 
     /**
@@ -1006,8 +1051,8 @@ public class ContactListModel
      * @param metaContact the <tt>MetaContact</tt> for which we add the listener
      * @param l the <tt>MessageListener</tt> to add
      */
-    public void addContactStatusListener(   MetaContact metaContact,
-                                            ContactPresenceStatusListener l)
+    private void addContactStatusListener( MetaContact metaContact,
+                                           ContactPresenceStatusListener l)
     {
         Iterator<Contact> protoContacts = metaContact.getContacts();
 
@@ -1033,8 +1078,8 @@ public class ContactListModel
      * listener
      * @param l the <tt>MessageListener</tt> to remove
      */
-    public void removeContactStatusListener(MetaContact metaContact,
-                                            ContactPresenceStatusListener l)
+    private void removeContactStatusListener(MetaContact metaContact,
+                                             ContactPresenceStatusListener l)
     {
         Iterator<Contact> protoContacts = metaContact.getContacts();
 
@@ -1053,6 +1098,10 @@ public class ContactListModel
         }
     }
 
+    /**
+     * Returns root <tt>MetaContactGroup</tt> of the contact list.
+     * @return root <tt>MetaContactGroup</tt> of the contact list.
+     */
     public MetaContactGroup getRoot()
     {
         return contactListService.getRoot();

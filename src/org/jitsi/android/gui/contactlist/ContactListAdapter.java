@@ -9,10 +9,8 @@ package org.jitsi.android.gui.contactlist;
 import java.util.*;
 
 import net.java.sip.communicator.service.contactlist.*;
-import net.java.sip.communicator.service.contactlist.event.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.OperationSetExtendedAuthorizations.*;
-import net.java.sip.communicator.service.protocol.event.*;
 import net.java.sip.communicator.util.*;
 
 import org.jitsi.*;
@@ -66,18 +64,23 @@ public class ContactListAdapter
      */
     private boolean isExtendedChat = AndroidUtils.isTablet();
 
+    /**
+     * Contact list data model.
+     */
     private final ContactListModel contactListModel;
 
     /**
      * Creates the contact list adapter.
      *
      * @param clFragment the parent <tt>ContactListFragment</tt>
+     * @param contactListModel data model of the contact list
      */
-    public ContactListAdapter(ContactListFragment clFragment)
+    public ContactListAdapter(ContactListFragment clFragment,
+                              ContactListModel contactListModel)
     {
         contactListFragment = clFragment;
         contactListView = contactListFragment.getContactListView();
-        contactListModel = new ContactListModel(this);
+        this.contactListModel = contactListModel;
     }
 
     /**
@@ -88,7 +91,7 @@ public class ContactListAdapter
         contactListModel.initModelData(
             ServiceUtils.getService(
                 AndroidGUIActivator.bundleContext,
-                MetaContactListService.class);
+                MetaContactListService.class));
 
         isInitialized = true;
 
@@ -273,29 +276,6 @@ public class ContactListAdapter
             }
         }
         return -1;
-    }
-
-    /**
-     * Finds group index for given <tt>MetaContactGroup</tt>.
-     * @param group the group for which we need the index.
-     * @return index of given <tt>MetaContactGroup</tt> or -1 if not found
-     */
-    int getGroupIndex(MetaContactGroup group)
-    {
-        return groups.indexOf(group);
-    }
-
-    /**
-     * Finds <tt>MetaContact</tt> index in <tt>MetaContactGroup</tt> identified
-     * by given <tt>groupIndex</tt>.
-     * @param groupIndex index of group we want to search.
-     * @param contact the <tt>MetaContact</tt> to find inside the group.
-     * @return index of <tt>MetaContact</tt> inside group identified by given
-     *         group index.
-     */
-    int getChildIndex(int groupIndex, MetaContact contact)
-    {
-        return getChildIndex(getContactList(groupIndex), contact);
     }
 
     /**
@@ -618,11 +598,6 @@ public class ContactListAdapter
     public boolean isChildSelectable(int groupPosition, int childPosition)
     {
         return true;
-    }
-
-    void runOnUiThread(Runnable runnable)
-    {
-        contactListFragment.runOnUiThread(runnable);
     }
 
     private class CallButtonClickListener
