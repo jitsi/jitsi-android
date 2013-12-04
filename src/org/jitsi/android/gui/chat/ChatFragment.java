@@ -193,7 +193,7 @@ public class ChatFragment
                         // if there's no loading task in progress
                         if(loadHistoryTask == null)
                         {
-                            loadHistoryTask = new LoadHistoryTask();
+                            loadHistoryTask = new LoadHistoryTask(false);
                             loadHistoryTask.execute();
                         }
                     }
@@ -223,6 +223,8 @@ public class ChatFragment
 
         chatSession = ChatSessionManager.getActiveChat(chatId);
         chatSession.addMessageListener(chatListAdapter);
+
+        initAdapter();
 
         return content;
     }
@@ -286,7 +288,7 @@ public class ChatFragment
      */
     private void initAdapter()
     {
-        loadHistoryTask = new LoadHistoryTask();
+        loadHistoryTask = new LoadHistoryTask(true);
 
         loadHistoryTask.execute();
     }
@@ -295,8 +297,6 @@ public class ChatFragment
     public void onResume()
     {
         super.onResume();
-
-        initAdapter();
 
         // If added to the pager adapter for the first time it is required
         // to check again, because it's marked visible when the Views
@@ -998,9 +998,18 @@ public class ChatFragment
         extends AsyncTask<Void, Void, Collection<ChatMessage>>
     {
         /**
+         * Indicates that history is being loaded for the first time.
+         */
+        private final boolean init;
+        /**
          * Remembers adapter size before new messages were added.
          */
         private int preSize;
+
+        LoadHistoryTask(boolean init)
+        {
+            this.init = init;
+        }
 
         @Override
         protected void onPreExecute()
@@ -1015,7 +1024,7 @@ public class ChatFragment
         @Override
         protected Collection<ChatMessage> doInBackground(Void... params)
         {
-            return chatSession.getHistory(preSize == 0);
+            return chatSession.getHistory(init);
         }
 
         @Override

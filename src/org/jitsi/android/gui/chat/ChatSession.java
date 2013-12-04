@@ -440,14 +440,13 @@ public class ChatSession
             if(msgCache.size() > 0)
             {
                 msgCache = mergeMsgLists(historyMsgs, msgCache, -1);
-                return msgCache;
             }
             else
             {
                 // Add messages to the cache
                 msgCache.addAll(0, historyMsgs);
-                return historyMsgs;
             }
+            return historyMsgs;
         }
     }
 
