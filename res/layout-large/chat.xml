@@ -28,7 +28,6 @@
             android:background="@color/blue"
             android:layout_margin="2dp"
             android:padding="3dp"
-            android:visibility="visible"
             />
         <EditText
             android:id="@+id/chatWriteText"
@@ -39,10 +38,12 @@
             android:layout_margin="5dip"
             android:padding="5dip"
             android:background="@color/white"
+            android:textColor="@color/black"
+            android:textColorHighlight="@color/white"
             android:imeOptions="actionSend|flagNoExtractUi"
             android:singleLine="true"
-            android:textColor="@color/black"
-            android:textColorHighlight="@color/white"/>
+            android:textCursorDrawable="@null"/>
+
         <ImageButton android:id="@+id/sendMessageButton"
             android:src="@drawable/send_message"
             android:layout_width="wrap_content"

@@ -26,7 +26,6 @@
             android:background="@color/blue"
             android:layout_margin="2dp"
             android:padding="3dp"
-            android:visibility="gone"
             />
         <EditText
             android:id="@+id/chatWriteText"

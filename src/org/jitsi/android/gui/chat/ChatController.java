@@ -262,7 +262,6 @@ public class ChatController
         {
             session.setCorrectionUID(null);
             msgEdit.setText("");
-            msgEdit.clearFocus();
             updateCorrectionState();
         }
     }
