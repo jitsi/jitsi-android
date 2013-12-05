@@ -14,7 +14,9 @@ import android.graphics.drawable.*;
 import android.os.*;
 import android.text.*;
 import android.text.ClipboardManager;
+import android.text.Html;
 import android.text.method.*;
+import android.text.util.*;
 import android.view.*;
 import android.widget.*;
 import android.widget.LinearLayout.*;
@@ -615,6 +617,26 @@ public class ChatFragment
         }
 
         /**
+         * Hack required to capture TextView(message body) clicks,
+         * when <tt>LinkMovementMethod</tt> is set.
+         */
+        private final View.OnClickListener msgClickAdapter
+            = new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if(chatController != null
+                    && v.getTag() instanceof Integer)
+                {
+                    Integer position = (Integer) v.getTag();
+                    chatController.onItemClick(
+                        chatListView, v, position, -1/* id not used */);
+                }
+            }
+        };
+
+        /**
          * {@inheritDoc}
          */
         public View getView(int position, View convertView, ViewGroup parent)
@@ -694,12 +716,25 @@ public class ChatFragment
                             R.id.messageView);
                 }
 
+                // Set link movement method
+                messageViewHolder
+                    .messageView
+                        .setMovementMethod(
+                            LinkMovementMethod.getInstance());
+                // Set clicks adapter
+                messageViewHolder
+                    .messageView.setOnClickListener(msgClickAdapter);
+
                 convertView.setTag(messageViewHolder);
             }
             else
             {
                 messageViewHolder = (MessageViewHolder) convertView.getTag();
             }
+
+            // Set position used for click handling from click adapter
+            messageViewHolder.messageView.setTag(
+                position + chatListView.getHeaderViewsCount());
 
             MessageDisplay message = getMessageDisplay(position);
 
@@ -714,23 +749,6 @@ public class ChatFragment
                 }
 
                 messageViewHolder.messageView.setText(message.getBody());
-
-                // Html links are handled only for system messages, which is
-                // currently used for displaying OTR authentication dialog.
-                // Otherwise settings movement method prevent form firing
-                // on item clicked events.
-                int currentMsgType = message.msg.getMessageType();
-                if(messageViewHolder.msgType != currentMsgType)
-                {
-                    MovementMethod movementMethod = null;
-                    if(currentMsgType == ChatMessage.SYSTEM_MESSAGE)
-                    {
-                        movementMethod = LinkMovementMethod.getInstance();
-                    }
-                    messageViewHolder
-                            .messageView
-                            .setMovementMethod(movementMethod);
-                }
             }
 
             return convertView;
@@ -961,6 +979,14 @@ public class ChatFragment
                 if(body == null)
                 {
                     body = Html.fromHtml(msg.getMessage(), imageGetter, null);
+
+                    //TODO: adding links will destroy our links in system msgs
+                    final int msgType = msg.getMessageType();
+                    if(msgType == ChatMessage.OUTGOING_MESSAGE
+                        || msgType == ChatMessage.INCOMING_MESSAGE)
+                    {
+                        Linkify.addLinks((Spannable) body, Linkify.ALL);
+                    }
                 }
                 return body;
             }
@@ -987,7 +1013,6 @@ public class ChatFragment
         TextView timeView;
         ImageView typingView;
         int viewType;
-        int msgType;
     }
 
     /**

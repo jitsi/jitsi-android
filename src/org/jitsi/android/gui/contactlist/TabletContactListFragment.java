@@ -61,7 +61,7 @@ public class TabletContactListFragment
                     = ChatSessionManager.getActiveChat(intentChatId);
                 if(intentChat != null)
                 {
-                    selectChatSession(intentChat);
+                    selectChatSession(intentChat, true);
                 }
                 else
                 {
@@ -79,8 +79,10 @@ public class TabletContactListFragment
      * fragment will be selected or new <tt>ChatActivity</tt> will be started.
      *
      * @param currentChat current chat session to be selected.
+     * @param scroll indicates whether view should be scrolled to show
+     *               chat contact.
      */
-    private void selectChatSession(ChatSession currentChat)
+    private void selectChatSession(ChatSession currentChat, boolean scroll)
     {
         currentChatId = currentChat.getChatId();
 
@@ -93,6 +95,9 @@ public class TabletContactListFragment
             .replace(R.id.chatView, chatTabletFragment)
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit();
+
+        if(!scroll)
+            return;
 
         // Select current chat contact
         MetaContact chatContact = currentChat.getMetaContact();
@@ -128,7 +133,7 @@ public class TabletContactListFragment
             = (ChatSession) ChatSessionManager
                 .findChatForContact(metaContact.getDefaultContact(), true);
 
-        selectChatSession(chatSession);
+        selectChatSession(chatSession, false);
     }
 
     /**

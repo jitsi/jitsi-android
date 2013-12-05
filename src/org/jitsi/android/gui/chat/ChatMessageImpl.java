@@ -9,7 +9,6 @@ package org.jitsi.android.gui.chat;
 import java.util.*;
 import java.util.regex.*;
 
-import android.text.*;
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.event.*;
@@ -20,6 +19,7 @@ import net.java.sip.communicator.util.*;
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
+import org.jitsi.android.gui.util.*;
 import org.jitsi.service.configuration.*;
 
 /**
@@ -58,12 +58,6 @@ public class ChatMessageImpl
      * The type of the message.
      */
     private int messageType;
-
-    /**
-     * The title of the message. This property is optional and could be used
-     * to show a title for error messages.
-     */
-    private String messageTitle;
 
     /**
      * The content of the message.
@@ -166,6 +160,7 @@ public class ChatMessageImpl
      * @param messageUID The ID of the message.
      * @param correctedMessageUID The ID of the message being replaced.
      */
+    @SuppressWarnings("unused")
     public ChatMessageImpl(String contactName,
                            String contactDisplayName,
                            Date date,
@@ -180,7 +175,6 @@ public class ChatMessageImpl
         this.contactDisplayName = contactDisplayName;
         this.date = date;
         this.messageType = messageType;
-        this.messageTitle = messageTitle;
         this.message = message;
         this.contentType = contentType;
         this.messageUID = messageUID;
@@ -229,16 +223,6 @@ public class ChatMessageImpl
     public int getMessageType()
     {
         return messageType;
-    }
-
-    /**
-     * Returns the title of the message.
-     * 
-     * @return the title of the message.
-     */
-    public String getMessageTitle()
-    {
-        return messageTitle;
     }
 
     /**
@@ -406,15 +390,6 @@ public class ChatMessageImpl
     }
 
     /**
-     * Sets the content type of the message (e.g. "text", "text/html", etc.).
-     * @param contentType the content type to set
-     */
-    public void setContentType(String contentType)
-    {
-        this.contentType = contentType;
-    }
-    
-    /**
      * Returns the UID of this message.
      * 
      * @return the UID of this message.
@@ -437,16 +412,6 @@ public class ChatMessageImpl
     }
 
     /**
-     * Sets the message type.
-     *
-     * @param msgType the type of the message
-     */
-    public void setMessageType(int msgType)
-    {
-        this.messageType = msgType;
-    }
-
-    /**
      * Indicates if given <tt>nextMsg</tt> is a consecutive message.
      *
      * @param nextMsg the next message to check
@@ -458,31 +423,13 @@ public class ChatMessageImpl
         boolean uidEqual = messageUID != null
                 && messageUID.equals(nextMsg.getCorrectedMessageUID());
 
-        if (uidEqual
+        return uidEqual
             || contactName != null
-                && (messageType == nextMsg.getMessageType())
-                && contactName.equals(nextMsg.getContactName())
-                // And if the new message is within a minute from the last one.
-                && ((nextMsg.getDate().getTime() - getDate().getTime()) < 60000))
-        {
-            return true;
-        }
+            && (messageType == nextMsg.getMessageType())
+            && contactName.equals(nextMsg.getContactName())
+            // And if the new message is within a minute from the last one.
+            && ((nextMsg.getDate().getTime() - getDate().getTime()) < 60000);
 
-        return false;
-    }
-
-    public ChatMessageImpl clone()
-    {
-        return new ChatMessageImpl(
-                        contactName,
-                        contactDisplayName,
-                        date,
-                        messageType,
-                        messageTitle,
-                        message,
-                        contentType,
-                        messageUID,
-                        correctedMessageUID);
     }
 
     /**

@@ -8,7 +8,7 @@ package org.jitsi.android.gui.util;
 
 import android.content.res.*;
 import android.graphics.drawable.*;
-import android.text.*;
+import android.text.Html;
 
 import net.java.sip.communicator.util.*;
 
