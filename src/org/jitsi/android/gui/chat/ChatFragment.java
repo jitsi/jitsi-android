@@ -1149,8 +1149,8 @@ public class ChatFragment
 
             typingTextView.setText(chatSession.getShortDisplayName()
                 + " "
-                + getResources()
-                    .getString(R.string.service_gui_CONTACT_TYPING));
+                + JitsiApplication.getResString(
+                    R.string.service_gui_CONTACT_TYPING));
             setVisible = true;
         }
         else if (typingState
@@ -1160,8 +1160,8 @@ public class ChatFragment
             typingTextView.setText(
                 chatSession.getShortDisplayName()
                 + " "
-                + getResources()
-                    .getString(R.string.service_gui_CONTACT_PAUSED_TYPING));
+                + JitsiApplication.getResString(
+                    R.string.service_gui_CONTACT_PAUSED_TYPING));
             setVisible = true;
         }
 
