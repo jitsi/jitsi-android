@@ -26,15 +26,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/service_gui_MOVE"
-                android:id="@+id/move"
+                android:text="@string/service_gui_CANCEL"
+                android:id="@+id/cancel"
                 style="?android:attr/buttonBarButtonStyle"/>
         <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/service_gui_CANCEL"
-                android:id="@+id/cancel"
+                android:text="@string/service_gui_MOVE"
+                android:id="@+id/move"
                 style="?android:attr/buttonBarButtonStyle"/>
     </LinearLayout>
 </RelativeLayout>

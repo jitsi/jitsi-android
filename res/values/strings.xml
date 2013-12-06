@@ -136,7 +136,7 @@
     <string name="service_gui_CLOSE_CHAT">Close chat</string>
     <string name="service_gui_CLOSE_ALL_CHATS">Close all chats</string>
     <string name="service_gui_COPY_MESSAGE_TEXT">Copy text</string>
-    <string name="service_gui_OK">Ok</string>
+    <string name="service_gui_OK">OK</string>
     <string name="service_gui_YES">Yes</string>
     <string name="service_gui_NO">No</string>
     <string name="service_gui_CANCEL">Cancel</string>
@@ -937,7 +937,7 @@
     <!-- Convert letters in phone numbers -->
     <string name="pref_key_accept_alpha_pnumbers">pref.key.call.convert.letters</string>
     <string name="service_gui_settings_ALLOW_ALPHA_PNUMBER">Letters in phone numbers</string>
-    <string name="service_gui_settings_ALLOW_ALPHA_ON">*e.g. +1-800-MYPHONE -> +1-800-694663</string>
+    <string name="service_gui_settings_ALLOW_ALPHA_ON"><![CDATA[*e.g. +1–800–MYPHONE –> +1–800–694663]]></string>
     <string name="service_gui_settings_ALLOW_ALPHA_OFF">No phone number modifications</string>
     <!-- Audio settings -->
     <string name="pref_cat_settings_audio">pref.cat.settings.audio</string>

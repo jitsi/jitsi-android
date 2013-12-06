@@ -22,17 +22,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/service_gui_REQUEST"
-                android:id="@+id/button"
-                android:onClick="onRequestClicked"
+                android:text="@string/service_gui_CANCEL"
+                android:id="@+id/button2"
+                android:onClick="onCancelClicked"
                 style="?android:attr/buttonBarButtonStyle"/>
         <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/service_gui_CANCEL"
-                android:id="@+id/button2"
-                android:onClick="onCancelClicked"
+                android:text="@string/service_gui_REQUEST"
+                android:id="@+id/button"
+                android:onClick="onRequestClicked"
                 style="?android:attr/buttonBarButtonStyle"/>
     </LinearLayout>
 </LinearLayout>

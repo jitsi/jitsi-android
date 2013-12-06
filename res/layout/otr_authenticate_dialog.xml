@@ -56,17 +56,17 @@
             <Button
                     android:layout_width="fill_parent"
                     android:layout_height="match_parent"
-                    android:text="@string/plugin_otr_authbuddydialog_AUTHENTICATE_BUDDY"
-                    style="?android:attr/buttonBarButtonStyle"
-                    android:id="@+id/okButton" android:layout_weight="1"
-                    android:onClick="onOkClicked" />
-            <Button
-                    android:layout_width="fill_parent"
-                    android:layout_height="match_parent"
                     android:text="@string/plugin_otr_authbuddydialog_CANCEL"
                     style="?android:attr/buttonBarButtonStyle"
                     android:id="@+id/cancelButton" android:layout_weight="1"
                     android:onClick="onCancelClicked" />
+            <Button
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:text="@string/plugin_otr_authbuddydialog_AUTHENTICATE_BUDDY"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:id="@+id/okButton" android:layout_weight="1"
+                    android:onClick="onOkClicked" />
         </LinearLayout>
     </RelativeLayout>
 </ScrollView>

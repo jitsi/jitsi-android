@@ -28,21 +28,21 @@
     <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/service_gui_OK"
-            style="?android:attr/buttonBarButtonStyle"
-            android:id="@+id/okButton"
-            android:layout_gravity="center_horizontal"
-            android:onClick="onOkClicked"
-            android:layout_weight="1"
-            />
-    <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
             android:text="@string/service_gui_CANCEL"
             style="?android:attr/buttonBarButtonStyle"
             android:id="@+id/cancelButton"
             android:layout_gravity="center_horizontal"
             android:onClick="onCancelClicked"
+            android:layout_weight="1"
+            />
+    <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/service_gui_OK"
+            style="?android:attr/buttonBarButtonStyle"
+            android:id="@+id/okButton"
+            android:layout_gravity="center_horizontal"
+            android:onClick="onOkClicked"
             android:layout_weight="1"
             />
     </LinearLayout>

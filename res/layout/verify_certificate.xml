@@ -20,8 +20,16 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:weightSum="3"
-            android:layout_alignLeft="@+id/showCert"
             android:layout_below="@+id/message">
+        <Button
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/service_gui_CANCEL"
+                android:id="@+id/cancelButton"
+                style="?android:attr/buttonBarButtonStyle"
+                android:onClick="onCancelClicked"
+                />
         <Button
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -39,15 +47,6 @@
                 android:id="@+id/continueButton"
                 style="?android:attr/buttonBarButtonStyle"
                 android:onClick="onContinueClicked"
-                />
-        <Button
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/service_gui_CANCEL"
-                android:id="@+id/cancelButton"
-                style="?android:attr/buttonBarButtonStyle"
-                android:onClick="onCancelClicked"
                 />
     </LinearLayout>
 </RelativeLayout>

@@ -28,18 +28,18 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     style="?android:attr/buttonBarButtonStyle"
-                    android:text="@string/service_gui_CONTINUE_ANYWAY"
-                    android:id="@+id/continueBtn"
-                    android:onClick="onContinueClicked"
+                    android:text="@string/service_gui_CANCEL"
+                    android:id="@+id/cancel"
+                    android:onClick="onCancelClicked"
                     />
             <Button
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     style="?android:attr/buttonBarButtonStyle"
-                    android:text="@string/service_gui_CANCEL"
-                    android:id="@+id/cancel"
-                    android:onClick="onCancelClicked"
+                    android:text="@string/service_gui_CONTINUE_ANYWAY"
+                    android:id="@+id/continueBtn"
+                    android:onClick="onContinueClicked"
                     />
         </LinearLayout>
     </LinearLayout>
