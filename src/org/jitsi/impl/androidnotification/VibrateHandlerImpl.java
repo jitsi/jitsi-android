@@ -24,11 +24,6 @@ public class VibrateHandlerImpl
 {
 
     /**
-     * The Android context.
-     */
-    private final Context context;
-
-    /**
      * The <tt>Vibrator</tt> if present on this device.
      */
     private final Vibrator vibratorService;
@@ -38,7 +33,7 @@ public class VibrateHandlerImpl
      */
     public VibrateHandlerImpl()
     {
-        this.context = JitsiApplication.getGlobalContext();
+        Context context = JitsiApplication.getGlobalContext();
         this.vibratorService
                 = (Vibrator) context.getSystemService(
                         Context.VIBRATOR_SERVICE);

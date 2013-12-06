@@ -6,8 +6,10 @@
  */
 package org.jitsi.impl.neomedia.device.util;
 
+import android.annotation.*;
 import android.graphics.*;
 
+import android.os.*;
 import net.java.sip.communicator.util.*;
 
 /**
@@ -53,6 +55,7 @@ public class SurfaceTextureManager
         surfaceTexture.setOnFrameAvailableListener(this);
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     public void release()
     {
         if (textureRender != null)

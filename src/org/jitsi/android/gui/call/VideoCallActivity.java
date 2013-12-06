@@ -9,6 +9,7 @@ package org.jitsi.android.gui.call;
 import java.beans.*;
 import java.util.*;
 
+import android.annotation.*;
 import android.content.*;
 import android.graphics.Color;
 import android.media.*;
@@ -999,6 +1000,7 @@ public class VideoCallActivity
      * @param isSecure <tt>true</tt> if the call is secured.
      * @param isVerified <tt>true</tt> if zrtp SAS string is verified.
      */
+    @SuppressLint("ResourceAsColor")
     private void doUpdatePadlockStatus(boolean isSecure, boolean isVerified)
     {
         if(isSecure)

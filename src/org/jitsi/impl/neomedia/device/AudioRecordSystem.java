@@ -6,6 +6,7 @@
  */
 package org.jitsi.impl.neomedia.device;
 
+import android.annotation.*;
 import android.media.audiofx.*;
 
 import java.io.*;
@@ -14,6 +15,7 @@ import java.util.*;
 import javax.media.*;
 import javax.media.format.AudioFormat;
 
+import android.os.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.impl.neomedia.jmfext.media.renderer.audio.*;
 import org.jitsi.service.neomedia.codec.*;
@@ -51,6 +53,7 @@ public class AudioRecordSystem
      * Returns feature set for current device.
      * @return feature set for current device.
      */
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public static int getFeatureSet()
     {
         int featureSet = FEATURE_NOTIFY_AND_PLAYBACK_DEVICES;

@@ -6,7 +6,9 @@
  */
 package org.jitsi.impl.neomedia.device.util;
 
+import android.annotation.*;
 import android.opengl.*;
+import android.os.*;
 import android.view.*;
 
 /**
@@ -39,6 +41,7 @@ public class CodecInputSurface
     /**
      * {@inheritDoc}
      */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     public void release()
     {

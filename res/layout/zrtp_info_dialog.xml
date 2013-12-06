@@ -20,8 +20,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/service_gui_security_SECURE_AUDIO"
                 android:id="@+id/secure_audio_text"
-                android:layout_alignLeft="@+id/security_cipher"
-                android:layout_below="@+id/textView2"
                 style="@style/MediumFont"/>
         <ImageView
                 android:layout_width="wrap_content"
@@ -41,8 +39,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/service_gui_security_SECURE_VIDEO"
                 android:id="@+id/secure_video_text"
-                style="@style/MediumFont" android:layout_alignLeft="@+id/security_cipher"
-                android:layout_below="@+id/secure_audio_text"/>
+                style="@style/MediumFont"/>
         <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

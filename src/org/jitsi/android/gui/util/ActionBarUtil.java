@@ -6,8 +6,10 @@
  */
 package org.jitsi.android.gui.util;
 
+import android.annotation.*;
 import android.app.*;
 import android.graphics.drawable.*;
+import android.os.*;
 import android.widget.*;
 import org.jitsi.R;
 import org.jitsi.android.*;
@@ -72,6 +74,7 @@ public class ActionBarUtil
      * @param a the current activity where the status should be displayed
      * @param avatar the avatar to set
      */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void setAvatar(Activity a, byte[] avatar)
     {
         if (avatarDrawable == null)
@@ -96,6 +99,7 @@ public class ActionBarUtil
      * @param a the current activity where the status should be displayed
      * @param statusIcon the status icon to set
      */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     public static void setStatus(Activity a, byte[] statusIcon)
     {
         if (avatarDrawable == null)

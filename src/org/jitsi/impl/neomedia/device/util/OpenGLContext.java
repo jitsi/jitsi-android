@@ -6,12 +6,15 @@
  */
 package org.jitsi.impl.neomedia.device.util;
 
+import android.annotation.*;
 import android.opengl.*;
+import android.os.*;
 import net.java.sip.communicator.util.*;
 
 /**
  * Code for EGL context handling
  */
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class OpenGLContext
 {
     /**

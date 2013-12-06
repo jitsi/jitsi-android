@@ -6,7 +6,9 @@
  */
 package org.jitsi.impl.neomedia.codec.video;
 
+import android.annotation.*;
 import android.media.*;
+import android.os.*;
 import android.view.*;
 
 import org.jitsi.android.util.java.awt.*;
@@ -262,6 +264,7 @@ public class AndroidDecoder
     /**
      * {@inheritDoc}
      */
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void configureMediaCodec(MediaCodec codec, String codecType)
     {

@@ -6,8 +6,10 @@
  */
 package org.jitsi.impl.neomedia.device.util;
 
+import android.annotation.*;
 import android.graphics.*;
 import android.opengl.*;
+import android.os.*;
 import android.view.*;
 
 /**
@@ -16,6 +18,7 @@ import android.view.*;
  *
  * @author Pawel Domas
  */
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class OpenGlCtxProvider
     extends ViewDependentProvider<OpenGLContext>
     implements TextureView.SurfaceTextureListener

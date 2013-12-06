@@ -6,8 +6,10 @@
  */
 package org.jitsi.android.gui;
 
+import android.annotation.*;
 import android.app.*;
 import android.content.*;
+import android.os.*;
 import android.os.Bundle; // disambiguation
 import android.view.*;
 import android.view.MenuItem.OnActionExpandListener;
@@ -117,6 +119,7 @@ public class Jitsi
      *
      * @param menu the options menu
      */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {

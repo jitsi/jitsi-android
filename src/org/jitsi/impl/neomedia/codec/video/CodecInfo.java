@@ -6,7 +6,9 @@
  */
 package org.jitsi.impl.neomedia.codec.video;
 
+import android.annotation.*;
 import android.media.*;
+import android.os.*;
 import net.java.sip.communicator.util.*;
 import org.jitsi.service.neomedia.codec.*;
 
@@ -17,6 +19,7 @@ import java.util.*;
  *
  * @author Pawel Domas
  */
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class CodecInfo
 {
     /**

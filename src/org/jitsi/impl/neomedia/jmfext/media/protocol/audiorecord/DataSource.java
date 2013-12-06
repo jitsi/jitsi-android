@@ -11,9 +11,11 @@ import java.io.*;
 import javax.media.*;
 import javax.media.control.*;
 
+import android.annotation.*;
 import android.media.*;
 import android.media.audiofx.*;
 
+import android.os.*;
 import android.os.Process;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.impl.neomedia.device.*;
@@ -344,6 +346,7 @@ public class DataSource
         /**
          * Configures echo cancellation and noise suppression effects.
          */
+        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
         private void configureEffects()
         {
             if(!AndroidUtils.hasAPI(16))

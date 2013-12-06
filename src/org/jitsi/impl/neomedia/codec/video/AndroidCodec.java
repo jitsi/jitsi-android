@@ -6,7 +6,9 @@
  */
 package org.jitsi.impl.neomedia.codec.video;
 
+import android.annotation.*;
 import android.media.*;
+import android.os.*;
 import android.view.*;
 
 import net.java.sip.communicator.util.*;
@@ -23,6 +25,7 @@ import javax.media.*;
  *
  * @author Pawel Domas
  */
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 abstract class AndroidCodec
     extends AbstractCodec2
 {

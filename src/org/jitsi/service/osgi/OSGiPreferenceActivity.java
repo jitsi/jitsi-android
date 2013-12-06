@@ -6,6 +6,7 @@
  */
 package org.jitsi.service.osgi;
 
+import android.annotation.*;
 import android.app.*;
 import android.content.*;
 import android.os.*;
@@ -103,6 +104,7 @@ public class OSGiPreferenceActivity
      * recently supplied in onSaveInstanceState(Bundle).
      * Note: Otherwise it is null.
      */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     protected void onCreate(android.os.Bundle savedInstanceState)
     {
@@ -121,7 +123,11 @@ public class OSGiPreferenceActivity
                 if(this.getClass().equals(homeActivity))
                 {
                     actionBar.setDisplayHomeAsUpEnabled(false);
-                    actionBar.setHomeButtonEnabled(false);
+
+                    if(AndroidUtils.hasAPI(14))
+                    {
+                        actionBar.setHomeButtonEnabled(false);
+                    }
                 }
 
                 ActionBarUtil.setTitle(this, getTitle());
