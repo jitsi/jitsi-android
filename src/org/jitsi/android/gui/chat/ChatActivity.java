@@ -249,12 +249,12 @@ public class ChatActivity
         switch (item.getItemId())
         {
         case R.id.call_contact:
-
-            AndroidCallUtil.createAndroidCall(
+            Contact contact
+                = selectedSession.getMetaContact().getDefaultContact();
+            AndroidCallUtil.createCall(
                 this,
-                item.getActionView(),
-                selectedSession
-                    .getMetaContact().getDefaultContact().getAddress());
+                contact.getAddress(),
+                contact.getProtocolProvider());
             return true;
 
         case R.id.close_chat:

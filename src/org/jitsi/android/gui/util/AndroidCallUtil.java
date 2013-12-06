@@ -76,7 +76,7 @@ public class AndroidCallUtil
      * @param destination target callee name.
      * @param provider the provider that will be used to make a call.
      */
-    private static void createCall( final Context context,
+    public static void createCall( final Context context,
                                     final String destination,
                                     final ProtocolProviderService provider)
     {
