@@ -6,7 +6,9 @@
  */
 package org.jitsi.impl.neomedia.codec.video;
 
+import android.annotation.*;
 import android.media.*;
+import android.os.*;
 import android.view.*;
 
 import org.jitsi.android.gui.util.*;
@@ -89,8 +91,8 @@ public class AndroidEncoder
     {
         boolean supported = AndroidUtils.hasAPI(18);
 
-        return isHwEncodingEnabled() &&
-                LibJitsi.getConfigurationService()
+        return isHwEncodingEnabled() && supported
+                && LibJitsi.getConfigurationService()
                     .getBoolean(DIRECT_SURFACE_ENCODE_PROPERTY, supported);
     }
 
@@ -265,6 +267,7 @@ public class AndroidEncoder
     /**
      * {@inheritDoc}
      */
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     protected void configureMediaCodec(MediaCodec codec, String codecType)
             throws ResourceUnavailableException
@@ -294,7 +297,6 @@ public class AndroidEncoder
             = ((MediaServiceImpl)LibJitsi.getMediaService())
                 .getDeviceConfiguration().getVideoBitrate() * 1024;
         format.setInteger(MediaFormat.KEY_BIT_RATE, bitrate);
-                          //8000000);
         format.setInteger(MediaFormat.KEY_FRAME_RATE, 30);
         format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 30);
 
@@ -318,6 +320,7 @@ public class AndroidEncoder
     /**
      * {@inheritDoc}
      */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
     protected void doClose()
     {

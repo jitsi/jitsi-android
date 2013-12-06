@@ -82,13 +82,13 @@ public class SettingsActivity
         = JitsiApplication.getResString(R.string.pref_key_video_camera);
     // Hardware encoding(API16)
     static private final String P_KEY_VIDEO_HW_ENCODE
-            = JitsiApplication.getResString(R.string.pref_key_video_hw_encode);
+        = JitsiApplication.getResString(R.string.pref_key_video_hw_encode);
     // Direct surface encoding(hw encoding required and API18)
-    //static private final String P_KEY_VIDEO_DIRECT_SURFACE
-    // = JitsiApplication.getResString(R.string.pref_key_video_surface_encode);
+    static private final String P_KEY_VIDEO_ENC_DIRECT_SURFACE
+        = JitsiApplication.getResString(R.string.pref_key_video_surface_encode);
     // Hardware decoding(API16)
     static private final String P_KEY_VIDEO_HW_DECODE
-            = JitsiApplication.getResString(R.string.pref_key_video_hw_decode);
+        = JitsiApplication.getResString(R.string.pref_key_video_hw_decode);
     // Video resolutions
     static private final String P_KEY_VIDEO_RES
         = JitsiApplication.getResString(R.string.pref_key_video_resolution);
@@ -528,6 +528,8 @@ public class SettingsActivity
 
             findPreference(P_KEY_VIDEO_HW_ENCODE)
                     .setEnabled(enableMediaCodecs);
+            findPreference(P_KEY_VIDEO_ENC_DIRECT_SURFACE)
+                    .setEnabled(AndroidUtils.hasAPI(18));
             findPreference(P_KEY_VIDEO_HW_DECODE)
                     .setEnabled(enableMediaCodecs);
         }
