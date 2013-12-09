@@ -89,7 +89,7 @@ public class AutoHideController
     {
         super.onResume();
 
-        reScheduleAutoHideTask();
+        show();
     }
 
     /**
