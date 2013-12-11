@@ -9,10 +9,13 @@ package org.jitsi.android.gui.menu;
 import java.util.*;
 
 import net.java.sip.communicator.service.protocol.*;
+import net.java.sip.communicator.service.update.*;
+import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.account.*;
 
 import org.jitsi.*;
 import org.jitsi.android.*;
+import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.account.*;
 import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.android.gui.settings.*;
@@ -110,6 +113,20 @@ public class MainMenuActivity
             return true;
         case R.id.send_logs:
             JitsiApplication.showSendLogsDialog();
+            return true;
+        case R.id.check_for_update:
+            new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    UpdateService updateService
+                        = ServiceUtils.getService(
+                                AndroidGUIActivator.bundleContext,
+                                UpdateService.class);
+                    updateService.checkForUpdates(true);
+                }
+            }.start();
             return true;
         default:
             return super.onOptionsItemSelected(item);

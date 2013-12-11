@@ -313,6 +313,22 @@
         &lt;a href="http://en.wikipedia.org/wiki/Off-the-Record_Messaging">
         http://en.wikipedia.org/wiki/Off-the-Record_Messaging&lt;/a>&lt;/span>
     </string>
+    <!-- Update checker -->
+    <string name="plugin_updatechecker_DIALOG_TITLE">Install Updates</string>
+    <string name="plugin_updatechecker_DIALOG_MESSAGE">
+    A new version of {0} is available for download.
+    </string>
+    <string name="plugin_updatechecker_BUTTON_DOWNLOAD">Download</string>
+    <string name="plugin_updatechecker_BUTTON_INSTALL">Install</string>
+    <string name="plugin_updatechecker_UPDATE_MENU_ENTRY">
+        Check for updates
+    </string>
+    <string name="plugin_updatechecker_DIALOG_NOUPDATE">
+        Your version is up to date.
+    </string>
+    <string name="plugin_updatechecker_DIALOG_NOUPDATE_TITLE">
+        No new version
+    </string>
     <!-- From resources.properties -->
     <string name="service_gui_JANUARY">Jan</string>
     <string name="service_gui_FEBRUARY">Feb</string>

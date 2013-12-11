@@ -21,6 +21,7 @@
 	<classpathentry kind="lib" path="libs/dnsservice.jar"/>
 	<classpathentry kind="lib" path="libs/filehistory.jar"/>
 	<classpathentry kind="lib" path="libs/history.jar"/>
+	<classpathentry kind="lib" path="libs/httputil.jar"/>
 	<classpathentry kind="lib" path="libs/globaldisplaydetails.jar"/>
 	<classpathentry kind="lib" path="libs/libjitsi.jar"/>
 	<classpathentry kind="lib" path="libs/metahistory.jar"/>
@@ -38,6 +39,7 @@
 	<classpathentry kind="lib" path="libs/sysactivitynotifications.jar"/>
 	<classpathentry kind="lib" path="libs/systray-service.jar"/>
 	<classpathentry kind="lib" path="libs/ui-service.jar"/>
+	<classpathentry kind="lib" path="libs/updateservice.jar"/>
 	<classpathentry kind="lib" path="libs/util.jar"/>
 	<classpathentry kind="lib" path="libs/zrtp4j.jar"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>

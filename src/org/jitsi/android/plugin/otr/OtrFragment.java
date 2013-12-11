@@ -235,7 +235,7 @@ public class OtrFragment
         }
         else
         {
-            this.setStatus(SessionStatus.PLAINTEXT);
+            this.setStatus(ScSessionStatus.PLAINTEXT);
             this.setPolicy(null);
         }
     }
@@ -287,11 +287,11 @@ public class OtrFragment
     }
 
     /**
-     * Sets the padlock icon according to the passed in {@link SessionStatus}.
+     * Sets the padlock icon according to the passed in {@link ScSessionStatus}.
      *
-     * @param status the {@link SessionStatus}.
+     * @param status the {@link ScSessionStatus}.
      */
-    private void setStatus(SessionStatus status)
+    private void setStatus(ScSessionStatus status)
     {
         final int iconId;
         switch (status)

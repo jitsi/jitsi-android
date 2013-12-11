@@ -27,6 +27,9 @@
     <item android:id="@+id/main_settings"
            android:title="@string/settings">
     </item>
+    <item android:id="@+id/check_for_update"
+          android:title="@string/plugin_updatechecker_UPDATE_MENU_ENTRY">
+    </item>
     <item android:id="@+id/send_logs"
           android:title="@string/service_gui_SEND_LOGS">
     </item>

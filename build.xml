@@ -309,6 +309,63 @@
         </copy>
     </target>
 
+    <!-- Executed before the build -->
+    <target name="-pre-build" depends="-manifest-version">
+    </target>
+    <!-- Executed after the build -->
+    <target name="-post-build"
+            depends="-gen-version-update-props,-restore-manifest">
+    </target>
+    <!-- Injects CC build label - it must be integer number -->
+    <condition property="build.label"
+               value="${label}">
+        <isset property="label"/>
+    </condition>
+    <!-- Injects build label into AndroidManifest.xml as versionCode
+         and as the nightly id part of versionName.
+         Version name syntax: {major}.{minor}.{nightly_id}
+         -->
+    <target name="-manifest-version" if="build.label">
+        <copy file="AndroidManifest.xml"
+              tofile="AndroidManifest.xml.antbak"
+              preservelastmodified="true" />
+        <replaceregexp
+                file="AndroidManifest.xml"
+                match='android:versionCode="(\d+)"'
+                replace='android:versionCode="${build.label}"' />
+        <replaceregexp
+                file="AndroidManifest.xml"
+                match='android:versionName="(\d+\.\d+)\..+"'
+                replace='android:versionName="\1.${build.label}"'
+                />
+    </target>
+    <!-- Restores original AndroidManifest.xml -->
+    <target name="-restore-manifest" if="build.label" >
+        <move file="AndroidManifest.xml.antbak"
+              tofile="AndroidManifest.xml"
+              preservelastmodified="true"
+              overwrite="true" />
+    </target>
+    <!-- Generates versionupdate.properties -->
+    <target name="-gen-version-update-props" if="link.download.android" >
+        <!-- Read version from AndroidManifest.xml -->
+        <loadfile
+                property="build.version.name"
+                srcFile="AndroidManifest.xml"
+                failonerror="true">
+            <filterchain>
+                <containsregex pattern='.*android:versionName="(.*)".*'
+                               replace='\1'/>
+                <deletecharacters chars="\r\n"/>
+            </filterchain>
+        </loadfile>
+        <!-- Generate versionupdate.properties file -->
+        <propertyfile file="${out.absolute.dir}/versionupdate.properties">
+            <entry key="last_version" value="${build.version.name}" />
+            <entry key="download_link" value="${link.download.android}" />
+        </propertyfile>
+    </target>
+
     <target name="compile" depends="-compile"/>
 
     <target name="debug-install" depends="debug">

@@ -45,6 +45,9 @@
 	<lib name="history.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/libs/history.jar!/"/>
 	</lib>
+	<lib name="httputil.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libs/httputil.jar!/"/>
+	</lib>
 	<lib name="globaldisplaydetails.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/libs/globaldisplaydetails.jar!/"/>
 	</lib>
@@ -95,6 +98,9 @@
 	</lib>
 	<lib name="ui-service.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/libs/ui-service.jar!/"/>
+	</lib>
+	<lib name="updateservice.jar" scope="COMPILE">
+		<relative-module-cls project-related="jar://$PROJECT_DIR$/libs/updateservice.jar!/"/>
 	</lib>
 	<lib name="util.jar" scope="COMPILE">
 		<relative-module-cls project-related="jar://$PROJECT_DIR$/libs/util.jar!/"/>
