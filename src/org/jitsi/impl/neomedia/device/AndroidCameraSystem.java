@@ -84,6 +84,20 @@ public class AndroidCameraSystem
                         LOCATOR_PROTOCOL, cameraId, cameraInfo);
 
             List<Camera.Size> previewSizes = params.getSupportedVideoSizes();
+            if (previewSizes == null)
+            {
+                /*
+                 * The video size is the same as the preview size.
+                 * MediaRecorder.setVideoSize(int,int) will most likely
+                 * fail, print a line in logcat and not throw an exception
+                 * (in DataSource.doStart()).
+                 */
+                logger.warn(
+                    "getSupportedVideoSizes returned null for camera: "
+                        + cameraId);
+                previewSizes = params.getSupportedPreviewSizes();
+            }
+
             logger.info(
                     "Video sizes supported by "
                             + locator.toString()
