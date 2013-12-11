@@ -8,6 +8,7 @@ package org.jitsi.android.gui.chat;
 
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.protocol.*;
+import net.java.sip.communicator.util.*;
 
 import org.jitsi.*;
 import org.jitsi.android.*;
@@ -31,6 +32,11 @@ public class ChatActivity
     extends OSGiActivity
     implements OnPageChangeListener
 {
+    /**
+     * The logger
+     */
+    private final static Logger logger = Logger.getLogger(ChatActivity.class);
+
     /**
      * The pager widget, which handles animation and allows swiping horizontally
      * to access previous and next wizard steps.
@@ -141,6 +147,13 @@ public class ChatActivity
         super.onResume();
 
         ChatSessionManager.setCurrentChatId(currentChatId);
+
+        if(currentChatId == null)
+        {
+            logger.warn("Chat id can't be null - finishing ChatActivity");
+            finish();
+            return;
+        }
 
         displaySelectedChatInfo();
     }
