@@ -8,6 +8,7 @@ package org.jitsi.impl.androidupdate;
 
 import android.app.*;
 import android.content.*;
+import android.database.*;
 import android.net.*;
 import android.os.*;
 
@@ -16,6 +17,7 @@ import net.java.sip.communicator.service.update.*;
 import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.Logger;
 
+import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.util.*;
@@ -64,6 +66,17 @@ public class UpdateServiceImpl
     //private String changesLink;
 
     /**
+     * <tt>SharedPreferences</tt> used to store download ids.
+     */
+    private SharedPreferences store;
+
+    /**
+     * Name of <tt>SharedPreferences</tt> entry used to store old download ids.
+     * Ids are stored in single string separated by ",".
+     */
+    private static final String ENTRY_NAME = "apk_ids";
+
+    /**
      * Checks for updates.
      *
      * @param notifyAboutNewestVersion <tt>true</tt> if the user is to be
@@ -86,6 +99,33 @@ public class UpdateServiceImpl
 
         if(!isLatest && downloadLink != null)
         {
+            // Check old or scheduled downloads
+            List<Long> previousDownloads = getOldDownloads();
+            if(previousDownloads.size() > 0)
+            {
+                long lastDownload
+                    = previousDownloads.get(previousDownloads.size()-1);
+
+                int lastJobStatus = checkDownloadStatus(lastDownload);
+                if(lastJobStatus == DownloadManager.STATUS_SUCCESSFUL)
+                {
+                    // Ask the use if he wants to install
+                    askInstallDownloadedApk(lastDownload);
+                    return;
+                }
+                else if(lastJobStatus != DownloadManager.STATUS_FAILED)
+                {
+                    // Download is in progress or scheduled for retry
+                    AndroidUtils.showAlertDialog(
+                        JitsiApplication.getGlobalContext(),
+                        R.getI18NString(
+                            "plugin.updatechecker.DIALOG_IN_PROGRESS_TITLE"),
+                        R.getI18NString(
+                            "plugin.updatechecker.DIALOG_IN_PROGRESS"));
+                    return;
+                }
+            }
+
             AndroidUtils.showAlertConfirmDialog(
                 JitsiApplication.getGlobalContext(),
                 R.getI18NString("plugin.updatechecker.DIALOG_TITLE"),
@@ -117,6 +157,76 @@ public class UpdateServiceImpl
     }
 
     /**
+     * Asks the user whether to install downloaded .apk.
+     * @param apkDownloadId download id of the apk to install.
+     */
+    private void askInstallDownloadedApk(final long apkDownloadId)
+    {
+        AndroidUtils.showAlertConfirmDialog(
+            JitsiApplication.getGlobalContext(),
+            JitsiApplication.getResString(
+                R.string.plugin_updatechecker_DIALOG_DOWNLOADED_TITLE),
+            JitsiApplication.getResString(
+                R.string.plugin_updatechecker_DIALOG_DOWNLOADED),
+            JitsiApplication.getResString(
+                R.string.plugin_updatechecker_BUTTON_INSTALL),
+            new DialogActivity.DialogListener()
+            {
+
+                @Override
+                public boolean onConfirmClicked(DialogActivity dialog)
+                {
+                    DownloadManager downloadManager
+                        = JitsiApplication.getDownloadManager();
+                    Uri fileUri = downloadManager
+                        .getUriForDownloadedFile(apkDownloadId);
+
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(fileUri, APK_MIME_TYPE);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                    JitsiApplication.getGlobalContext().startActivity(intent);
+
+                    return true;
+                }
+
+                @Override
+                public void onDialogCancelled(DialogActivity dialog){ }
+            }
+        );
+    }
+
+    /**
+     * Queries the <tt>DownloadManager</tt> for the status of download job
+     * identified by given <tt>id</tt>.
+     * @param id download identifier which status will be returned.
+     * @return download status of the job identified by given id. If given job
+     * is not found {@link DownloadManager#STATUS_FAILED} will be returned.
+     */
+    private int checkDownloadStatus(long id)
+    {
+        DownloadManager downloadManager
+            = JitsiApplication.getDownloadManager();
+
+        DownloadManager.Query query = new DownloadManager.Query();
+        query.setFilterById(id);
+
+        Cursor cursor = downloadManager.query(query);
+        try
+        {
+            if(!cursor.moveToFirst())
+                return DownloadManager.STATUS_FAILED;
+            else
+                return cursor.getInt(
+                    cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
+        }
+        finally
+        {
+            cursor.close();
+        }
+    }
+
+    /**
      * Schedules .apk download.
      */
     private void downloadApk()
@@ -132,31 +242,72 @@ public class UpdateServiceImpl
         request.setDestinationInExternalPublicDir(
             Environment.DIRECTORY_DOWNLOADS, fileName);
 
-        DownloadManager downloadManager = (DownloadManager)
-            JitsiApplication.getGlobalContext()
-                .getSystemService(Context.DOWNLOAD_SERVICE);
-        downloadManager.enqueue(request);
+        DownloadManager downloadManager
+            = JitsiApplication.getDownloadManager();
 
-        /*JitsiApplication.getGlobalContext()
-            .registerReceiver(new BroadcastReceiver()
+        long jobId = downloadManager.enqueue(request);
+
+        rememberDownloadId(jobId);
+    }
+
+    private void rememberDownloadId(long id)
+    {
+        SharedPreferences store = getStore();
+
+        String storeStr = store.getString(ENTRY_NAME, "");
+        storeStr += id + ",";
+
+        store.edit().putString(ENTRY_NAME, storeStr).commit();
+    }
+
+    private SharedPreferences getStore()
+    {
+        if(store == null)
         {
-            @Override
-            public void onReceive(Context context,
-                                  Intent intent)
-            {
-                Uri fileUri
-                    = downloadManager.getUriForDownloadedFile(jobId);
-                String mime
-                    = downloadManager.getMimeTypeForDownloadedFile(jobId);
-                logger.info("Completed: "+fileUri+" mime: "+mime);
-                JitsiApplication.getGlobalContext().unregisterReceiver(this);
+            store
+                = JitsiApplication.getGlobalContext()
+                    .getSharedPreferences("store", Context.MODE_PRIVATE);
+        }
+        return store;
+    }
 
-                Intent install = new Intent(Intent.ACTION_VIEW);
-                install.setDataAndType(fileUri, APK_MIME_TYPE");
-                install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                JitsiApplication.getGlobalContext().startActivity(install);
+    private List<Long> getOldDownloads()
+    {
+        String storeStr = getStore().getString(ENTRY_NAME, "");
+        String[] idStrs = storeStr.split(",");
+        List<Long> apkIds = new ArrayList<Long>(idStrs.length);
+        for(String idStr : idStrs)
+        {
+            try
+            {
+                apkIds.add(Long.parseLong(idStr));
             }
-        }, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));*/
+            catch (NumberFormatException e)
+            {
+                logger.error(
+                    "Error parsing apk id for string: " + idStr
+                        + " [" + storeStr + "]");
+            }
+        }
+        return apkIds;
+    }
+
+    /**
+     * Removes old downloads.
+     */
+    void removeOldDownloads()
+    {
+        List<Long> apkIds = getOldDownloads();
+
+        DownloadManager downloadManager
+            = JitsiApplication.getDownloadManager();
+        for(long id : apkIds)
+        {
+            logger.debug("Removing .apk for id "+id);
+            downloadManager.remove(id);
+        }
+
+        getStore().edit().remove(ENTRY_NAME).commit();
     }
 
     /**

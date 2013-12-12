@@ -329,6 +329,18 @@
     <string name="plugin_updatechecker_DIALOG_NOUPDATE_TITLE">
         No new version
     </string>
+    <string name="plugin_updatechecker_DIALOG_IN_PROGRESS_TITLE">
+        In progress
+    </string>
+    <string name="plugin_updatechecker_DIALOG_IN_PROGRESS">
+        Downloading update is in progress.
+    </string>
+    <string name="plugin_updatechecker_DIALOG_DOWNLOADED_TITLE">
+        Download finished
+    </string>
+    <string name="plugin_updatechecker_DIALOG_DOWNLOADED">
+        Update is downloaded and ready to be installed.
+    </string>
     <!-- From resources.properties -->
     <string name="service_gui_JANUARY">Jan</string>
     <string name="service_gui_FEBRUARY">Feb</string>

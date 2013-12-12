@@ -162,6 +162,18 @@ public class JitsiApplication
     }
 
     /**
+     * Retrieves <tt>DownloadManager</tt> instance using application
+     * context.
+     *
+     * @return <tt>DownloadManager</tt> service instance.
+     */
+    public static DownloadManager getDownloadManager()
+    {
+        return (DownloadManager) getGlobalContext()
+            .getSystemService(Context.DOWNLOAD_SERVICE);
+    }
+
+    /**
      * Returns global application context.
      *
      * @return Returns global application <tt>Context</tt>.

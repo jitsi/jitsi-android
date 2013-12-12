@@ -61,5 +61,7 @@ public class UpdateActivator
         UpdateActivator.bundleContext = bundleContext;
 
         super.start(bundleContext);
+
+        ((UpdateServiceImpl)serviceImpl).removeOldDownloads();
     }
 }
