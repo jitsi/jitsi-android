@@ -41,6 +41,7 @@
             android:textColor="@color/black"
             android:textColorHighlight="@color/white"
             android:imeOptions="actionSend|flagNoExtractUi"
+            android:inputType="textShortMessage"
             android:singleLine="true"
             android:textCursorDrawable="@null"/>
 
