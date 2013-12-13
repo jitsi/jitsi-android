@@ -362,8 +362,11 @@ public class ContactListAdapter
                     .findViewById(R.id.buttonSeparatorView);
             contactViewHolder.callButtonLayout
                 = convertView.findViewById(R.id.callButtonLayout);
-            contactViewHolder.groupPosition = groupPosition;
-            contactViewHolder.contactPosition = childPosition;
+            // Create call button listener and add bind holder tag
+            contactViewHolder.callButtonLayout
+                .setOnClickListener(callButtonListener);
+            contactViewHolder.callButtonLayout
+                .setTag(contactViewHolder);
 
             convertView.setTag(contactViewHolder);
         }
@@ -372,10 +375,8 @@ public class ContactListAdapter
             contactViewHolder = (ContactViewHolder) convertView.getTag();
         }
 
-        contactViewHolder.callButtonLayout.setOnClickListener(
-            new CallButtonClickListener(
-                    contactViewHolder.groupPosition,
-                    contactViewHolder.contactPosition));
+        contactViewHolder.groupPosition = groupPosition;
+        contactViewHolder.contactPosition = childPosition;
 
         MetaContact metaContact
             = (MetaContact) getChild(groupPosition, childPosition);
@@ -600,23 +601,28 @@ public class ContactListAdapter
         return true;
     }
 
+    /**
+     * We keep one instance of call button listener to avoid unnecessary
+     * allocations. Clicked positions are obtained from the view holder.
+     */
+    private final CallButtonClickListener callButtonListener
+        = new CallButtonClickListener();
+
     private class CallButtonClickListener
     implements View.OnClickListener
     {
-        private int groupPosition;
-        private int childPosition;
-
-        public CallButtonClickListener( int groupPosition,
-                                        int childPosition)
-        {
-            this.groupPosition = groupPosition;
-            this.childPosition = childPosition;
-        }
-
         public void onClick(View view)
         {
+            if(!(view.getTag() instanceof ContactViewHolder))
+            {
+                return;
+            }
+
+            ContactViewHolder viewHolder = (ContactViewHolder) view.getTag();
+
             MetaContact metaContact
-                = (MetaContact) getChild(groupPosition, childPosition);
+                = (MetaContact) getChild( viewHolder.groupPosition,
+                                          viewHolder.contactPosition);
 
             if (metaContact != null)
                 AndroidCallUtil
