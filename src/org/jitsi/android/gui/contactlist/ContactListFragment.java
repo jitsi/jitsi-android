@@ -424,7 +424,14 @@ public class ContactListFragment
     {
         Intent chatIntent = ChatSessionManager.getChatIntent(metaContact);
 
-        getActivity().startActivity(chatIntent);
+        if(chatIntent != null)
+        {
+            getActivity().startActivity(chatIntent);
+        }
+        else
+        {
+            logger.warn("Failed to start chat with " + metaContact);
+        }
     }
 
     /**

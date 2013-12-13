@@ -292,8 +292,7 @@ public class AndroidLoginRenderer
             JitsiApplication.getResString(R.string.app_name),
             protocolProvider.getAccountID().getAccountAddress()
                 + " " + status,
-            date,
-            JitsiApplication.getHomeScreenActivityClass());
+            date);
     }
 
     /**

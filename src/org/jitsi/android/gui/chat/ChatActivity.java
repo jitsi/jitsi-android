@@ -97,6 +97,10 @@ public class ChatActivity
 
         if(chatPagerAdapter != null)
             chatPagerAdapter.dispose();
+
+        // Clear last chat intent
+        AndroidUtils.clearGeneralNotification(
+            JitsiApplication.getGlobalContext());
     }
 
     /**
@@ -212,6 +216,10 @@ public class ChatActivity
         currentChatId = chatId;
 
         ChatSessionManager.setCurrentChatId(chatId);
+
+        // Leave last chat intent by updating general notification
+        AndroidUtils.clearGeneralNotification(
+            JitsiApplication.getGlobalContext());
     }
 
     /**
@@ -276,6 +284,7 @@ public class ChatActivity
             chatPagerAdapter.removeChatSession(selectedChat);
             if (chatPagerAdapter.getCount() <= 0)
             {
+                setCurrentChatId(null);
                 startActivity(JitsiApplication.getHomeIntent());
             }
             else
@@ -288,6 +297,7 @@ public class ChatActivity
 
         case R.id.close_all_chats:
 
+            setCurrentChatId(null);
             ChatSessionManager.removeAllActiveChats();
             chatPagerAdapter.removeAllChatSessions();
             startActivity(JitsiApplication.getHomeIntent());

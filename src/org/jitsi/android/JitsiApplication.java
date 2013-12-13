@@ -21,7 +21,9 @@ import org.jitsi.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.LauncherActivity;
 import org.jitsi.android.gui.account.*;
+import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.gui.util.*;
+import org.jitsi.service.configuration.*;
 import org.jitsi.service.log.*;
 import org.jitsi.service.osgi.*;
 import org.osgi.framework.*;
@@ -40,6 +42,13 @@ public class JitsiApplication
      */
     private static final Logger logger
             = Logger.getLogger(JitsiApplication.class);
+
+    /**
+     * Name of config property that indicates whether foreground icon should be
+     * displayed.
+     */
+    public static final String SHOW_ICON_PROPERTY_NAME
+        = "org.jitsi.android.show_icon";
 
     /**
      * The EXIT action name that is broadcasted to all OSGiActivities
@@ -263,15 +272,44 @@ public class JitsiApplication
     }
 
     /**
-     * Creates home activity pending <tt>Intent</tt>.
-     * @return new home activity pending <tt>Intent</tt>.
+     * Creates pending <tt>Intent</tt> to be started, when Jitsi icon is
+     * clicked.
+     * @return new pending <tt>Intent</tt> to be started, when Jitsi icon is
+     *         clicked.
      */
-    public static PendingIntent getHomePendingIntent()
+    public static PendingIntent getJitsiIconIntent()
     {
+        Intent intent = ChatSessionManager.getLastChatIntent();
+
+        if(intent == null)
+        {
+            intent = getHomeIntent();
+        }
+
         return PendingIntent.getActivity(
                 getGlobalContext(), 0,
-                getHomeIntent(),
+                intent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    /**
+     * Returns <tt>ConfigurationService</tt> instance.
+     * @return <tt>ConfigurationService</tt> instance.
+     */
+    public static ConfigurationService getConfig()
+    {
+        return ServiceUtils.getService(
+            AndroidGUIActivator.bundleContext,
+            ConfigurationService.class);
+    }
+
+    /**
+     * Returns <tt>true</tt> if Jitsi notification icon should be displayed.
+     * @return <tt>true</tt> if Jitsi notification icon should be displayed.
+     */
+    public static boolean isIconEnabled()
+    {
+        return getConfig().getBoolean(SHOW_ICON_PROPERTY_NAME, true);
     }
 
     /**
@@ -301,10 +339,10 @@ public class JitsiApplication
      */
     public static boolean isHomeActivityActive()
     {
-        if(currentActivity == null)
-            return false;
+        return currentActivity != null
+            && currentActivity.getClass().equals(
+                    getHomeScreenActivityClass());
 
-        return currentActivity.getClass().equals(getHomeScreenActivityClass());
     }
 
     /**

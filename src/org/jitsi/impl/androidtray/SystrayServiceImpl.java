@@ -203,6 +203,12 @@ public class SystrayServiceImpl
                 {
                     targetIntent
                         = ChatSessionManager.getChatIntent(metaContact);
+
+                    if(targetIntent == null)
+                    {
+                        logger.error(
+                            "Failed to create chat with " + metaContact);
+                    }
                 }
                 else
                 {

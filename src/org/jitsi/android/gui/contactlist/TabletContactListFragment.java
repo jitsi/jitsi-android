@@ -13,7 +13,9 @@ import android.widget.*;
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.util.*;
 import org.jitsi.*;
+import org.jitsi.android.*;
 import org.jitsi.android.gui.chat.*;
+import org.jitsi.android.gui.util.*;
 
 /**
  * On tablet contact list fragment is also responsible for managing current chat
@@ -65,8 +67,8 @@ public class TabletContactListFragment
                 }
                 else
                 {
-                    logger.warn("Chat for given session: "
-                                    + intentChatId + "- no longer exists");
+                    logger.warn("Chat for given session id: "
+                                    + intentChatId + " - no longer exists");
                 }
             }
         }
@@ -133,7 +135,19 @@ public class TabletContactListFragment
             = (ChatSession) ChatSessionManager
                 .findChatForContact(metaContact.getDefaultContact(), true);
 
-        selectChatSession(chatSession, false);
+        if(chatSession != null)
+        {
+            selectChatSession(chatSession, false);
+
+            // Leave last chat intent by updating general notification
+            AndroidUtils.clearGeneralNotification(
+                JitsiApplication.getGlobalContext());
+        }
+        else
+        {
+            logger.warn(
+                "Failed to start chat with contact " + metaContact);
+        }
     }
 
     /**
@@ -211,6 +225,10 @@ public class TabletContactListFragment
     {
         ChatSessionManager.setCurrentChatId(null);
         currentChatId = null;
+
+        // Clears last chat intent
+        AndroidUtils.clearGeneralNotification(
+            JitsiApplication.getGlobalContext());
 
         FragmentManager fragmentManager
             = getActivity().getSupportFragmentManager();

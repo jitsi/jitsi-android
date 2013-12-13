@@ -12,13 +12,9 @@ import android.content.*;
 import android.support.v4.app.*;
 import android.os.*;
 
-import net.java.sip.communicator.util.*;
-
 import org.jitsi.*;
 import org.jitsi.android.*;
-import org.jitsi.android.gui.*;
 import org.jitsi.impl.osgi.*;
-import org.jitsi.service.configuration.*;
 
 import java.beans.*;
 
@@ -35,13 +31,6 @@ public class OSGiService
      * The ID of Jitsi notification icon
      */
     private static int GENERAL_NOTIFICATION_ID = R.string.app_name;
-
-    /**
-     * Name of config property that indicates whether foreground icon should be
-     * displayed.
-     */
-    private static final String SHOW_ICON_PROPERTY_NAME
-            = "org.jitsi.android.show_icon";
 
     /**
      * Indicates that Jitsi is running in foreground mode and it's icon is
@@ -93,9 +82,7 @@ public class OSGiService
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        int result = impl.onStartCommand(intent, flags, startId);
-
-        return result;
+        return impl.onStartCommand(intent, flags, startId);
     }
 
     /**
@@ -103,40 +90,27 @@ public class OSGiService
      */
     public void onOSGiStarted()
     {
-        if(isIconEnabled())
+        if(JitsiApplication.isIconEnabled())
         {
             showIcon();
         }
-        getConfig().addPropertyChangeListener(
-                SHOW_ICON_PROPERTY_NAME,
-                new PropertyChangeListener()
+        JitsiApplication.getConfig().addPropertyChangeListener(
+            JitsiApplication.SHOW_ICON_PROPERTY_NAME,
+            new PropertyChangeListener()
+            {
+                @Override
+                public void propertyChange(PropertyChangeEvent event)
                 {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent event)
+                    if (JitsiApplication.isIconEnabled())
                     {
-                        if(isIconEnabled())
-                        {
-                            showIcon();
-                        }
-                        else
-                        {
-                            hideIcon();
-                        }
+                        showIcon();
+                    } else
+                    {
+                        hideIcon();
                     }
-                });
+                }
+            });
         serviceStarted = true;
-    }
-
-    private ConfigurationService getConfig()
-    {
-        return ServiceUtils.getService(
-                AndroidGUIActivator.bundleContext,
-                ConfigurationService.class);
-    }
-
-    private boolean isIconEnabled()
-    {
-        return getConfig().getBoolean(SHOW_ICON_PROPERTY_NAME, true);
     }
 
     /**
@@ -146,13 +120,7 @@ public class OSGiService
     private void showIcon()
     {
         //The intent to launch when the user clicks the expanded notification
-        Intent intent
-            = new Intent(this, JitsiApplication.getHomeScreenActivityClass());
-        intent.setFlags(
-                Intent.FLAG_ACTIVITY_CLEAR_TOP
-                        | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pendIntent =
-                PendingIntent.getActivity(this, 0, intent, 0);
+        PendingIntent pendIntent = JitsiApplication.getJitsiIconIntent();
 
         Resources res = getResources();
         String title = res.getString(R.string.app_name);

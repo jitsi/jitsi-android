@@ -13,7 +13,6 @@ import net.java.sip.communicator.util.Logger;
 
 import org.jitsi.*;
 
-import android.annotation.*;
 import android.app.*;
 import android.content.*;
 import android.graphics.drawable.*;
@@ -108,34 +107,6 @@ public class AndroidUtils
     }
 
     /**
-     * Shows an alert dialog for the given context and a title given by
-     * <tt>titleId</tt> and message given by <tt>messageId</tt>.
-     *
-     * @param context the android <tt>Context</tt>
-     * @param title the title of the message
-     * @param message the message
-     * @param date the date on which the event corresponding to the notification
-     * happened
-     * @param resultActivityClass the result activity
-     *
-     * @return the identifier of this notification
-     */
-    public static int showGeneralNotification( Context context,
-                                                String title,
-                                                String message,
-                                                long date,
-                                                Class<?> resultActivityClass)
-    {
-        return updateGeneralNotification(   context,
-                                            (int)(System.currentTimeMillis()
-                                                    % Integer.MAX_VALUE),
-                                            title,
-                                            message,
-                                            date,
-                                            resultActivityClass);
-    }
-
-    /**
      * Clears the general notification.
      *
      * @param appContext the <tt>Context</tt> that will be used to create new
@@ -154,8 +125,7 @@ public class AndroidUtils
                 id,
                 appContext.getString(R.string.app_name),
                 "",
-                System.currentTimeMillis(),
-                JitsiApplication.getHomeScreenActivityClass());
+                System.currentTimeMillis());
     }
 
     /**
@@ -168,47 +138,14 @@ public class AndroidUtils
      * @param message the message
      * @param date the date on which the event corresponding to the notification
      * happened
-     * @param resultActivityClass the result activity
      *
      * @return the identifier of this notification
      */
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public static int updateGeneralNotification(Context context,
                                                 int notificationID,
                                                 String title,
                                                 String message,
-                                                long date,
-                                                Class<?> resultActivityClass)
-    {
-        Intent resultIntent = new Intent(context, resultActivityClass);
-
-        return updateGeneralNotification(
-                context, notificationID, title, message, date,
-                resultActivityClass, resultIntent);
-    }
-
-    /**
-     * Shows an alert dialog for the given context and a title given by
-     * <tt>titleId</tt> and message given by <tt>messageId</tt>.
-     *
-     * @param context the android <tt>Context</tt>
-     * @param notificationID the identifier of the notification to update
-     * @param title the title of the message
-     * @param message the message
-     * @param date the date on which the event corresponding to the notification
-     * happened
-     * @param resultActivityClass the result activity
-     *
-     * @return the identifier of this notification
-     */
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    public static int updateGeneralNotification(Context context,
-                                                int notificationID,
-                                                String title,
-                                                String message,
-                                                long date,
-                                                Class<?> resultActivityClass,
-                                                Intent resultIntent)
+                                                long date)
     {
         NotificationCompat.Builder nBuilder
             = new NotificationCompat.Builder(context)
@@ -217,9 +154,7 @@ public class AndroidUtils
             .setWhen(date)
             .setSmallIcon(R.drawable.notificationicon);
 
-        isActivityRunning(context, resultActivityClass);
-
-        nBuilder.setContentIntent(JitsiApplication.getHomePendingIntent());
+        nBuilder.setContentIntent(JitsiApplication.getJitsiIconIntent());
         NotificationManager mNotificationManager
             = (NotificationManager) context.getSystemService(
                 Context.NOTIFICATION_SERVICE);

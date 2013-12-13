@@ -68,6 +68,11 @@ public class ChatSessionManager
     private static String currentChatId;
 
     /**
+     * ID of the last chat contact uid
+     */
+    private static MetaContact lastChatContact;
+
+    /**
      * Adds an active chat.
      *
      * @param chatSession the <tt>ChatSession</tt> corresponding to the active
@@ -190,11 +195,15 @@ public class ChatSessionManager
         {
             logger.debug("Current chat with: "
                                  + currChat.getMetaContact().getDisplayName());
+            // Remember last chat contact
+            lastChatContact = currChat.getMetaContact();
         }
         else
         {
             logger.debug("Chat for id: "+chatId+" no longer exists");
             currentChatId = null;
+            // Forget last chat contact
+            lastChatContact = null;
         }
 
         // Notifies about new current chat session
@@ -318,7 +327,10 @@ public class ChatSessionManager
                 .findMetaContactByContact(contact);
 
         if(metaContact == null)
-            throw new RuntimeException("No metacontact found for "+contact);
+        {
+            logger.warn("No metacontact found for "+contact);
+            return null;
+        }
 
         ChatSession newChat = new ChatSession(metaContact);
         addActiveChat(newChat);
@@ -376,6 +388,12 @@ public class ChatSessionManager
                 = (ChatSession) findChatForContact(
                                     contact.getDefaultContact(),
                                     true);
+        if(chatSession == null)
+        {
+            logger.warn("Failed to create new chat with "+contact);
+            return null;
+        }
+
         Intent chatIntent;
         if(AndroidUtils.isTablet())
         {
@@ -394,6 +412,18 @@ public class ChatSessionManager
         chatIntent.putExtra(CHAT_IDENTIFIER, chatSession.getChatId());
 
         return chatIntent;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public static Intent getLastChatIntent()
+    {
+        if(lastChatContact == null)
+            return null;
+        else
+            return getChatIntent(lastChatContact);
     }
 
     /**
