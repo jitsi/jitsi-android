@@ -33,7 +33,7 @@ public class ContactListModel
     /**
      * The logger for this class.
      */
-    private final Logger logger = Logger.getLogger(ContactListAdapter.class);
+    private final Logger logger = Logger.getLogger(ContactListModel.class);
 
     /**
      * UI thread handler used to call all operations that access data model.
