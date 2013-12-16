@@ -98,6 +98,10 @@ public class AndroidCallListener
             restoreSpeakerPhoneStatus();
             break;
         case CallEvent.CALL_INITIATED:
+            // Stores speakerphone status to be restored after
+            // the call has ended.
+            storeSpeakerPhoneStatus();
+
             startVideoCallActivity(evt);
             break;
         case CallEvent.CALL_RECEIVED:
@@ -126,6 +130,7 @@ public class AndroidCallListener
         AudioManager audioManager = JitsiApplication.getAudioManager();
 
         this.speakerPhoneBeforeCall = audioManager.isSpeakerphoneOn();
+        logger.error("Sstoring speakphone status: "+speakerPhoneBeforeCall);
     }
 
     /**
@@ -137,6 +142,7 @@ public class AndroidCallListener
         {
             AudioManager audioManager = JitsiApplication.getAudioManager();
             audioManager.setSpeakerphoneOn(speakerPhoneBeforeCall);
+            logger.error("Restoring speakphone to: "+speakerPhoneBeforeCall);
             speakerPhoneBeforeCall = null;
         }
     }
