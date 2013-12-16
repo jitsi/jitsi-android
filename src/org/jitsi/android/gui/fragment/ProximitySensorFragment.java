@@ -7,12 +7,16 @@
 package org.jitsi.android.gui.fragment;
 
 import android.app.*;
+import android.content.*;
 import android.hardware.*;
 import android.os.*;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.*;
 import net.java.sip.communicator.util.*;
+import org.jitsi.*;
 import org.jitsi.android.*;
+import org.jitsi.service.osgi.*;
 
 import java.util.*;
 
@@ -35,19 +39,9 @@ public class ProximitySensorFragment
             = Logger.getLogger(ProximitySensorFragment.class);
 
     /**
-     * Hidden screen off lock.
-     */
-    private static final int PROXIMITY_SCREEN_OFF_WAKE_LOCK = 32;
-
-    /**
      * Proximity sensor managed used by this fragment.
      */
     private Sensor proximitySensor;
-
-    /**
-     * Instance of screen off lock managed by this fragment.
-     */
-    private PowerManager.WakeLock screenOffLock;
 
     /**
      * Unreliable sensor status flag.
@@ -101,13 +95,8 @@ public class ProximitySensorFragment
     public void onPause()
     {
         super.onPause();
-        // If the screen is on in onPause() call it means that this was caused
-        // by "home screen" button(or other system action) and we don't want
-        // to keep turning the screen on and off in this case
-        if(isScreenOff() == false)
-        {
-            JitsiApplication.getSensorManager().unregisterListener(this);
-        }
+
+        JitsiApplication.getSensorManager().unregisterListener(this);
     }
 
     /**
@@ -120,7 +109,6 @@ public class ProximitySensorFragment
 
         if(proximitySensor != null)
         {
-            screenOn();
             JitsiApplication.getSensorManager().unregisterListener(this);
             proximitySensor = null;
         }
@@ -148,31 +136,19 @@ public class ProximitySensorFragment
         }
     }
 
-    /**
-     * Returns <tt>true</tt> if screen off lock is held which means that
-     * the screen is turned off by this <tt>ProximitySensorFragment</tt>.
-     * @return <tt>true</tt> if the screen is turned off by this
-     *         <tt>ProximitySensorFragment</tt>.
-     */
-    private boolean isScreenOff()
+    private ScreenOffDialog getScreenOffDialog()
     {
-        return getScreenOffLock().isHeld();
-    }
-
-    /**
-     * Screen off lock getter.
-     * @return the screen off lock instance.
-     */
-    private PowerManager.WakeLock getScreenOffLock()
-    {
-        if(screenOffLock == null)
+        Activity activity = getActivity();
+        if(activity == null)
         {
-            this.screenOffLock
-                = JitsiApplication.getPowerManager()
-                    .newWakeLock( PROXIMITY_SCREEN_OFF_WAKE_LOCK,
-                                  "proximity_off" );
+            logger.warn("Activity was null when trying to get ScreenOffDialog");
+            return null;
         }
-        return screenOffLock;
+
+        FragmentManager fm = ((OSGiActivity)activity)
+            .getSupportFragmentManager();
+
+        return (ScreenOffDialog) fm.findFragmentByTag("screen_off_dialog");
     }
 
     /**
@@ -184,15 +160,10 @@ public class ProximitySensorFragment
         if(activity == null || sensorDisabled)
             return;
 
-        PowerManager.WakeLock screenOffLock = getScreenOffLock();
-
-        if(!screenOffLock.isHeld())
-        {
-            logger.debug("Acquire lock");
-            activity.getWindow()
-                    .addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-            screenOffLock.acquire();
-        }
+        FragmentManager fm = ((OSGiActivity)activity)
+            .getSupportFragmentManager();
+        ScreenOffDialog screenOffDialog = new ScreenOffDialog();
+        screenOffDialog.show(fm, "screen_off_dialog");
     }
 
     /**
@@ -200,24 +171,10 @@ public class ProximitySensorFragment
      */
     private void screenOn()
     {
-        PowerManager.WakeLock screenOffLock = getScreenOffLock();
-        if(!screenOffLock.isHeld())
+        ScreenOffDialog screenOffDialog = getScreenOffDialog();
+        if(screenOffDialog != null)
         {
-           return;
-        }
-
-        logger.debug("Release lock");
-        screenOffLock.release();
-
-        PowerManager pm = JitsiApplication.getPowerManager();
-        PowerManager.WakeLock onLock
-            = pm.newWakeLock(
-                PowerManager.FULL_WAKE_LOCK
-                        | PowerManager.ACQUIRE_CAUSES_WAKEUP, "full_on");
-        onLock.acquire();
-        if(onLock.isHeld())
-        {
-            onLock.release();
+            screenOffDialog.dismiss();
         }
     }
 
@@ -234,6 +191,36 @@ public class ProximitySensorFragment
         else
         {
             sensorDisabled = false;
+        }
+    }
+
+    /**
+     * Blank full screen dialog that captures all keys
+     * (BACK is what interest us the most).
+     */
+    public static class ScreenOffDialog
+        extends android.support.v4.app.DialogFragment
+    {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState)
+        {
+            setStyle(R.style.ScreenOffDialog,
+                     android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+
+            Dialog d = super.onCreateDialog(savedInstanceState);
+            d.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            d.setOnKeyListener(new DialogInterface.OnKeyListener()
+            {
+                @Override
+                public boolean onKey(DialogInterface dialog, int keyCode,
+                                     KeyEvent event)
+                {
+                    // Capture all events
+                    return true;
+                }
+            });
+
+            return d;
         }
     }
 }
