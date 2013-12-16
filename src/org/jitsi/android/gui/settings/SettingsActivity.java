@@ -359,7 +359,8 @@ public class SettingsActivity
             // Get camera from configuration
             AndroidCamera currentCamera
                 = AndroidCamera.getSelectedCameraDevInfo();
-            cameraList.setValue(currentCamera.getLocator().toString());
+            if(currentCamera != null)
+                cameraList.setValue(currentCamera.getLocator().toString());
 
             updateHwCodecStatus(currentCamera);
 

@@ -6,7 +6,8 @@
  */
 package org.jitsi.impl.neomedia.device.util;
 
-import android.hardware.*;
+import android.graphics.*;
+import android.hardware.Camera;
 import android.view.*;
 
 import org.jitsi.android.util.java.awt.*;
@@ -14,6 +15,7 @@ import org.jitsi.android.util.java.awt.*;
 import javax.media.*;
 import java.io.*;
 import java.lang.reflect.*;
+import java.util.*;
 
 /**
  * Utility methods for operations on <tt>Camera</tt> objects.
@@ -91,6 +93,47 @@ public class CameraUtils
             if (s.length() != 0)
                 s.append(", ");
             s.append(size.width).append('x').append(size.height);
+        }
+        return s.toString();
+    }
+
+    /**
+     * Returns the string representation of the formats contained in given list.
+     * @param formats the list of image formats integers defined in
+     *                <tt>ImageFormat</tt> class.
+     * @return the string representation of the formats contained in given list.
+     */
+    public static String cameraImgFormatsToString(List<Integer> formats)
+    {
+        StringBuilder s = new StringBuilder();
+
+        for (int format : formats)
+        {
+            if (s.length() != 0)
+                s.append(", ");
+            switch (format)
+            {
+                case ImageFormat.YV12:
+                    s.append("YV12");
+                    break;
+                case ImageFormat.NV21:
+                    s.append("NV21");
+                    break;
+                case ImageFormat.JPEG:
+                    s.append("JPEG");
+                    break;
+                case ImageFormat.NV16:
+                    s.append("NV16");
+                    break;
+                case ImageFormat.RGB_565:
+                    s.append("RGB_565");
+                    break;
+                case ImageFormat.YUY2:
+                    s.append("YUY2");
+                    break;
+                default:
+                    s.append("?");
+            }
         }
         return s.toString();
     }

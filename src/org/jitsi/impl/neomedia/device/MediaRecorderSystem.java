@@ -6,7 +6,6 @@
  */
 package org.jitsi.impl.neomedia.device;
 
-import java.io.*;
 import java.util.*;
 import java.util.List;
 
@@ -245,28 +244,5 @@ public class MediaRecorderSystem
             for (CaptureDeviceInfo captureDevice : captureDevices)
                 CaptureDeviceManager.addDevice(captureDevice);
         }
-    }
-
-    /**
-     * Obtains an audio input stream from the URL provided.
-     * @param url a valid url to a sound resource.
-     * @return the input stream to audio data.
-     * @throws java.io.IOException if an I/O exception occurs
-     */
-    public InputStream getAudioInputStream(String url)
-        throws IOException
-    {
-        return AudioStreamUtils.getAudioInputStream(url);
-    }
-
-    /**
-     * Returns the audio format for the <tt>InputStream</tt>. Or null
-     * if format cannot be obtained.
-     * @param audioInputStream the input stream.
-     * @return the format of the audio stream.
-     */
-    public Format getFormat(InputStream audioInputStream)
-    {
-        return AudioStreamUtils.getFormat(audioInputStream);
     }
 }

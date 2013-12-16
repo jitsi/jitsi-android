@@ -123,6 +123,13 @@ public class AndroidCameraSystem
             //SUPPORTED_SIZES = array;
 
             List<Integer> camFormats = params.getSupportedPreviewFormats();
+
+            logger.info(
+                "Image formats supported by "
+                    + locator.toString()
+                    + ": "
+                    + CameraUtils.cameraImgFormatsToString(camFormats));
+
             List<Format> formats = new ArrayList<Format>();
 
             // Surface format
@@ -154,7 +161,7 @@ public class AndroidCameraSystem
             }
 
             // YUV format
-            if(camFormats.contains(new Integer(ImageFormat.YV12)))
+            if(camFormats.contains(Integer.valueOf(ImageFormat.YV12)))
             {
                 // Image formats
                 for(Dimension size : sizes)
