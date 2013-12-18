@@ -349,6 +349,9 @@ public class ContactListAdapter
                 = (TextView) convertView.findViewById(R.id.statusMessage);
             contactViewHolder.avatarView
                 = (ImageView) convertView.findViewById(R.id.avatarIcon);
+	    contactViewHolder.avatarView
+		    .setOnClickListener(avatarIconClickListener);
+	    contactViewHolder.avatarView.setTag(contactViewHolder);
             contactViewHolder.statusView
                 = (ImageView) convertView.findViewById(R.id.contactStatusIcon);
             contactViewHolder.callButton
