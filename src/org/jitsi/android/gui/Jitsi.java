@@ -52,13 +52,13 @@ public class Jitsi
      * The action that will show chat with contact given
      * in <tt>CONTACT_EXTRA</tt>.
      */
-    public static final String ACTION_SHOW_CHAT ="org.jitsi.show_chat";
+    //public static final String ACTION_SHOW_CHAT ="org.jitsi.show_chat";
 
     /**
      * Contact argument used to show the chat.
      * It must be the <tt>MetaContact</tt> UID string.
      */
-    public static final String CONTACT_EXTRA = "org.jitsi.chat.contact";
+    //public static final String CONTACT_EXTRA = "org.jitsi.chat.contact";
 
     /**
      * A call back parameter.
@@ -70,6 +70,7 @@ public class Jitsi
      * the case of a tablet interface.
      */
     private ContactListFragment contactListFragment;
+    private MenuItem searchItem;
 
     /**
      * Called when the activity is starting. Initializes the corresponding
@@ -129,7 +130,7 @@ public class Jitsi
         SearchManager searchManager
             = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 
-        MenuItem searchItem = menu.findItem(R.id.search);
+        this.searchItem = menu.findItem(R.id.search);
 
         // OnActionExpandListener not supported prior API 14
         if(AndroidUtils.hasAPI(14))
@@ -254,7 +255,24 @@ public class Jitsi
                 .commit();
     }
 
-    public void filterContactList(String query)
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        // Restore search state based on entered text
+        if(searchItem != null)
+        {
+            SearchView searchView = (SearchView) searchItem.getActionView();
+            int id = searchView.getContext().getResources()
+                .getIdentifier("android:id/search_src_text", null, null);
+            TextView textView = (TextView) searchView.findViewById(id);
+
+            filterContactList(textView.getText().toString());
+        }
+    }
+
+    private void filterContactList(String query)
     {
         contactListFragment.filterContactList(query);
     }

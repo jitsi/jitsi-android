@@ -49,8 +49,7 @@
             android:background="@anim/background_fadein"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:clickable="true"
-            android:onClick="onCallContactClicked">
+            android:clickable="true">
     
             <ImageView
                 android:id="@+id/buttonSeparatorView"

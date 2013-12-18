@@ -130,7 +130,7 @@ public class AndroidCallListener
         AudioManager audioManager = JitsiApplication.getAudioManager();
 
         this.speakerPhoneBeforeCall = audioManager.isSpeakerphoneOn();
-        logger.error("Sstoring speakphone status: "+speakerPhoneBeforeCall);
+        logger.debug("Storing speakerphone status: "+speakerPhoneBeforeCall);
     }
 
     /**
@@ -142,7 +142,7 @@ public class AndroidCallListener
         {
             AudioManager audioManager = JitsiApplication.getAudioManager();
             audioManager.setSpeakerphoneOn(speakerPhoneBeforeCall);
-            logger.error("Restoring speakphone to: "+speakerPhoneBeforeCall);
+            logger.debug("Restoring speakerphone to: "+speakerPhoneBeforeCall);
             speakerPhoneBeforeCall = null;
         }
     }
