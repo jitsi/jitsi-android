@@ -633,6 +633,32 @@ public class ContactListAdapter
         }
     }
 
+    private class AvatarIconClickListener implements View.OnClickListener
+    {
+	public void onClick(View view)
+	{
+	    if (!(view.getTag() instanceof ContactViewHolder))
+	    {
+		return;
+	    }
+
+	    ContactViewHolder viewHolder = (ContactViewHolder) view.getTag();
+
+	    MetaContact metaContact =
+		    (MetaContact) getChild(viewHolder.groupPosition,
+			    viewHolder.contactPosition);
+
+	    if (metaContact != null)
+	    {
+		String contactAddress =
+			metaContact.getDefaultContact().getAddress();
+		// make toast, show contact details
+		Toast.makeText(contactListFragment.getActivity(),
+			contactAddress, Toast.LENGTH_SHORT).show();
+	    }
+	}
+    }
+
     private boolean isContactSelected(MetaContact metaContact)
     {
         return ChatSessionManager.getCurrentChatId() != null
