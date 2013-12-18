@@ -608,6 +608,9 @@ public class ContactListAdapter
     private final CallButtonClickListener callButtonListener
         = new CallButtonClickListener();
 
+    private final AvatarIconClickListener avatarIconClickListener =
+	    new AvatarIconClickListener();
+
     private class CallButtonClickListener
     implements View.OnClickListener
     {
