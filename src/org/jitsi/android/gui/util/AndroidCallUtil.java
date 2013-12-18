@@ -8,15 +8,19 @@ package org.jitsi.android.gui.util;
 
 import java.util.*;
 
-import org.jitsi.*;
-
 import android.content.*;
 import android.view.*;
 import android.widget.*;
+
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.account.*;
 import net.java.sip.communicator.util.call.*;
+
+import org.jitsi.*;
+import org.jitsi.android.*;
+import org.jitsi.android.gui.*;
+import org.jitsi.android.gui.call.*;
 
 /**
  * 
@@ -29,6 +33,11 @@ public class AndroidCallUtil
      */
     private final static Logger logger
         = Logger.getLogger(AndroidCallUtil.class);
+
+    /**
+     * Field used to track the thread used to create outgoing calls.
+     */
+    private static Thread createCallThread;
 
     /**
      * Creates an android call.
@@ -80,7 +89,26 @@ public class AndroidCallUtil
                                     final String destination,
                                     final ProtocolProviderService provider)
     {
-        new Thread()
+        if(createCallThread != null)
+        {
+            logger.warn("Another call is already being created");
+            return;
+        }
+        else if(CallManager.getActiveCallsCount() > 0)
+        {
+            logger.warn("Another call is in progress");
+            return;
+        }
+
+        final long dialogId
+            = ProgressDialogFragment.showProgressDialog(
+                    JitsiApplication.getResString(
+                        R.string.service_gui_OUTGOING_CALL),
+                    JitsiApplication.getResString(
+                        R.string.service_gui_OUTGOING_CALL_MSG,
+                        destination));
+
+        createCallThread = new Thread()
         {
             public void run()
             {
@@ -96,8 +124,16 @@ public class AndroidCallUtil
                             context.getString(R.string.service_gui_ERROR),
                             t.getMessage());
                 }
+                finally
+                {
+                    createCallThread = null;
+                    DialogActivity.closeDialog(
+                        JitsiApplication.getGlobalContext(), dialogId);
+                }
             }
-        }.start();
+        };
+
+        createCallThread.start();
     }
 
 

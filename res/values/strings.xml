@@ -76,6 +76,8 @@
     <string name="service_gui_IGNORE">Ignore</string>
     <string name="service_gui_LAST_MSG_CORRECTION">Last message correction</string>
     <string name="service_gui_NOT_AUTHORIZED">Not authorized</string>
+    <string name="service_gui_OUTGOING_CALL">Outgoing call</string>
+    <string name="service_gui_OUTGOING_CALL_MSG">Connecting with %s…</string>
     <string name="service_gui_TYPE_YOUR_REQUEST">Type your request here</string>
     <string name="service_gui_REQUEST">Request</string>
     <string name="service_gui_REQUEST_AUTHORIZATION">Request authorization</string>

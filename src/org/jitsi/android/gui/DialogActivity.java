@@ -15,6 +15,7 @@ import org.jitsi.R;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.service.osgi.*;
 
+import java.io.*;
 import java.util.*;
 
 /**
@@ -50,6 +51,11 @@ public class DialogActivity
     public static final String EXTRA_CONFRIM_TXT="confirm_txt";
 
     /**
+     * Dialog id extra used to listen for close dialog broadcast intents.
+     */
+    private static final String EXTRA_DIALOG_ID="dialog_id";
+
+    /**
      * Optional listener ID extra(can be supplied only using method static
      * <tt>showConfirmDialog</tt>.
      */
@@ -65,6 +71,17 @@ public class DialogActivity
      * Optional content fragment's argument <tt>Bundle</tt>.
      */
     public static final String EXTRA_CONTENT_ARGS = "fragment_args";
+
+    /**
+     * Prevents from closing this activity on outside touch events and blocks
+     * the back key if set to <tt>true</tt>.
+     */
+    public static final String EXTRA_CANCELABLE = "cancelable";
+
+    /**
+     * Hide all buttons.
+     */
+    public static final String EXTRA_REMOVE_BUTTONS = "remove_buttons";
 
     /**
      * Static map holds listeners for currently displayed dialogs.
@@ -92,6 +109,20 @@ public class DialogActivity
      * get recreated in future(device rotation).
      */
     private boolean flagSaved = false;
+
+    /**
+     * <tt>BroadcastReceiver</tt> that listens for close dialog action.
+     */
+    private CloseDialogListener closeIntentListener;
+
+    /**
+     * Name of the action which can be used to close dialog with given id
+     * supplied in {@link #EXTRA_DIALOG_ID}.
+     */
+    public static final String ACTION_CLOSE_DIALOG
+        = "org.jitsi.gui.close_dialog";
+
+    private boolean cancelable;
 
     /**
      * {@inheritDoc}
@@ -165,6 +196,28 @@ public class DialogActivity
         {
             this.listener = listenersMap.get(listenerID);
         }
+
+        this.cancelable = intent.getBooleanExtra(EXTRA_CANCELABLE, true);
+
+        // Prevents from closing the dialog on outside touch
+        setFinishOnTouchOutside(cancelable);
+
+        // Removes the buttons
+        if(intent.getBooleanExtra(EXTRA_REMOVE_BUTTONS, false))
+        {
+            ViewUtil.ensureVisible(content, R.id.okButton, false);
+            ViewUtil.ensureVisible(content, R.id.cancelButton, false);
+        }
+
+        // Close this dialog on ACTION_CLOSE_DIALOG broadcast
+        long dialogId = intent.getLongExtra(EXTRA_DIALOG_ID, -1);
+        if(dialogId != -1)
+        {
+            this.closeIntentListener
+                = new CloseDialogListener(dialogId);
+            registerReceiver(closeIntentListener,
+                             new IntentFilter(ACTION_CLOSE_DIALOG));
+        }
     }
 
     /**
@@ -177,10 +230,21 @@ public class DialogActivity
         return getSupportFragmentManager().findFragmentById(R.id.alertContent);
     }
 
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event)
+    {
+        if(!cancelable && keyCode == KeyEvent.KEYCODE_BACK)
+        {
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
+    }
+
     /**
      * Fired when confirm button is clicked.
      * @param v the confirm button view.
      */
+    @SuppressWarnings("unused")
     public void onOkClicked(View v)
     {
         if(listener != null)
@@ -198,6 +262,7 @@ public class DialogActivity
      * Fired when cancel button is clicked.
      * @param v the cancel button view.
      */
+    @SuppressWarnings("unused")
     public void onCancelClicked(View v)
     {
         finish();
@@ -222,6 +287,11 @@ public class DialogActivity
     {
         super.onDestroy();
 
+        if(closeIntentListener != null)
+        {
+            unregisterReceiver(closeIntentListener);
+        }
+
         // Skip this phase in case state was saved and Activity
         // might get recreated(device rotation)
         if(flagSaved)
@@ -238,6 +308,40 @@ public class DialogActivity
         {
             listenersMap.remove(listenerID);
         }
+    }
+
+    class CloseDialogListener
+        extends BroadcastReceiver
+    {
+        private final long dialogId;
+
+        CloseDialogListener(long dialogId)
+        {
+            this.dialogId = dialogId;
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            if(intent.getLongExtra(EXTRA_DIALOG_ID, -1) == dialogId)
+            {
+                // Finish this activity
+                finish();
+            }
+        }
+    }
+
+    /**
+     * Fires {@link #ACTION_CLOSE_DIALOG} brodcast action in order to close
+     * the dialog identified by given <tt>dialogId</tt>.
+     * @param ctx the context.
+     * @param dialogId dialog identifier returned when the dialog was created.
+     */
+    public static void closeDialog(Context ctx, long dialogId)
+    {
+        Intent intent = new Intent(ACTION_CLOSE_DIALOG);
+        intent.putExtra(EXTRA_DIALOG_ID, dialogId);
+        ctx.sendBroadcast(intent);
     }
 
     /**
@@ -304,22 +408,28 @@ public class DialogActivity
      *        <tt>Bundle</tt>.
      * @param confirmTxt the confirm button's label.
      * @param listener listener that will be notified on user actions.
+     * @param extraArguments additional arguments with keys defined in
+     *                       {@link DialogActivity}.
      */
-    public static void showCustomDialog(
+    public static long showCustomDialog(
             Context context,
             String title,
             String fragmentClass,
             Bundle fragmentArguments,
             String confirmTxt,
-            DialogListener listener )
+            DialogListener listener,
+            Map<String, Serializable> extraArguments)
     {
         Intent alert = new Intent(context, DialogActivity.class);
 
+        long dialogId = System.currentTimeMillis();
+
+        alert.putExtra(EXTRA_DIALOG_ID, dialogId);
+
         if(listener != null)
         {
-            long listenerID = System.currentTimeMillis();
-            listenersMap.put(listenerID, listener);
-            alert.putExtra(EXTRA_LISTENER_ID, listenerID);
+            listenersMap.put(dialogId, listener);
+            alert.putExtra(EXTRA_LISTENER_ID, dialogId);
         }
 
         alert.putExtra(EXTRA_TITLE, title);
@@ -328,10 +438,19 @@ public class DialogActivity
         alert.putExtra(EXTRA_CONTENT_FRAGMENT, fragmentClass);
         alert.putExtra(EXTRA_CONTENT_ARGS, fragmentArguments);
 
+        if(extraArguments != null)
+        {
+            for(String key : extraArguments.keySet())
+            {
+                alert.putExtra(key, extraArguments.get(key));
+            }
+        }
 
         alert.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         context.startActivity(alert);
+
+        return dialogId;
     }
 
     /**

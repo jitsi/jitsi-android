@@ -175,7 +175,7 @@ public class AndroidSecurityAuthority
                             credentialsLock.notify();
                         }
                     }
-                });
+                }, null);
         try
         {
             synchronized (credentialsLock)

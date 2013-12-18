@@ -67,7 +67,8 @@ public class AddGroupDialog
                 null,
                 parent.getString(
                     R.string.service_gui_CREATE),
-                new DialogListenerImpl(createListener));
+                new DialogListenerImpl(createListener),
+                null);
     }
 
     /**
