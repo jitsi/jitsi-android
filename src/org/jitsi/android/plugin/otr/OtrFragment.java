@@ -6,19 +6,21 @@
  */
 package org.jitsi.android.plugin.otr;
 
+import android.app.*;
 import android.content.*;
 import android.view.*;
 
 import net.java.otr4j.*;
-import net.java.otr4j.session.*;
 
 import net.java.sip.communicator.plugin.otr.*;
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.gui.*;
 import net.java.sip.communicator.service.protocol.*;
 
+import net.java.sip.communicator.util.*;
 import org.jitsi.*;
 import org.jitsi.android.*;
+import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.gui.settings.*;
 import org.jitsi.service.osgi.*;
@@ -36,6 +38,11 @@ public class OtrFragment
     extends OSGiFragment
     implements ChatSessionManager.CurrentChatListener
 {
+    /**
+     * The logger
+     */
+    private final static Logger logger = Logger.getLogger(OtrFragment.class);
+
     /**
      * Menu instance used to control the padlock.
      */
@@ -95,6 +102,22 @@ public class OtrFragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         super.onCreateOptionsMenu(menu, inflater);
+
+        // (OtrActivator.scOtrEngine == null)
+        // This happens when Activity is recreated by the system after OSGi
+        // service has been killed(and the whole process)
+        if(AndroidGUIActivator.bundleContext == null)
+        {
+            logger.error("OSGi service probably not initialized" +
+                             ", finishing the activity");
+            Activity activity = getActivity();
+            if(activity != null)
+            {
+                startActivity(JitsiApplication.getHomeIntent());
+                activity.finish();
+            }
+            return;
+        }
 
         // Append OTR items
         inflater.inflate(R.menu.otr_menu, menu);
