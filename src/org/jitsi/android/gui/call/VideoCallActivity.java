@@ -151,6 +151,7 @@ public class VideoCallActivity
 
         callConference = call.getConference();
 
+        initSpeakerphoneButton();
         initMicrophoneView();
         initHangupView();
 
@@ -336,6 +337,24 @@ public class VideoCallActivity
             microphoneButton.setImageResource(
                     R.drawable.callmicrophone);
         }
+    }
+
+    /**
+     * Initializes speakerphone button.
+     */
+    private void initSpeakerphoneButton()
+    {
+        View speakerphoneButton = findViewById(R.id.speakerphoneButton);
+        speakerphoneButton.setOnLongClickListener(
+            new View.OnLongClickListener()
+        {
+            @Override
+            public boolean onLongClick(View v)
+            {
+                onCallVolumeClicked(v);
+                return true;
+            }
+        });
     }
 
     /**
@@ -1046,9 +1065,9 @@ public class VideoCallActivity
     private void setPadlockSecure(boolean isSecure)
     {
         ViewUtil.setImageViewIcon(
-                findViewById(R.id.videoCallLayout),
-                R.id.security_padlock,
-                isSecure ? R.drawable.secure_on : R.drawable.secure_off);
+            findViewById(R.id.videoCallLayout),
+            R.id.security_padlock,
+            isSecure ? R.drawable.secure_on : R.drawable.secure_off);
     }
 
     /**
