@@ -102,6 +102,7 @@
     <string name="service_gui_REMOVE_ACCOUNT_MESSAGE">
         Are you sure you want to remove %s?
     </string>
+    <string name="service_gui_VOLUME_GAIN_LEVEL">Volume gain level: %s%%</string>
 
     <!-- Sign in -->
     <string name="service_gui_SIGN_IN">Sign in</string>

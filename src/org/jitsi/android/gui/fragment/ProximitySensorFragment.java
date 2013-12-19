@@ -215,14 +215,7 @@ public class ProximitySensorFragment
                 public boolean onKey(DialogInterface dialog, int keyCode,
                                      KeyEvent event)
                 {
-                    // Do not catch volume buttons
-                    if(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN
-                        || keyCode == KeyEvent.KEYCODE_VOLUME_UP
-                        || keyCode == KeyEvent.KEYCODE_VOLUME_MUTE)
-                    {
-                        return false;
-                    }
-                    // Capture all other events
+                    // Capture all events
                     return true;
                 }
             });

@@ -14,7 +14,7 @@ import android.content.*;
 import android.graphics.Color;
 import android.media.*;
 import android.os.*;
-import android.support.v4.app.DialogFragment;
+import android.support.v4.app.*;
 import android.view.*;
 import android.view.Menu; // Disambiguation
 import android.view.MenuItem; // Disambiguation
@@ -86,6 +86,11 @@ public class VideoCallActivity
     private static final long AUTO_HIDE_DELAY = 5000;
 
     /**
+     * Tag for call volume control fragment.
+     */
+    private static final String VOLUME_CTRL_TAG = "call_volume_ctrl";
+
+    /**
      * The call peer adapter that gives us access to all call peer events.
      */
     private CallPeerAdapter callPeerAdapter;
@@ -119,6 +124,11 @@ public class VideoCallActivity
      * Auto-hide controller fragment for call control buttons.
      */
     private AutoHideController autoHide;
+
+    /**
+     * Call volume control fragment instance.
+     */
+    private CallVolumeCtrlFragment volControl;
 
     /**
      * Called when the activity is starting. Initializes the corresponding
@@ -194,12 +204,15 @@ public class VideoCallActivity
                 videoFragment = new VideoHandlerFragment();
             }
 
+            volControl = new CallVolumeCtrlFragment();
+
             /**
              * Adds fragment that turns on and off the screen when proximity
              * sensor detects FAR/NEAR distance.
              */
             getSupportFragmentManager()
                     .beginTransaction()
+                    .add(volControl, VOLUME_CTRL_TAG)
                     .add(new ProximitySensorFragment(), PROXIMITY_FRAGMENT_TAG)
                     /* Adds the fragment that handles video display logic */
                     .add(videoFragment, VIDEO_FRAGMENT_TAG)
@@ -209,9 +222,14 @@ public class VideoCallActivity
         }
         else
         {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+
             // Retrieve restored auto hide fragment
             autoHide = (AutoHideController)
-                getSupportFragmentManager().findFragmentByTag(AUTO_HIDE_TAG);
+                fragmentManager.findFragmentByTag(AUTO_HIDE_TAG);
+
+            volControl = (CallVolumeCtrlFragment)
+                fragmentManager.findFragmentByTag(VOLUME_CTRL_TAG);
         }
     }
 
@@ -418,19 +436,13 @@ public class VideoCallActivity
             case KeyEvent.KEYCODE_VOLUME_UP:
                 if (action == KeyEvent.ACTION_UP)
                 {
-                    ((AudioManager)getSystemService(Context.AUDIO_SERVICE))
-                            .adjustStreamVolume(AudioManager.STREAM_VOICE_CALL,
-                                                AudioManager.ADJUST_RAISE,
-                                                AudioManager.FLAG_SHOW_UI);
+                    volControl.onKeyVolUp();
                 }
                 return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 if (action == KeyEvent.ACTION_DOWN)
                 {
-                    ((AudioManager)getSystemService(Context.AUDIO_SERVICE))
-                            .adjustStreamVolume(AudioManager.STREAM_VOICE_CALL,
-                                                AudioManager.ADJUST_LOWER,
-                                                AudioManager.FLAG_SHOW_UI);
+                    volControl.onKeyVolDown();
                 }
                 return true;
             default:
