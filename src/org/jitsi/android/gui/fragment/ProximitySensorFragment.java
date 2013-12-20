@@ -208,7 +208,8 @@ public class ProximitySensorFragment
                      android.R.style.Theme_Black_NoTitleBar_Fullscreen);
 
             Dialog d = super.onCreateDialog(savedInstanceState);
-            d.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            d.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN
+                                   | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             d.setOnKeyListener(new DialogInterface.OnKeyListener()
             {
                 @Override

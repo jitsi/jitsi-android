@@ -111,6 +111,18 @@
     <string name="service_gui_LOGIN_FAILED">
         Login failed
     </string>
+    <string name="service_gui_LOGIN_NETWORK_ERROR">
+        Unable to log in with account: User name: {0}, Server name: {1}, due to a network failure. Please check your network connection.
+    </string>
+    <string name="service_gui_LOGIN_GENERAL_ERROR">
+        An error occurred while logging in with account: User name: {0}, Server name: {1}:{2}.
+    </string>
+    <string name="service_gui_LOGIN_INTERNAL_ERROR">
+        An error occurred while logging in with account: User name: {0}, Server name: {1}. This is most probably an internal application error. Please report the problem to our developers mailing list (dev@jitsi.java.net).
+    </string>
+    <string name="service_gui_LOGIN_INVALID_PROPERTIES_ERROR">
+        Unable to log in with account: User name: {0}, Server name: {1}, due to an account configuration problem. Please check your account configuration.
+    </string>
     <string name="service_gui_USERNAME_NULL">
         Please fill your username and password.
     </string>
@@ -543,6 +555,35 @@
     <string name="service_gui_CONTINUE">Continue</string>
     <string name="service_gui_SHOW_CERT">Show Certificate</string>
     <string name="service_gui_HIDE_CERT">Hide Certificate</string>
+
+    <!-- ZRTP -->
+    <string name="impl_media_security_WARNING_NO_RS_MATCH">
+        &lt;html>No retained shared secret available.&lt;br/>&lt;b>SAS verification is recommended&lt;/b>&lt;/html>
+    </string>
+    <string name="impl_media_security_WARNING_NO_EXPECTED_RS_MATCH">
+        &lt;html>An expected retained shared secret is missing.&lt;br/>&lt;b>SAS verification is required&lt;/b>&lt;br/>If SAS codes do not match then hangup and try again&lt;/html>
+    </string>
+    <string name="impl_media_security_SEVERE_GENERIC_MSG">
+        &lt;html>A severe security problem was detected.&lt;br/>&lt;b>Your call is not secure&lt;/b>&lt;br/>Error code: {0}&lt;/html>
+    </string>
+    <string name="impl_media_security_INTERNAL_PROTOCOL_ERROR">
+        &lt;html>Internal protocol error occurred.&lt;br/>&lt;b>Your call is not secure&lt;/b>&lt;br/>Error code: {0}&lt;/html>
+    </string>
+    <string name="impl_media_security_CHECKSUM_MISMATCH">
+        &lt;html>Internal ZRTP packet checksum mismatch.&lt;br/>If you see this message often this may mean a denial-of-service attack!&lt;/html>
+    </string>
+    <string name="impl_media_security_RETRY_RATE_EXCEEDED">
+        &lt;html>Too much retries during security negotiation. This may mean that the other party has internet connection problems.&lt;br/>&lt;b>Your call is not secure&lt;/b>&lt;br/>Error code: {0}&lt;/html>
+    </string>
+    <string name="impl_media_security_DATA_SEND_FAILED">
+        &lt;html>Failed to send encryption data. Internet data connection or peer is down.&lt;br/>&lt;b>Your call is not secure&lt;/b>&lt;br/>Error code: {0}&lt;/html>
+    </string>
+    <string name="impl_media_security_SECURITY_OFF">
+        Call encryption support off
+    </string>
+    <string name="impl_media_security_SECURITY_ON">
+        Call encryption support on
+    </string>
 
     <!-- Settings -->
     <string name="service_gui_SETTINGS_NOT_SET">(Not set)</string>

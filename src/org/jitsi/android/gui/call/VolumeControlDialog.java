@@ -14,7 +14,6 @@ import org.jitsi.impl.neomedia.*;
 import org.jitsi.service.neomedia.*;
 import org.jitsi.service.neomedia.event.*;
 import org.jitsi.service.osgi.*;
-import org.osgi.framework.*;
 
 /**
  * The dialog allows user to manipulate input or output volume gain level. To
@@ -55,10 +54,9 @@ public class VolumeControlDialog
      * {@inheritDoc}
      */
     @Override
-    public void start(BundleContext bundleContext)
-            throws Exception
+    public void onActivityCreated(Bundle savedInstanceState)
     {
-        super.start(bundleContext);
+        super.onActivityCreated(savedInstanceState);
 
         MediaServiceImpl mediaService = NeomediaActivator.getMediaServiceImpl();
 
@@ -83,9 +81,9 @@ public class VolumeControlDialog
      * {@inheritDoc}
      */
     @Override
-    public void onStart()
+    public void onResume()
     {
-        super.onStart();
+        super.onResume();
 
         volumeControl.addVolumeChangeListener(this);
 
@@ -100,11 +98,11 @@ public class VolumeControlDialog
      * {@inheritDoc}
      */
     @Override
-    public void onStop()
+    public void onPause()
     {
-        volumeControl.removeVolumeChangeListener(this);
+        super.onPause();
 
-        super.onStop();
+        volumeControl.removeVolumeChangeListener(this);
     }
 
     /**
