@@ -104,6 +104,8 @@ public class ContactListAdapter
      */
     public void dispose()
     {
+        notifyDataSetInvalidated();
+
         contactListModel.dispose();
     }
 

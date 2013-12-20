@@ -84,24 +84,12 @@ public class ContactListFragment
 
         contactListView = (ExpandableListView) content
                 .findViewById(R.id.contactListView);
-
-        contactListModel = new ContactListModel();
-        this.contactListAdapter
-            = new ContactListAdapter(this, contactListModel);
-        contactListModel.setAdapter(contactListAdapter);
-        contactListView.setAdapter(contactListAdapter);
         contactListView.setSelector(R.drawable.contact_list_selector);
         contactListView.setOnChildClickListener(this);
         contactListView.setOnGroupClickListener(this);
+
         // Adds context menu for contact list items
         registerForContextMenu(contactListView);
-
-        // If the MetaContactListService is already available we need to
-        // initialize the adapter.
-        if (!contactListAdapter.isInitialized())
-        {
-            contactListAdapter.initAdapterData();
-        }
 
         return content;
     }
@@ -114,6 +102,18 @@ public class ContactListFragment
     {
         super.onResume();
 
+        contactListModel = new ContactListModel();
+        this.contactListAdapter
+            = new ContactListAdapter(this, contactListModel);
+        contactListModel.setAdapter(contactListAdapter);
+        contactListView.setAdapter(contactListAdapter);
+        // If the MetaContactListService is already available we need to
+        // initialize the adapter.
+        if (!contactListAdapter.isInitialized())
+        {
+            contactListAdapter.initAdapterData();
+        }
+
         // Update active chats
         contactListAdapter.invalidateViews();
     }
@@ -122,14 +122,19 @@ public class ContactListFragment
      * {@inheritDoc}
      */
     @Override
-    public void onDestroy()
+    public void onPause()
     {
+        super.onPause();
+
         if(contactListAdapter != null)
         {
             contactListAdapter.dispose();
-        }
 
-        super.onDestroy();
+            contactListView.setAdapter((ExpandableListAdapter)null);
+
+            contactListAdapter = null;
+            contactListModel = null;
+        }
     }
 
     /**
