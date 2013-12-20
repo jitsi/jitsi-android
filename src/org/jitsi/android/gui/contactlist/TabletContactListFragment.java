@@ -37,6 +37,12 @@ public class TabletContactListFragment
      */
     private String currentChatId;
 
+    /**
+     * Indicates that we should scroll the contact list on resume.
+     * This is one time action in response to the chat intent.
+     */
+    private boolean scrollToContact=true;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
@@ -63,7 +69,10 @@ public class TabletContactListFragment
                     = ChatSessionManager.getActiveChat(intentChatId);
                 if(intentChat != null)
                 {
-                    selectChatSession(intentChat, true);
+                    selectChatSession(intentChat);
+                    // Want to scroll the contact list to started chat
+                    // in response to chat intent
+                    scrollToContact = true;
                 }
                 else
                 {
@@ -81,10 +90,8 @@ public class TabletContactListFragment
      * fragment will be selected or new <tt>ChatActivity</tt> will be started.
      *
      * @param currentChat current chat session to be selected.
-     * @param scroll indicates whether view should be scrolled to show
-     *               chat contact.
      */
-    private void selectChatSession(ChatSession currentChat, boolean scroll)
+    private void selectChatSession(ChatSession currentChat)
     {
         currentChatId = currentChat.getChatId();
 
@@ -97,32 +104,6 @@ public class TabletContactListFragment
             .replace(R.id.chatView, chatTabletFragment)
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .commit();
-
-        if(!scroll)
-            return;
-
-        // Select current chat contact
-        MetaContact chatContact = currentChat.getMetaContact();
-
-        int groupIndex
-            = contactListModel.getGroupIndex(
-                    chatContact.getParentMetaContactGroup());
-        if(groupIndex < 0)
-        {
-            logger.warn("No group found for chat contact: " + chatContact);
-            return;
-        }
-
-        int contactIndex
-            = contactListModel.getChildIndex(groupIndex, chatContact);
-        if(contactIndex < 0)
-        {
-            logger.warn(chatContact + " not found in group " + groupIndex);
-            return;
-        }
-
-        ExpandableListView contactListView = getContactListView();
-        contactListView.setSelectedChild(groupIndex, contactIndex, true);
     }
 
     /**
@@ -137,7 +118,7 @@ public class TabletContactListFragment
 
         if(chatSession != null)
         {
-            selectChatSession(chatSession, false);
+            selectChatSession(chatSession);
 
             // Leave last chat intent by updating general notification
             AndroidUtils.clearGeneralNotification(
@@ -164,7 +145,42 @@ public class TabletContactListFragment
         ChatSession session
             = ChatSessionManager.getActiveChat(currentChatId);
         if(session == null)
+        {
             hideChatFragment();
+
+        }
+        else if(scrollToContact)
+        {
+            scrollToChatContact(session.getMetaContact());
+        }
+        scrollToContact = false;
+    }
+
+    /**
+     * Functions scrolls the contact list to given <tt>chatContact</tt>
+     * @param chatContact the <tt>MetaContact</tt> to scroll the list to.
+     */
+    private void scrollToChatContact(MetaContact chatContact)
+    {
+        int groupIndex
+            = contactListModel.getGroupIndex(
+                    chatContact.getParentMetaContactGroup());
+        if(groupIndex < 0)
+        {
+            logger.warn("No group found for chat contact: " + chatContact);
+            return;
+        }
+
+        int contactIndex
+            = contactListModel.getChildIndex(groupIndex, chatContact);
+        if(contactIndex < 0)
+        {
+            logger.warn(chatContact + " not found in group " + groupIndex);
+            return;
+        }
+
+        ExpandableListView contactListView = getContactListView();
+        contactListView.setSelectedChild(groupIndex, contactIndex, true);
     }
 
     /**
