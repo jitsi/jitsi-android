@@ -106,6 +106,12 @@ public class ChatSession
         currentChatTransport = metaContact.getDefaultContact(
             OperationSetBasicInstantMessaging.class);
 
+        // Prevent from creating chats without the chat op set.
+        if(currentChatTransport == null)
+        {
+            throw new NullPointerException();
+        }
+
         Iterator<Contact> protoContacts = metaContact.getContacts();
 
         while (protoContacts.hasNext())
@@ -886,7 +892,13 @@ public class ChatSession
      */
     public boolean allowsTypingNotifications()
     {
-        Object tnOpSet = currentChatTransport.getProtocolProvider()
+        ProtocolProviderService protocolProviderService
+            = currentChatTransport.getProtocolProvider();
+
+        if(protocolProviderService == null)
+            return false;
+
+        Object tnOpSet = protocolProviderService
                 .getOperationSet(OperationSetTypingNotifications.class);
 
         return tnOpSet != null;

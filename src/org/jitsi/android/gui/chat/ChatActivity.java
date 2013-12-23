@@ -347,8 +347,15 @@ public class ChatActivity
 
         ActionBarUtil.setTitle(this, metaContact.getDisplayName());
 
-        PresenceStatus status
-            = metaContact.getDefaultContact().getPresenceStatus();
+        Contact defaultContact = metaContact.getDefaultContact();
+        if(defaultContact == null)
+        {
+            logger.error("Can not continue without the default contact");
+            finish();
+            return;
+        }
+
+        PresenceStatus status = defaultContact.getPresenceStatus();
 
         ActionBarUtil.setSubtitle(this, status.getStatusName());
 
