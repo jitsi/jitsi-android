@@ -23,6 +23,7 @@ import org.jitsi.service.osgi.*;
 import net.java.sip.communicator.service.globaldisplaydetails.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.event.*;
+import net.java.sip.communicator.service.protocol.globalstatus.*;
 import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.account.*;
 
@@ -49,7 +50,8 @@ public class AndroidLoginRenderer
     /**
      * The android implementation of the provider presence listener.
      */
-    private ProviderPresenceStatusListener androidPresenceListener;
+    private final ProviderPresenceStatusListener androidPresenceListener
+        = new UIProviderPresenceStatusListener();
 
     /**
      * The security authority used by this login renderer.
@@ -130,8 +132,6 @@ public class AndroidLoginRenderer
 
         if (presenceOpSet != null)
         {
-            androidPresenceListener = new UIProviderPresenceStatusListener();
-
             presenceOpSet.addProviderPresenceStatusListener(
                 androidPresenceListener);
         }
@@ -157,7 +157,7 @@ public class AndroidLoginRenderer
         OperationSetPresence presenceOpSet
             = protocolProvider.getOperationSet(OperationSetPresence.class);
 
-        if (presenceOpSet != null && androidPresenceListener != null)
+        if (presenceOpSet != null)
         {
             presenceOpSet.removeProviderPresenceStatusListener(
                     androidPresenceListener);
@@ -203,11 +203,6 @@ public class AndroidLoginRenderer
         {
             presence.setAuthorizationHandler(authorizationHandler);
         }
-
-        showStatusNotification(
-            protocolProvider,
-            JitsiApplication.getResString(R.string.service_gui_ONLINE),
-            date);
 
         updateGlobalStatus();
     }
@@ -265,19 +260,25 @@ public class AndroidLoginRenderer
     }
 
     /**
-     * Shows a status notification for the given <tt>protocolProvider</tt>,
-     * <tt>status</tt> and <tt>date</tt>.
-     *
-     * @param protocolProvider the <tt>ProtocolProviderService</tt>
-     * corresponding to the account concerned by the status change
-     * @param status the new status string
-     * @param date the date on which the status change has happened
+     * Updates Jitsi icon notification to reflect current global status.
      */
-    private void showStatusNotification(
-                                    ProtocolProviderService protocolProvider,
-                                    String status,
-                                    long date)
+    public void updateJitsiIconNotification()
     {
+        String status;
+        if(getGlobalStatus().isOnline())
+        {
+            // At least one provider is online
+            status
+                = JitsiApplication.getResString(R.string.service_gui_ONLINE);
+        }
+        else
+        {
+            // There are no active providers so we consider to be in
+            // the offline state
+            status
+                = JitsiApplication.getResString(R.string.service_gui_OFFLINE);
+        }
+
         int notificationID = OSGiService.getGeneralNotificationId();
         if(notificationID == -1)
         {
@@ -290,9 +291,8 @@ public class AndroidLoginRenderer
             JitsiApplication.getGlobalContext(),
             notificationID,
             JitsiApplication.getResString(R.string.app_name),
-            protocolProvider.getAccountID().getAccountAddress()
-                + " " + status,
-            date);
+            status,
+            System.currentTimeMillis());
     }
 
     /**
@@ -321,9 +321,12 @@ public class AndroidLoginRenderer
     {
         if(globalStatus == null)
         {
-            globalStatus
-                = AndroidGUIActivator
-                        .getGlobalStatusService().getGlobalPresenceStatus();
+            GlobalStatusService gss
+                = AndroidGUIActivator.getGlobalStatusService();
+
+            globalStatus = gss != null
+                ? gss.getGlobalPresenceStatus()
+                : GlobalStatusEnum.OFFLINE;
         }
         return globalStatus;
     }
@@ -346,11 +349,6 @@ public class AndroidLoginRenderer
     {
         public void providerStatusChanged(ProviderPresenceStatusChangeEvent evt)
         {
-            showStatusNotification(
-                evt.getProvider(),
-                evt.getNewStatus().getStatusName(),
-                System.currentTimeMillis());
-
             updateGlobalStatus();
         }
 
@@ -387,6 +385,8 @@ public class AndroidLoginRenderer
             globalStatus = null;
             globalStatusListeners.notifyEventListeners(getGlobalStatus());
         }
+
+        updateJitsiIconNotification();
     }
 
     /**

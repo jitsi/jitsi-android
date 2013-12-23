@@ -14,6 +14,7 @@ import android.os.*;
 
 import org.jitsi.*;
 import org.jitsi.android.*;
+import org.jitsi.android.gui.util.*;
 import org.jitsi.impl.osgi.*;
 
 import java.beans.*;
@@ -154,6 +155,8 @@ public class OSGiService
         {
             stopForeground(true);
             running_foreground = false;
+
+            AndroidUtils.generalNotificationRemoved();
         }
     }
 

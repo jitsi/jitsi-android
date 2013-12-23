@@ -71,6 +71,11 @@ public class JitsiApplication
     private final DrawableCache drawableCache = new DrawableCache();
 
     /**
+     * Used to keep the track of GUI activity.
+     */
+    private static long lastGuiActivity;
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -321,6 +326,15 @@ public class JitsiApplication
     {
         logger.info("Current activity set to "+a);
         currentActivity = a;
+
+        if(currentActivity == null)
+        {
+            lastGuiActivity = System.currentTimeMillis();
+        }
+        else
+        {
+            lastGuiActivity = -1;
+        }
     }
 
     /**
@@ -331,6 +345,23 @@ public class JitsiApplication
     public static Activity getCurrentActivity()
     {
         return currentActivity;
+    }
+
+    /**
+     * Returns the time elapsed since last Jitsi <tt>Activity</tt> was open in
+     * milliseconds.
+     *
+     * @return the time elapsed since last Jitsi <tt>Activity</tt> was open in
+     *         milliseconds.
+     */
+    public static long getLastGuiActivityInterval()
+    {
+        // GUI is currently active
+        if(lastGuiActivity == -1)
+        {
+            return 0;
+        }
+        return System.currentTimeMillis() - lastGuiActivity;
     }
 
     /**

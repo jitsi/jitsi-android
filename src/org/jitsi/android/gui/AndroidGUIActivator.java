@@ -205,6 +205,9 @@ public class AndroidGUIActivator
      */
     public static GlobalStatusService getGlobalStatusService()
     {
+        if(bundleContext == null)
+            return null;
+
         return ServiceUtils.getService( bundleContext,
                                         GlobalStatusService.class);
     }

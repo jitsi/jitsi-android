@@ -49,6 +49,14 @@ public class AndroidUtils
     private static final int API_LEVEL = Build.VERSION.SDK_INT;
 
     /**
+     * Var used to track last Jitsi icon notification text in order to prevent
+     * from posting updates that make no sense. This will happen when providers
+     * registration state changes and global status is still the same(online or
+     * offline).
+     */
+    private static String lastNotificationText = null;
+
+    /**
      * Shows an alert dialog for the given context and a title given by
      * <tt>titleId</tt> and message given by <tt>messageId</tt>.
      *
@@ -120,12 +128,10 @@ public class AndroidUtils
             logger.warn("There's no global notification icon bound");
             return;
         }
-        AndroidUtils.updateGeneralNotification(
-                appContext,
-                id,
-                appContext.getString(R.string.app_name),
-                "",
-                System.currentTimeMillis());
+
+        AndroidGUIActivator
+            .getLoginRenderer()
+            .updateJitsiIconNotification();
     }
 
     /**
@@ -138,15 +144,20 @@ public class AndroidUtils
      * @param message the message
      * @param date the date on which the event corresponding to the notification
      * happened
-     *
-     * @return the identifier of this notification
      */
-    public static int updateGeneralNotification(Context context,
+    public static void updateGeneralNotification(Context context,
                                                 int notificationID,
                                                 String title,
                                                 String message,
                                                 long date)
     {
+        // Filter out the same subsequent notifications
+        if(lastNotificationText != null
+            && lastNotificationText.equals(message))
+        {
+            return;
+        }
+
         NotificationCompat.Builder nBuilder
             = new NotificationCompat.Builder(context)
             .setContentTitle(title)
@@ -168,7 +179,16 @@ public class AndroidUtils
         // mId allows you to update the notification later on.
         mNotificationManager.notify(notificationID, notification);
 
-        return notificationID;
+        lastNotificationText = message;
+    }
+
+    /**
+     * This can be only called by the <tt>OSGiService</tt> to notify that
+     * the notification icon is hidden.
+     */
+    public static void generalNotificationRemoved()
+    {
+        lastNotificationText = null;
     }
 
     /**
