@@ -73,8 +73,14 @@ public class AudioTrackRenderer
      * {@link BasicVolumeControl#applyGain(GainControl, byte[], int, int)} or
      * in a hardware manner using
      * {@link AudioTrack#setStereoVolume(float, float)}.
+     *
+     * Currently we use software gain control. Output volume is controlled
+     * using <tt>AudioManager</tt> by adjusting stream volume. When the minimum
+     * value is reached we keep lowering the volume using software gain control.
+     * The opposite happens for the maximum volume.
+     * See {@link org.jitsi.android.gui.fragment.CallVolumeCtrlFragment}.
      */
-    private static final boolean USE_SOFTWARE_GAIN = false;
+    private static final boolean USE_SOFTWARE_GAIN = true;
 
     static
     {
