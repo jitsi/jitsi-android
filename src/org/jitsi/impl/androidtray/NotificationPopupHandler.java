@@ -118,9 +118,15 @@ public class NotificationPopupHandler
     void fireNotificationClicked(int notificationId)
     {
         logger.debug("Notification clicked: " + notificationId);
-        PopupMessage msg
-            = notificationMap.get(notificationId).getPopupMessage();
 
+        AndroidPopup popup = notificationMap.get(notificationId);
+        if(popup == null)
+        {
+            logger.error("No valid notification exists for " + notificationId);
+            return;
+        }
+
+        PopupMessage msg = popup.getPopupMessage();
         if(msg == null)
         {
             logger.error("No popup message found for "+notificationId);
