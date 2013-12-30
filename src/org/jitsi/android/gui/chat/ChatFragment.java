@@ -411,7 +411,8 @@ public class ChatFragment
                     TypingNotificationsListener
     {
         /**
-         * The list of chat message displays.
+         * The list of chat message displays. All access and modification of
+         * this list must be done on the UI thread.
          */
         private final List<MessageDisplay> messages
                 = new ArrayList<MessageDisplay>();
@@ -447,49 +448,59 @@ public class ChatFragment
         private final Html.ImageGetter imageGetter = new HtmlImageGetter();
 
         /**
-         * Passes the message to the contained <code>ChatConversationPanel</code>
-         * for processing and appends it at the end of the conversationPanel
-         * document.
+         * Passes the message to the <tt>ChatListAdapter</tt>
+         * for processing and appends it at the end.
+         *
+         * @param newMessage the message to add.
+         * @param update if set to <tt>true</tt> will notify the UI about update
+         *               immediately.
+         */
+        public void addMessage( final ChatMessage newMessage,
+                                final boolean update )
+        {
+            runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    addMessageImpl(newMessage, update);
+                }
+            });
+        }
+
+        /**
+         * This method must be called on the UI thread(as well as any other that
+         * access the {@link #messages} list).
          *
          */
-        public void addMessage( ChatMessage newMessage, boolean update)
+        private void addMessageImpl( ChatMessage newMessage, boolean update)
         {
-            final int msgIdx;
-            synchronized (messages)
-            {
-                int lastMsgIdx = getLastMessageIdx(newMessage);
-                ChatMessage lastMsg = lastMsgIdx != -1
-                            ? chatListAdapter.getMessage(lastMsgIdx)
-                            : null;
+            int msgIdx;
+            int lastMsgIdx = getLastMessageIdx(newMessage);
+            ChatMessage lastMsg = lastMsgIdx != -1
+                        ? chatListAdapter.getMessage(lastMsgIdx)
+                        : null;
 
-                if(lastMsg == null || !lastMsg.isConsecutiveMessage(newMessage))
-                {
-                    messages.add(new MessageDisplay(newMessage));
-                    msgIdx = messages.size()-1;
-                }
-                else
-                {
-                    // Merge the message and update the object in the list
-                    messages.get(lastMsgIdx)
-                            .update(lastMsg.mergeMessage(newMessage));
-                    msgIdx = lastMsgIdx;
-                }
+            if(lastMsg == null || !lastMsg.isConsecutiveMessage(newMessage))
+            {
+                messages.add(new MessageDisplay(newMessage));
+                msgIdx = messages.size()-1;
+            }
+            else
+            {
+                // Merge the message and update the object in the list
+                messages.get(lastMsgIdx)
+                        .update(lastMsg.mergeMessage(newMessage));
+                msgIdx = lastMsgIdx;
             }
 
             if(update)
             {
-                runOnUiThread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        chatListAdapter.notifyDataSetChanged();
-                        // List must be scrolled manually, when
-                        // android:transcriptMode="normal" is set
-                        chatListView.setSelection(
-                                msgIdx + chatListView.getHeaderViewsCount());
-                    }
-                });
+                chatListAdapter.notifyDataSetChanged();
+                // List must be scrolled manually, when
+                // android:transcriptMode="normal" is set
+                chatListView.setSelection(
+                        msgIdx + chatListView.getHeaderViewsCount());
             }
         }
 
@@ -557,10 +568,7 @@ public class ChatFragment
          */
         public int getCount()
         {
-            synchronized (messages)
-            {
-                return messages.size();
-            }
+            return messages.size();
         }
 
         /**
@@ -568,12 +576,10 @@ public class ChatFragment
          */
         public Object getItem(int position)
         {
-            synchronized (messages)
-            {
-                if (logger.isDebugEnabled())
-                    logger.debug("OBTAIN CHAT ITEM ON POSITION: " + position);
-                return messages.get(position);
-            }
+            if (logger.isDebugEnabled())
+                logger.debug("OBTAIN CHAT ITEM ON POSITION: " + position);
+
+            return messages.get(position);
         }
 
         ChatMessage getMessage(int pos)
