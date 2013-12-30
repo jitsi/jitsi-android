@@ -48,6 +48,11 @@ public class AndroidDecoder
     private final boolean useOutputSurface;
 
     /**
+     * Output video size.
+     */
+    private Dimension outputSize;
+
+    /**
      * Surface provider used to obtain <tt>Surface</tt> object that will be used
      * for decoded video rendering.
      */
@@ -205,30 +210,12 @@ public class AndroidDecoder
             return null;
 
         VideoFormat videoFormat = (VideoFormat) format;
-        /*
-         * An Encoder translates raw media data in (en)coded media data.
-         * Consequently, the size of the output is equal to the size of the
-         * input.
-         */
-        Dimension size = null;
-
-        if (inputFormat != null)
-            size = ((VideoFormat) inputFormat).getSize();
-        if ((size == null) && format.matches(outputFormat))
-            size = ((VideoFormat) outputFormat).getSize();
-
-        //TODO: report video size when returned by decoder
-        // (on output format changed), currently hw decoding works only for
-        // 352x288
-        if(size == null)
-            size = new Dimension(352,288);
-
         if(format instanceof YUVFormat)
         {
             YUVFormat yuvFormat = (YUVFormat) videoFormat;
             outputFormat
                     = new YUVFormat(
-                            /* size */ size,
+                            /* size */ outputSize,
                             /* maxDataLength */ videoFormat.getMaxDataLength(),
                             Format.byteArray,
                             /* frameRate */ videoFormat.getFrameRate(),
@@ -243,7 +230,7 @@ public class AndroidDecoder
         {
             outputFormat = new VideoFormat(
                             videoFormat.getEncoding(),
-                            size,
+                            outputSize,
                             videoFormat.getMaxDataLength(),
                             videoFormat.getDataType(),
                             videoFormat.getFrameRate());
@@ -303,5 +290,12 @@ public class AndroidDecoder
         super.doClose();
 
         renderSurfaceProvider.onObjectReleased();
+    }
+
+    @Override
+    protected void onSizeDiscovered(Dimension dimension)
+    {
+        outputSize = dimension;
+        setOutputFormat(outputFormat);
     }
 }

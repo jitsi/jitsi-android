@@ -6,6 +6,7 @@
  */
 package org.jitsi.android.gui.controller;
 
+import android.app.*;
 import android.os.*;
 import android.view.*;
 import android.view.animation.*;
@@ -56,9 +57,14 @@ public class AutoHideController
     private Timer autoHideTimer;
 
     /**
-     * Hide <tt>View</tt> tiemout
+     * Hide <tt>View</tt> timeout
      */
     private long hideTimeout;
+
+    /**
+     * Listener object
+     */
+    private AutoHideListener listener;
 
     /**
      * {@inheritDoc}
@@ -68,7 +74,14 @@ public class AutoHideController
     {
         super.onActivityCreated(savedInstanceState);
 
-        view = getActivity().findViewById(getArguments().getInt(ARG_VIEW_ID));
+        Activity activity = getActivity();
+
+        if(activity instanceof AutoHideListener)
+        {
+            listener = (AutoHideListener) getActivity();
+        }
+
+        view = activity.findViewById(getArguments().getInt(ARG_VIEW_ID));
 
         hideTimeout = getArguments().getLong(ARG_HIDE_TIMEOUT);
 
@@ -76,7 +89,7 @@ public class AutoHideController
         //                                           R.anim.show_from_bottom);
         //inAnimation.setAnimationListener(this);
 
-        outAnimation = AnimationUtils.loadAnimation(getActivity(),
+        outAnimation = AnimationUtils.loadAnimation(activity,
                                                     R.anim.hide_to_bottom);
         outAnimation.setAnimationListener(this);
     }
@@ -154,6 +167,11 @@ public class AutoHideController
             // Need to re-layout the View
             view.setVisibility(View.GONE);
             view.setVisibility(View.VISIBLE);
+
+            if(listener != null)
+            {
+                listener.onAutoHideStateChanged(this, View.VISIBLE);
+            }
         }
         reScheduleAutoHideTask();
     }
@@ -190,6 +208,11 @@ public class AutoHideController
         if(animation == outAnimation && autoHideTimer == null)
         {
             view.setVisibility(View.GONE);
+
+            if(listener != null)
+            {
+                listener.onAutoHideStateChanged(this, View.GONE);
+            }
         }
     }
 
@@ -216,6 +239,23 @@ public class AutoHideController
                 }
             });
         }
+    }
+
+    /**
+     * Interface which can be used for listening to controlled view visibility
+     * state changes.
+     * Must be implemented by parent <tt>Activity</tt>, which will be registered
+     * as a listener when this fragment is created.
+     */
+    public interface AutoHideListener
+    {
+        /**
+         * Fired when controlled <tt>View</tt> visibility is changed by this
+         * controller.
+         * @param source the source <tt>AutoHideController</tt> of the event.
+         * @param visibility controlled <tt>View</tt> visibility state.
+         */
+        void onAutoHideStateChanged(AutoHideController source, int visibility);
     }
 
     /**

@@ -6,12 +6,18 @@
  */
 package org.jitsi.impl.neomedia.jmfext.media.renderer.video;
 
+import android.content.*;
 import android.view.*;
+
+import org.jitsi.android.util.java.awt.*;
+import org.jitsi.impl.neomedia.codec.video.*;
 import org.jitsi.impl.neomedia.jmfext.media.renderer.*;
+import org.jitsi.service.neomedia.*;
 import org.jitsi.service.neomedia.codec.*;
 
 import javax.media.*;
 import javax.media.format.*;
+import javax.media.renderer.*;
 
 /**
  * Dummy renderer used only to construct valid codec graph when decoding into
@@ -22,6 +28,7 @@ import javax.media.format.*;
 @SuppressWarnings("unused")
 public class SurfaceRenderer
     extends AbstractRenderer<VideoFormat>
+    implements VideoRenderer
 {
     private final static Format[] INPUT_FORMATS = new Format[]
             {
@@ -32,6 +39,8 @@ public class SurfaceRenderer
                             Surface.class,
                             Format.NOT_SPECIFIED)
             };
+
+    private Component component;
 
     public SurfaceRenderer()
     {
@@ -79,5 +88,58 @@ public class SurfaceRenderer
             throws ResourceUnavailableException
     {
 
+    }
+
+    @Override
+    public Format setInputFormat(Format format)
+    {
+        VideoFormat newFormat = (VideoFormat) super.setInputFormat(format);
+
+        if(newFormat.getSize() != null)
+        {
+            getComponent().setPreferredSize(
+                new Dimension(newFormat.getSize()));
+        }
+
+        return newFormat;
+    }
+
+    @Override
+    public Rectangle getBounds()
+    {
+        return null;
+    }
+
+    @Override
+    public void setBounds(Rectangle rectangle)
+    {
+
+    }
+
+    @Override
+    public Component getComponent()
+    {
+        if(component == null)
+        {
+            component = new SurfaceComponent();
+        }
+        return component;
+    }
+
+    @Override
+    public boolean setComponent(Component component)
+    {
+        return false;
+    }
+
+    private class SurfaceComponent
+    extends Component
+        implements ViewAccessor
+    {
+        @Override
+        public View getView(Context context)
+        {
+            return AndroidDecoder.renderSurfaceProvider.getView();
+        }
     }
 }

@@ -7,6 +7,7 @@
 package org.jitsi.impl.neomedia.device.util;
 
 import android.annotation.*;
+import android.app.*;
 import android.graphics.*;
 import android.opengl.*;
 import android.os.*;
@@ -23,18 +24,30 @@ public class OpenGlCtxProvider
     extends ViewDependentProvider<OpenGLContext>
     implements TextureView.SurfaceTextureListener
 {
+    /**
+     * The <tt>OpenGLContext</tt>.
+     */
     OpenGLContext context;
 
     /**
      * Creates new instance of <tt>OpenGlCtxProvider</tt>.
-     *
-     * @param textureView the <tt>TextureView</tt> used for drawing and context
-     *                    creation.
+     * @param activity parent <tt>Activity</tt>.
+     * @param container the container that will hold maintained <tt>View</tt>.
      */
-    public OpenGlCtxProvider(TextureView textureView)
+    public OpenGlCtxProvider(Activity activity, ViewGroup container)
     {
-        super(textureView);
-        textureView.setSurfaceTextureListener(this);
+        super(activity, container);
+    }
+
+    @Override
+    protected View createViewInstance()
+    {
+        TextureView textureView = new TextureView(activity);
+
+        textureView.setSurfaceTextureListener(
+            OpenGlCtxProvider.this);
+
+        return textureView;
     }
 
     @Override
@@ -61,17 +74,6 @@ public class OpenGlCtxProvider
         }
 
         return false;
-    }
-
-    @Override
-    public synchronized OpenGLContext obtainObject()
-    {
-        // Check if we still have the context(View still exists)
-        if(providedObject == null && context!= null)
-        {
-            providedObject = context;
-        }
-        return super.obtainObject();
     }
 
     @Override

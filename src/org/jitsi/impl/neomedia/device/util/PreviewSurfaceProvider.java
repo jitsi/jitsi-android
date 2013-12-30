@@ -6,8 +6,9 @@
  */
 package org.jitsi.impl.neomedia.device.util;
 
-import android.app.*;
 import android.view.*;
+import net.java.sip.communicator.util.*;
+import org.jitsi.service.osgi.*;
 
 /**
  * The class exposes methods for managing preview surface state which must
@@ -28,21 +29,50 @@ public class PreviewSurfaceProvider
     extends ViewDependentProvider<SurfaceHolder>
     implements SurfaceHolder.Callback
 {
+    private final static Logger logger
+        = Logger.getLogger(PreviewSurfaceProvider.class);
+
     /**
-     * Parent activity used to obtain rotation.
+     * Flag indicates whether {@link SurfaceView#setZOrderMediaOverlay(boolean)}
+     * should be called on created <tt>SurfaceView</tt>.
      */
-    private final Activity activity;
+    private final boolean setZMediaOverlay;
+
+    /**
+     * Maintained <tt>SurfaceView</tt> object.
+     */
+    protected SurfaceView view;
 
     /**
      * Creates new instance of <tt>PreviewSurfaceProvider</tt>.
-     * @param activity parent <tt>Activity</tt> of the <tt>view</tt>.
-     * @param view <tt>SurfaceView</tt> used for displaying camera preview.
+     *
+     * @param parent parent <tt>OSGiActivity</tt> instance.
+     * @param container the <tt>ViewGroup</tt> that will hold maintained
+     *                  <tt>SurfaceView</tt>.
+     * @param setZMediaOverlay if set to <tt>true</tt> then the
+     *                         <tt>SurfaceView</tt> will be displayed on the top
+     *                         of other surfaces.
      */
-    public PreviewSurfaceProvider(Activity activity, SurfaceView view)
+    public PreviewSurfaceProvider( OSGiActivity parent,
+                                   ViewGroup container,
+                                   boolean setZMediaOverlay )
     {
-        super(view);
-        view.getHolder().addCallback(this);
-        this.activity = activity;
+        super(parent, container);
+        this.setZMediaOverlay = setZMediaOverlay;
+    }
+
+    @Override
+    protected View createViewInstance()
+    {
+        SurfaceView view = new SurfaceView(activity);
+
+        view.getHolder()
+            .addCallback(PreviewSurfaceProvider.this);
+
+        if(setZMediaOverlay)
+            view.setZOrderMediaOverlay(true);
+
+        return view;
     }
 
     /**
@@ -56,6 +86,19 @@ public class PreviewSurfaceProvider
     public SurfaceHolder obtainObject()
     {
         return super.obtainObject();
+    }
+
+    /**
+     * Returns maintained <tt>View</tt> object.
+     * @return maintained <tt>View</tt> object.
+     */
+    public View getView()
+    {
+        if(obtainObject() != null)
+        {
+            return view;
+        }
+        throw new RuntimeException("Failed to obtain view");
     }
 
     /**

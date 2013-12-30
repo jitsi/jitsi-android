@@ -50,7 +50,8 @@ public class VideoCallActivity
                 CallRenderer,
                 CallChangeListener,
                 PropertyChangeListener,
-                ZrtpInfoDialog.SasVerificationListener
+                ZrtpInfoDialog.SasVerificationListener,
+                AutoHideController.AutoHideListener
 {
     /**
      * The logger
@@ -122,6 +123,7 @@ public class VideoCallActivity
 
     /**
      * Auto-hide controller fragment for call control buttons.
+     * It is attached when remote video covers most part of the screen.
      */
     private AutoHideController autoHide;
 
@@ -577,9 +579,6 @@ public class VideoCallActivity
     public void setPeerState(CallPeerState oldState, CallPeerState newState,
         final String stateString)
     {
-        if(newState == CallPeerState.CONNECTED)
-            ensureAutoHideFragmentAttached();
-
         runOnUiThread(new Runnable()
         {
             public void run()
@@ -594,7 +593,7 @@ public class VideoCallActivity
     /**
      * Ensures that auto hide fragment is added and started.
      */
-    private void ensureAutoHideFragmentAttached()
+    void ensureAutoHideFragmentAttached()
     {
         if(autoHide != null)
             return;
@@ -606,6 +605,24 @@ public class VideoCallActivity
                 .beginTransaction()
                 .add(autoHide,AUTO_HIDE_TAG)
                 .commit();
+    }
+
+    /**
+     * Removes the auto hide fragment, so that call control buttons will be
+     * always visible from now on.
+     */
+    public void ensureAutoHideFragmentDetached()
+    {
+        if(autoHide != null)
+        {
+            autoHide.show();
+
+            getSupportFragmentManager().beginTransaction()
+                .remove(autoHide)
+                .commit();
+
+            autoHide = null;
+        }
     }
 
     /**
@@ -1018,7 +1035,7 @@ public class VideoCallActivity
 
         // Protocol name label
         ViewUtil.setTextViewValue(
-                findViewById(R.id.videoCallLayout),
+                findViewById(android.R.id.content),
                 R.id.security_protocol,
                 zrtpCtrl != null ? "zrtp" : "");
 
@@ -1077,9 +1094,9 @@ public class VideoCallActivity
     private void setPadlockSecure(boolean isSecure)
     {
         ViewUtil.setImageViewIcon(
-            findViewById(R.id.videoCallLayout),
-            R.id.security_padlock,
-            isSecure ? R.drawable.secure_on : R.drawable.secure_off);
+                findViewById(android.R.id.content),
+                R.id.security_padlock,
+                isSecure ? R.drawable.secure_on : R.drawable.secure_off);
     }
 
     /**
@@ -1147,7 +1164,7 @@ public class VideoCallActivity
 
                 // Protocol name label
                 ViewUtil.setTextViewValue(
-                        findViewById(R.id.videoCallLayout),
+                        findViewById(android.R.id.content),
                         R.id.security_protocol,
                         zrtpControl != null ? "zrtp" : "sdes");
 
@@ -1185,5 +1202,18 @@ public class VideoCallActivity
         VideoHandlerFragment.wasVideoEnabled = false;
 
         return videoCallIntent;
+    }
+
+    /**
+     * Updates views alignment which depend on call control buttons group
+     * visibility state.
+     *
+     * {@inheritDoc}
+     */
+    @Override
+    public void onAutoHideStateChanged(AutoHideController source,
+                                       int visibility)
+    {
+        getVideoFragment().updateCallInfoMargin();
     }
 }

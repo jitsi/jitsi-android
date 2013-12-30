@@ -6,10 +6,9 @@
  */
 package org.jitsi.impl.neomedia.device.util;
 
+import android.app.*;
 import android.view.*;
 import net.java.sip.communicator.util.*;
-import org.jitsi.android.gui.util.*;
-
 
 /**
  * <tt>ViewDependentProvider</tt> is used to implement classes that provide
@@ -19,7 +18,7 @@ import org.jitsi.android.gui.util.*;
  *
  * @author Pawel Domas
  */
-public class ViewDependentProvider<T>
+public abstract class ViewDependentProvider<T>
 {
     /**
      * The logger
@@ -38,9 +37,19 @@ public class ViewDependentProvider<T>
     private static final long CREATE_TIMEOUT = 10000L;
 
     /**
-     * The View on which this provider depends.
+     * <tt>Activity</tt> context.
      */
-    private final View view;
+    protected final Activity activity;
+
+    /**
+     * The container that will hold maintained view.
+     */
+    private final ViewGroup container;
+
+    /**
+     * The view maintained by this instance.
+     */
+    private View view;
 
     /**
      * Provided object created when <tt>View</tt> is visible.
@@ -48,14 +57,71 @@ public class ViewDependentProvider<T>
     protected T providedObject;
 
     /**
-     * Creates new instance of <tt>ViewDependentProvider</tt> that depends on
-     * given <tt>View</tt>.
-     * @param view the <tt>View</tt> from which visibility state this provider
-     *             is dependent.
+     * Creates new instance of <tt>ViewDependentProvider</tt>.
+     * @param activity parent <tt>Activity</tt> that manages
+     *                 the <tt>container</tt>.
+     * @param container the container that will hold maintained <tt>View</tt>.
      */
-    ViewDependentProvider(View view)
+    public ViewDependentProvider(Activity activity, ViewGroup container)
     {
-        this.view = view;
+        this.activity = activity;
+        this.container = container;
+    }
+
+    /**
+     * Checks if the view is currently created. If not creates new <tt>View</tt>
+     * and adds it to the <tt>container</tt>.
+     */
+    protected void ensureViewCreated()
+    {
+        if(view == null)
+        {
+            activity.runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    view = createViewInstance();
+
+                    ViewGroup.LayoutParams params
+                        = new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT);
+                    container.addView(view, params);
+
+                    container.setVisibility(View.VISIBLE);
+                }
+            });
+        }
+    }
+
+    /**
+     * Factory method that creates new <tt>View</tt> instance.
+     * @return new <tt>View</tt> instance.
+     */
+    protected abstract View createViewInstance();
+
+    /**
+     * Checks if maintained view exists and removes if from
+     * the <tt>container</tt>.
+     */
+    protected void ensureViewDestroyed()
+    {
+        if(view != null)
+        {
+            final View viewToRemove = view;
+            view = null;
+
+            activity.runOnUiThread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    container.removeView(viewToRemove);
+                    container.setVisibility(View.GONE);
+                }
+            });
+        }
     }
 
     /**
@@ -77,7 +143,7 @@ public class ViewDependentProvider<T>
      */
     synchronized public T obtainObject()
     {
-        ViewUtil.setViewVisible(view, true);
+        ensureViewCreated();
         if(this.providedObject == null)
         {
             try
@@ -112,8 +178,9 @@ public class ViewDependentProvider<T>
      */
     public void onObjectReleased()
     {
-        ViewUtil.setViewVisible(view, false);
         releaseObject();
+        // Remove the view once it's released
+        ensureViewDestroyed();
     }
 
     /**
@@ -153,5 +220,7 @@ public class ViewDependentProvider<T>
                 throw new RuntimeException(e);
             }
         }
+
+        ensureViewDestroyed();
     }
 }

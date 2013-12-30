@@ -8,6 +8,7 @@ package org.jitsi.android.gui.call;
 
 import android.app.*;
 import android.hardware.*;
+import android.opengl.*;
 import android.os.*;
 import android.util.*;
 import android.view.*;
@@ -59,9 +60,9 @@ public class VideoHandlerFragment
     private ViewAccessor remoteVideoAccessor;
 
     /**
-     * The local video container.
+     * Container used for local preview
      */
-    private SurfaceView previewDisplay;
+    protected ViewGroup localPreviewContainer;
 
     /**
      * Instance of video listener that should be unregistered once this Activity
@@ -96,13 +97,14 @@ public class VideoHandlerFragment
     private Thread cameraSwitchThread;
 
     /**
-     * Surface provider used for displaying remote video in hw decoding mode.
+     * Call info group
      */
-    private PreviewSurfaceProvider remoteSurfaceHandler;
+    private ViewGroup callInfoGroup;
+
     /**
-     * Remote video view.
+     * Call control buttons group.
      */
-    private SurfaceView remoteVideo;
+    private View ctrlButtonsGroup;
 
     /**
      * Creates new instance of <tt>VideoHandlerFragment</tt>.
@@ -120,10 +122,36 @@ public class VideoHandlerFragment
         Activity activity = getActivity();
 
         remoteVideoContainer
-                = (ViewGroup) activity.findViewById(R.id.remoteVideoContainer);
+            = (ViewGroup) activity.findViewById(R.id.remoteVideoContainer);
 
-        previewDisplay
-                = (SurfaceView) activity.findViewById(R.id.previewDisplay);
+        localPreviewContainer
+            = (ViewGroup) activity.findViewById(R.id.localPreviewContainer);
+
+        callInfoGroup
+            = (ViewGroup) activity.findViewById(R.id.callInfoGroup);
+
+        ctrlButtonsGroup
+            = activity.findViewById(R.id.buttonContainer);
+
+        // (must be done after layout or 0 sizes will be returned)
+        ctrlButtonsGroup.getViewTreeObserver()
+            .addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener()
+                {
+                    @Override
+                    public void onGlobalLayout()
+                    {
+                        // We know the size of all components at this point,
+                        // so we can init layout dependent stuff
+
+                        // Initial call info margin adjustment
+                        updateCallInfoMargin();
+
+                        // Remove the listener, as it has to be called only once
+                        ctrlButtonsGroup.getViewTreeObserver()
+                            .removeOnGlobalLayoutListener(this);
+                    }
+                });
 
         calleeAvatar = (ImageView) activity.findViewById(R.id.calleeAvatar);
 
@@ -139,23 +167,18 @@ public class VideoHandlerFragment
 
         // Creates and registers surface handler for events
         this.previewSurfaceHandler
-            = new PreviewSurfaceProvider(activity, previewDisplay);
+            = new PreviewSurfaceProvider(
+                (OSGiActivity) activity, localPreviewContainer, true);
         CameraUtils.setPreviewSurfaceProvider(previewSurfaceHandler);
 
-        // Preview display will be displayed on top of remote video
-        previewDisplay.setZOrderMediaOverlay(true);
-
         // Makes the preview display draggable on the screen
-        previewDisplay.setOnTouchListener(new SimpleDragController());
+        localPreviewContainer.setOnTouchListener(new SimpleDragController());
 
         this.call = ((VideoCallActivity)activity).getCall();
 
-        this.remoteVideo
-                = (SurfaceView) activity.findViewById(R.id.remoteDisplay);
-        this.remoteSurfaceHandler
-                = new PreviewSurfaceProvider(activity, remoteVideo);
-
-        AndroidDecoder.renderSurfaceProvider = remoteSurfaceHandler;
+        AndroidDecoder.renderSurfaceProvider
+            = new PreviewSurfaceProvider(
+                    (OSGiActivity) activity, remoteVideoContainer, false);
     }
 
     @Override
@@ -213,7 +236,8 @@ public class VideoHandlerFragment
              */
             setLocalVideoEnabled(false);
             previewSurfaceHandler.waitForObjectRelease();
-            //TODO: release object on rotation ?
+            //TODO: release object on rotation, but the data source
+            // have to be paused
             //remoteSurfaceHandler.waitForObjectRelease();
         }
     }
@@ -224,11 +248,7 @@ public class VideoHandlerFragment
         super.onDestroy();
 
         // Release shared video component
-        if(remoteVideoAccessor != null)
-        {
-            remoteVideoContainer.removeView(
-                    remoteVideoAccessor.getView(getActivity()));
-        }
+        remoteVideoContainer.removeAllViews();
     }
 
     @Override
@@ -372,39 +392,6 @@ public class VideoHandlerFragment
     }
 
     /**
-     * Sets {@link #previewDisplay} visibility state. As a result onCreate and
-     * onDestroy events are produced when the surface used for camera display is
-     * created/destroyed.
-     *
-     * @param isVisible flag indicating if it should be shown or hidden
-     */
-    private void setLocalVideoPreviewVisible(final boolean isVisible)
-    {
-        Handler previewDisplayHandler = previewDisplay.getHandler();
-        if(previewDisplayHandler == null)
-        {
-            logger.warn("Preview surface is no longer attached");
-            return;
-        }
-        previewDisplayHandler.post(new Runnable()
-        {
-            public void run()
-            {
-                if (isVisible)
-                {
-                    // Show the local video in the center or in the left
-                    // corner depending on if we have a remote video shown.
-                    realignPreviewDisplay();
-                    previewDisplay.setVisibility(View.VISIBLE);
-                } else
-                {
-                    previewDisplay.setVisibility(View.GONE);
-                }
-            }
-        });
-    }
-
-    /**
      * Adds a video listener for the given call peer.
      *
      * @param callPeer the <tt>CallPeer</tt> to which we add a video listener
@@ -443,8 +430,8 @@ public class VideoHandlerFragment
             };
         }
         osvt.addVideoListener(
-                callPeer,
-                callPeerVideoListener);
+            callPeer,
+            callPeerVideoListener);
     }
 
     /**
@@ -510,7 +497,7 @@ public class VideoHandlerFragment
 
         event.consume();
 
-        if (event.getOrigin() == VideoEvent.LOCAL)
+        /*if (event.getOrigin() == VideoEvent.LOCAL)
         {
             // TODO: local video events are not used because the preview surface
             // is required for camera to start and it must not be removed until
@@ -530,8 +517,8 @@ public class VideoHandlerFragment
             {
 
             }
-        }
-        else if (event.getOrigin() == VideoEvent.REMOTE)
+        }*/
+        if (event.getOrigin() == VideoEvent.REMOTE)
         {
             Component visualComponent
                     = (event.getType() == VideoEvent.VIDEO_ADDED
@@ -580,6 +567,13 @@ public class VideoHandlerFragment
         {
             public void run()
             {
+                if (getActivity() == null)
+                {
+                    logger.warn(
+                        "Remote video event when getActivity() returned null");
+                    return;
+                }
+
                 final View view
                         = remoteVideoAccessor != null
                         ? remoteVideoAccessor.getView(getActivity())
@@ -669,64 +663,51 @@ public class VideoHandlerFragment
     private void doAlignRemoteVideo(View remoteVideoView,
                                     Dimension preferredSize)
     {
-        double width = preferredSize.getWidth();
-        double height = preferredSize.getHeight();
-
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        getActivity().getWindowManager()
-                .getDefaultDisplay().getMetrics(displaymetrics);
-        int viewHeight = displaymetrics.heightPixels;
-        int viewWidth = displaymetrics.widthPixels;
-
-        remoteVideoContainer.removeAllViews();
-
         if (remoteVideoView != null)
         {
-            double ratio = width / height;
+            ((RemoteVideoLayout)remoteVideoContainer)
+                .setVideoPreferredSize(preferredSize);
 
-            if (height < viewHeight)
+            // Hack only for GLSurfaceView
+            // Remote video view will match parents width and height,
+            // but renderer object is properly updated only when removed
+            // and added back again.
+            if(remoteVideoView instanceof GLSurfaceView)
             {
-                height = viewHeight;
-                width = height*ratio;
+                remoteVideoContainer.removeAllViews();
+                remoteVideoContainer.addView(remoteVideoView);
             }
-            remoteVideoContainer.addView(
-                    remoteVideoView,
-                    new ViewGroup.LayoutParams(
-                            (int)width,
-                            (int)height));
 
             calleeAvatar.setVisibility(View.GONE);
 
-            // Show the local video in the center or in the
-            // left corner depending on if we have a remote
-            // video shown.
-            realignPreviewDisplay();
+            // When remote video is visible then the call info is positioned
+            // in the bottom part of the screen
+            RelativeLayout.LayoutParams params
+                = (RelativeLayout.LayoutParams)
+                        callInfoGroup.getLayoutParams();
+            params.addRule(RelativeLayout.CENTER_VERTICAL, 0);
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            callInfoGroup.setLayoutParams(params);
         }
         else
+        {
+            remoteVideoContainer.removeAllViews();
+
+            // When remote video is hidden then the call info is centered
+            // below the avatar
+            RelativeLayout.LayoutParams params
+                = (RelativeLayout.LayoutParams)
+                        callInfoGroup.getLayoutParams();
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, 0);
+            params.addRule(RelativeLayout.CENTER_VERTICAL);
+            callInfoGroup.setLayoutParams(params);
+
             calleeAvatar.setVisibility(View.VISIBLE);
-    }
-
-    /**
-     * Re-aligns the preview display depending on the remote video visibility.
-     */
-    private void realignPreviewDisplay()
-    {
-        RelativeLayout.LayoutParams params
-                = (RelativeLayout.LayoutParams) previewDisplay
-                .getLayoutParams();
-
-        if (remoteVideoContainer.getChildCount() > 0)
-        {
-            params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-            params.addRule(RelativeLayout.CENTER_HORIZONTAL, 0);
-        }
-        else
-        {
-            params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
-            params.addRule(RelativeLayout.CENTER_HORIZONTAL);
         }
 
-        previewDisplay.setLayoutParams(params);
+        // Update call info group margin based on control buttons group
+        // visibility state
+        updateCallInfoMargin();
     }
 
     /**
@@ -735,20 +716,62 @@ public class VideoHandlerFragment
      */
     public boolean isLocalVideoVisible()
     {
-        if(previewDisplay == null)
-            return false;
-
-        return previewDisplay.getVisibility() == View.VISIBLE;
+        return localPreviewContainer.getChildCount() > 0;
     }
 
     /**
      * Block the program until camera is stopped to prevent from crashing on
      * not existing preview surface.
      */
-    public void ensureCameraClosed()
+    void ensureCameraClosed()
     {
         previewSurfaceHandler.waitForObjectRelease();
         //TODO: remote display must be released too
-        //remoteSurfaceHandler.waitForObjectRelease();
+        // (but the DataSource must be paused)
+        //remoteVideoSurfaceHandler.waitForObjectRelease();
+    }
+
+    /**
+     * Positions call info group buttons.
+     */
+    void updateCallInfoMargin()
+    {
+        RelativeLayout.LayoutParams params
+            = (RelativeLayout.LayoutParams)
+                    callInfoGroup.getLayoutParams();
+
+        // If we have remote video
+        if(remoteVideoContainer.getChildCount() > 0)
+        {
+            DisplayMetrics displaymetrics = new DisplayMetrics();
+            getActivity().getWindowManager()
+                .getDefaultDisplay().getMetrics(displaymetrics);
+
+            int ctrlButtonsHeight = ctrlButtonsGroup.getHeight();
+
+            int marginBottom = (int) (0.10*displaymetrics.heightPixels);
+
+            if(marginBottom < ctrlButtonsHeight
+                && ctrlButtonsGroup.getVisibility() == View.VISIBLE)
+            {
+                // Calculate 10 dp size
+                int size10dp = (int) (10 * displaymetrics.density + 0.5f);
+                marginBottom = ctrlButtonsHeight + size10dp;
+            }
+
+            // This can be used if we want to keep it on the same height
+            if(ctrlButtonsGroup.getVisibility() == View.VISIBLE)
+            {
+                marginBottom -= ctrlButtonsHeight;
+            }
+
+            params.setMargins(0, 0, 0, marginBottom);
+            callInfoGroup.setLayoutParams(params);
+        }
+        else
+        {
+            params.setMargins(0, 0, 0, 0);
+            callInfoGroup.setLayoutParams(params);
+        }
     }
 }

@@ -10,18 +10,19 @@
 
     <LinearLayout
         android:id="@+id/layout1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/screen_padding"
-        android:layout_centerInParent="true"
-        android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_margin="@dimen/screen_padding"
+        android:paddingBottom="100dp"
+        android:gravity="center">
 
         <ImageView
              android:id="@+id/calleeAvatar"
              android:src="@drawable/personphoto"
              android:contentDescription="@string/service_gui_CALL"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
+             android:layout_width="match_parent"
+             android:layout_height="@dimen/avatar_height"
              android:layout_gravity="center_horizontal"
              android:paddingBottom="@dimen/between_padding"/>
 
@@ -31,7 +32,9 @@
             android:layout_height="wrap_content"
             android:textSize="22sp"
             android:layout_gravity="center_horizontal"
-            android:paddingBottom="@dimen/between_padding"/>
+            android:paddingBottom="@dimen/between_padding"
+            android:text="some.long.name@sip-communicator.org"
+            android:gravity="center_horizontal"/>
 
         <TextView
             android:id="@+id/calleeAddress"
@@ -39,7 +42,9 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/label_text_size"
             android:layout_gravity="center_horizontal"
-            android:paddingBottom="@dimen/between_padding"/>
+            android:paddingBottom="@dimen/between_padding"
+            android:text="name@sip-communicator.org/jitsi-randowm23!@43$"
+            android:gravity="center_horizontal"/>
     </LinearLayout>
 
     <!-- ImageView
@@ -55,7 +60,6 @@
         android:layout_width="fill_parent"
         android:layout_height="100dp"
         android:orientation="horizontal"
-        android:paddingBottom="0px"
         android:background="#40000000">
 
  <ImageButton

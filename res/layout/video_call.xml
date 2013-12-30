@@ -1,137 +1,146 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/videoCallLayout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@drawable/background"
-    android:keepScreenOn="true">
-
-    <LinearLayout
-        android:id="@+id/remoteVideoContainer"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:gravity="center"/>
-
-    <SurfaceView
-        android:id="@+id/previewDisplay"
-        android:layout_width="160dp"
-        android:layout_height="120dp"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="80dp"
-        android:visibility="gone"/>
-    <SurfaceView
-            android:id="@+id/remoteDisplay"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
-            android:visibility="gone"/>
-
-    <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/background"
+                android:keepScreenOn="true"
+        >
+    <org.jitsi.android.gui.call.RemoteVideoLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/remoteVideoContainer"
             android:orientation="vertical"
             android:layout_centerInParent="true"
-            android:paddingBottom="80dp">
-        <ImageView
-                android:id="@+id/calleeAvatar"
-                android:src="@drawable/personphoto"
-                android:contentDescription="@string/service_gui_CALL"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/avatar_height"
-                android:layout_gravity="center_horizontal"
-                android:paddingBottom="@dimen/between_padding"/>
-        <RelativeLayout
+            android:background="@color/red"
+            />
+    <LinearLayout
+            android:layout_width="160dp"
+            android:layout_height="120dp"
+            android:id="@+id/localPreviewContainer"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="80dp"
+            />
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:layout_above="@+id/buttonContainer"
+            >
+        <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                android:orientation="vertical"
+                android:id="@+id/callInfoGroup"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
                 >
-            <TextView
-                    android:id="@+id/callStatus"
+            <ImageView
+                    android:id="@+id/calleeAvatar"
+                    android:src="@drawable/personphoto"
+                    android:contentDescription="@string/service_gui_CALL"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/label_text_size"
+                    android:layout_height="@dimen/avatar_height"
                     android:layout_gravity="center_horizontal"
-                    android:paddingBottom="@dimen/between_padding"
-                    android:text="{call status}"
-                    android:layout_marginLeft="5dp"
-                    android:layout_toRightOf="@+id/security_group"/>
+                    android:paddingBottom="@dimen/between_padding"/>
             <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/security_group"
-                    android:background="@color/orange_padlock">
+                    android:layout_gravity="center"
+                    android:background="@drawable/call_status_bg"
+                    android:padding="10dp"
+                    android:gravity="center_vertical">
                 <TextView
-                        android:id="@+id/security_protocol"
-                        android:text="{proto}"
+                        android:id="@+id/callStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textSize="@dimen/label_text_size"
-                        android:layout_gravity="center_horizontal"
-                        android:textColor="@color/white"/>
-                <ImageView
+                        android:text="{call status}"
+                        android:textColor="@color/white"
+                        android:layout_marginLeft="5dp"
+                        android:layout_toRightOf="@+id/security_group"
+                        android:gravity="center_vertical"/>
+                <RelativeLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/security_padlock"
-                        android:layout_toRightOf="@+id/security_protocol"
-                        android:src="@drawable/secure_off"/>
+                        android:id="@+id/security_group"
+                        android:background="@color/orange_padlock">
+                    <TextView
+                            android:id="@+id/security_protocol"
+                            android:text="{proto}"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="@dimen/label_text_size"
+                            android:textColor="@color/white"/>
+                    <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/security_padlock"
+                            android:layout_toRightOf="@+id/security_protocol"
+                            android:src="@drawable/secure_off"/>
+                </RelativeLayout>
+                <TextView
+                        android:id="@+id/callTime"
+                        android:text="00:00:00"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/label_text_size"
+                        android:textColor="@color/white"
+                        android:layout_toRightOf="@+id/callStatus"
+                        android:layout_marginLeft="5dp"/>
             </RelativeLayout>
-            <TextView
-                    android:id="@+id/callTime"
-                    android:text="00:00:00"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="@dimen/label_text_size"
-                    android:layout_toRightOf="@+id/callStatus"
-                    android:layout_marginLeft="5dp"/>
-        </RelativeLayout>
-    </LinearLayout>
-
+        </LinearLayout>
+        <include layout="@layout/clickable_toast"
+                 android:id="@+id/clickable_toast"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_alignParentBottom="true"
+                 android:layout_centerHorizontal="true"
+                 android:layout_marginBottom="15dp"/>
+    </RelativeLayout>
     <LinearLayout
-        android:id="@+id/buttonContainer"
-        android:layout_alignParentBottom="true"
-        android:layout_width="fill_parent"
-        android:layout_height="80dp"
-        android:orientation="horizontal"
-        android:paddingBottom="0px"
-        android:background="#40000000">
+            android:id="@+id/buttonContainer"
+            android:layout_alignParentBottom="true"
+            android:layout_width="fill_parent"
+            android:layout_height="80dp"
+            android:orientation="horizontal"
+            android:background="#40000000">
 
         <ImageButton
-            android:id="@+id/speakerphoneButton"
-            android:src="@drawable/callvolume"
-            android:background="@drawable/image_button_background"
-            android:contentDescription="@string/service_gui_VOLUME_CONTROL_TOOL_TIP"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical"
-            android:focusable="true"
-            android:onClick="onSpeakerphoneClicked"/>
+                android:id="@+id/speakerphoneButton"
+                android:src="@drawable/callvolume"
+                android:background="@drawable/image_button_background"
+                android:contentDescription="@string/service_gui_VOLUME_CONTROL_TOOL_TIP"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:focusable="true"
+                android:onClick="onSpeakerphoneClicked"/>
 
         <ImageButton
-            android:id="@+id/callMicrophoneButton"
-            android:src="@drawable/callmicrophone"
-            android:background="@drawable/image_button_background"
-            android:contentDescription="@string/service_gui_MUTE_BUTTON_TOOL_TIP"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical"
-            android:focusable="true"/>
+                android:id="@+id/callMicrophoneButton"
+                android:src="@drawable/callmicrophone"
+                android:background="@drawable/image_button_background"
+                android:contentDescription="@string/service_gui_MUTE_BUTTON_TOOL_TIP"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:focusable="true"/>
 
         <ImageButton
-            android:id="@+id/callVideoButton"
-            android:src="@drawable/callvideo"
-            android:background="@drawable/image_button_background"
-            android:contentDescription="@string/service_gui_LOCAL_VIDEO_BUTTON_TOOL_TIP"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical"
-            android:focusable="true"/>
+                android:id="@+id/callVideoButton"
+                android:src="@drawable/callvideo"
+                android:background="@drawable/image_button_background"
+                android:contentDescription="@string/service_gui_LOCAL_VIDEO_BUTTON_TOOL_TIP"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:focusable="true"/>
 
         <ImageButton
                 android:id="@+id/callHoldButton"
@@ -146,21 +155,14 @@
                 android:onClick="onHoldButtonClicked"/>
 
         <ImageButton
-            android:id="@+id/callHangupButton"
-            android:src="@drawable/callhangup"
-            android:background="@drawable/image_button_background"
-            android:contentDescription="@string/hang_up"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical"
-            android:focusable="true"/>
+                android:id="@+id/callHangupButton"
+                android:src="@drawable/callhangup"
+                android:background="@drawable/image_button_background"
+                android:contentDescription="@string/hang_up"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:focusable="true"/>
     </LinearLayout>
-    <include layout="@layout/clickable_toast"
-             android:id="@+id/clickable_toast"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:layout_alignParentBottom="true"
-             android:layout_centerHorizontal="true"
-             android:layout_marginBottom="85dp"/>
 </RelativeLayout>

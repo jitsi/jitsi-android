@@ -13,6 +13,7 @@ import android.view.*;
 
 import net.java.sip.communicator.util.*;
 
+import org.jitsi.android.util.java.awt.*;
 import org.jitsi.impl.neomedia.codec.*;
 import org.jitsi.service.neomedia.codec.*;
 
@@ -33,6 +34,11 @@ abstract class AndroidCodec
      * The logger
      */
     private final static Logger logger = Logger.getLogger(AndroidCodec.class);
+
+    /**
+     * Copied from <tt>MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface</tt>
+     */
+    private final static int COLOR_FormatSurface = 0x7F000789;
 
     /**
      * Indicates that this instance is used for encoding(and not for decoding).
@@ -107,7 +113,7 @@ abstract class AndroidCodec
     protected int getColorFormat()
     {
         return useSurface() ?
-                MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface :
+                COLOR_FormatSurface :
                 MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar;
     }
 
@@ -230,6 +236,11 @@ abstract class AndroidCodec
                                 + ", try using the Surface");
                 }
             }
+            // Video size should be known at this point
+            onSizeDiscovered(
+                new Dimension(
+                    outFormat.getInteger(MediaFormat.KEY_WIDTH),
+                    outFormat.getInteger(MediaFormat.KEY_HEIGHT)));
         }
         else if(mediaCodecOutputIndex == MediaCodec.INFO_TRY_AGAIN_LATER)
         {
@@ -253,6 +264,7 @@ abstract class AndroidCodec
                 if(!isEncoder && useSurface())
                 {
                     processed &= ~OUTPUT_BUFFER_NOT_FILLED;
+                    outputBuffer.setFormat(outputFormat);
                 }
                 else if ((outputLength = info.size) > 0)
                 {
@@ -341,5 +353,14 @@ abstract class AndroidCodec
             }
         }
         return processed;
+    }
+
+    /**
+     * Method fired when <tt>MediaCodec</tt> detects video size.
+     * @param dimension video dimension.
+     */
+    protected void onSizeDiscovered(Dimension dimension)
+    {
+
     }
 }
