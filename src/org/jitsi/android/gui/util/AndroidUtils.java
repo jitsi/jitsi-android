@@ -183,10 +183,10 @@ public class AndroidUtils
     }
 
     /**
-     * This can be only called by the <tt>OSGiService</tt> to notify that
-     * the notification icon is hidden.
+     * This method should be called when general notification is changed from
+     * the outside(like in call notification for example).
      */
-    public static void generalNotificationRemoved()
+    public static void generalNotificationInvalidated()
     {
         lastNotificationText = null;
     }

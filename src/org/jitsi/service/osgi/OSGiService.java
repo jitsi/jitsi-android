@@ -156,7 +156,7 @@ public class OSGiService
             stopForeground(true);
             running_foreground = false;
 
-            AndroidUtils.generalNotificationRemoved();
+            AndroidUtils.generalNotificationInvalidated();
         }
     }
 

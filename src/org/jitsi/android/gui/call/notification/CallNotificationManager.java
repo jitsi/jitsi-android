@@ -67,7 +67,7 @@ public class CallNotificationManager
     public synchronized void showCallNotification(Context ctx,
                                                   final String callID)
     {
-        Call call = CallManager.getActiveCall(callID);
+        final Call call = CallManager.getActiveCall(callID);
         if(call == null)
         {
             throw new IllegalArgumentException(
@@ -118,6 +118,7 @@ public class CallNotificationManager
             public void callPeerRemoved(CallPeerEvent evt)
             {
                 stopNotification(callID);
+                call.removeCallChangeListener(this);
             }
 
             public void callStateChanged(CallChangeEvent evt)
