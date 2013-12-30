@@ -65,6 +65,18 @@ public class ChatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        // Use SOFT_INPUT_ADJUST_PAN mode only in horizontal orientation, which
+        // doesn't provide enough space to write messages comfortably.
+        // Adjust pan is causing copy-paste options not being displayed as well
+        // as the action bar which contains few useful options.
+        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+        if( rotation == Surface.ROTATION_90
+            || rotation == Surface.ROTATION_270 )
+        {
+            getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+        }
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.chat);
