@@ -506,12 +506,6 @@ public class CallInfoDialogFragment
                         + " " + UP_ARROW + " "
                         + this.videoSizeToString(uploadVideoSize));
             }
-            // Otherwise, quit the stats for this video stream.
-            else
-            {
-                ensureVisible(container, container.getId(), false);
-                return;
-            }
         }
 
         // Shows video size if it's available(always false for AUDIO)
