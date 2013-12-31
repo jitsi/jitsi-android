@@ -166,6 +166,18 @@ public abstract class ViewDependentProvider<T>
     }
 
     /**
+     * Checks if provider has already the object and returns it immediately.
+     * If there is no object and we would have to wait for it, then the
+     * <tt>null</tt> is returned.
+     * @return the object if it is currently held by this provider or
+     *         <tt>null</tt> otherwise.
+     */
+    synchronized public T tryObtainObject()
+    {
+        return providedObject;
+    }
+
+    /**
      * Should be called by subclasses when object is destroyed.
      */
     synchronized protected void onObjectDestroyed()

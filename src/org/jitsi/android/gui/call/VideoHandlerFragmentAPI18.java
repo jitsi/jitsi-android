@@ -9,8 +9,6 @@ package org.jitsi.android.gui.call;
 import android.os.*;
 
 import org.jitsi.impl.neomedia.device.util.*;
-import org.jitsi.impl.neomedia.jmfext.media.protocol.androidcamera.*;
-import org.jitsi.service.osgi.*;
 
 /**
  * Video handler fragment for API18 and above. Provides OpenGL context for
@@ -27,9 +25,16 @@ public class VideoHandlerFragmentAPI18
     {
         super.onActivityCreated(savedInstanceState);
 
-        OSGiActivity parent = (OSGiActivity) getActivity();
+        CameraUtils.localPreviewCtxProvider
+            = new OpenGlCtxProvider(getActivity(), localPreviewContainer);
+    }
 
-        SurfaceStream.ctxProvider
-            = new OpenGlCtxProvider(parent, localPreviewContainer);
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+
+        // This provider is no longer valid
+        CameraUtils.localPreviewCtxProvider = null;
     }
 }

@@ -12,6 +12,7 @@ import android.graphics.*;
 import android.opengl.*;
 import android.os.*;
 import android.view.*;
+import net.java.sip.communicator.util.*;
 
 /**
  * Provider of Open GL context. Currently used to provide shared context for
@@ -25,9 +26,21 @@ public class OpenGlCtxProvider
     implements TextureView.SurfaceTextureListener
 {
     /**
+     * The logger.
+     */
+    private final static Logger logger
+        = Logger.getLogger(OpenGlCtxProvider.class);
+
+    /**
      * The <tt>OpenGLContext</tt>.
      */
     OpenGLContext context;
+
+    /**
+     * Flag used to inform the <tt>SurfaceStream</tt> that the
+     * <tt>onSurfaceTextureUpdated</tt> event has occurred.
+     */
+    public boolean textureUpdated = true;
 
     /**
      * Creates new instance of <tt>OpenGlCtxProvider</tt>.
@@ -44,8 +57,7 @@ public class OpenGlCtxProvider
     {
         TextureView textureView = new TextureView(activity);
 
-        textureView.setSurfaceTextureListener(
-            OpenGlCtxProvider.this);
+        textureView.setSurfaceTextureListener(this);
 
         return textureView;
     }
@@ -81,5 +93,9 @@ public class OpenGlCtxProvider
             SurfaceTexture surface, int width, int height){}
 
     @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface){}
+    public void onSurfaceTextureUpdated(SurfaceTexture surface)
+    {
+        logger.trace("onSurfaceTextureUpdated");
+        this.textureUpdated = true;
+    }
 }

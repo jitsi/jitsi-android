@@ -158,6 +158,19 @@ public class OpenGLContext
     }
 
     /**
+     * Sets "no surface" and "no context" on the current display.
+     */
+    public void ensureIsNotCurrentCtx()
+    {
+        if (eglDisplay != EGL14.EGL_NO_DISPLAY)
+        {
+            EGL14.eglMakeCurrent(eglDisplay, EGL14.EGL_NO_SURFACE,
+                                 EGL14.EGL_NO_SURFACE,
+                                 EGL14.EGL_NO_CONTEXT);
+        }
+    }
+
+    /**
      * Calls eglSwapBuffers.  Use this to "publish" the current frame.
      */
     public void swapBuffers()

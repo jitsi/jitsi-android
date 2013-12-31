@@ -32,6 +32,12 @@ public class CameraUtils
     private static PreviewSurfaceProvider surfaceProvider;
 
     /**
+     * <tt>OpenGlCtxProvider</tt> that provides Open GL context for local
+     * preview rendering. It is used in direct surface encoding mode.
+     */
+    public static OpenGlCtxProvider localPreviewCtxProvider;
+
+    /**
      * The list of sizes from which the first supported by the respective
      * {@link Camera} is to be chosen as the size of the one and only
      * <tt>Format</tt> supported by the associated <tt>mediarecorder</tt>

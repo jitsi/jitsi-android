@@ -9,7 +9,9 @@ package org.jitsi.impl.neomedia.jmfext.media.protocol.androidcamera;
 import android.graphics.*;
 import android.view.*;
 import net.java.sip.communicator.util.*;
+import org.jitsi.android.gui.util.*;
 import org.jitsi.impl.neomedia.device.util.*;
+import org.jitsi.service.osgi.*;
 
 import javax.media.*;
 import javax.media.control.*;
@@ -58,10 +60,21 @@ public class SurfaceStream
      * Capture thread.
      */
     private Thread captureThread;
+
     /**
-     * Render context provider used to draw the preview.
+     * <tt>OpenGlCtxProvider</tt> used by this instance.
      */
-    public static OpenGlCtxProvider ctxProvider;
+    private OpenGlCtxProvider myCtxProvider;
+
+    /**
+     * Object used to synchronize local preview painting.
+     */
+    private final Object paintLock = new Object();
+
+    /**
+     * Flag indicates that the local preview has been painted.
+     */
+    private boolean paintDone;
 
     /**
      * Creates new instance of <tt>SurfaceStream</tt>.
@@ -99,7 +112,9 @@ public class SurfaceStream
     @Override
     protected void onInitPreview() throws IOException
     {
-        OpenGLContext previewCtx = ctxProvider.obtainObject();
+        myCtxProvider = CameraUtils.localPreviewCtxProvider;
+
+        OpenGLContext previewCtx = myCtxProvider.obtainObject();
         this.inputSurface = new CodecInputSurface(encoderSurface,
                                                   previewCtx.getContext());
         // Make current
@@ -128,14 +143,8 @@ public class SurfaceStream
             SurfaceTexture st = surfaceManager.getSurfaceTexture();
             surfaceManager.awaitNewImage();
 
-            // Renders the preview
-            OpenGLContext previewCtx = ctxProvider.obtainObject();
-            if(previewCtx != null)
-            {
-                previewCtx.ensureIsCurrentCtx();
-                surfaceManager.drawImage();
-                previewCtx.swapBuffers();
-            }
+            // Renders the preview on main thread
+            paintLocalPreview();
 
             //TODO: use frame rate supplied by format control
             long delay = calcStats();
@@ -160,6 +169,81 @@ public class SurfaceStream
             inputSurface.swapBuffers();
 
             transferHandler.transferData(this);
+        }
+    }
+
+    /**
+     * Paints the local preview on UI thread by posting paint job and waiting
+     * for the UI handler to complete it's job.
+     */
+    private void paintLocalPreview()
+    {
+        paintDone = false;
+        OSGiActivity.uiHandler.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    assert AndroidUtils.isUIThread();
+
+                    OpenGLContext previewCtx = myCtxProvider.tryObtainObject();
+                    /**
+                     * If we will not wait until local preview frame is posted
+                     * to the TextureSurface((onSurfaceTextureUpdated) we will
+                     * freeze on trying to set the current context.
+                     * We skip the frame in this case.
+                     */
+                    if(previewCtx == null || !myCtxProvider.textureUpdated)
+                    {
+                        logger.warn("Skipped preview frame, ctx: " + previewCtx
+                        + " textureUpdated: " + myCtxProvider.textureUpdated);
+                    }
+                    else
+                    {
+                        previewCtx.ensureIsCurrentCtx();
+                        surfaceManager.drawImage();
+                        previewCtx.swapBuffers();
+                        /* If current context is not unregistered the main
+                           thread will freeze at:
+                        at com.google.android.gles_jni.EGLImpl.eglMakeCurrent(EGLImpl.java:-1)
+                        at android.view.HardwareRenderer$GlRenderer.checkRenderContextUnsafe(HardwareRenderer.java:1767)
+                        at android.view.HardwareRenderer$GlRenderer.draw(HardwareRenderer.java:1438)
+                        at android.view.ViewRootImpl.draw(ViewRootImpl.java:2381)
+                        ....
+                        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:595)
+                        at dalvik.system.NativeStart.main(NativeStart.java:-1)
+                        */
+                        previewCtx.ensureIsNotCurrentCtx();
+
+                        myCtxProvider.textureUpdated = false;
+                    }
+                }
+                finally
+                {
+                    synchronized (paintLock)
+                    {
+                        paintDone = true;
+                        paintLock.notifyAll();
+                    }
+                }
+            }
+        });
+        // Wait for the main thread to finish painting
+        synchronized (paintLock)
+        {
+            if(!paintDone)
+            {
+                try
+                {
+                    paintLock.wait();
+                }
+                catch (InterruptedException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
@@ -212,6 +296,6 @@ public class SurfaceStream
             surfaceManager = null;
         }
 
-        ctxProvider.onObjectReleased();
+        myCtxProvider.onObjectReleased();
     }
 }
