@@ -73,6 +73,14 @@ public class ConfigListPreference
         }
     }
 
+    @Override
+    protected void onAttachedToHierarchy(PreferenceManager preferenceManager)
+    {
+        // Force load default value from configuration service
+        setDefaultValue(getPersistedString(null));
+
+        super.onAttachedToHierarchy(preferenceManager);
+    }
 
     /**
      * {@inheritDoc}
@@ -92,11 +100,8 @@ public class ConfigListPreference
     @Override
     protected String getPersistedString(String defaultReturnValue)
     {
-        String value
-            = AndroidGUIActivator.getConfigurationService()
-                    .getString(getKey(), defaultReturnValue);
-
-        return value;
+        return AndroidGUIActivator.getConfigurationService()
+            .getString(getKey(), defaultReturnValue);
     }
 
     /**

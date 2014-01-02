@@ -5,24 +5,20 @@
     <org.jitsi.android.gui.settings.widget.ConfigCheckBox
         android:title="@string/service_gui_settings_SILK_FEC"
         android:key="@string/pref_key_silk_fec"
-        android:defaultValue="true"
         />
     <org.jitsi.android.gui.settings.widget.ConfigCheckBox
         android:title="@string/service_gui_settings_SILK_ASSUME_PL"
         android:key="@string/pref_key_silk_assume_pl"
-        android:defaultValue="true"
         />
     <org.jitsi.android.gui.settings.widget.ConfigEditText
         android:title="@string/service_gui_settings_SILK_FEC_SAT"
         android:key="@string/pref_key_silk_fec_sat"
         android:inputType="numberDecimal"
-        android:defaultValue="0.5"
         custom:floatMin="0"
         custom:floatMax="1"
         />
     <org.jitsi.android.gui.settings.widget.ConfigCheckBox
         android:title="@string/service_gui_settings_SILK_ADVERTISE_FEC"
         android:key="@string/pref_key_silk_advertise_FEC"
-        android:defaultValue="false"
         />
 </PreferenceScreen>

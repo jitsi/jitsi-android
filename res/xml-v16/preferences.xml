@@ -12,7 +12,6 @@
         <org.jitsi.android.gui.settings.widget.ConfigCheckBox
             android:title="@string/service_gui_settings_SHOW_ICON"
             android:key="@string/pref_key_show_jitsi_icon"
-            android:defaultValue="true"
             />
     </PreferenceCategory>
 
@@ -148,24 +147,20 @@
         <org.jitsi.android.gui.settings.widget.ConfigCheckBox
                 android:title="@string/service_gui_settings_HW_ENCODE"
                 android:key="@string/pref_key_video_hw_encode"
-                android:defaultValue="true"
                 />
         <org.jitsi.android.gui.settings.widget.ConfigCheckBox
                 android:title="@string/service_gui_settings_DIRECT_SURFACE_ENCODE"
                 android:key="@string/pref_key_video_surface_encode"
                 android:dependency="@string/pref_key_video_hw_encode"
-                android:defaultValue="true"
                 />
         <org.jitsi.android.gui.settings.widget.ConfigCheckBox
                 android:title="@string/service_gui_settings_HW_DECODE"
                 android:key="@string/pref_key_video_hw_decode"
-                android:defaultValue="false"
                 />
         <org.jitsi.android.gui.settings.widget.ConfigCheckBox
                 android:title="@string/service_gui_settings_DIRECT_SURFACE_DECODE"
                 android:key="@string/pref_key_video_surface_decode"
                 android:dependency="@string/pref_key_video_hw_decode"
-                android:defaultValue="true"
                 />
         <ListPreference
                 android:title="@string/service_gui_settings_VIDEO_RESOLUTION"

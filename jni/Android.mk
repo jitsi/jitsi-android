@@ -120,6 +120,6 @@ LOCAL_SRC_FILES		:= celt/bands.c								celt/celt.c \
 					   src/opus_decoder.c						src/opus_encoder.c \
 					   src/opus_multistream.c					src/repacketizer.c \
                        ../org_jitsi_impl_neomedia_codec_audio_opus_Opus.c
-LOCAL_CFLAGS	:= -Drestrict='' -D__EMX__ -DOPUS_BUILD -DFIXED_POINT -DUSE_ALLOCA -DHAVE_LRINT -DHAVE_LRINTF -O3 -fno-math-errno
+LOCAL_CFLAGS	:= -Drestrict='' -D__EMX__ -DOPUS_BUILD -DFIXED_POINT -DDISABLE_FLOAT_API -DUSE_ALLOCA -DHAVE_LRINT -DHAVE_LRINTF -O3 -fno-math-errno
 include $(BUILD_SHARED_LIBRARY)
 

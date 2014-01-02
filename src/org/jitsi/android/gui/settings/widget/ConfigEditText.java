@@ -9,7 +9,6 @@ package org.jitsi.android.gui.settings.widget;
 import android.content.*;
 import android.content.res.*;
 import android.preference.*;
-import android.text.*;
 import android.util.*;
 
 import org.jitsi.*;
@@ -90,16 +89,16 @@ public class ConfigEditText
             switch (attribute)
             {
                 case R.styleable.ConfigEditText_intMax:
-                    this.intMax = new Integer(attArray.getInt(attribute, -1));
+                    this.intMax = attArray.getInt(attribute, -1);
                     break;
                 case R.styleable.ConfigEditText_intMin:
-                    this.intMin = new Integer(attArray.getInt(attribute, -1));
+                    this.intMin = attArray.getInt(attribute, -1);
                     break;
                 case R.styleable.ConfigEditText_floatMax:
-                    this.floatMax = new Float(attArray.getFloat(attribute, -1));
+                    this.floatMax = attArray.getFloat(attribute, -1);
                     break;
                 case R.styleable.ConfigEditText_floatMin:
-                    this.floatMin = new Float(attArray.getFloat(attribute, -1));
+                    this.floatMin = attArray.getFloat(attribute, -1);
                     break;
                 case R.styleable.ConfigEditText_editable:
                     this.editable = attArray.getBoolean(attribute, true);
@@ -110,6 +109,15 @@ public class ConfigEditText
         setOnPreferenceChangeListener(this);
 
         configUtil.parseAttributes(context, attrs);
+    }
+
+    @Override
+    protected void onAttachedToHierarchy(PreferenceManager preferenceManager)
+    {
+        // Force load default value from configuration service
+        setDefaultValue(getPersistedString(null));
+
+        super.onAttachedToHierarchy(preferenceManager);
     }
 
     /**
@@ -130,11 +138,8 @@ public class ConfigEditText
     @Override
     protected String getPersistedString(String defaultReturnValue)
     {
-        String value
-            = AndroidGUIActivator.getConfigurationService()
+        return AndroidGUIActivator.getConfigurationService()
                     .getString(getKey(), defaultReturnValue);
-
-        return value;
     }
 
     /**

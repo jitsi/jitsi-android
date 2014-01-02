@@ -57,6 +57,15 @@ public class ConfigCheckBox
         configUtil.updateSummary(isChecked());
     }
 
+    @Override
+    protected void onAttachedToHierarchy(PreferenceManager preferenceManager)
+    {
+        // Force load default value from configuration service
+        setDefaultValue(getPersistedBoolean(false));
+
+        super.onAttachedToHierarchy(preferenceManager);
+    }
+
     /**
      * {@inheritDoc}
      */

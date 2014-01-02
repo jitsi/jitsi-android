@@ -12,7 +12,6 @@
         <org.jitsi.android.gui.settings.widget.ConfigCheckBox
                 android:title="@string/service_gui_settings_SHOW_ICON"
                 android:key="@string/pref_key_show_jitsi_icon"
-                android:defaultValue="true"
                 />
     </PreferenceCategory>
 

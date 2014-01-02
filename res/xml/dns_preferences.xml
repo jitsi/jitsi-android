@@ -9,13 +9,11 @@
             android:title="@string/plugin_dnsconfig_chkBackupDnsEnabled_text"
             android:key="@string/pref_key_dns_backup_dns_enabled"
             custom:storeInNewThread="true"
-            android:defaultValue="true"
             />
         <org.jitsi.android.gui.settings.widget.ConfigEditText
             android:title="@string/plugin_dnsconfig_lblBackupResolver_text"
             android:key="@string/pref_key_dns_backup_resolver"
             android:dependency="@string/pref_key_dns_backup_dns_enabled"
-            android:defaultValue="backup-resolver.jitsi.net"
             custom:storeInNewThread="true"
             />
         <org.jitsi.android.gui.settings.widget.ConfigEditText
@@ -29,7 +27,6 @@
             android:key="@string/pref_key_dns_backup_port"
             android:dependency="@string/pref_key_dns_backup_dns_enabled"
             android:inputType="number"
-            android:defaultValue="53"
             custom:intMax="65535"
             custom:intMin="0"
             custom:storeInNewThread="true"
@@ -40,7 +37,6 @@
             android:key="@string/pref_key_dns_backup_patience"
             android:dependency="@string/pref_key_dns_backup_dns_enabled"
             android:inputType="number"
-            android:defaultValue="1500"
             custom:storeInNewThread="true"
             custom:mapSummary="false"
             />
@@ -50,7 +46,6 @@
             android:key="@string/pref_key_dns_backup_redemption"
             android:dependency="@string/pref_key_dns_backup_dns_enabled"
             android:inputType="number"
-            android:defaultValue="3"
             custom:storeInNewThread="true"
             custom:mapSummary="false"
             />
@@ -61,13 +56,11 @@
         <org.jitsi.android.gui.settings.widget.ConfigCheckBox
             android:title="@string/plugin_dnsconfig_dnssec_chkAbsolute"
             android:key="@string/pref_key_dns_dnssec_absolute"
-            android:defaultValue="false"
             />
         <org.jitsi.android.gui.settings.widget.ConfigCheckBox
             android:title="@string/plugin_dnsconfig_dnssec_chkEnabled"
             android:summary="@string/plugin_dnsconfig_dnssec_RESTART_WARNING"
             android:key="@string/pref_key_dns_dnssec_enabled"
-            android:defaultValue="false"
             />
         <org.jitsi.android.gui.settings.widget.ConfigEditText
             android:title="@string/plugin_dnsconfig_dnssec_lblNameservers"
@@ -81,7 +74,6 @@
             android:key="@string/pref_key_dns_dnssec_default_behaviour"
             android:entries="@array/pref_dnssec_default_behaviour"
             android:entryValues="@array/pref_dnssec_default_behaviour_values"
-            android:defaultValue="WarnIfBogus"
             android:dependency="@string/pref_key_dns_dnssec_enabled"
             />
     </PreferenceCategory>
