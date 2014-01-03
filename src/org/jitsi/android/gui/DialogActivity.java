@@ -90,6 +90,13 @@ public class DialogActivity
             = new HashMap<Long, DialogListener>();
 
     /**
+     * Static list holds existing dialog instances
+     * (since onCreate() until onDestroy()). Only dialogs with valid id are
+     * listed here.
+     */
+    private final static List<Long> displayedDialogs = new ArrayList<Long>();
+
+    /**
      * The dialog listener.
      */
     private DialogListener listener;
@@ -217,6 +224,14 @@ public class DialogActivity
                 = new CloseDialogListener(dialogId);
             registerReceiver(closeIntentListener,
                              new IntentFilter(ACTION_CLOSE_DIALOG));
+
+            // Adds this dialog to active dialogs list and notifies all waiting
+            // threads.
+            synchronized (displayedDialogs)
+            {
+                displayedDialogs.add(dialogId);
+                displayedDialogs.notifyAll();
+            }
         }
     }
 
@@ -290,6 +305,12 @@ public class DialogActivity
         if(closeIntentListener != null)
         {
             unregisterReceiver(closeIntentListener);
+            // Notify about dialogs list change
+            synchronized (displayedDialogs)
+            {
+                displayedDialogs.remove(listenerID);
+                displayedDialogs.notifyAll();
+            }
         }
 
         // Skip this phase in case state was saved and Activity
@@ -451,6 +472,36 @@ public class DialogActivity
         context.startActivity(alert);
 
         return dialogId;
+    }
+
+    /**
+     * Waits until the dialog with given <tt>dialogId</tt> is opened.
+     * @param dialogId the id of the dialog we want to wait for.
+     * @return <tt>true</tt> if dialog has been opened or <tt>false</tt> if the
+     *         dialog had not been opened within 10 seconds after call to this
+     *         method.
+     */
+    public static boolean waitForDialogOpened(long dialogId)
+    {
+        synchronized (displayedDialogs)
+        {
+            if(!displayedDialogs.contains(dialogId))
+            {
+                try
+                {
+                    displayedDialogs.wait(10000);
+                    return displayedDialogs.contains(dialogId);
+                }
+                catch (InterruptedException e)
+                {
+                    throw new RuntimeException(e);
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 
     /**

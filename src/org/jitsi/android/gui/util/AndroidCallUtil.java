@@ -20,11 +20,11 @@ import net.java.sip.communicator.util.call.*;
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
-import org.jitsi.android.gui.call.*;
 
 /**
  * 
  * @author Yana Stamcheva
+ * @author Pawel Domas
  */
 public class AndroidCallUtil
 {
@@ -108,7 +108,7 @@ public class AndroidCallUtil
                         R.string.service_gui_OUTGOING_CALL_MSG,
                         destination));
 
-        createCallThread = new Thread()
+        createCallThread = new Thread("Create call thread")
         {
             public void run()
             {
@@ -126,9 +126,17 @@ public class AndroidCallUtil
                 }
                 finally
                 {
+                    if(DialogActivity.waitForDialogOpened(dialogId))
+                    {
+                        DialogActivity.closeDialog(
+                            JitsiApplication.getGlobalContext(), dialogId);
+                    }
+                    else
+                    {
+                        logger.error(
+                            "Failed to wait for the dialog: " + dialogId );
+                    }
                     createCallThread = null;
-                    DialogActivity.closeDialog(
-                        JitsiApplication.getGlobalContext(), dialogId);
                 }
             }
         };
