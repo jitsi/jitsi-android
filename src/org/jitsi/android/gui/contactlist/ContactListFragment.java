@@ -7,9 +7,11 @@
 package org.jitsi.android.gui.contactlist;
 
 import android.annotation.*;
+import android.app.*;
 import android.content.*;
 import android.os.*;
-import android.support.v4.app.*;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.*;
 import android.widget.*;
 import android.widget.ExpandableListView.OnChildClickListener;
@@ -46,6 +48,11 @@ public class ContactListFragment
     private ContactListAdapter contactListAdapter;
 
     /**
+     * Search options menu items.
+     */
+    private MenuItem searchItem;
+
+    /**
      * Contact list data model.
      */
     protected ContactListModel contactListModel;
@@ -64,6 +71,15 @@ public class ContactListFragment
      * Stores recently clicked contact group.
      */
     private MetaContactGroup clickedGroup;
+
+    /**
+     * Creates new instance of <tt>ContactListFragment</tt>.
+     */
+    public ContactListFragment()
+    {
+        // This fragment will create options menu.
+        setHasOptionsMenu(true);
+    }
 
     /**
      * {@inheritDoc}
@@ -95,6 +111,64 @@ public class ContactListFragment
     }
 
     /**
+     * Invoked when the options menu is created. Creates our own options menu
+     * from the corresponding xml.
+     *
+     * @param menu the options menu
+     */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater menuInflater)
+    {
+        super.onCreateOptionsMenu(menu, menuInflater);
+
+        Activity activity = getActivity();
+
+        // Get the SearchView and set the searchable configuration
+        SearchManager searchManager
+            = (SearchManager) activity.getSystemService(Context.SEARCH_SERVICE);
+
+        this.searchItem = menu.findItem(R.id.search);
+
+        // OnActionExpandListener not supported prior API 14
+        if(AndroidUtils.hasAPI(14))
+        {
+            searchItem.setOnActionExpandListener(
+                new MenuItem.OnActionExpandListener()
+            {
+                @Override
+                public boolean onMenuItemActionCollapse(MenuItem item)
+                {
+                    filterContactList("");
+
+                    return true; // Return true to collapse action view
+                }
+                public boolean onMenuItemActionExpand(MenuItem item)
+                {
+                    return true; // Return true to expand action view
+                }
+            });
+        }
+
+        if(AndroidUtils.hasAPI(11))
+        {
+            SearchView searchView = (SearchView) searchItem.getActionView();
+            searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(activity.getComponentName()));
+
+            int id = searchView.getContext().getResources()
+                .getIdentifier("android:id/search_src_text", null, null);
+            TextView textView = (TextView) searchView.findViewById(id);
+            textView.setTextColor(getResources().getColor(R.color.white));
+            textView.setHintTextColor(getResources().getColor(R.color.white));
+
+            SearchViewListener listener = new SearchViewListener();
+            searchView.setOnQueryTextListener(listener);
+            searchView.setOnCloseListener(listener);
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -116,6 +190,17 @@ public class ContactListFragment
 
         // Update active chats
         contactListAdapter.invalidateViews();
+
+        // Restore search state based on entered text
+        if(searchItem != null)
+        {
+            SearchView searchView = (SearchView) searchItem.getActionView();
+            int id = searchView.getContext().getResources()
+                .getIdentifier("android:id/search_src_text", null, null);
+            TextView textView = (TextView) searchView.findViewById(id);
+
+            filterContactList(textView.getText().toString());
+        }
     }
 
     /**
@@ -449,5 +534,39 @@ public class ContactListFragment
             return;
 
         contactListAdapter.filterData(query);
+    }
+
+    /**
+     * Class used to implement <tt>SearchView</tt> listeners for compatibility
+     * purposes.
+     *
+     */
+    class SearchViewListener
+        implements SearchView.OnQueryTextListener,
+                   SearchView.OnCloseListener
+    {
+        @Override
+        public boolean onClose()
+        {
+            filterContactList("");
+
+            return false;
+        }
+
+        @Override
+        public boolean onQueryTextChange(String query)
+        {
+            filterContactList(query);
+
+            return false;
+        }
+
+        @Override
+        public boolean onQueryTextSubmit(String query)
+        {
+            filterContactList(query);
+
+            return false;
+        }
     }
 }

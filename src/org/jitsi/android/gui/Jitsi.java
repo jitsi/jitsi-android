@@ -6,15 +6,9 @@
  */
 package org.jitsi.android.gui;
 
-import android.annotation.*;
 import android.app.*;
 import android.content.*;
-import android.os.*;
 import android.os.Bundle; // disambiguation
-import android.view.*;
-import android.view.MenuItem.OnActionExpandListener;
-import android.widget.*;
-import android.widget.SearchView.*;
 
 import net.java.sip.communicator.util.Logger;
 
@@ -70,7 +64,6 @@ public class Jitsi
      * the case of a tablet interface.
      */
     private ContactListFragment contactListFragment;
-    private MenuItem searchItem;
 
     /**
      * Called when the activity is starting. Initializes the corresponding
@@ -112,63 +105,6 @@ public class Jitsi
         }
 
         handleIntent(getIntent(), savedInstanceState);
-    }
-
-    /**
-     * Invoked when the options menu is created. Creates our own options menu
-     * from the corresponding xml.
-     *
-     * @param menu the options menu
-     */
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        boolean optionsMenu = super.onCreateOptionsMenu(menu);
-
-        // Get the SearchView and set the searchable configuration
-        SearchManager searchManager
-            = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-
-        this.searchItem = menu.findItem(R.id.search);
-
-        // OnActionExpandListener not supported prior API 14
-        if(AndroidUtils.hasAPI(14))
-        {
-            searchItem.setOnActionExpandListener(new OnActionExpandListener()
-            {
-                @Override
-                public boolean onMenuItemActionCollapse(MenuItem item)
-                {
-                    filterContactList("");
-
-                    return true; // Return true to collapse action view
-                }
-                public boolean onMenuItemActionExpand(MenuItem item)
-                {
-                    return true; // Return true to expand action view
-                }
-            });
-        }
-
-        if(AndroidUtils.hasAPI(11))
-        {
-            SearchView searchView = (SearchView) searchItem.getActionView();
-            searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
-
-            int id = searchView.getContext().getResources()
-                    .getIdentifier("android:id/search_src_text", null, null);
-            TextView textView = (TextView) searchView.findViewById(id);
-            textView.setTextColor(getResources().getColor(R.color.white));
-            textView.setHintTextColor(getResources().getColor(R.color.white));
-
-            SearchViewListener listener = new SearchViewListener();
-            searchView.setOnQueryTextListener(listener);
-            searchView.setOnCloseListener(listener);
-        }
-
-        return optionsMenu;
     }
 
     /**
@@ -255,28 +191,6 @@ public class Jitsi
                 .commit();
     }
 
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
-
-        // Restore search state based on entered text
-        if(searchItem != null)
-        {
-            SearchView searchView = (SearchView) searchItem.getActionView();
-            int id = searchView.getContext().getResources()
-                .getIdentifier("android:id/search_src_text", null, null);
-            TextView textView = (TextView) searchView.findViewById(id);
-
-            filterContactList(textView.getText().toString());
-        }
-    }
-
-    private void filterContactList(String query)
-    {
-        contactListFragment.filterContactList(query);
-    }
-
     /**
      * Called when an activity is destroyed.
      */
@@ -322,40 +236,6 @@ public class Jitsi
                     System.err.println("ACCOUNT DATA STRING===="
                         + accountLoginIntent.getDataString());
                 }
-        }
-    }
-
-    /**
-     * Class used to implement <tt>SearchView</tt> listeners for compatibility
-     * purposes.
-     *
-     */
-    class SearchViewListener
-        implements  OnQueryTextListener,
-                    OnCloseListener
-    {
-        @Override
-        public boolean onClose()
-        {
-            filterContactList("");
-
-            return false;
-        }
-
-        @Override
-        public boolean onQueryTextChange(String query)
-        {
-            filterContactList(query);
-
-            return false;
-        }
-
-        @Override
-        public boolean onQueryTextSubmit(String query)
-        {
-            filterContactList(query);
-
-            return false;
         }
     }
 }
