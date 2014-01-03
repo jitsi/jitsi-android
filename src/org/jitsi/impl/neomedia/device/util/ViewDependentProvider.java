@@ -49,7 +49,7 @@ public abstract class ViewDependentProvider<T>
     /**
      * The view maintained by this instance.
      */
-    private View view;
+    protected View view;
 
     /**
      * Provided object created when <tt>View</tt> is visible.

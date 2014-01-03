@@ -39,11 +39,6 @@ public class PreviewSurfaceProvider
     private final boolean setZMediaOverlay;
 
     /**
-     * Maintained <tt>SurfaceView</tt> object.
-     */
-    protected SurfaceView view;
-
-    /**
      * Creates new instance of <tt>PreviewSurfaceProvider</tt>.
      *
      * @param parent parent <tt>OSGiActivity</tt> instance.
