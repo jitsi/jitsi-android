@@ -129,6 +129,8 @@ public class AndroidUtils
             return;
         }
 
+        AndroidUtils.generalNotificationInvalidated();
+
         AndroidGUIActivator
             .getLoginRenderer()
             .updateJitsiIconNotification();

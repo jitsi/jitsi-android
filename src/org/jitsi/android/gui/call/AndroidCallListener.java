@@ -91,7 +91,6 @@ public class AndroidCallListener
             // Call Activity must close itself
             //startHomeActivity(evt);
             // Clears the in call notification
-            AndroidUtils.generalNotificationInvalidated();
             AndroidUtils.clearGeneralNotification(appContext);
             // Removes the call from active calls list
             CallManager.removeActiveCall(evt.getSourceCall());
