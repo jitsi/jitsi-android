@@ -172,6 +172,17 @@ public abstract class AccountPreferenceFragment
 
         String accountID = getArguments().getString(EXTRA_ACCOUNT_ID);
         AccountID account = AccountUtils.getAccountForID(accountID);
+
+        ProtocolProviderService pps
+            = AccountUtils.getRegisteredProviderForAccount(account);
+
+        if(pps == null)
+        {
+            logger.warn("No protocol provider registered for " + account);
+            getActivity().finish();
+            return;
+        }
+
         /**
          * Workaround for desynchronization problem when account was created for
          * the first time.
@@ -179,8 +190,7 @@ public abstract class AccountPreferenceFragment
          * AccountManager and another from corresponding ProtocolProvider.
          * We should use that one from the provider.
          */
-        account = AccountUtils.getRegisteredProviderForAccount(account)
-                .getAccountID();
+        account = pps.getAccountID();
 
         // Loads the account details
         loadAccount(account);
@@ -432,7 +442,7 @@ public abstract class AccountPreferenceFragment
     }
 
     /**
-     * Handles {@link EncodingActivity} and {@ling SecurityActivity} results 
+     * Handles {@link EncodingActivity} and {@link SecurityActivity} results
      */
     public void onActivityResult(int requestCode, int resultCode,
                                  Intent data)

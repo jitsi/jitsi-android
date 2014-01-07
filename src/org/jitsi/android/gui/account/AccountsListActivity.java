@@ -143,6 +143,10 @@ public class AccountsListActivity
         super.onCreateContextMenu(menu, v, menuInfo);
 
         getMenuInflater().inflate(R.menu.account_ctx_menu, menu);
+
+        MenuItem accountSettings = menu.findItem(R.id.account_settings);
+        accountSettings.setVisible(
+            clickedAccount.getProtocolProvider() != null);
     }
 
     @Override
@@ -237,8 +241,8 @@ public class AccountsListActivity
                 public boolean onLongClick(View v)
                 {
                     registerForContextMenu(v);
-                    openContextMenu(v);
                     clickedAccount = account;
+                    openContextMenu(v);
                     return true;
                 }
             });
