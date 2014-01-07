@@ -37,6 +37,7 @@
     <string name="service_gui_ACCOUNT_SETTINGS">Account settings</string>
     <string name="service_gui_CONTACT_PAUSED_TYPING">paused typing</string>
     <string name="service_gui_CONTACT_TYPING">is typing</string>
+    <string name="service_gui_BUSY_STATUS">Busy</string>
 
     <string name="service_gui_ADD_AUTHORIZED_CONTACT">Add %s to your contact list</string>
     <string name="service_gui_ADD_GROUP_LOCAL_ERROR">
