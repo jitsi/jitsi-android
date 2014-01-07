@@ -107,6 +107,13 @@ public class ChatController
         chatFragment.getChatListView().setOnItemClickListener(this);
         // Gets message edit view
         this.msgEdit = ((EditText)parent.findViewById(R.id.chatWriteText));
+
+        // We set input type here, as editors not always respect XML settings
+        msgEdit.setInputType(
+            InputType.TYPE_CLASS_TEXT
+                |InputType.TYPE_TEXT_VARIATION_SHORT_MESSAGE
+                |InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+
         // Handle IME send action
         msgEdit.setOnEditorActionListener(this);
         // Restore edited text
