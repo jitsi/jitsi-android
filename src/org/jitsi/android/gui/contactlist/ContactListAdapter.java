@@ -349,11 +349,13 @@ public class ContactListAdapter
                 = (TextView) convertView.findViewById(R.id.displayName);
             contactViewHolder.statusMessage
                 = (TextView) convertView.findViewById(R.id.statusMessage);
+
             contactViewHolder.avatarView
                 = (ImageView) convertView.findViewById(R.id.avatarIcon);
-	    contactViewHolder.avatarView
-		    .setOnClickListener(avatarIconClickListener);
-	    contactViewHolder.avatarView.setTag(contactViewHolder);
+            contactViewHolder.avatarView
+                .setOnClickListener(avatarIconClickListener);
+            contactViewHolder.avatarView.setTag(contactViewHolder);
+
             contactViewHolder.statusView
                 = (ImageView) convertView.findViewById(R.id.contactStatusIcon);
             contactViewHolder.callButton
@@ -365,6 +367,7 @@ public class ContactListAdapter
             contactViewHolder.buttonSeparatorView
                 = (ImageView) convertView
                     .findViewById(R.id.buttonSeparatorView);
+
             contactViewHolder.callButtonLayout
                 = convertView.findViewById(R.id.callButtonLayout);
             // Create call button listener and add bind holder tag
@@ -613,8 +616,8 @@ public class ContactListAdapter
     private final CallButtonClickListener callButtonListener
         = new CallButtonClickListener();
 
-    private final AvatarIconClickListener avatarIconClickListener =
-	    new AvatarIconClickListener();
+    private final AvatarIconClickListener avatarIconClickListener
+        = new AvatarIconClickListener();
 
     private class CallButtonClickListener
     implements View.OnClickListener
@@ -643,28 +646,28 @@ public class ContactListAdapter
 
     private class AvatarIconClickListener implements View.OnClickListener
     {
-	public void onClick(View view)
-	{
-	    if (!(view.getTag() instanceof ContactViewHolder))
-	    {
-		return;
-	    }
+        public void onClick(View view)
+        {
+            if (!(view.getTag() instanceof ContactViewHolder))
+            {
+                return;
+            }
 
-	    ContactViewHolder viewHolder = (ContactViewHolder) view.getTag();
+            ContactViewHolder viewHolder = (ContactViewHolder) view.getTag();
 
-	    MetaContact metaContact =
-		    (MetaContact) getChild(viewHolder.groupPosition,
-			    viewHolder.contactPosition);
+            MetaContact metaContact =
+                (MetaContact) getChild(viewHolder.groupPosition,
+                    viewHolder.contactPosition);
 
-	    if (metaContact != null)
-	    {
-		String contactAddress =
-			metaContact.getDefaultContact().getAddress();
-		// make toast, show contact details
-		Toast.makeText(contactListFragment.getActivity(),
-			contactAddress, Toast.LENGTH_SHORT).show();
-	    }
-	}
+            if (metaContact != null)
+            {
+                String contactAddress =
+                    metaContact.getDefaultContact().getAddress();
+                // make toast, show contact details
+                Toast.makeText(contactListFragment.getActivity(),
+                    contactAddress, Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
     private boolean isContactSelected(MetaContact metaContact)
