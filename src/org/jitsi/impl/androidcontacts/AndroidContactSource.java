@@ -6,16 +6,8 @@
  */
 package org.jitsi.impl.androidcontacts;
 
-import android.content.*;
-import android.database.*;
-import android.net.*;
-import android.os.*;
-import android.provider.*;
 import net.java.sip.communicator.service.contactsource.*;
-import org.jitsi.android.*;
-import org.jitsi.android.gui.util.*;
 
-import java.util.*;
 import java.util.regex.*;
 
 /**
@@ -27,39 +19,6 @@ public class AndroidContactSource
     implements ExtendedContactSourceService
 {
     /**
-     * Key for display name varies on Android versions
-     */
-    private final static String DISPLAY_NAME_COLUMN
-            = AndroidUtils.hasAPI(Build.VERSION_CODES.HONEYCOMB)
-                    ? ContactsContract.Contacts.DISPLAY_NAME_PRIMARY
-                    : ContactsContract.Contacts.DISPLAY_NAME;
-
-    /**
-     * Selection query
-     */
-    private static final String SELECTION = DISPLAY_NAME_COLUMN+ " LIKE ?";
-
-    /**
-     * List of projection columns that will be returned
-     */
-    private static final String[] PROJECTION =
-            {
-                    ContactsContract.Contacts._ID,
-                    ContactsContract.Contacts.LOOKUP_KEY,
-                    DISPLAY_NAME_COLUMN,
-                    ContactsContract.Contacts.HAS_PHONE_NUMBER,
-                    ContactsContract.Contacts.PHOTO_THUMBNAIL_URI,
-                    ContactsContract.Contacts.PHOTO_URI,
-                    ContactsContract.Contacts.PHOTO_ID
-            };
-
-    /**
-     * The uri that will be user for queries.
-     */
-    private static final Uri CONTACTS_URI
-            = ContactsContract.Contacts.CONTENT_URI;
-
-    /**
      * Queries this search source for the given <tt>searchPattern</tt>.
      * @param queryPattern the pattern to search for
      * @return the created query
@@ -67,52 +26,8 @@ public class AndroidContactSource
     @Override
     public ContactQuery queryContactSource(Pattern queryPattern)
     {
-        String patternStr = "%"+queryPattern.toString()+"%";
-
-        Context ctx = JitsiApplication.getGlobalContext();
-        Cursor rCursor = ctx.getContentResolver()
-                .query(CONTACTS_URI,
-                       PROJECTION,
-                       SELECTION,
-                       new String[]{patternStr}, null);
-
-        // Get projection column ids
-        int ID = rCursor.getColumnIndex(ContactsContract.Contacts._ID);
-        int LOOP_UP = rCursor.getColumnIndex(
-                ContactsContract.Contacts.LOOKUP_KEY);
-        int DISPLAY_NAME = rCursor.getColumnIndex(
-                DISPLAY_NAME_COLUMN);
-        int HAS_PHONE = rCursor.getColumnIndex(
-                ContactsContract.Contacts.HAS_PHONE_NUMBER);
-        int THUMBNAIL_URI = rCursor.getColumnIndex(
-                ContactsContract.Contacts.PHOTO_THUMBNAIL_URI);
-        int PHOTO_URI = rCursor.getColumnIndex(
-                ContactsContract.Contacts.PHOTO_URI);
-        int PHOTO_ID = rCursor.getColumnIndex(
-                ContactsContract.Contacts.PHOTO_ID);
-
-        // Create results
-        List<SourceContact> results = new ArrayList<SourceContact>();
-        while(rCursor.moveToNext())
-        {
-            long id = rCursor.getLong(ID);
-            String lookUp = rCursor.getString(LOOP_UP);
-            String displayName = rCursor.getString(DISPLAY_NAME);
-            boolean hasPhone = rCursor.getInt(HAS_PHONE) == 1;
-            String thumbnail = rCursor.getString(THUMBNAIL_URI);
-            String photoUri = rCursor.getString(PHOTO_URI);
-            String photoId = rCursor.getString(PHOTO_ID);
-
-            results.add(new AndroidContact(this, id, lookUp,
-                                           displayName,
-                                           hasPhone,
-                                           thumbnail,
-                                           photoUri,
-                                           photoId));
-        }
-        rCursor.close();
-
-        return new AndroidContactQuery(this, patternStr, results);
+        return new AndroidContactQuery(this,
+                                       "%"+queryPattern.toString()+"%");
     }
 
     /**
@@ -173,7 +88,7 @@ public class AndroidContactSource
     @Override
     public String getDisplayName()
     {
-        return "Android contacts";
+        return "Phone book";
     }
 
     /**

@@ -163,7 +163,7 @@ public class TabletContactListFragment
     private void scrollToChatContact(MetaContact chatContact)
     {
         int groupIndex
-            = contactListModel.getGroupIndex(
+            = contactListAdapter.getGroupIndex(
                     chatContact.getParentMetaContactGroup());
         if(groupIndex < 0)
         {
@@ -172,7 +172,7 @@ public class TabletContactListFragment
         }
 
         int contactIndex
-            = contactListModel.getChildIndex(groupIndex, chatContact);
+            = contactListAdapter.getChildIndex(groupIndex, chatContact);
         if(contactIndex < 0)
         {
             logger.warn(chatContact + " not found in group " + groupIndex);

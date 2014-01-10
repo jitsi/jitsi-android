@@ -28,8 +28,6 @@ public class AndroidContact
 
     private final String lookUpKey;
 
-    private final boolean hasPhone;
-
     private final String thumbnailUri;
 
     private final String photoUri;
@@ -38,14 +36,13 @@ public class AndroidContact
 
     public AndroidContact(ContactSourceService contactSource,
                           long id, String loopUpKey, String displayName,
-                          boolean hasPhone, String thumbnail, String photoUri,
+                          String thumbnail, String photoUri,
                           String photoId)
     {
         super(contactSource, displayName, new ArrayList<ContactDetail>());
 
         this.id = id;
         this.lookUpKey = loopUpKey;
-        this.hasPhone = hasPhone;
         this.thumbnailUri = thumbnail;
         this.photoUri = photoUri;
         this.photoId = photoId;
@@ -57,7 +54,10 @@ public class AndroidContact
     @Override
     public String getContactAddress()
     {
-        String address = super.getContactAddress();
+        // Return the phone number
+        return getDisplayDetails();
+
+        /*String address = super.getContactAddress();
         if(address == null)
         {
             Context ctx = JitsiApplication.getGlobalContext();
@@ -77,7 +77,33 @@ public class AndroidContact
             }
             result.close();
         }
-        return address;
+        return address;*/
+    }
+
+    @Override
+    public String getDisplayDetails()
+    {
+        String details = super.getDisplayDetails();
+        if(details == null)
+        {
+            Context ctx = JitsiApplication.getGlobalContext();
+
+            Cursor result = ctx.getContentResolver().query(
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                new String[]{ContactsContract.CommonDataKinds.Phone.DATA},
+                ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY+"=?",
+                new String[]{String.valueOf(lookUpKey)},null);
+
+            if(result.moveToNext())
+            {
+                int adrIdx = result.getColumnIndex(
+                    ContactsContract.CommonDataKinds.Phone.DATA);
+                details = result.getString(adrIdx);
+                setDisplayDetails(details);
+            }
+            result.close();
+        }
+        return details;
     }
 
     /**

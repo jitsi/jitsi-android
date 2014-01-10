@@ -19,14 +19,16 @@ import android.widget.ExpandableListView.OnGroupClickListener;
 
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.protocol.*;
-import net.java.sip.communicator.util.*;
+import net.java.sip.communicator.util.Logger;
 
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.chat.*;
+import org.jitsi.android.gui.contactlist.model.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.service.osgi.*;
+import org.jitsi.util.*;
 
 /**
  *
@@ -43,11 +45,6 @@ public class ContactListFragment
         = Logger.getLogger(ContactListFragment.class);
 
     /**
-     * The adapter containing list data.
-     */
-    private ContactListAdapter contactListAdapter;
-
-    /**
      * Search options menu items.
      */
     private MenuItem searchItem;
@@ -55,7 +52,12 @@ public class ContactListFragment
     /**
      * Contact list data model.
      */
-    protected ContactListModel contactListModel;
+    protected MetaContactListAdapter contactListAdapter;
+
+    /**
+     * List model used to search contact list and contact sources.
+     */
+    private QueryContactListAdapter sourcesAdapter;
 
     /**
      * The contact list view.
@@ -162,6 +164,16 @@ public class ContactListFragment
             textView.setTextColor(getResources().getColor(R.color.white));
             textView.setHintTextColor(getResources().getColor(R.color.white));
 
+            bindSearchListener();
+        }
+    }
+
+    private void bindSearchListener()
+    {
+        if(searchItem != null)
+        {
+            SearchView searchView = (SearchView) searchItem.getActionView();
+
             SearchViewListener listener = new SearchViewListener();
             searchView.setOnQueryTextListener(listener);
             searchView.setOnCloseListener(listener);
@@ -176,18 +188,9 @@ public class ContactListFragment
     {
         super.onResume();
 
-        contactListModel = new ContactListModel();
-        this.contactListAdapter
-            = new ContactListAdapter(this, contactListModel);
-        contactListModel.setAdapter(contactListAdapter);
-        contactListView.setAdapter(contactListAdapter);
-        // If the MetaContactListService is already available we need to
-        // initialize the adapter.
-        if (!contactListAdapter.isInitialized())
-        {
-            contactListAdapter.initAdapterData();
-        }
+        contactListView.setAdapter(getContactListAdapter());
 
+        contactListAdapter.expandAllGroups();
         // Update active chats
         contactListAdapter.invalidateViews();
 
@@ -200,7 +203,41 @@ public class ContactListFragment
             TextView textView = (TextView) searchView.findViewById(id);
 
             filterContactList(textView.getText().toString());
+
+            bindSearchListener();
         }
+    }
+
+    private MetaContactListAdapter getContactListAdapter()
+    {
+        if(contactListAdapter == null)
+        {
+            contactListAdapter = new MetaContactListAdapter(this);
+            contactListAdapter.initModelData();
+        }
+        return contactListAdapter;
+    }
+
+    private QueryContactListAdapter getSourcesAdapter()
+    {
+        if(sourcesAdapter == null)
+        {
+            sourcesAdapter
+                = new QueryContactListAdapter(
+                        this, getContactListAdapter());
+
+            sourcesAdapter.initModelData();
+        }
+        return sourcesAdapter;
+    }
+
+    private void disposeSourcesAdapter()
+    {
+        if(sourcesAdapter != null)
+        {
+            sourcesAdapter.dispose();
+        }
+        sourcesAdapter = null;
     }
 
     /**
@@ -211,15 +248,24 @@ public class ContactListFragment
     {
         super.onPause();
 
+        // Unbind search listener
+        if(searchItem != null)
+        {
+            SearchView searchView = (SearchView) searchItem.getActionView();
+            searchView.setOnQueryTextListener(null);
+            searchView.setOnCloseListener(null);
+        }
+
+        contactListView.setAdapter((ExpandableListAdapter)null);
+
         if(contactListAdapter != null)
         {
             contactListAdapter.dispose();
 
-            contactListView.setAdapter((ExpandableListAdapter)null);
-
             contactListAdapter = null;
-            contactListModel = null;
         }
+
+        disposeSourcesAdapter();
     }
 
     /**
@@ -230,6 +276,12 @@ public class ContactListFragment
                                     ContextMenu.ContextMenuInfo menuInfo)
     {
         super.onCreateContextMenu(menu, v, menuInfo);
+
+        if( contactListView.getExpandableListAdapter()
+                != getContactListAdapter() )
+        {
+            return;
+        }
 
         ExpandableListView.ExpandableListContextMenuInfo info =
                 (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
@@ -450,23 +502,32 @@ public class ContactListFragment
                                 int childPosition,
                                 long id)
     {
+        // Check if meta contact list is currently used
+        if(contactListView.getExpandableListAdapter()
+            != getContactListAdapter())
+        {
+            return false;
+        }
+
         int position
             = contactListAdapter.getListIndex(groupPosition, childPosition);
-        contactListView.setSelection(position);
 
-        contactListAdapter.notifyDataSetChanged();
+        contactListView.setSelection(position);
+        contactListAdapter.invalidateViews();
 
         MetaContact metaContact
             = (MetaContact) contactListAdapter
                 .getChild(groupPosition, childPosition);
 
-        if (metaContact != null)
+        if(metaContact == null)
         {
-            if(!metaContact.getContactsForOperationSet(
+            logger.warn(
+                "No meta contact at "+groupPosition+", "+childPosition);
+        }
+        else if(!metaContact.getContactsForOperationSet(
                     OperationSetBasicInstantMessaging.class).isEmpty())
-            {
-                startChatActivity(metaContact);
-            }
+        {
+            startChatActivity(metaContact);
             return true;
         }
         return false;
@@ -528,12 +589,90 @@ public class ContactListFragment
      * Filters contact list for given <tt>query</tt>.
      * @param query the query string that will be used for filtering contacts.
      */
-    public void filterContactList(String query)
+    private void filterContactList(String query)
     {
-        if (contactListAdapter == null)
-            return;
+        if(StringUtils.isNullOrEmpty(query))
+        {
+            // Cancel any pending queries
+            disposeSourcesAdapter();
 
-        contactListAdapter.filterData(query);
+            // Display the contact list
+            if( contactListView.getExpandableListAdapter()
+                != getContactListAdapter() )
+            {
+                contactListView.setAdapter(getContactListAdapter());
+
+                contactListAdapter.filterData("");
+            }
+        }
+        else
+        {
+            // Display search results
+            if( contactListView.getExpandableListAdapter()
+                != getSourcesAdapter() )
+            {
+                contactListView.setAdapter(getSourcesAdapter());
+            }
+
+            // Update query string
+            sourcesAdapter.filterData(query);
+        }
+
+        updateSearchView(query);
+    }
+
+    private void updateSearchView(final String query)
+    {
+        View view = getView();
+        if(view == null)
+        {
+            logger.error("No view created yet!!! query: "+query);
+            return;
+        }
+
+        RelativeLayout callSearchLayout
+            = (RelativeLayout) view.findViewById(R.id.callSearchLayout);
+
+        if (StringUtils.isNullOrEmpty(query))
+        {
+            if (callSearchLayout != null)
+            {
+                callSearchLayout.setVisibility(View.INVISIBLE);
+                callSearchLayout.getLayoutParams().height = 0;
+            }
+        }
+        else
+        {
+            if (callSearchLayout != null)
+            {
+                TextView searchContactView
+                    = (TextView) callSearchLayout
+                    .findViewById(R.id.callSearchContact);
+
+                searchContactView.setText(query);
+                callSearchLayout.getLayoutParams().height
+                    = searchContactView.getResources()
+                        .getDimensionPixelSize(R.dimen.account_list_row_height);
+
+                callSearchLayout.setVisibility(View.VISIBLE);
+
+                final ImageButton callButton
+                    = (ImageButton) callSearchLayout
+                            .findViewById(R.id.contactCallButton);
+                callButton.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        AndroidCallUtil
+                            .createAndroidCall(
+                                getActivity(),
+                                callButton,
+                                query);
+                    }
+                });
+            }
+        }
     }
 
     /**
@@ -550,7 +689,7 @@ public class ContactListFragment
         {
             filterContactList("");
 
-            return false;
+            return true;
         }
 
         @Override
@@ -558,7 +697,7 @@ public class ContactListFragment
         {
             filterContactList(query);
 
-            return false;
+            return true;
         }
 
         @Override
@@ -566,7 +705,7 @@ public class ContactListFragment
         {
             filterContactList(query);
 
-            return false;
+            return true;
         }
     }
 }

@@ -66,6 +66,14 @@ public class Jitsi
     private ContactListFragment contactListFragment;
 
     /**
+     * Variable caches instance state stored for example on on rotate event to
+     * prevent from recreating the contact list after rotation.
+     * It is passed as second argument of {@link #handleIntent(Intent, Bundle)}
+     * when called from {@link #onNewIntent(Intent)}.
+     */
+    private Bundle instanceState;
+
+    /**
      * Called when the activity is starting. Initializes the corresponding
      * call interface.
      *
@@ -117,7 +125,15 @@ public class Jitsi
     {
         super.onNewIntent(intent);
 
-        handleIntent(intent, null);
+        handleIntent(intent, instanceState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState)
+    {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        this.instanceState = savedInstanceState;
     }
 
     /**

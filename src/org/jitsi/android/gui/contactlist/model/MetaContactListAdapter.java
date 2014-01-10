@@ -4,7 +4,7 @@
  * Distributable under LGPL license.
  * See terms of license at gnu.org.
  */
-package org.jitsi.android.gui.contactlist;
+package org.jitsi.android.gui.contactlist.model;
 
 import android.os.*;
 import android.os.Handler;
@@ -14,6 +14,12 @@ import net.java.sip.communicator.service.contactlist.event.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.protocol.event.*;
 
+import net.java.sip.communicator.util.*;
+import org.jitsi.*;
+import org.jitsi.android.*;
+import org.jitsi.android.gui.*;
+import org.jitsi.android.gui.chat.*;
+import org.jitsi.android.gui.contactlist.*;
 import org.jitsi.service.osgi.*;
 import org.jitsi.util.Logger;
 
@@ -24,16 +30,20 @@ import java.util.*;
  * from contact sources.(It will apply contact source filters which result in
  * different output model).
  *
+ * @author Yana Stamcheva
  * @author Pawel Domas
  */
-public class ContactListModel
+public class MetaContactListAdapter
+    extends BaseContactListAdapter
     implements MetaContactListListener,
-               ContactPresenceStatusListener
+               ContactPresenceStatusListener,
+               UIGroupRenderer
 {
     /**
      * The logger for this class.
      */
-    private final Logger logger = Logger.getLogger(ContactListModel.class);
+    private final Logger logger
+        = Logger.getLogger(MetaContactListAdapter.class);
 
     /**
      * UI thread handler used to call all operations that access data model.
@@ -45,11 +55,6 @@ public class ContactListModel
      * The current filter query.
      */
     private String currentQuery;
-
-    /**
-     * Adapter used to display this contact list.
-     */
-    private ContactListAdapter contactListAdapter;
 
     /**
      * The list of contact list groups
@@ -77,28 +82,31 @@ public class ContactListModel
      */
     private MetaContactListService contactListService;
 
-    public ContactListModel()
+    /**
+     * <tt>MetaContactRenderer</tt> instance used by this adapter.
+     */
+    private MetaContactRenderer contactRenderer;
+
+    public MetaContactListAdapter(ContactListFragment contactListFragment)
     {
+        super(contactListFragment);
+
         this.originalContacts = new LinkedList<TreeSet<MetaContact>>();
         this.contacts = new LinkedList<TreeSet<MetaContact>>();
         this.originalGroups = new LinkedList<MetaContactGroup>();
         this.groups = new LinkedList<MetaContactGroup>();
     }
 
-    public void setAdapter(ContactListAdapter adapter)
-    {
-        this.contactListAdapter = adapter;
-    }
-
     /**
      * Initializes the adapter data.
      *
-     * @param clService the <tt>MetaContactListService</tt>, which is the
-     * back end of this adapter
      */
-    void initModelData(MetaContactListService clService)
+    public void initModelData()
     {
-        contactListService = clService;
+        contactListService
+            = ServiceUtils.getService(
+                AndroidGUIActivator.bundleContext,
+                MetaContactListService.class);
 
         addContacts(contactListService.getRoot());
 
@@ -119,6 +127,15 @@ public class ContactListModel
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UIGroupRenderer getGroupRenderer(int groupPosition)
+    {
+        return this;
+    }
+
+    /**
      * Assert that current thread is the UI thread.
      */
     private void assertUIThread()
@@ -131,6 +148,7 @@ public class ContactListModel
      *
      * @param groupPosition the index of the group
      */
+    @Override
     public Object getGroup(int groupPosition)
     {
         assertUIThread();
@@ -141,6 +159,7 @@ public class ContactListModel
     /**
      * Returns the count of all groups contained in this adapter.
      */
+    @Override
     public int getGroupCount()
     {
         assertUIThread();
@@ -155,11 +174,22 @@ public class ContactListModel
      * @param groupPosition the index of the group, which children we would
      * like to count
      */
+    @Override
     public int getChildrenCount(int groupPosition)
     {
         assertUIThread();
 
         return getContactList(groupPosition).size();
+    }
+
+    @Override
+    public UIContactRenderer getContactRenderer(int groupPosition)
+    {
+        if(contactRenderer == null)
+        {
+            contactRenderer = new MetaContactRenderer();
+        }
+        return contactRenderer;
     }
 
     /**
@@ -207,7 +237,7 @@ public class ContactListModel
      * @param group the group for which we need the index.
      * @return index of given <tt>MetaContactGroup</tt> or -1 if not found
      */
-    int getGroupIndex(MetaContactGroup group)
+    public int getGroupIndex(MetaContactGroup group)
     {
         return groups.indexOf(group);
     }
@@ -220,7 +250,7 @@ public class ContactListModel
      * @return index of <tt>MetaContact</tt> inside group identified by given
      *         group index.
      */
-    int getChildIndex(int groupIndex, MetaContact contact)
+    public int getChildIndex(int groupIndex, MetaContact contact)
     {
         return getChildIndex(getContactList(groupIndex), contact);
     }
@@ -428,8 +458,7 @@ public class ContactListModel
                             metaContact);
 
         if (contactIndex >= 0)
-            contactListAdapter
-                .updateDisplayName(groupIndex, contactIndex);
+            updateDisplayName(groupIndex, contactIndex);
     }
 
     /**
@@ -449,8 +478,7 @@ public class ContactListModel
             = getChildIndex(getContactList(groupIndex), metaContact);
 
         if (contactIndex >= 0)
-            contactListAdapter.
-                updateAvatar(groupIndex, contactIndex, metaContact);
+            updateAvatar(groupIndex, contactIndex, metaContact);
     }
 
     /**
@@ -470,8 +498,7 @@ public class ContactListModel
             = getChildIndex(getContactList(groupIndex), metaContact);
 
         if (contactIndex >= 0)
-            contactListAdapter.
-                updateStatus(groupIndex, contactIndex, metaContact);
+            updateStatus(groupIndex, contactIndex, metaContact);
     }
 
     /**
@@ -493,7 +520,7 @@ public class ContactListModel
                 addContact(evt.getParentGroup(),
                            evt.getSourceMetaContact());
 
-                contactListAdapter.dataChanged();
+                notifyDataSetChanged();
             }
         });
     }
@@ -547,18 +574,11 @@ public class ContactListModel
      */
     public void protoContactModified(final ProtoContactEvent evt)
     {
-        uiHandler.post(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                if (logger.isDebugEnabled())
-                    logger.debug("PROTO CONTACT MODIFIED: "
-                                     + evt.getProtoContact().getAddress());
+        if (logger.isDebugEnabled())
+            logger.debug("PROTO CONTACT MODIFIED: "
+                             + evt.getProtoContact().getAddress());
 
-                contactListAdapter.invalidateViews();
-            }
-        });
+        invalidateViews();
     }
 
     /**
@@ -624,7 +644,7 @@ public class ContactListModel
                 removeContact( evt.getParentGroup(),
                                evt.getSourceMetaContact());
 
-                contactListAdapter.dataChanged();
+                notifyDataSetChanged();
             }
         });
     }
@@ -693,7 +713,7 @@ public class ContactListModel
                         dstGroup.add(evt.getSourceMetaContact());
                     }
                 }
-                contactListAdapter.dataChanged();
+                notifyDataSetChanged();
             }
         });
     }
@@ -716,7 +736,7 @@ public class ContactListModel
 
                 addContacts(evt.getSourceMetaContactGroup());
 
-                contactListAdapter.dataChanged();
+                notifyDataSetChanged();
             }
         });
     }
@@ -731,7 +751,7 @@ public class ContactListModel
         if (logger.isDebugEnabled())
             logger.debug("GROUP MODIFIED: " + evt.getSourceMetaContactGroup());
 
-        contactListAdapter.invalidateViews();
+        invalidateViews();
     }
 
     /**
@@ -753,7 +773,7 @@ public class ContactListModel
 
                 removeGroup(evt.getSourceMetaContactGroup());
 
-                contactListAdapter.dataChanged();
+                notifyDataSetChanged();
             }
         });
     }
@@ -806,7 +826,7 @@ public class ContactListModel
                     }
                 }
 
-                contactListAdapter.dataChanged();
+                notifyDataSetChanged();
             }
         });
     }
@@ -822,7 +842,7 @@ public class ContactListModel
             logger.debug("META CONTACT MODIFIED: "
                              + evt.getSourceMetaContact());
 
-        contactListAdapter.invalidateViews();
+        invalidateViews();
     }
 
     /**
@@ -858,10 +878,9 @@ public class ContactListModel
      * @return the contained object on the given <tt>groupPosition</tt> and
      * <tt>childPosition</tt>
      */
-    public MetaContact getChild(int groupPosition, int childPosition)
+    @Override
+    public Object getChild(int groupPosition, int childPosition)
     {
-        assertUIThread();
-
         if (contacts.size() <= 0)
             return null;
 
@@ -944,9 +963,9 @@ public class ContactListModel
             }
         }
 
-        contactListAdapter.notifyDataSetChanged();
+        notifyDataSetChanged();
 
-        contactListAdapter.expandAllGroups();
+        expandAllGroups();
     }
 
     /**
@@ -1099,11 +1118,33 @@ public class ContactListModel
     }
 
     /**
-     * Returns root <tt>MetaContactGroup</tt> of the contact list.
-     * @return root <tt>MetaContactGroup</tt> of the contact list.
+     * Checks if given <tt>metaContact</tt> is considered to be selected. That
+     * is if the chat session with given <tt>metaContact</tt> is the one
+     * currently visible.
+     * @param metaContact the <tt>MetaContact</tt> to check.
+     * @return <tt>true</tt> if given <tt>metaContact</tt> is considered to be
+     *         selected.
      */
-    public MetaContactGroup getRoot()
+    public static boolean isContactSelected(MetaContact metaContact)
     {
-        return contactListService.getRoot();
+        return ChatSessionManager.getCurrentChatId() != null
+            && ChatSessionManager.getActiveChat(metaContact) != null
+            && ChatSessionManager.getCurrentChatId().equals(
+            ChatSessionManager.getActiveChat(metaContact).getChatId());
+    }
+
+    /**
+     * Implements {@link UIGroupRenderer}.
+     * {@inheritDoc}
+     */
+    @Override
+    public String getDisplayName(Object groupImpl)
+    {
+        MetaContactGroup metaGroup = (MetaContactGroup) groupImpl;
+        if (metaGroup.equals(contactListService.getRoot()))
+            return JitsiApplication.getResString(
+                R.string.service_gui_CONTACTS);
+        else
+            return metaGroup.getGroupName();
     }
 }

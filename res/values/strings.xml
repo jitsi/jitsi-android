@@ -60,6 +60,7 @@
         Enter group name
     </string>
     <string name="service_gui_ADD_GROUP">Create group</string>
+    <string name="service_gui_AT">at</string>
     <string name="service_gui_AUTHENTICATION_REJECTED">contact has rejected your authorization request.</string>
     <string name="service_gui_AUTHENTICATION_WINDOW_TITLE">%s authentication</string>
     <string name="service_gui_AUTHENTICATION_REQUESTED">Authentication requested</string>
@@ -73,6 +74,7 @@
         In the field below enter the name of the group you would like to create.
     </string>
     <string name="service_gui_DENY">Deny</string>
+    <string name="service_gui_DURATION">duration</string>
     <string name="service_gui_EDITED_AT">edited at %s</string>
     <string name="service_gui_IGNORE">Ignore</string>
     <string name="service_gui_LAST_MSG_CORRECTION">Last message correction</string>

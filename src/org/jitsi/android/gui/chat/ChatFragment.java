@@ -31,7 +31,7 @@ import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.account.*;
-import org.jitsi.android.gui.contactlist.*;
+import org.jitsi.android.gui.contactlist.model.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.android.gui.util.event.EventListener;
 import org.jitsi.service.osgi.*;
@@ -770,11 +770,11 @@ public class ChatFragment
             Drawable status;
             if (viewHolder.viewType == INCOMING_MESSAGE_VIEW)
             {
-                avatar = ContactListAdapter.getAvatarDrawable(
-                        chatSession.getMetaContact());
+                avatar = MetaContactRenderer.getAvatarDrawable(
+                    chatSession.getMetaContact());
 
-                status = ContactListAdapter.getStatusDrawable(
-                        chatSession.getMetaContact());
+                status = MetaContactRenderer.getStatusDrawable(
+                    chatSession.getMetaContact());
             }
             else if (viewHolder.viewType == OUTGOING_MESSAGE_VIEW)
             {
@@ -1102,8 +1102,8 @@ public class ChatFragment
                     && viewHolder.viewType
                         == chatListAdapter.INCOMING_MESSAGE_VIEW)
                 {
-                    Drawable status = ContactListAdapter
-                        .getStatusDrawable(
+                    Drawable status
+                        = MetaContactRenderer.getStatusDrawable(
                             chatSession.getMetaContact());
 
                     ImageView statusView = viewHolder.statusView;
