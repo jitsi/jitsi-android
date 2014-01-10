@@ -55,6 +55,11 @@ public class ContactListFragment
     protected MetaContactListAdapter contactListAdapter;
 
     /**
+     * Meta contact groups expand memory.
+     */
+    private MetaGroupExpandHandler listExpandHandler;
+
+    /**
      * List model used to search contact list and contact sources.
      */
     private QueryContactListAdapter sourcesAdapter;
@@ -190,7 +195,11 @@ public class ContactListFragment
 
         contactListView.setAdapter(getContactListAdapter());
 
-        contactListAdapter.expandAllGroups();
+        // Attach contact groups expand memory
+        listExpandHandler = new MetaGroupExpandHandler(contactListAdapter,
+                                                       contactListView);
+        listExpandHandler.bindAndRestore();
+
         // Update active chats
         contactListAdapter.invalidateViews();
 
@@ -254,6 +263,13 @@ public class ContactListFragment
             SearchView searchView = (SearchView) searchItem.getActionView();
             searchView.setOnQueryTextListener(null);
             searchView.setOnCloseListener(null);
+        }
+
+        // Dispose of group expand memory
+        if(listExpandHandler != null)
+        {
+            listExpandHandler.unbind();
+            listExpandHandler = null;
         }
 
         contactListView.setAdapter((ExpandableListAdapter)null);
@@ -604,9 +620,19 @@ public class ContactListFragment
 
                 contactListAdapter.filterData("");
             }
+
+            // Restore previously collapsed groups
+            if(listExpandHandler != null)
+            {
+                listExpandHandler.bindAndRestore();
+            }
         }
         else
         {
+            // Unbind group expand memory
+            if(listExpandHandler != null)
+                listExpandHandler.unbind();
+
             // Display search results
             if( contactListView.getExpandableListAdapter()
                 != getSourcesAdapter() )
@@ -626,7 +652,7 @@ public class ContactListFragment
         View view = getView();
         if(view == null)
         {
-            logger.error("No view created yet!!! query: "+query);
+            logger.error("No view created yet!!! query: " + query);
             return;
         }
 
