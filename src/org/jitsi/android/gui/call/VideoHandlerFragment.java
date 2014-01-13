@@ -20,6 +20,7 @@ import net.java.sip.communicator.util.call.*;
 
 import org.jitsi.*;
 import org.jitsi.android.gui.controller.*;
+import org.jitsi.android.gui.util.*;
 import org.jitsi.android.util.java.awt.*;
 import org.jitsi.impl.neomedia.codec.video.*;
 import org.jitsi.impl.neomedia.device.util.*;
@@ -138,6 +139,7 @@ public class VideoHandlerFragment
             .addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener()
                 {
+                    @SuppressWarnings("deprecation")
                     @Override
                     public void onGlobalLayout()
                     {
@@ -148,8 +150,16 @@ public class VideoHandlerFragment
                         updateCallInfoMargin();
 
                         // Remove the listener, as it has to be called only once
-                        ctrlButtonsGroup.getViewTreeObserver()
-                            .removeOnGlobalLayoutListener(this);
+                        if (AndroidUtils.hasAPI(16))
+                        {
+                            ctrlButtonsGroup.getViewTreeObserver()
+                                .removeOnGlobalLayoutListener(this);
+                        }
+                        else
+                        {
+                            ctrlButtonsGroup.getViewTreeObserver()
+                                .removeGlobalOnLayoutListener(this);
+                        }
                     }
                 });
 
@@ -467,6 +477,7 @@ public class VideoHandlerFragment
      *
      * @param callPeer owner of video object.
      */
+    @SuppressWarnings("deprecation")
     private void initRemoteVideo(CallPeer callPeer)
     {
         ProtocolProviderService pps = callPeer.getProtocolProvider();
