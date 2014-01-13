@@ -7,10 +7,6 @@
 	<classpathentry kind="lib" path="libs/java-stubs.jar" sourcepath="lib/java-stubs.jar"/>
 	<classpathentry kind="lib" path="libs/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="libs/osgi.core.jar"/>
-	<classpathentry kind="lib" path="libs/installer-exclude/package-renamer.jar"/>
-	<classpathentry kind="lib" path="libs/installer-exclude/jarjar.jar"/>
-	<classpathentry kind="lib" path="libs/installer-exclude/asm-4.1.jar"/>
-	<classpathentry kind="lib" path="libs/installer-exclude/asm-commons-4.1.jar"/>
 	<classpathentry kind="lib" path="libs/bccontrib.jar"/>
 	<classpathentry kind="lib" path="libs/bouncycastle.jar"/>
 	<classpathentry kind="lib" path="libs/browserlauncher.jar"/>
