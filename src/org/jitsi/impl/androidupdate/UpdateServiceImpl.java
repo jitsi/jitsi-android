@@ -280,7 +280,8 @@ public class UpdateServiceImpl
         {
             try
             {
-                apkIds.add(Long.parseLong(idStr));
+                if(!idStr.isEmpty())
+                    apkIds.add(Long.parseLong(idStr));
             }
             catch (NumberFormatException e)
             {
