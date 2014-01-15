@@ -614,4 +614,10 @@ public class AndroidUIServiceImpl
     {
         // TODO: not implemented
     }
+
+    @Override
+    public void showAddChatRoomDialog()
+    {
+        // TODO: not implemented
+    }
 }

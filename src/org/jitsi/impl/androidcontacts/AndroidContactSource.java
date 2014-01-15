@@ -24,7 +24,7 @@ public class AndroidContactSource
      * @return the created query
      */
     @Override
-    public ContactQuery queryContactSource(Pattern queryPattern)
+    public ContactQuery createContactQuery(Pattern queryPattern)
     {
         return new AndroidContactQuery(this,
                                        "%"+queryPattern.toString()+"%");
@@ -37,9 +37,9 @@ public class AndroidContactSource
      * @return the created query
      */
     @Override
-    public ContactQuery queryContactSource(String query)
+    public ContactQuery createContactQuery(String query)
     {
-        return queryContactSource(
+        return createContactQuery(
             Pattern.compile(query, Pattern.CASE_INSENSITIVE | Pattern.LITERAL));
     }
 
@@ -51,9 +51,9 @@ public class AndroidContactSource
      * @return the created query
      */
     @Override
-    public ContactQuery queryContactSource(String query, int contactCount)
+    public ContactQuery createContactQuery(String query, int contactCount)
     {
-        return queryContactSource(
+        return createContactQuery(
             Pattern.compile(query, Pattern.CASE_INSENSITIVE | Pattern.LITERAL));
     }
 

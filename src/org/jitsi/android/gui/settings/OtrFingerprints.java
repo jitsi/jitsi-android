@@ -115,12 +115,13 @@ public class OtrFingerprints
                 = (AdapterView.AdapterContextMenuInfo) menuInfo;
         Contact contact = (Contact) adapter.getItem(ctxInfo.position);
 
+        /* TODO: OTR update
         boolean isVerified = OtrActivator.scOtrKeyManager.isVerified(contact);
         boolean keyExists = OtrActivator.scOtrKeyManager
                 .getRemoteFingerprint(contact) != null;
 
         menu.findItem(R.id.verify).setEnabled(!isVerified && keyExists);
-        menu.findItem(R.id.forget).setEnabled(isVerified);
+        menu.findItem(R.id.forget).setEnabled(isVerified);*/
     }
 
     /**
@@ -138,7 +139,8 @@ public class OtrFingerprints
 
         if(id == R.id.forget)
         {
-            OtrActivator.scOtrKeyManager.unverify(contact);
+            // TODO: OTR update
+            // OtrActivator.scOtrKeyManager.unverify(contact);
 
             adapter.notifyDataSetChanged();
 
@@ -146,7 +148,8 @@ public class OtrFingerprints
         }
         else if(id == R.id.verify)
         {
-            OtrActivator.scOtrKeyManager.verify(contact);
+            // TODO: OTR update
+            //OtrActivator.scOtrKeyManager.verify(contact);
 
             adapter.notifyDataSetChanged();
 
@@ -222,6 +225,7 @@ public class OtrFingerprints
             ViewUtil.setTextViewValue(row, R.id.accountName,
                                       contact.getDisplayName());
 
+            /* TODO: OTR update
             ViewUtil.setTextViewValue(row, R.id.fingerprint,
                                       keyManager.getRemoteFingerprint(contact));
 
@@ -234,7 +238,7 @@ public class OtrFingerprints
                     getString(stringRes));
 
             ViewUtil.setTextViewValue(row, R.id.fingerprint_status, verifyStr);
-
+            */
             return row;
         }
     }

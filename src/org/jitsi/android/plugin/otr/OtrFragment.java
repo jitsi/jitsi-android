@@ -73,8 +73,9 @@ public class OtrFragment
      */
     private void doInit()
     {
-        OtrActivator.scOtrEngine.addListener(scOtrEngineListener);
-        OtrActivator.scOtrKeyManager.addListener(scOtrKeyManagerListener);
+        // TODO: OTR update
+        //OtrActivator.scOtrEngine.addListener(scOtrEngineListener);
+        //OtrActivator.scOtrKeyManager.addListener(scOtrKeyManagerListener);
 
         ChatSessionManager.addCurrentChatListener(this);
 
@@ -89,8 +90,9 @@ public class OtrFragment
     {
         ChatSessionManager.removeCurrentChatListener(this);
 
-        OtrActivator.scOtrEngine.removeListener(scOtrEngineListener);
-        OtrActivator.scOtrKeyManager.removeListener(scOtrKeyManagerListener);
+        // TODO: OTR update
+        //OtrActivator.scOtrEngine.removeListener(scOtrEngineListener);
+        //OtrActivator.scOtrKeyManager.removeListener(scOtrKeyManagerListener);
 
         super.onPause();
     }
@@ -156,6 +158,7 @@ public class OtrFragment
      */
     private void doHandleOtrPadlockPressed()
     {
+        /* TODO: OTR update
         switch (OtrActivator.scOtrEngine.getSessionStatus(currentContact))
         {
             case ENCRYPTED:
@@ -169,7 +172,7 @@ public class OtrFragment
                 // start session.
                 OtrActivator.scOtrEngine.startSession(currentContact);
                 break;
-        }
+        }*/
     }
 
     /**
@@ -180,6 +183,7 @@ public class OtrFragment
     /**
      * OTR engine listener.
      */
+    /* TODO: OTR update
     private final ScOtrEngineListener scOtrEngineListener =
             new ScOtrEngineListener()
     {
@@ -214,6 +218,7 @@ public class OtrFragment
     /**
      * OTR key manager listener.
      */
+    /* TODO: OTR update
     private final ScOtrKeyManagerListener scOtrKeyManagerListener =
     new ScOtrKeyManagerListener()
     {
@@ -226,7 +231,7 @@ public class OtrFragment
                         OtrActivator.scOtrEngine.getSessionStatus(contact));
             }
         }
-    };
+    };*/
 
     /**
      * Sets the current <tt>Contact</tt> and updates status and policy.
@@ -253,7 +258,8 @@ public class OtrFragment
         this.currentContact = contact;
         if (contact != null)
         {
-            this.setStatus(OtrActivator.scOtrEngine.getSessionStatus(contact));
+            // TODO: OTR update
+            //this.setStatus(OtrActivator.scOtrEngine.getSessionStatus(contact));
             this.setPolicy(OtrActivator.scOtrEngine.getContactPolicy(contact));
         }
         else
@@ -320,9 +326,10 @@ public class OtrFragment
         switch (status)
         {
             case ENCRYPTED:
-                iconId = OtrActivator.scOtrKeyManager.isVerified(currentContact)
-                       ? R.drawable.encrypted_verified
-                       : R.drawable.encrypted_unverified;
+                iconId = // TODO: OTR update
+                       //OtrActivator.scOtrKeyManager.isVerified(currentContact)
+                       //? R.drawable.encrypted_verified
+                       R.drawable.encrypted_unverified;
                 break;
             case FINISHED:
                 iconId = R.drawable.encrypted_finished;

@@ -199,9 +199,11 @@ public class QueryContactListAdapter
 
         for(ContactSourceService css : sources)
         {
-            ContactQuery query = css.queryContactSource(queryStr);
+            ContactQuery query = css.createContactQuery(queryStr);
             queries.add(query);
             query.addContactQueryListener(this);
+
+            query.start();
         }
 
         metaContactList.filterData(queryStr);
