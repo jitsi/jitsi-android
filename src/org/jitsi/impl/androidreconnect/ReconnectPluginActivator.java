@@ -1058,17 +1058,17 @@ public class ReconnectPluginActivator
      */
     private long getInitialReconnectDelay()
     {
-        if(JitsiApplication.getLastGuiActivityInterval()
-            < GUI_IDLE_THRESHOLD)
-        {
+        //if(JitsiApplication.getLastGuiActivityInterval()
+        //    < GUI_IDLE_THRESHOLD)
+        //{
             // Return short reconnect delay when the GUI is considered active
             return (long)(RECONNECT_DELAY_MIN
                 + Math.random() * RECONNECT_DELAY_MAX)*1000;
-        }
-        else
-        {
-            return (long)(RECONNECT_IDLE_DELAY_MIN
-                + Math.random() * RECONNECT_IDLE_DELAY_MAX)*1000;
-        }
+        //}
+        //else
+        //{
+        //    return (long)(RECONNECT_IDLE_DELAY_MIN
+        //        + Math.random() * RECONNECT_IDLE_DELAY_MAX)*1000;
+        //}
     }
 }
