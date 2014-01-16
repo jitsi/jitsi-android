@@ -518,30 +518,27 @@ public class ContactListFragment
                                 int childPosition,
                                 long id)
     {
-        // Check if meta contact list is currently used
-        if(contactListView.getExpandableListAdapter()
-            != getContactListAdapter())
+        BaseContactListAdapter adapter
+            = (BaseContactListAdapter) listView.getExpandableListAdapter();
+
+        int position
+            = adapter.getListIndex(groupPosition, childPosition);
+
+        contactListView.setSelection(position);
+        adapter.invalidateViews();
+
+        Object clicked = adapter.getChild(groupPosition, childPosition);
+        if(!(clicked instanceof MetaContact))
         {
+            logger.debug(
+                "No meta contact at "+groupPosition+", "+childPosition);
             return false;
         }
 
-        int position
-            = contactListAdapter.getListIndex(groupPosition, childPosition);
+        MetaContact metaContact = (MetaContact) clicked;
 
-        contactListView.setSelection(position);
-        contactListAdapter.invalidateViews();
-
-        MetaContact metaContact
-            = (MetaContact) contactListAdapter
-                .getChild(groupPosition, childPosition);
-
-        if(metaContact == null)
-        {
-            logger.warn(
-                "No meta contact at "+groupPosition+", "+childPosition);
-        }
-        else if(!metaContact.getContactsForOperationSet(
-                    OperationSetBasicInstantMessaging.class).isEmpty())
+        if(!metaContact.getContactsForOperationSet(
+                OperationSetBasicInstantMessaging.class).isEmpty())
         {
             startChatActivity(metaContact);
             return true;
