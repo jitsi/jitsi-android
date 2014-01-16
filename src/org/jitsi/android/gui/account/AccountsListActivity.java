@@ -388,11 +388,18 @@ public class AccountsListActivity
             }
             finally
             {
-                accEnableThread = null;
+                if(DialogActivity.waitForDialogOpened(progressDialog))
+                {
+                    DialogActivity.closeDialog(
+                        JitsiApplication.getGlobalContext(), progressDialog);
+                }
+                else
+                {
+                    logger.error(
+                        "Failed to wait for the dialog: " + progressDialog );
+                }
 
-                DialogActivity.closeDialog(
-                    JitsiApplication.getGlobalContext(),
-                    progressDialog);
+                accEnableThread = null;
             }
         }
     }
