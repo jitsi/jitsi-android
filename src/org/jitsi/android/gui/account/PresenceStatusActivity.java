@@ -125,8 +125,13 @@ public class PresenceStatusActivity
         // Check for presence support
         if(accountPresence == null)
         {
-            logger.error("Presence is not supported by "
-                         + account.getAccountName());
+            Toast t = Toast.makeText(
+                this,
+                getString( R.string.service_gui_PRESENCE_NOT_SUPPORTED,
+                           account.getAccountName() ),
+                Toast.LENGTH_LONG);
+            t.show();
+
             finish();
             return;
         }

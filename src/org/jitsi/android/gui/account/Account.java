@@ -267,10 +267,21 @@ public class Account
     private void setProtocolProvider(ProtocolProviderService protocolProvider)
     {
         if(this.protocolProvider != null
-                && protocolProvider != null
-                && !this.protocolProvider.equals(protocolProvider))
-            throw new RuntimeException(
-                    "This account have already registered provider");
+                && protocolProvider != null)
+        {
+            if(this.protocolProvider == protocolProvider)
+            {
+                // It's the same
+                return;
+            }
+
+            logger.warn("This account have already registered provider "
+                            + "- will update");
+            // Unregister old
+            setProtocolProvider(null);
+            // Register new
+            setProtocolProvider(protocolProvider);
+        }
 
         if(protocolProvider != null)
         {

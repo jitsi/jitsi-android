@@ -76,12 +76,6 @@ public class AccountsListAdapter
     private final boolean filterDisabledAccounts;
 
     /**
-     * If set to true adapter will not remove accounts from the list on
-     * protocol service unregistered events.
-     */
-    private final boolean keepUnregisteredAccounts;
-
-    /**
      * Creates new instance of {@link AccountsListAdapter}
      *
      * @param parent the {@link Activity} running this adapter
@@ -90,22 +84,17 @@ public class AccountsListAdapter
      *  {@link AccountsListAdapter} for detailed description
      * @param filterDisabledAccounts flag indicates if disabled accounts
      *  should be filtered out from the list
-     * @param keepUnregisteredAccounts if set to <tt>true</tt> adapter
-     *                                 will not remove accounts on service
-     *                                 unregistered events.
      */
     public AccountsListAdapter(
             Activity parent,
             int listRowResourceID,
             int dropDownRowResourceID,
             Collection<AccountID> accounts,
-            boolean filterDisabledAccounts,
-            boolean keepUnregisteredAccounts)
+            boolean filterDisabledAccounts)
     {
         super(parent);
 
         this.filterDisabledAccounts = filterDisabledAccounts;
-        this.keepUnregisteredAccounts = keepUnregisteredAccounts;
 
         this.listRowResourceID = listRowResourceID;
         this.dropDownRowResourceID = dropDownRowResourceID;
@@ -185,21 +174,21 @@ public class AccountsListAdapter
         }
         else if (event.getType() == ServiceEvent.UNREGISTERING)
         {
-            if(keepUnregisteredAccounts)
+            Account acc = findAccountID(protocolProvider.getAccountID());
+            if(acc != null && acc.isEnabled())
             {
-                Account acc = findAccountID(protocolProvider.getAccountID());
-                if(acc != null)
+                // Remove enabled accounts
+                if(acc.isEnabled())
                 {
-                    // Only unregisters from notifications
+                    // Remove the account completely
+                    removeAccount(protocolProvider.getAccountID());
+                }
+                else
+                {
+                    // Quit from listening to updates
                     acc.removeAccountEventListener(this);
                 }
             }
-            else
-            {
-                // Remove the account completely
-                removeAccount(protocolProvider.getAccountID());
-            }
-
         }
     }
 

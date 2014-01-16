@@ -11,8 +11,10 @@ import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.account.*;
 
 import org.jitsi.R;
+import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.account.settings.*;
+import org.jitsi.android.gui.util.*;
 import org.jitsi.service.osgi.*;
 
 import android.content.*;
@@ -50,6 +52,18 @@ public class AccountsListActivity
      * from "normal" list item clicks/long clicks handling.
      */
     private Account clickedAccount;
+
+    /**
+     * Keeps track of displayed "in progress" dialog during account
+     * registration.
+     */
+    private static long progressDialog;
+
+    /**
+     * Keeps track of thread used to register accounts and prevents from
+     * starting multiple at one time.
+     */
+    private static AccountEnableThread accEnableThread;
 
     @Override
     protected void onCreate(android.os.Bundle savedInstanceState)
@@ -144,6 +158,9 @@ public class AccountsListActivity
 
         getMenuInflater().inflate(R.menu.account_ctx_menu, menu);
 
+        // Set menu title
+        menu.setHeaderTitle(clickedAccount.getAccountName());
+
         MenuItem accountSettings = menu.findItem(R.id.account_settings);
         accountSettings.setVisible(
             clickedAccount.getProtocolProvider() != null);
@@ -203,6 +220,11 @@ public class AccountsListActivity
     {
 
         /**
+         * Toast instance
+         */
+        private Toast offlineToast;
+
+        /**
          * Creates new instance of {@link AccountStatusListAdapter}
          * @param accounts array of currently stored accounts
          */
@@ -210,8 +232,7 @@ public class AccountsListActivity
         {
            super( AccountsListActivity.this,
                   R.layout.account_enable_row, -1,
-                  accounts,
-                  false, true);
+                  accounts, false);
         }
 
         /**
@@ -232,7 +253,30 @@ public class AccountsListActivity
                 @Override
                 public void onClick(View v)
                 {
-                    startPresenceActivity(account);
+                    // Start only for registered accounts
+                    if(account.getProtocolProvider() != null
+                        && account.getProtocolProvider().isRegistered())
+                    {
+                        startPresenceActivity(account);
+                    }
+                    else
+                    {
+                        String msg = getString(
+                            R.string.service_gui_ACCOUNT_OFFLINE,
+                            account.getAccountName());
+
+                        if(offlineToast == null)
+                        {
+                            offlineToast = Toast.makeText(
+                                AccountsListActivity.this,
+                                msg, Toast.LENGTH_SHORT);
+                        }
+                        else
+                        {
+                            offlineToast.setText(msg);
+                        }
+                        offlineToast.show();
+                    }
                 }
             });
             rowView.setOnLongClickListener(new View.OnLongClickListener()
@@ -258,6 +302,11 @@ public class AccountsListActivity
                 public void onCheckedChanged( CompoundButton compoundButton,
                                               boolean enable)
                 {
+                    if(accEnableThread != null)
+                    {
+                        logger.error("Ongoing operation in progress");
+                        return;
+                    }
                     logger.debug("Toggle " + account + " -> " + enable);
 
                     // Prevents from switching the state after key pressed.
@@ -265,9 +314,21 @@ public class AccountsListActivity
                     // the operation.
                     compoundButton.setChecked(account.isEnabled());
 
-                    Thread accEnableThread =
-                            new AccountEnableThread( account.getAccountID(),
-                                                     enable );
+                    accEnableThread =
+                        new AccountEnableThread( account.getAccountID(),
+                                                 enable );
+
+                    String message = enable
+                        ? getString( R.string.service_gui_CONNECTING_ACCOUNT,
+                                   account.getAccountName() )
+                        : getString( R.string.service_gui_DISCONNECTING_ACCOUNT,
+                                     account.getAccountName() );
+
+                    progressDialog
+                        = ProgressDialogFragment.showProgressDialog(
+                            getString(R.string.service_gui_INFO),
+                            message);
+
                     accEnableThread.start();
                 }
             });
@@ -317,9 +378,21 @@ public class AccountsListActivity
             }
             catch (OperationFailedException e)
             {
-                logger.error( "Failed to "
-                                      + (enable ? "load" : "unload")
-                                      + " "+account, e);
+                AndroidUtils.showAlertDialog(
+                    JitsiApplication.getGlobalContext(),
+                    getString(R.string.service_gui_ERROR),
+                    "Failed to " + (enable ? "load" : "unload")
+                        + " "+account );
+
+                logger.error(e.getMessage(), e);
+            }
+            finally
+            {
+                accEnableThread = null;
+
+                DialogActivity.closeDialog(
+                    JitsiApplication.getGlobalContext(),
+                    progressDialog);
             }
         }
     }

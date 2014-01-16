@@ -35,6 +35,7 @@
     <string name="service_gui_UNKNOWN_CONTACT">Unknown</string>
     <string name="service_gui_ACCOUNT_ME">Me</string>
     <string name="service_gui_ACCOUNT_SETTINGS">Account settings</string>
+    <string name="service_gui_ACCOUNT_OFFLINE">%s is offline</string>
     <string name="service_gui_CONTACT_PAUSED_TYPING">paused typing</string>
     <string name="service_gui_CONTACT_TYPING">is typing</string>
     <string name="service_gui_BUSY_STATUS">Busy</string>
@@ -77,6 +78,7 @@
     <string name="service_gui_DURATION">duration</string>
     <string name="service_gui_EDITED_AT">edited at %s</string>
     <string name="service_gui_IGNORE">Ignore</string>
+    <string name="service_gui_INFO">Info</string>
     <string name="service_gui_LAST_MSG_CORRECTION">Last message correction</string>
     <string name="service_gui_NOT_AUTHORIZED">Not authorized</string>
     <string name="service_gui_OUTGOING_CALL">Outgoing call</string>
@@ -374,15 +376,18 @@
     <string name="service_gui_DECEMBER">Dec</string>
 
     <string name="service_gui_NOT_IN_CONTACT_LIST_GROUP_NAME">NotInContactList</string>
+    <string name="service_gui_CONNECTING_ACCOUNT">Connecting %s</string>
     <string name="service_gui_CONNECTED_STATUS">Connected</string>
     <string name="service_gui_CONNECTING_STATUS">Connecting</string>
     <string name="service_gui_CONNECTING_EARLY_MEDIA_STATUS">Connecting*</string>
     <string name="service_gui_DISCONNECTED_STATUS">Disconnected</string>
+    <string name="service_gui_DISCONNECTING_ACCOUNT">Disconnecting %s</string>
     <string name="service_gui_FAILED_STATUS">Call failed</string>
     <string name="service_gui_INCOMING_CALL_STATUS">Incoming call</string>
     <string name="service_gui_INITIATING_CALL_STATUS">Initiating call</string>
     <string name="service_gui_LOCALLY_ON_HOLD_STATUS">Locally on hold</string>
     <string name="service_gui_MUTUALLY_ON_HOLD_STATUS">Mutually On Hold</string>
+    <string name="service_gui_PRESENCE_NOT_SUPPORTED">Presence is not supported by %s</string>
     <string name="service_gui_REFERRED_STATUS">Referred</string>
     <string name="service_gui_REMOTELY_ON_HOLD_STATUS">Remotely on hold</string>
     <string name="service_gui_REMOVE_CONTACT_NOT_CONNECTED">
