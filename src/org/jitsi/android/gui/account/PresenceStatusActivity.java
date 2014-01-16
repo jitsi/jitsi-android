@@ -397,11 +397,15 @@ public class PresenceStatusActivity
                 {
                     logger.error(e);
 
-                    AndroidUtils.showAlertDialog(
+                    // TODO: fix me
+                    // This is annoying and removed for now. It is displayed for
+                    // XMPP provider even when switching from offline to any
+                    // other status.
+                    /*AndroidUtils.showAlertDialog(
                             getBaseContext(),
                             "Error",
                             "An error occurred while setting the status: "
-                            + e.getLocalizedMessage());
+                            + e.getLocalizedMessage());*/
                 }
             }
         }).start();
@@ -473,8 +477,6 @@ public class PresenceStatusActivity
                                 View view, int i, long l)
     {
         hasChanges = true;
-
-        commitStatusChanges();
     }
 
     public void onNothingSelected(AdapterView<?> adapterView)

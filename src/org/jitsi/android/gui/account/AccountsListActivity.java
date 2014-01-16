@@ -254,15 +254,14 @@ public class AccountsListActivity
                 public void onClick(View v)
                 {
                     // Start only for registered accounts
-                    if(account.getProtocolProvider() != null
-                        && account.getProtocolProvider().isRegistered())
+                    if(account.getProtocolProvider() != null)
                     {
                         startPresenceActivity(account);
                     }
                     else
                     {
                         String msg = getString(
-                            R.string.service_gui_ACCOUNT_OFFLINE,
+                            R.string.service_gui_ACCOUNT_DISCONNECTED,
                             account.getAccountName());
 
                         if(offlineToast == null)

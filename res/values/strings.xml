@@ -35,7 +35,7 @@
     <string name="service_gui_UNKNOWN_CONTACT">Unknown</string>
     <string name="service_gui_ACCOUNT_ME">Me</string>
     <string name="service_gui_ACCOUNT_SETTINGS">Account settings</string>
-    <string name="service_gui_ACCOUNT_OFFLINE">%s is offline</string>
+    <string name="service_gui_ACCOUNT_DISCONNECTED">%s is disconnected</string>
     <string name="service_gui_CONTACT_PAUSED_TYPING">paused typing</string>
     <string name="service_gui_CONTACT_TYPING">is typing</string>
     <string name="service_gui_BUSY_STATUS">Busy</string>
