@@ -99,8 +99,11 @@ public class ReceivedCallActivity
         callIdentifier = extras.getString(CallManager.CALL_IDENTIFIER);
         call = CallManager.getActiveCall(callIdentifier);
         if(call == null)
-            throw new IllegalArgumentException(
-                    "There is no call with ID: "+callIdentifier);
+        {
+            logger.error("There is no call with ID: "+callIdentifier);
+            finish();
+            return;
+        }
 
         ImageView hangupView = (ImageView) findViewById(R.id.hangupButton);
 
@@ -186,7 +189,10 @@ public class ReceivedCallActivity
     @Override
     protected void onPause()
     {
-        call.removeCallChangeListener(this);
+        if(call != null)
+        {
+            call.removeCallChangeListener(this);
+        }
 
         super.onPause();
     }
