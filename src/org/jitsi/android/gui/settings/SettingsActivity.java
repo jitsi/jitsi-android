@@ -10,6 +10,7 @@ import android.content.*;
 import android.os.Bundle;
 import android.preference.*;
 
+import net.java.sip.communicator.service.msghistory.*;
 import net.java.sip.communicator.service.replacement.*;
 import net.java.sip.communicator.service.systray.*;
 import net.java.sip.communicator.util.*;
@@ -223,8 +224,9 @@ public class SettingsActivity
         private void initMessagesPreferences()
         {
             PreferenceUtil.setCheckboxVal(
-                    getPreferenceScreen(), P_KEY_LOG_CHAT_HISTORY,
-                    ConfigurationUtils.isHistoryLoggingEnabled());
+                getPreferenceScreen(), P_KEY_LOG_CHAT_HISTORY,
+                AndroidGUIActivator.getMessageHistoryService()
+                    .isHistoryLoggingEnabled());
 
             PreferenceUtil.setCheckboxVal(
                     getPreferenceScreen(),P_KEY_SHOW_HISTORY,
@@ -570,10 +572,13 @@ public class SettingsActivity
         {
             if(key.equals(P_KEY_LOG_CHAT_HISTORY))
             {
-                ConfigurationUtils.setHistoryLoggingEnabled(
-                        shPreferences.getBoolean(
-                                P_KEY_LOG_CHAT_HISTORY,
-                                ConfigurationUtils.isHistoryLoggingEnabled()));
+                MessageHistoryService mhs
+                    = AndroidGUIActivator.getMessageHistoryService();
+
+                mhs.setHistoryLoggingEnabled(
+                    shPreferences.getBoolean(
+                        P_KEY_LOG_CHAT_HISTORY,
+                        mhs.isHistoryLoggingEnabled()));
             }
             else if(key.equals(P_KEY_SHOW_HISTORY))
             {

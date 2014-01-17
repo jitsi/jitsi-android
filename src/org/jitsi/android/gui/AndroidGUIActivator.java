@@ -14,6 +14,7 @@ import net.java.sip.communicator.service.globaldisplaydetails.*;
 
 import net.java.sip.communicator.service.gui.*;
 import net.java.sip.communicator.service.metahistory.*;
+import net.java.sip.communicator.service.msghistory.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.replacement.*;
 import net.java.sip.communicator.service.systray.*;
@@ -83,6 +84,8 @@ public class AndroidGUIActivator
      */
     private static MetaContactListService metaContactList;
 
+    private static MessageHistoryService messageHistoryService;
+
     /**
      * Replacement services observer.
      */
@@ -148,7 +151,7 @@ public class AndroidGUIActivator
 
         // Register show history settings OTR link listener
         ChatSessionManager.addChatLinkListener(
-                new OtrFragment.ShowHistoryLinkListener());
+            new OtrFragment.ShowHistoryLinkListener());
     }
 
     /**
@@ -233,6 +236,19 @@ public class AndroidGUIActivator
     public static MetaHistoryService getMetaHistoryService()
     {
         return ServiceUtils.getService(bundleContext, MetaHistoryService.class);
+    }
+
+    /**
+     * Gets the service giving access to message history.
+     *
+     * @return the service giving access to message history.
+     */
+    public static MessageHistoryService getMessageHistoryService()
+    {
+        if (messageHistoryService == null)
+            messageHistoryService = ServiceUtils.getService(bundleContext,
+                MessageHistoryService.class);
+        return messageHistoryService;
     }
 
     /**

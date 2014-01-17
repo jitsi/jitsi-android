@@ -258,7 +258,7 @@ public class AndroidUIServiceImpl
      */
     public Chat getChat(Contact contact)
     {
-        return ChatSessionManager.findChatForContact(contact, false);
+        return ChatSessionManager.findChatForContact(contact, true);
     }
 
     /**
@@ -611,6 +611,19 @@ public class AndroidUIServiceImpl
     @Override
     public void closeChatRoomWindow(
             net.java.sip.communicator.service.muc.ChatRoomWrapper chatRoomWrapper)
+    {
+        // TODO: not implemented
+    }
+
+    @Override
+    public void showAddChatRoomDialog()
+    {
+        // TODO: not implemented
+    }
+
+    @Override
+    public void showChatRoomAutoOpenConfigDialog(
+        ProtocolProviderService protocolProviderService, String s)
     {
         // TODO: not implemented
     }

@@ -95,6 +95,17 @@ public class AndroidContactQuery
         super(contactSource);
 
         this.queryString = queryString;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void start()
+    {
+        if(queryThread != null)
+            return;
+
         queryThread = new Thread(new Runnable()
         {
             @Override

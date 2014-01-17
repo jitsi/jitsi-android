@@ -874,7 +874,8 @@ public class ChatSession
             OperationSetMessageCorrection mcOpSet = getOpSetMessageCorrection();
 
             Message msg = mcOpSet.createMessage(message);
-            mcOpSet.correctMessage(currentChatTransport, msg, uidToCorrect);
+            mcOpSet.correctMessage(
+                currentChatTransport, null, msg, uidToCorrect);
         }
         catch(Exception e)
         {
