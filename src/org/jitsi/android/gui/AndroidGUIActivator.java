@@ -150,9 +150,8 @@ public class AndroidGUIActivator
         replacementServices.start(bundleContext);
 
         // Register show history settings OTR link listener
-        // TODO: OTR update
-        //ChatSessionManager.addChatLinkListener(
-        //        new OtrFragment.ShowHistoryLinkListener());
+        ChatSessionManager.addChatLinkListener(
+            new OtrFragment.ShowHistoryLinkListener());
     }
 
     /**

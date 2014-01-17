@@ -90,7 +90,6 @@ public class ChatActivity
 
         chatPager.setOnPageChangeListener(this);
 
-        /* TODO: OTR update
         if(savedInstanceState == null)
         {
             // OTR menu padlock
@@ -98,7 +97,7 @@ public class ChatActivity
                     .beginTransaction()
                     .add(new OtrFragment(), "otr_fragment")
                     .commit();
-        }*/
+        }
 
         handleIntent(getIntent(), savedInstanceState);
     }

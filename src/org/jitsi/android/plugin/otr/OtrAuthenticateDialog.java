@@ -47,10 +47,6 @@ public class OtrAuthenticateDialog
     {
         super.onCreate(savedInstanceState);
 
-        // TODO: OTR update
-        finish();
-
-        /* TODO: OTR update
         setContentView(R.layout.otr_authenticate_dialog);
 
         setTitle(R.string.plugin_otr_authbuddydialog_TITLE);
@@ -98,7 +94,7 @@ public class OtrAuthenticateDialog
         // Verify button
         ViewUtil.setCompoundChecked(
                 getContentView(), R.id.verifyButton,
-                OtrActivator.scOtrKeyManager.isVerified(contact));*/
+                OtrActivator.scOtrKeyManager.isVerified(contact));
     }
 
     /**
@@ -107,7 +103,6 @@ public class OtrAuthenticateDialog
      */
     public void onOkClicked(View v)
     {
-        /* TODO: OTR update
         if(ViewUtil.isCompoundChecked(getContentView(), R.id.verifyButton))
         {
             OtrActivator.scOtrKeyManager.verify(contact);
@@ -115,7 +110,7 @@ public class OtrAuthenticateDialog
         else
         {
             OtrActivator.scOtrKeyManager.unverify(contact);
-        }*/
+        }
 
         finish();
     }

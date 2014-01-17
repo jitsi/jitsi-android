@@ -404,6 +404,8 @@
         <copy todir="lib/bundles" verbose="true" overwrite="true">
             <fileset dir="./${jitsi.path}/sc-bundles">
                 <include name="*.jar"/>
+                <!-- Exclude OTR bundle -->
+                <exclude name="otr.jar" />
                 <not>
                     <present present="srconly" targetdir="lib/bundles"/>
                 </not>

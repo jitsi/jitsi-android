@@ -102,7 +102,6 @@ public class Jitsi
                         .commit();
             }
 
-            /* TODO: OTR update
             if(isTablet)
             {
                 // OTR menu padlock
@@ -110,7 +109,7 @@ public class Jitsi
                         .beginTransaction()
                         .add(new OtrFragment(), "otr_fragment")
                         .commit();
-            }*/
+            }
         }
 
         handleIntent(getIntent(), savedInstanceState);
