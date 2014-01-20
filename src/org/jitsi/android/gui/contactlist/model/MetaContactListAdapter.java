@@ -24,6 +24,7 @@ import org.jitsi.service.osgi.*;
 import org.jitsi.util.Logger;
 
 import java.util.*;
+import java.util.regex.*;
 
 /**
  * Contact list model is responsible for caching current contact list obtained
@@ -987,7 +988,12 @@ public class MetaContactListAdapter
         if (query == null || query.length() <= 0)
             return true;
 
-        if (metaContact.getDisplayName().contains(query))
+        Pattern queryPattern
+            = Pattern.compile(query,
+                              Pattern.CASE_INSENSITIVE | Pattern.LITERAL);
+
+        if (queryPattern.matcher(
+                metaContact.getDisplayName()).find())
             return true;
         else
         {
@@ -996,8 +1002,8 @@ public class MetaContactListAdapter
             {
                 Contact contact = contacts.next();
 
-                if (contact.getDisplayName().contains(query)
-                    || contact.getAddress().contains(query))
+                if (queryPattern.matcher(contact.getDisplayName()).find()
+                    || queryPattern.matcher(contact.getAddress()).find())
                 {
                     return true;
                 }
