@@ -12,6 +12,8 @@ import android.text.*;
 import android.view.*;
 import android.widget.*;
 
+import net.java.sip.communicator.util.*;
+
 import org.jitsi.R;
 import org.jitsi.service.osgi.*;
 
@@ -26,6 +28,12 @@ public class VerifyCertificateActivity
     extends OSGiActivity
     implements CertInfoDialog.CertInfoDialogListener
 {
+    /**
+     * The logger.
+     */
+    private final static Logger logger
+        = Logger.getLogger(VerifyCertificateActivity.class);
+
     /**
      * Request identifier extra key.
      */
@@ -65,7 +73,11 @@ public class VerifyCertificateActivity
                 = CertificateDialogActivator.getDialog(requestId);
 
         if(certDialog == null)
-            throw new NullPointerException("No dialog found for "+requestId);
+        {
+            logger.error("No dialog instance found for "+requestId);
+            finish();
+            return;
+        }
 
         setContentView(R.layout.verify_certificate);
 
