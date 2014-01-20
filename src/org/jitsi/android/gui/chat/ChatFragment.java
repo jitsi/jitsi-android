@@ -463,6 +463,13 @@ public class ChatFragment
                 @Override
                 public void run()
                 {
+                    if(chatListAdapter == null)
+                    {
+                        logger.warn(
+                            "Add message handled, when there's no adapter" +
+                                "-possibly after onDetach()");
+                        return;
+                    }
                     addMessageImpl(newMessage, update);
                 }
             });
