@@ -307,6 +307,12 @@ public class ChatSessionManager
     public synchronized static Chat findChatForContact(Contact contact,
                                                        boolean startIfNotExists)
     {
+        if(contact == null)
+        {
+            logger.error("Failed to obtain chat instance for null contact");
+            return null;
+        }
+
         for(ChatSession chat : activeChats.values())
         {
             Iterator<Contact> inner = chat.getMetaContact().getContacts();
