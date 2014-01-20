@@ -384,8 +384,12 @@ public class JitsiApplication
         LogUploadService logUpload
                 = ServiceUtils.getService(AndroidGUIActivator.bundleContext,
                                           LogUploadService.class);
+
+        String defaultEmail
+            = getConfig().getString("org.jitsi.android.LOG_REPORT_EMAIL");
+
         logUpload.sendLogs(
-                null,
+                new String[]{ defaultEmail },
                 getResString(R.string.service_gui_SEND_LOGS_SUBJECT),
                 getResString(R.string.service_gui_SEND_LOGS_TITLE));
     }
