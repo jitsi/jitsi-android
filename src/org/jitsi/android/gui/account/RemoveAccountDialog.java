@@ -45,9 +45,7 @@ public class RemoveAccountDialog
                        @Override
                        public void onClick(DialogInterface dialog, int which)
                        {
-                           removeAccount(account);
-                           listener.onAccountRemoved(account);
-                           dialog.dismiss();
+                           onRemoveClicked(dialog, account, listener);
                        }
                    })
                 .setNegativeButton(R.string.service_gui_NO,
@@ -61,6 +59,34 @@ public class RemoveAccountDialog
                            dialog.dismiss();
                        }
                    }).create();
+    }
+
+    private static void onRemoveClicked(final DialogInterface dialog,
+                                        final AccountID account,
+                                        final OnAccountRemovedListener l)
+    {
+        // Fix "network on main thread"
+        final Thread removeAccountThread = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                removeAccount(account);
+            }
+        };
+        removeAccountThread.start();
+        try
+        {
+            // Simply block UI thread as it shouldn't take too long to uninstall
+            removeAccountThread.join();
+            // Notify about results
+            l.onAccountRemoved(account);
+            dialog.dismiss();
+        }
+        catch (InterruptedException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
