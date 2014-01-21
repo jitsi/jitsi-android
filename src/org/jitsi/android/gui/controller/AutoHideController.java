@@ -11,6 +11,8 @@ import android.os.*;
 import android.view.*;
 import android.view.animation.*;
 
+import net.java.sip.communicator.util.*;
+
 import org.jitsi.*;
 import org.jitsi.service.osgi.*;
 
@@ -28,6 +30,12 @@ public class AutoHideController
     extends OSGiFragment
     implements Animation.AnimationListener
 {
+    /**
+     * The logger.
+     */
+    private static final Logger logger
+        = Logger.getLogger(AutoHideController.class);
+
     /**
      * Argument key for the identifier of <tt>View</tt> that will be auto
      * hidden. It must exists in parent <tt>Activity</tt> view hierarchy.
@@ -82,6 +90,9 @@ public class AutoHideController
         }
 
         view = activity.findViewById(getArguments().getInt(ARG_VIEW_ID));
+
+        if(view == null)
+            throw new NullPointerException("The view is null");
 
         hideTimeout = getArguments().getLong(ARG_HIDE_TIMEOUT);
 
@@ -160,6 +171,11 @@ public class AutoHideController
      */
     public void show()
     {
+        if(view == null)
+        {
+            logger.error("The view has not been created yet");
+            return;
+        }
         // This means that the View is hidden or animation is in progress
         if(autoHideTimer == null)
         {
