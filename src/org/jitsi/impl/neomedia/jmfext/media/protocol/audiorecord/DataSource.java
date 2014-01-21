@@ -204,6 +204,7 @@ public class DataSource
      */
     private static class AudioRecordStream
         extends AbstractPullBufferStream<DataSource>
+        implements AudioEffect.OnEnableStatusChangeListener
     {
         /**
          * The <tt>android.media.AudioRecord</tt> which does the actual
@@ -363,7 +364,26 @@ public class DataSource
                     = AcousticEchoCanceler.create(
                             audioRecord.getAudioSessionId());
                 if(echoCanceller != null)
+                {
+                    echoCanceller.setEnableStatusListener(this);
                     echoCanceller.setEnabled(audioSystem.isEchoCancel());
+                    logger.info("Echo cancellation: "
+                                    + echoCanceller.getEnabled());
+                }
+            }
+
+            // Automatic gain control
+            if(AutomaticGainControl.isAvailable())
+            {
+                AutomaticGainControl agc
+                    = AutomaticGainControl.create(
+                            audioRecord.getAudioSessionId());
+                if(agc != null)
+                {
+                    agc.setEnableStatusListener(this);
+                    agc.setEnabled(audioSystem.isAutomaticGainControl());
+                    logger.info("Auto gain control: " + agc.getEnabled());
+                }
             }
 
             // Creates noise suppressor if available
@@ -373,7 +393,12 @@ public class DataSource
                     = NoiseSuppressor.create(
                             audioRecord.getAudioSessionId());
                 if(noiseSuppressor != null)
+                {
+                    noiseSuppressor.setEnableStatusListener(this);
                     noiseSuppressor.setEnabled(audioSystem.isDenoise());
+                    logger.info("Noise suppressor: "
+                                    + noiseSuppressor.getEnabled());
+                }
             }
         }
 
@@ -545,6 +570,12 @@ public class DataSource
             }
 
             super.stop();
+        }
+
+        @Override
+        public void onEnableStatusChange(AudioEffect effect, boolean enabled)
+        {
+            logger.info(effect.getDescriptor()+" : "+enabled);
         }
     }
 }

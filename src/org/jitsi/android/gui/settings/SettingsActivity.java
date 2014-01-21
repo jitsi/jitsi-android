@@ -75,6 +75,8 @@ public class SettingsActivity
     // Audio settings
     static private final String P_KEY_AUDIO_ECHO_CANCEL
         = JitsiApplication.getResString(R.string.pref_key_audio_echo_cancel);
+    static private final String P_KEY_AUDIO_AGC
+        = JitsiApplication.getResString(R.string.pref_key_audio_agc);
     static private final String P_KEY_AUDIO_DENOISE
         = JitsiApplication.getResString(R.string.pref_key_audio_denoise);
 
@@ -503,6 +505,15 @@ public class SettingsActivity
             echoCancelPRef.setChecked( hasEchoFeature
                                        &&audioSystem.isEchoCancel() );
 
+            // Automatic gain control
+            CheckBoxPreference agcPRef
+                = (CheckBoxPreference) findPreference(P_KEY_AUDIO_AGC);
+            boolean hasAgcFeature
+                = (AudioSystem.FEATURE_AGC & audioSystemFeatures) != 0;
+            agcPRef.setEnabled( hasAgcFeature );
+            agcPRef.setChecked( hasAgcFeature
+                                && audioSystem.isAutomaticGainControl() );
+
             // Denoise
             CheckBoxPreference denoisePref
                     = (CheckBoxPreference) findPreference(P_KEY_AUDIO_DENOISE);
@@ -668,6 +679,13 @@ public class SettingsActivity
                 audioSystem.setEchoCancel(
                         shPreferences.getBoolean(
                                 P_KEY_AUDIO_ECHO_CANCEL, true));
+            }
+            else if(key.equals(P_KEY_AUDIO_ECHO_CANCEL))
+            {
+                // Auto gain control
+                audioSystem.setAutomaticGainControl(
+                        shPreferences.getBoolean(
+                                P_KEY_AUDIO_AGC, true));
             }
             else if(key.equals(P_KEY_AUDIO_DENOISE))
             {

@@ -1027,6 +1027,11 @@
     <string name="service_gui_settings_ECHO_CANCEL">Echo cancellation</string>
     <string name="service_gui_settings_ECHO_CANCEL_ON">Enabled</string>
     <string name="service_gui_settings_ECHO_CANCEL_OFF">Disabled</string>
+    <!-- Auto gain control -->
+    <string name="pref_key_audio_agc">pref.key.audio.agc</string>
+    <string name="service_gui_settings_AGC">Automatic gain control</string>
+    <string name="service_gui_settings_AGC_ON">Enabled</string>
+    <string name="service_gui_settings_AGC_OFF">Disabled</string>
     <!-- Denoise -->
     <string name="pref_key_audio_denoise">pref.key.audio.denoise</string>
     <string name="service_gui_settings_DENOISE">Noise suppression</string>

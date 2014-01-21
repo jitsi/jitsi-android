@@ -112,6 +112,12 @@
                 android:summaryOff="@string/service_gui_settings_ECHO_CANCEL_OFF"
                 />
         <CheckBoxPreference
+                android:title="@string/service_gui_settings_AGC"
+                android:key="@string/pref_key_audio_agc"
+                android:summaryOn="@string/service_gui_settings_AGC_ON"
+                android:summaryOff="@string/service_gui_settings_AGC_OFF"
+                />
+        <CheckBoxPreference
                 android:title="@string/service_gui_settings_DENOISE"
                 android:key="@string/pref_key_audio_denoise"
                 android:summaryOn="@string/service_gui_settings_DENOISE_ON"

@@ -67,6 +67,10 @@ public class AudioRecordSystem
             {
                 featureSet |= FEATURE_DENOISE;
             }
+            if(AutomaticGainControl.isAvailable())
+            {
+                featureSet |= FEATURE_AGC;
+            }
         }
         return featureSet;
     }
