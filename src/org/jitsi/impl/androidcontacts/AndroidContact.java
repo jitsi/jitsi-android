@@ -12,6 +12,7 @@ import android.net.*;
 import android.provider.*;
 
 import net.java.sip.communicator.service.contactsource.*;
+import net.java.sip.communicator.util.*;
 import org.jitsi.android.*;
 
 import java.util.*;
@@ -24,6 +25,8 @@ import java.util.*;
 public class AndroidContact
     extends GenericSourceContact
 {
+    private final static Logger logger = Logger.getLogger(AndroidContact.class);
+
     private final long id;
 
     private final String lookUpKey;
@@ -34,10 +37,12 @@ public class AndroidContact
 
     private final String photoId;
 
+    private final String phone;
+
     public AndroidContact(ContactSourceService contactSource,
                           long id, String loopUpKey, String displayName,
                           String thumbnail, String photoUri,
-                          String photoId)
+                          String photoId, String phone)
     {
         super(contactSource, displayName, new ArrayList<ContactDetail>());
 
@@ -46,6 +51,10 @@ public class AndroidContact
         this.thumbnailUri = thumbnail;
         this.photoUri = photoUri;
         this.photoId = photoId;
+        this.phone = phone;
+
+        setContactAddress(phone);
+        setDisplayDetails(phone);
     }
 
     /**
@@ -54,8 +63,7 @@ public class AndroidContact
     @Override
     public String getContactAddress()
     {
-        // Return the phone number
-        return getDisplayDetails();
+        return super.getContactAddress();
 
         /*String address = super.getContactAddress();
         if(address == null)
@@ -80,31 +88,38 @@ public class AndroidContact
         return address;*/
     }
 
-    @Override
-    public String getDisplayDetails()
-    {
-        String details = super.getDisplayDetails();
-        if(details == null)
-        {
-            Context ctx = JitsiApplication.getGlobalContext();
-
-            Cursor result = ctx.getContentResolver().query(
-                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                new String[]{ContactsContract.CommonDataKinds.Phone.DATA},
-                ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY+"=?",
-                new String[]{String.valueOf(lookUpKey)},null);
-
-            if(result.moveToNext())
-            {
-                int adrIdx = result.getColumnIndex(
-                    ContactsContract.CommonDataKinds.Phone.DATA);
-                details = result.getString(adrIdx);
-                setDisplayDetails(details);
-            }
-            result.close();
-        }
-        return details;
-    }
+//    @Override
+//    public String getDisplayDetails()
+//    {
+//        String details = super.getDisplayDetails();
+//        if(details == null)
+//        {
+//            Context ctx = JitsiApplication.getGlobalContext();
+//
+//            Cursor result = ctx.getContentResolver().query(
+//                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+//                new String[]{ContactsContract.CommonDataKinds.Phone.DATA},
+//                ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY+"=?",
+//                new String[]{String.valueOf(lookUpKey)},null);
+//
+//            if(result.moveToNext())
+//            {
+//                int adrIdx = result.getColumnIndex(
+//                    ContactsContract.CommonDataKinds.Phone.DATA);
+//                details = result.getString(adrIdx);
+//                setDisplayDetails(details);
+//            }
+//            while (result.moveToNext())
+//            {
+//                int adrIdx = result.getColumnIndex(
+//                    ContactsContract.CommonDataKinds.Phone.DATA);
+//                logger.error(getDisplayName()
+//                                 +" has more phones: "+result.getString(adrIdx));
+//            }
+//            result.close();
+//        }
+//        return details;
+//    }
 
     /**
      * {@inheritDoc}

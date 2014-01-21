@@ -159,21 +159,40 @@ public class AndroidContactQuery
                 long id = rCursor.getLong(ID);
                 String lookUp = rCursor.getString(LOOP_UP);
                 String displayName = rCursor.getString(DISPLAY_NAME);
-                //boolean hasPhone = rCursor.getInt(HAS_PHONE) == 1;
                 String thumbnail = rCursor.getString(THUMBNAIL_URI);
                 String photoUri = rCursor.getString(PHOTO_URI);
                 String photoId = rCursor.getString(PHOTO_ID);
 
-                //if(hasPhone)
-                //{
-                    results.add(
-                        new AndroidContact( getContactSource(),
-                                            id, lookUp,
-                                            displayName,
-                                            thumbnail,
-                                            photoUri,
-                                            photoId) );
-                //}
+                // Loop on all phones
+                Cursor result = null;
+                try
+                {
+                    result = ctx.getContentResolver().query(
+                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                    new String[]{ContactsContract.CommonDataKinds.Phone.DATA},
+                    ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY+"=?",
+                    new String[]{String.valueOf(lookUp)},null);
+
+                    while (result.moveToNext() && !cancel)
+                    {
+                        int adrIdx = result.getColumnIndex(
+                            ContactsContract.CommonDataKinds.Phone.DATA);
+                        String phone = result.getString(adrIdx);
+                        results.add(
+                            new AndroidContact( getContactSource(),
+                                                id, lookUp,
+                                                displayName,
+                                                thumbnail,
+                                                photoUri,
+                                                photoId,
+                                                phone) );
+                    }
+                }
+                finally
+                {
+                    if(result != null)
+                        result.close();
+                }
             }
 
             if(!cancel)
