@@ -109,6 +109,8 @@ public class CallTimerFragment
             = (TextView) getActivity().findViewById(R.id.callTime);
 
         callTime.setText(timeStr);
+
+        VideoCallActivity.callState.callDuration = timeStr;
     }
 
     /**

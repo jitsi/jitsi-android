@@ -14,7 +14,8 @@ import android.content.*;
 import android.graphics.Color;
 import android.media.*;
 import android.os.*;
-import android.support.v4.app.*;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
 import android.view.*;
 import android.view.Menu; // Disambiguation
 import android.view.MenuItem; // Disambiguation
@@ -133,6 +134,12 @@ public class VideoCallActivity
     private CallVolumeCtrlFragment volControl;
 
     /**
+     * Instance holds call state to be displayed in <tt>CallEnded</tt> fragment.
+     * Call objects will be no longer available after the call has ended.
+     */
+    static final CallStateHolder callState = new CallStateHolder();
+
+    /**
      * Called when the activity is starting. Initializes the corresponding
      * call interface.
      *
@@ -156,8 +163,7 @@ public class VideoCallActivity
 
         if(call == null)
         {
-            logger.error("There's no call with id: "+callIdentifier);
-            finish();
+            logger.error("There's no call with id: " + callIdentifier);
             return;
         }
 
@@ -238,7 +244,8 @@ public class VideoCallActivity
     @Override
     protected void onSaveInstanceState(Bundle outState)
     {
-        sasToastController.onSaveInstanceState(outState);
+        if(sasToastController != null)
+            sasToastController.onSaveInstanceState(outState);
         super.onSaveInstanceState(outState);
     }
 
@@ -246,7 +253,8 @@ public class VideoCallActivity
     protected void onRestoreInstanceState(Bundle savedInstanceState)
     {
         super.onRestoreInstanceState(savedInstanceState);
-        sasToastController.onRestoreInstanceState(savedInstanceState);
+        if(sasToastController != null)
+            sasToastController.onRestoreInstanceState(savedInstanceState);
     }
 
     /**
@@ -277,15 +285,38 @@ public class VideoCallActivity
             return;
         
         finishing = true;
-        
-        new Thread(new Runnable() 
+
+        new Thread(new Runnable()
         {
             public void run() 
             {
                 // Waits for camera to be stopped
                 getVideoFragment().ensureCameraClosed();
 
-                switchActivity(JitsiApplication.getHomeScreenActivityClass());
+                runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        callState.callDuration
+                            = ViewUtil.getTextViewValue(
+                                findViewById(android.R.id.content),
+                                R.id.callTime);
+
+                        if(getVideoFragment() != null)
+                        {
+                            getSupportFragmentManager()
+                                .beginTransaction()
+                                .remove(getVideoFragment())
+                                .commit();
+                        }
+
+                        getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(android.R.id.content, new CallEnded())
+                            .commit();
+                    }
+                });
             }
         }).start();        
     }
@@ -466,6 +497,10 @@ public class VideoCallActivity
             CallNotificationManager.get().stopNotification(callIdentifier);
 
         }
+        // Call already ended or not found
+        if(call == null)
+            return;
+
         // Registers as the call state listener
         call.addCallChangeListener(this);
 
@@ -497,6 +532,8 @@ public class VideoCallActivity
     @Override
     protected void onPause()
     {
+        super.onPause();
+
         if(call == null)
             return;
 
@@ -517,8 +554,6 @@ public class VideoCallActivity
         {
             leaveNotification();
         }
-
-        super.onPause();
     }
 
     /**
@@ -546,6 +581,8 @@ public class VideoCallActivity
         // ActionBar is not support prior 3.0
         if(!AndroidUtils.hasAPI(11))
             return;
+
+        callState.callPeerName = name;
 
         runOnUiThread(new Runnable()
         {
@@ -637,7 +674,27 @@ public class VideoCallActivity
             autoHide.show();
     }
 
-    public void setErrorReason(String reason) {}
+    public void setErrorReason(final String reason)
+    {
+        logger.info("Error reason: "+reason);
+
+        runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                callState.errorReason = reason;
+
+                TextView errorReason
+                    = (TextView) findViewById(R.id.callErrorReason);
+                if(errorReason != null)
+                {
+                    errorReason.setText(reason);
+                    errorReason.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+    }
 
     public void setMute(boolean isMute)
     {
@@ -1215,5 +1272,15 @@ public class VideoCallActivity
                                        int visibility)
     {
         getVideoFragment().updateCallInfoMargin();
+    }
+
+    static class CallStateHolder
+    {
+        //Call call;
+        //CallPeer callPeer;
+
+        String callPeerName="";
+        String callDuration="";
+        String errorReason="";
     }
 }

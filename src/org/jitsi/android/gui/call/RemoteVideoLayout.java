@@ -87,7 +87,14 @@ public class RemoteVideoLayout
         lastChildCount = childCount;
         preferredSizeChanged = false;
 
-        VideoCallActivity videoActivity = (VideoCallActivity) getContext();
+        Context ctx = getContext();
+        if(!(ctx instanceof VideoCallActivity))
+        {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            return;
+        }
+
+        VideoCallActivity videoActivity = (VideoCallActivity) ctx;
 
         if(childCount > 0)
         {
