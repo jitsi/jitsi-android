@@ -244,6 +244,11 @@
                   result="org.jitsi.apache.commons.codec.@1"/>
         </jarjar>
         <!-- Rename org.apache.http -->
+        <jarjar jarfile="libs/httpcore.jar">
+            <zipfileset src="lib/bundles/httpcore.jar"/>
+            <rule pattern="org.apache.http.**"
+                  result="org.jitsi.apache.http.@1"/>
+        </jarjar>
         <jarjar jarfile="libs/httpclient.jar">
             <zipfileset src="lib/bundles/httpclient.jar"/>
             <rule pattern="org.apache.http.**"
