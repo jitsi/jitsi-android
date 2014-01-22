@@ -303,6 +303,7 @@ public class VideoCallActivity
                                 findViewById(android.R.id.content),
                                 R.id.callTime);
 
+                        // Remove video fragment
                         if(getVideoFragment() != null)
                         {
                             getSupportFragmentManager()
@@ -310,6 +311,8 @@ public class VideoCallActivity
                                 .remove(getVideoFragment())
                                 .commit();
                         }
+                        // Remove auto hide fragment
+                        ensureAutoHideFragmentDetached();
 
                         getSupportFragmentManager()
                             .beginTransaction()
