@@ -277,12 +277,21 @@ public abstract class CodecInfo
         String[] types = codecInfo.getSupportedTypes();
         for(String type : types)
         {
-            if(type.equals(MEDIA_CODEC_TYPE_H263))
-                return new H263CodecInfo(codecInfo);
-            else if(type.equals(MEDIA_CODEC_TYPE_H264))
-                return new H264CodecInfo(codecInfo);
-            else if(type.equals(MEDIA_CODEC_TYPE_VP8))
-                return new VP8CodecInfo(codecInfo);
+            try
+            {
+                if(type.equals(MEDIA_CODEC_TYPE_H263))
+                    return new H263CodecInfo(codecInfo);
+                else if(type.equals(MEDIA_CODEC_TYPE_H264))
+                    return new H264CodecInfo(codecInfo);
+                else if(type.equals(MEDIA_CODEC_TYPE_VP8))
+                    return new VP8CodecInfo(codecInfo);
+            }
+            catch(IllegalArgumentException e)
+            {
+                logger.error(
+                    "Error initializing codec info: "
+                        + codecInfo.getName() + ", type: " + type, e);
+            }
         }
         return null;
     }
