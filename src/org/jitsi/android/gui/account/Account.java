@@ -161,8 +161,14 @@ public class Account
 
             try
             {
-                icon = new byte[is.available()];
-                is.read(icon);
+                ByteArrayOutputStream bout = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int read;
+                while (-1 != (read = is.read(buffer)))
+                {
+                    bout.write(buffer, 0, read);
+                }
+                icon = bout.toByteArray();
             }
             catch (IOException ioex)
             {
@@ -531,8 +537,8 @@ public class Account
             }
             catch (IllegalStateException exc)
             {
-                logger.error("Error retrieving avatar: "
-                        + exc.getLocalizedMessage(), exc);
+                logger.error(
+                    "Error retrieving avatar: " + exc.getMessage());
             }
 
             updateAvatar(avatarBlob);

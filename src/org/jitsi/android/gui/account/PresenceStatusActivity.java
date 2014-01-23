@@ -71,11 +71,6 @@ public class PresenceStatusActivity
     private OperationSetPresence accountPresence;
 
     /**
-     * The {@link StatusListAdapter} used as status list adapter
-     */
-    private StatusListAdapter statusAdapter;
-
-    /**
      * The instance of {@link Account} used for operations on the account
      */
     private Account account;
@@ -104,7 +99,7 @@ public class PresenceStatusActivity
         AccountID accountID = AccountUtils.getAccountForID(accountIDStr);
         if(accountID == null)
         {
-            logger.error("No account found for: "+accountID);
+            logger.error("No account found for: "+accountIDStr);
             finish();
             return;
         }
@@ -153,14 +148,14 @@ public class PresenceStatusActivity
         Iterator<PresenceStatus> statusIter =
                 accountPresence.getSupportedStatusSet();
 
-        statusAdapter = new StatusListAdapter(statusIter);
+        StatusListAdapter statusAdapter = new StatusListAdapter(statusIter);
 
         statusSpinner.setAdapter(statusAdapter);
 
         // Selects current status
         statusSpinner.setSelection(
                 statusAdapter.getPositionForItem(
-                        accountPresence.getPresenceStatus()));
+                    accountPresence.getPresenceStatus()));
 
         statusSpinner.setOnItemSelectedListener(this);
 
@@ -261,6 +256,7 @@ public class PresenceStatusActivity
      *
      * @param avatarView the {@link View} that has been clicked
      */
+    @SuppressWarnings("unused")
     public void onAvatarClicked(View avatarView)
     {
         if(account.getAvatarOpSet() == null)
