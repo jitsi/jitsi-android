@@ -9,6 +9,7 @@
         <item>NONE</item>
         <item>OPTIONS</item>
         <item>REGISTER</item>
+        <item>CRLF</item>
     </string-array>
     <string-array name="pref_sip_clist_type">
         <item>Local</item>
