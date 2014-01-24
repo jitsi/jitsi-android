@@ -108,7 +108,8 @@ public class CallInfoDialogFragment
         {
             public void run()
             {
-                doUpdateView();
+                if(getView() != null)
+                    doUpdateView();
             }
         });
     }
