@@ -137,7 +137,7 @@ public class VideoCallActivity
      * Instance holds call state to be displayed in <tt>CallEnded</tt> fragment.
      * Call objects will be no longer available after the call has ended.
      */
-    static final CallStateHolder callState = new CallStateHolder();
+    static CallStateHolder callState = new CallStateHolder();
 
     /**
      * Called when the activity is starting. Initializes the corresponding

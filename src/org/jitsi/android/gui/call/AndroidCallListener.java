@@ -101,6 +101,7 @@ public class AndroidCallListener
             // Stores speakerphone status to be restored after
             // the call has ended.
             storeSpeakerPhoneStatus();
+            clearVideoCallState();
 
             startVideoCallActivity(evt);
             break;
@@ -115,11 +116,21 @@ public class AndroidCallListener
                 // Stores speakerphone status to be restored after
                 // the call has ended.
                 storeSpeakerPhoneStatus();
+                clearVideoCallState();
 
                 startReceivedCallActivity(evt);
             }
             break;
         }
+    }
+
+    /**
+     * Clears call state stored in previous calls.
+     */
+    private void clearVideoCallState()
+    {
+        VideoCallActivity.callState
+            = new VideoCallActivity.CallStateHolder();
     }
 
     /**
