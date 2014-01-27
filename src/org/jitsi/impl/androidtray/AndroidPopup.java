@@ -12,12 +12,14 @@ import android.content.res.*;
 import android.graphics.*;
 import android.support.v4.app.*;
 
+import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.systray.*;
 import net.java.sip.communicator.util.*;
 
 import org.jitsi.R;
 import org.jitsi.android.*;
+import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.android.plugin.notificationwiring.*;
@@ -317,6 +319,71 @@ public class AndroidPopup
         }
 
         return builder;
+    }
+
+    /**
+     * Returns the <tt>PendingIntent</tt> that should be trigger when user
+     * clicks the notification.
+     * @return the <tt>PendingIntent</tt> that should be trigger by notification
+     */
+    public PendingIntent constructIntent()
+    {
+        Intent targetIntent = null;
+        PopupMessage message = getPopupMessage();
+
+        Object tag = message.getTag();
+        if(tag instanceof Contact)
+        {
+            Contact contact = (Contact) tag;
+            MetaContact metaContact
+                = AndroidGUIActivator.getContactListService()
+                .findMetaContactByContact(contact);
+            if(metaContact == null)
+            {
+                logger.error("Meta contact not found for "+contact);
+                return null;
+            }
+
+            String group = message != null ? message.getGroup() : null;
+
+            if(AndroidNotifications.MESSAGE_GROUP.equals(group))
+            {
+                targetIntent
+                    = ChatSessionManager.getChatIntent(metaContact);
+
+                if(targetIntent == null)
+                {
+                    logger.error(
+                        "Failed to create chat with " + metaContact);
+                }
+            }
+            else
+            {
+                // TODO: add call history intent here
+                targetIntent = null;
+            }
+        }
+
+        // Displays popup message details when the notification is clicked
+        if(message != null && targetIntent == null)
+        {
+            targetIntent = DialogActivity.getDialogIntent(
+                JitsiApplication.getGlobalContext(),
+                message.getMessageTitle(),
+                message.getMessage());
+        }
+
+        if(targetIntent == null)
+            return null;
+
+        return PendingIntent.getActivity(
+                JitsiApplication.getGlobalContext(),
+                getId(), /*
+                          * Must be unique for each, so use
+                          * the notification id as the request code
+                          */
+                targetIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
     /**

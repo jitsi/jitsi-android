@@ -87,6 +87,14 @@ public class Jitsi
     {
         super.onCreate(savedInstanceState);
 
+        // Checks if OSGi has been started and if not starts
+        // LauncherActivity which will restore this Activity
+        // from it's Intent.
+        if(postRestoreIntent())
+        {
+            return;
+        }
+
         setContentView(R.layout.main_view);
 
         boolean isTablet = AndroidUtils.isTablet();
@@ -176,28 +184,27 @@ public class Jitsi
      */
     private void showContactsFragment(Intent intent)
     {
-        if(AndroidUtils.isTablet())
-        {
-            contactListFragment = new TabletContactListFragment();
-        }
-        else
+        if(!AndroidUtils.isTablet())
         {
             contactListFragment = new ContactListFragment();
         }
-
-        String chatId
+        else
+        {
+            contactListFragment = new TabletContactListFragment();
+            String chatID
                 = intent.getStringExtra(
                         ChatSessionManager.CHAT_IDENTIFIER);
 
-        if(chatId != null)
-        {
-            Bundle args = new Bundle();
+            if(chatID != null)
+            {
+                Bundle args = new Bundle();
 
-            args.putString(ChatSessionManager.CHAT_IDENTIFIER,
-                           intent.getStringExtra(
+                args.putString(ChatSessionManager.CHAT_IDENTIFIER,
+                               intent.getStringExtra(
                                    ChatSessionManager.CHAT_IDENTIFIER));
 
-            contactListFragment.setArguments(args);
+                contactListFragment.setArguments(args);
+            }
         }
 
         getSupportFragmentManager()

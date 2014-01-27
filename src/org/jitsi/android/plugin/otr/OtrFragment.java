@@ -6,7 +6,6 @@
  */
 package org.jitsi.android.plugin.otr;
 
-import android.app.*;
 import android.content.*;
 import android.view.*;
 
@@ -16,8 +15,8 @@ import net.java.sip.communicator.plugin.otr.*;
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.gui.*;
 import net.java.sip.communicator.service.protocol.*;
-
 import net.java.sip.communicator.util.*;
+
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
@@ -108,14 +107,7 @@ public class OtrFragment
         // service has been killed(and the whole process)
         if(AndroidGUIActivator.bundleContext == null)
         {
-            logger.error("OSGi service probably not initialized" +
-                             ", finishing the activity");
-            Activity activity = getActivity();
-            if(activity != null)
-            {
-                startActivity(JitsiApplication.getHomeIntent());
-                activity.finish();
-            }
+            logger.error("OSGi service probably not initialized");
             return;
         }
 

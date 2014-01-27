@@ -34,7 +34,7 @@ public class ChatSessionManager
             = Logger.getLogger(ChatSessionManager.class);
 
     /**
-     * The chat identifier property.
+     * The chat identifier property. It corresponds to chat's meta contact UID.
      */
     public static final String CHAT_IDENTIFIER = "ChatIdentifier";
 
@@ -64,6 +64,7 @@ public class ChatSessionManager
 
     /**
      * The currently selected chat identifier.
+     * It's equal to chat's <tt>MetaContact</tt> UID.
      */
     private static String currentChatId;
 
@@ -79,13 +80,11 @@ public class ChatSessionManager
      * chat
      * @return the active chat identifier
      */
-    public synchronized static String addActiveChat(ChatSession chatSession)
+    private synchronized static String addActiveChat(ChatSession chatSession)
     {
-        String key = String.valueOf(System.currentTimeMillis());
+        String key = chatSession.getChatId();
 
         activeChats.put(key, chatSession);
-
-        chatSession.setChatId(key);
 
         notifyChatStarted(chatSession);
 
@@ -152,12 +151,9 @@ public class ChatSessionManager
     public synchronized static ChatSession getActiveChat(
             MetaContact metaContact)
     {
-        for (ChatSession chatSession : activeChats.values())
-        {
-            if (chatSession.getMetaContact().equals(metaContact))
-                return chatSession;
-        }
-        return null;
+        return metaContact != null
+            ? activeChats.get(metaContact.getMetaUID())
+            : null;
     }
 
     /**
@@ -334,7 +330,7 @@ public class ChatSessionManager
 
         if(metaContact == null)
         {
-            logger.warn("No metacontact found for "+contact);
+            logger.warn("No meta contact found for "+contact);
             return null;
         }
 
@@ -342,6 +338,40 @@ public class ChatSessionManager
         addActiveChat(newChat);
 
         return newChat;
+    }
+
+    /**
+     * Finds a <tt>ChatSession</tt> for the <tt>MetaContact</tt> identified
+     * by given <tt>metaContactUid</tt>.
+     * @param metaContactUid <tt>MetaContact</tt> UID.
+     * @return <tt>true</tt> if the chat was successfully started or
+     * <tt>false</tt> if no <tt>MetaContact</tt> has been found for given UID.
+     */
+    public synchronized static ChatSession createChatForMetaUID(
+        String metaContactUid)
+    {
+        if(metaContactUid == null)
+            throw new NullPointerException();
+
+        MetaContact metaContact = AndroidGUIActivator
+            .getContactListService().findMetaContactByMetaUID(metaContactUid);
+        if(metaContact == null)
+        {
+            logger.error(
+                "Meta contact not found for meta UID: " + metaContactUid);
+            return null;
+        }
+
+        if(activeChats.containsKey(metaContactUid))
+        {
+            return activeChats.get(metaContactUid);
+        }
+        else
+        {
+            ChatSession newChat = new ChatSession(metaContact);
+            addActiveChat(newChat);
+            return newChat;
+        }
     }
 
     /**
@@ -390,16 +420,6 @@ public class ChatSessionManager
      */
     public static Intent getChatIntent(MetaContact contact)
     {
-        ChatSession chatSession
-                = (ChatSession) findChatForContact(
-                                    contact.getDefaultContact(),
-                                    true);
-        if(chatSession == null)
-        {
-            logger.warn("Failed to create new chat with "+contact);
-            return null;
-        }
-
         Intent chatIntent;
         if(AndroidUtils.isTablet())
         {
@@ -415,7 +435,7 @@ public class ChatSessionManager
         }
 
         chatIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        chatIntent.putExtra(CHAT_IDENTIFIER, chatSession.getChatId());
+        chatIntent.putExtra(CHAT_IDENTIFIER, contact.getMetaUID());
 
         return chatIntent;
     }

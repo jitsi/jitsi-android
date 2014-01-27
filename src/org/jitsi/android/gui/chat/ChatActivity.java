@@ -81,6 +81,14 @@ public class ChatActivity
 
         setContentView(R.layout.chat);
 
+        // If chat notification has been clicked and OSGi service
+        // has been killed in the meantime then we have to start it and
+        // restore this activity
+        if(postRestoreIntent())
+        {
+            return;
+        }
+
         // Instantiate a ViewPager and a PagerAdapter.
         chatPager = (ViewPager) findViewById(R.id.chatPager);
         chatPagerAdapter
@@ -144,10 +152,19 @@ public class ChatActivity
         if(chatId == null)
             throw new RuntimeException("Missing chat identifier extra");
 
-        setCurrentChatId(chatId);
+        ChatSession session
+            = ChatSessionManager
+                .createChatForMetaUID(chatId);
+        if(session == null)
+        {
+            logger.error(
+                "Failed to create chat session for meta UID: "+chatId);
+            return;
+        }
+        setCurrentChatId(session.getChatId());
 
         // Synchronize chat page
-        chatPager.setCurrentItem(chatPagerAdapter.getChatIdx(chatId));
+        chatPager.setCurrentItem(chatPagerAdapter.getChatIdx(currentChatId));
     }
 
     /**

@@ -373,11 +373,26 @@ public class DialogActivity
      */
     public static void showDialog(Context ctx, String title, String message)
     {
+        Intent alert = getDialogIntent(ctx, title, message);
+        ctx.startActivity(alert);
+    }
+
+    /**
+     * Creates an <tt>Intent</tt> that will display a dialog with given
+     * <tt>title</tt> and content <tt>message</tt>.
+     * @param ctx Android context.
+     * @param title dialog title that will be used
+     * @param message dialog message that wil be used.
+     * @return an <tt>Intent</tt> that will display a dialog.
+     */
+    public static Intent getDialogIntent( Context ctx, String title,
+                                          String message )
+    {
         Intent alert = new Intent(ctx, DialogActivity.class);
         alert.putExtra(EXTRA_TITLE, title);
         alert.putExtra(EXTRA_MESSAGE, message);
         alert.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        ctx.startActivity(alert);
+        return alert;
     }
 
     /**

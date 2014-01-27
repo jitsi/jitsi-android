@@ -6,17 +6,10 @@
  */
 package org.jitsi.impl.androidtray;
 
-import android.content.*;
-import net.java.sip.communicator.service.contactlist.*;
-import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.service.systray.*;
 import net.java.sip.communicator.service.systray.event.*;
-
 import net.java.sip.communicator.util.*;
-import org.jitsi.android.*;
-import org.jitsi.android.gui.*;
-import org.jitsi.android.gui.chat.*;
-import org.jitsi.android.plugin.notificationwiring.*;
+
 import org.jitsi.service.osgi.*;
 
 /**
@@ -176,7 +169,11 @@ public class SystrayServiceImpl
          */
         public void popupMessageClicked(SystrayPopupMessageEvent evt)
         {
-            Object src = evt.getSource();
+            // TODO: notifications now fire intents directly and
+            // SystrayPopupMessageListener is omitted. Make sure that this code
+            // is no longer required and remove this code completely.
+
+            /*Object src = evt.getSource();
             PopupMessage message = null;
             if(src instanceof PopupMessage)
             {
@@ -232,7 +229,7 @@ public class SystrayServiceImpl
                         JitsiApplication.getGlobalContext(),
                         message.getMessageTitle(),
                         message.getMessage());
-            }
+            }*/
         }
     }
 }

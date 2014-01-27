@@ -224,6 +224,12 @@ public class ChatFragment
             throw new IllegalArgumentException();
 
         chatSession = ChatSessionManager.getActiveChat(chatId);
+        if(chatSession == null)
+        {
+            logger.error("Chat for given id: " + chatId + " not exists");
+            return null;
+        }
+
         chatSession.addMessageListener(chatListAdapter);
 
         initAdapter();
@@ -363,10 +369,10 @@ public class ChatFragment
     }
 
     /**
-     * Creates new parametrized instance of <tt>CallContactFragment</tt>.
+     * Creates new parametrized instance of <tt>ChatFragment</tt>.
      *
      * @param chatId optional phone number that will be filled.
-     * @return new parametrized instance of <tt>CallContactFragment</tt>.
+     * @return new parametrized instance of <tt>ChatFragment</tt>.
      */
     public static ChatFragment newInstance(String chatId)
     {

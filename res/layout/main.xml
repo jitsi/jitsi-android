@@ -15,5 +15,15 @@
         android:layout_centerInParent="true"
         android:layout_margin="@dimen/screen_padding"
         android:paddingBottom="80dp"/>
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/clickable_toast_bg"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/service_gui_RESTORING"
+            android:id="@+id/restoring"
+            android:padding="10dp"
+            android:layout_centerHorizontal="true"
+            android:layout_alignBottom="@+id/loadingImage"/>
 
 </RelativeLayout>

@@ -81,15 +81,7 @@ public class NotificationPopupHandler
         int nId = newPopup.getId();
 
         // Registers click intent
-        builder.setContentIntent(
-                PendingIntent.getBroadcast(
-                        JitsiApplication.getGlobalContext(),
-                        nId, /*
-                              * Must be unique for each, so use
-                              * the notification id as the request code
-                              */
-                        PopupClickReceiver.createIntent(nId),
-                        PendingIntent.FLAG_UPDATE_CURRENT));
+        builder.setContentIntent(newPopup.constructIntent());
 
         // Registers delete intent
         builder.setDeleteIntent(

@@ -6,6 +6,7 @@
  */
 package org.jitsi.android.gui;
 
+import android.content.*;
 import android.os.Bundle;
 import android.view.*;
 import android.view.animation.*;
@@ -40,6 +41,17 @@ import org.osgi.framework.*;
 public class LauncherActivity
     extends OSGiActivity
 {
+    /**
+     * Argument that holds an <tt>Intent</tt> that will be started once OSGi
+     * startup is finished.
+     */
+    public static final String ARG_RESTORE_INTENT = "ARG_RESTORE_INTENT";
+
+    /**
+     * Intent instance that will be called once OSGi startup is finished.
+     */
+    private Intent restoreIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -58,6 +70,15 @@ public class LauncherActivity
         Animation myFadeInAnimation
                 = AnimationUtils.loadAnimation(this, R.anim.fadein);
         myImageView.startAnimation(myFadeInAnimation);
+
+        // Get restore Intent and display "Restoring..." label
+        Intent intent = getIntent();
+        if(intent != null)
+            this.restoreIntent = intent.getParcelableExtra(ARG_RESTORE_INTENT);
+
+        View restoreView = findViewById(R.id.restoring);
+        restoreView.setVisibility(
+            restoreIntent != null ? View.VISIBLE : View.GONE);
     }
 
 
@@ -72,8 +93,17 @@ public class LauncherActivity
         {
             public void run()
             {
-                // Start home screen Activity
-                switchActivity(JitsiApplication.getHomeScreenActivityClass());
+                if(restoreIntent != null)
+                {
+                    // Starts restore intent
+                    startActivity(restoreIntent);
+                    finish();
+                }
+                else
+                {
+                    // Start home screen Activity
+                    switchActivity(JitsiApplication.getHomeScreenActivityClass());
+                }
             }
         });
     }

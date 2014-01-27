@@ -66,7 +66,8 @@ public class TabletContactListFragment
             if(intentChatId != null)
             {
                 ChatSession intentChat
-                    = ChatSessionManager.getActiveChat(intentChatId);
+                    = ChatSessionManager
+                        .createChatForMetaUID(intentChatId);
                 if(intentChat != null)
                 {
                     selectChatSession(intentChat);
@@ -76,8 +77,8 @@ public class TabletContactListFragment
                 }
                 else
                 {
-                    logger.warn("Chat for given session id: "
-                                    + intentChatId + " - no longer exists");
+                    logger.warn("Meta contact for given id: "
+                                    + intentChatId + " - not found");
                 }
             }
         }

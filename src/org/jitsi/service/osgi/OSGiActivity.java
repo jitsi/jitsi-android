@@ -17,6 +17,8 @@ import android.view.*;
 import net.java.sip.communicator.util.*;
 import org.jitsi.*;
 import org.jitsi.android.*;
+import org.jitsi.android.gui.*;
+import org.jitsi.android.gui.LauncherActivity;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.android.plugin.errorhandler.*;
 import org.osgi.framework.*;
@@ -59,7 +61,7 @@ public class OSGiActivity
      * List of attached {@link OSGiUiPart}.
      */
     private List<OSGiUiPart> osgiFrgaments = new ArrayList<OSGiUiPart>();
-    
+
     /**
      * Starts this osgi activity.
      *
@@ -479,6 +481,29 @@ public class OSGiActivity
     protected View getContentView()
     {
         return findViewById(android.R.id.content);
+    }
+
+    /**
+     * Checks if the OSGi is started and if not eventually triggers
+     * <tt>LauncherActivity</tt> that will restore current activity from it's
+     * <tt>Intent</tt>.
+     * @return <tt>true</tt> if restore <tt>Intent</tt> has been posted.
+     */
+    protected boolean postRestoreIntent()
+    {
+        // Restore after OSGi startup
+        if(AndroidGUIActivator.bundleContext == null)
+        {
+            Intent intent = new Intent(
+                JitsiApplication.getGlobalContext(),
+                LauncherActivity.class);
+            intent.putExtra(
+                LauncherActivity.ARG_RESTORE_INTENT, getIntent());
+            startActivity(intent);
+            finish();
+            return true;
+        }
+        return false;
     }
 
     /**

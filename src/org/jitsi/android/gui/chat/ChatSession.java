@@ -43,10 +43,6 @@ public class ChatSession
      * Limits the amount of messages being loaded at one time.
      */
     private static final int HISTORY_CHUNK_SIZE = 30;
-    /**
-     * The chat identifier.
-     */
-    private String chatId;
 
     /**
      * The underlying <tt>MetaContact</tt>, we're chatting with.
@@ -130,23 +126,13 @@ public class ChatSession
     }
 
     /**
-     * Sets the chat identifier.
-     *
-     * @param chatId the identifier of the chat
-     */
-    public void setChatId(String chatId)
-    {
-        this.chatId = chatId;
-    }
-
-    /**
      * Returns the chat identifier.
      *
      * @return the chat identifier
      */
     public String getChatId()
     {
-        return chatId;
+        return metaContact.getMetaUID();
     }
 
     /**
@@ -506,7 +492,7 @@ public class ChatSession
     @Override
     public boolean isChatFocused()
     {
-        return chatId.equals(ChatSessionManager.getCurrentChatId());
+        return getChatId().equals(ChatSessionManager.getCurrentChatId());
     }
 
     @Override
