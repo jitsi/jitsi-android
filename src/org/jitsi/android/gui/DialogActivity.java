@@ -112,12 +112,6 @@ public class DialogActivity
     private boolean confirmed;
 
     /**
-     * Flag indicates that this instance state was saved and it might
-     * get recreated in future(device rotation).
-     */
-    private boolean flagSaved = false;
-
-    /**
      * <tt>BroadcastReceiver</tt> that listens for close dialog action.
      */
     private CloseDialogListener closeIntentListener;
@@ -284,17 +278,6 @@ public class DialogActivity
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void onSaveInstanceState(Bundle outState)
-    {
-        super.onSaveInstanceState(outState);
-
-        this.flagSaved = true;
-    }
-
-    /**
      * Removes listener from the map.
      */
     @Override
@@ -312,11 +295,6 @@ public class DialogActivity
                 displayedDialogs.notifyAll();
             }
         }
-
-        // Skip this phase in case state was saved and Activity
-        // might get recreated(device rotation)
-        if(flagSaved)
-            return;
 
         // Notify that dialog was cancelled if confirmed == false
         if(listener != null && !confirmed)

@@ -76,6 +76,12 @@ public class JitsiApplication
     private static long lastGuiActivity;
 
     /**
+     * Used to track current <tt>Activity</tt>.
+     * This monitor is notified each time current <tt>Activity</tt> changes.
+     */
+    private static final Object currentActivityMonitor = new Object();
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -324,17 +330,33 @@ public class JitsiApplication
      */
     public static void setCurrentActivity(Activity a)
     {
-        logger.info("Current activity set to "+a);
-        currentActivity = a;
+        synchronized (currentActivityMonitor)
+        {
+            logger.info("Current activity set to "+a);
+            currentActivity = a;
 
-        if(currentActivity == null)
-        {
-            lastGuiActivity = System.currentTimeMillis();
+            if(currentActivity == null)
+            {
+                lastGuiActivity = System.currentTimeMillis();
+            }
+            else
+            {
+                lastGuiActivity = -1;
+            }
+            // Notify listening threads
+            currentActivityMonitor.notifyAll();
         }
-        else
-        {
-            lastGuiActivity = -1;
-        }
+    }
+
+    /**
+     * Returns monitor object that will be notified each time current
+     * <tt>Activity</tt> changes.
+     * @return monitor object that will be notified each time current
+     * <tt>Activity</tt> changes.
+     */
+    static public Object getCurrentActivityMonitor()
+    {
+        return currentActivityMonitor;
     }
 
     /**

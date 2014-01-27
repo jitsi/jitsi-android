@@ -6,6 +6,7 @@
  */
 package org.jitsi.android.gui.login;
 
+import android.app.*;
 import android.content.*;
 import android.os.*;
 import android.view.*;
@@ -14,6 +15,7 @@ import net.java.sip.communicator.util.*;
 import org.jitsi.*;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
+import org.jitsi.android.gui.LauncherActivity;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.service.resources.*;
 
@@ -31,23 +33,9 @@ public class AndroidSecurityAuthority
     private Logger logger = Logger.getLogger(AndroidSecurityAuthority.class);
 
     /**
-     * Android context.
-     */
-    private final Context context;
-
-    /**
      * If user name should be editable when asked for credentials.
      */
     private boolean isUserNameEditable = false;
-
-    /**
-     * Creates new instance of <tt>AndroidSecurityAuthority</tt>
-     * @param context the Android context.
-     */
-    public AndroidSecurityAuthority(Context context)
-    {
-        this.context = context;
-    }
 
     /**
      * Returns a UserCredentials object associated with the specified realm,
@@ -128,6 +116,37 @@ public class AndroidSecurityAuthority
         args.putBoolean( CredentialsFragment.ARG_STORE_PASSWORD,
                          defaultValues.isPasswordPersistent() );
 
+        // If OSGi has not started wait for
+        // the <tt>LauncherActivity</tt> to finish
+        if(AndroidGUIActivator.bundleContext == null)
+        {
+            final Object currentActivityMonitor
+                = JitsiApplication.getCurrentActivityMonitor();
+            synchronized (currentActivityMonitor)
+            {
+                while (true)
+                {
+                    Activity currentActivity
+                        = JitsiApplication.getCurrentActivity();
+                    if(currentActivity != null
+                        && !(currentActivity instanceof LauncherActivity))
+                    {
+                        break;
+                    }
+                    try
+                    {
+                        logger.warn(
+                            "Enter password dialog waiting for any Activity");
+                        currentActivityMonitor.wait();
+                    }
+                    catch (InterruptedException e)
+                    {
+                        logger.error(e, e);
+                    }
+                }
+            }
+        }
+
         ResourceManagementService resources
                 = AndroidGUIActivator.getResourcesService();
 
@@ -136,7 +155,7 @@ public class AndroidSecurityAuthority
 
         // Displays the credentials dialog and waits for it to complete
         DialogActivity.showCustomDialog(
-                context,
+                JitsiApplication.getGlobalContext(),
                 resources.getI18NString("service.gui.LOGIN_FAILED"),
                 CredentialsFragment.class.getName(),
                 args,

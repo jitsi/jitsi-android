@@ -98,12 +98,10 @@ public class AndroidGUIActivator
     public void start(BundleContext bundleContext)
             throws Exception
     {
-        AndroidGUIActivator.bundleContext = bundleContext;
-
         Context androidContext = JitsiApplication.getGlobalContext();
 
         SecurityAuthority secuirtyAuthority
-                = new AndroidSecurityAuthority(androidContext);
+                = new AndroidSecurityAuthority();
 
         loginRenderer = new AndroidLoginRenderer(secuirtyAuthority);
 
@@ -116,15 +114,6 @@ public class AndroidGUIActivator
         bundleContext.registerService(
                 AlertUIService.class.getName(),
                 alertServiceImpl,
-                null);
-
-        // Registers UIService stub
-        AndroidUIServiceImpl uiService
-            = new AndroidUIServiceImpl( secuirtyAuthority);
-
-        bundleContext.registerService(
-                UIService.class.getName(),
-                uiService,
                 null);
 
         // Creates and registers presence status handler
@@ -152,6 +141,15 @@ public class AndroidGUIActivator
         // Register show history settings OTR link listener
         ChatSessionManager.addChatLinkListener(
             new OtrFragment.ShowHistoryLinkListener());
+
+        AndroidGUIActivator.bundleContext = bundleContext;
+
+        // Registers UIService stub
+        AndroidUIServiceImpl uiService
+            = new AndroidUIServiceImpl( secuirtyAuthority);
+
+        bundleContext.registerService(
+            UIService.class.getName(), uiService, null);
     }
 
     /**
