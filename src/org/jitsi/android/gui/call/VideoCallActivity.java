@@ -302,6 +302,7 @@ public class VideoCallActivity
                             = ViewUtil.getTextViewValue(
                                 findViewById(android.R.id.content),
                                 R.id.callTime);
+                        callState.callEnded = true;
 
                         // Remove video fragment
                         if(getVideoFragment() != null)
@@ -516,8 +517,11 @@ public class VideoCallActivity
         }
         else
         {
-            logger.error("There aren't any peers in the call");
-            finish();
+            if(!callState.callEnded)
+            {
+                logger.error("There aren't any peers in the call");
+                finish();
+            }
             return;
         }
 
@@ -1285,5 +1289,6 @@ public class VideoCallActivity
         String callPeerName="";
         String callDuration="";
         String errorReason="";
+        boolean callEnded=false;
     }
 }
