@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:background="@color/blue"
+              android:paddingLeft="3dp">
+
+    <ImageButton android:id="@+id/cancelCorrectionBtn"
+                 android:src="@drawable/cancel_edit"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_gravity="center_vertical"
+                 android:background="@color/blue"
+                 android:layout_margin="2dp"
+                 android:padding="3dp"/>
+    <EditText
+            android:id="@+id/chatWriteText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="2dp"
+            android:padding="5dp"
+            android:background="@color/white"
+            android:textColor="@color/black"
+            android:textColorHighlight="@color/blue"
+            android:imeOptions="actionSend|flagNoExtractUi"
+            android:singleLine="true"
+            android:textCursorDrawable="@null"/>
+
+    <ImageButton android:id="@+id/sendMessageButton"
+                 android:src="@drawable/send_message"
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:layout_gravity="center_vertical"
+                 android:background="@color/blue"
+                 android:layout_margin="2dp"
+                 android:padding="3dp"
+            />
+</LinearLayout>
