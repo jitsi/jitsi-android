@@ -44,9 +44,7 @@ public class MetaContactListManager
                     @Override
                     public boolean onConfirmClicked(DialogActivity dialog)
                     {
-                        MetaContactListService mls
-                                = AndroidGUIActivator.getContactListService();
-                        mls.removeMetaContact(contact);
+                        doRemoveContact(contact);
                         return true;
                     }
 
@@ -54,6 +52,21 @@ public class MetaContactListManager
                     public void onDialogCancelled(DialogActivity dialog){ }
                 }
         );
+    }
+
+    private static void doRemoveContact(final MetaContact contact)
+    {
+        // Prevent NetworkOnMainThreadException
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                MetaContactListService mls
+                    = AndroidGUIActivator.getContactListService();
+                mls.removeMetaContact(contact);
+            }
+        }).start();
     }
 
     /**
@@ -106,20 +119,28 @@ public class MetaContactListManager
      *
      * @param group the group to remove from the contact list.
      */
-    private static void doRemoveGroup(MetaContactGroup group)
+    private static void doRemoveGroup(final MetaContactGroup group)
     {
-        Context ctx = JitsiApplication.getGlobalContext();
-        try
+        // Prevent NetworkOnMainThreadException
+        new Thread(new Runnable()
         {
-            AndroidGUIActivator.getContactListService()
-                    .removeMetaContactGroup(group);
-        }
-        catch (Exception ex)
-        {
-            AndroidUtils.showAlertDialog(
-                    ctx,
-                    ctx.getString(R.string.service_gui_REMOVE_GROUP),
-                    ex.getMessage());
-        }
+            @Override
+            public void run()
+            {
+                Context ctx = JitsiApplication.getGlobalContext();
+                try
+                {
+                    AndroidGUIActivator.getContactListService()
+                        .removeMetaContactGroup(group);
+                }
+                catch (Exception ex)
+                {
+                    AndroidUtils.showAlertDialog(
+                        ctx,
+                        ctx.getString(R.string.service_gui_REMOVE_GROUP),
+                        ex.getMessage());
+                }
+            }
+        }).start();
     }
 }

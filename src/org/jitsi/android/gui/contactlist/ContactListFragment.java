@@ -330,7 +330,7 @@ public class ContactListFragment
      * @param group clicked group index.
      * @param child clicked contact index.
      */
-    private void createContactCtxMenu(Menu menu, MenuInflater inflater,
+    private void createContactCtxMenu(ContextMenu menu, MenuInflater inflater,
                                       int group, int child)
     {
         // Inflate contact list context menu
@@ -339,6 +339,8 @@ public class ContactListFragment
         // Remembers clicked contact
         clickedContact
                 = ((MetaContact) contactListAdapter.getChild(group, child));
+
+        menu.setHeaderTitle(clickedContact.getDisplayName());
 
         // Checks if close chats options should be visible
         boolean closeChatsVisible
@@ -384,13 +386,16 @@ public class ContactListFragment
      * @param inflater the inflater.
      * @param group clicked group index.
      */
-    private void createGroupCtxMenu(Menu menu, MenuInflater inflater, int group)
+    private void createGroupCtxMenu(ContextMenu menu,
+                                    MenuInflater inflater, int group)
     {
+        this.clickedGroup
+            = (MetaContactGroup) contactListAdapter.getGroup(group);
+
         // Inflate contact list context menu
         inflater.inflate(R.menu.group_menu, menu);
 
-        this.clickedGroup
-                = (MetaContactGroup) contactListAdapter.getGroup(group);
+        menu.setHeaderTitle(clickedGroup.getGroupName());
     }
 
     /**
