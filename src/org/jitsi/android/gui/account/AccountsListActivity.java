@@ -70,6 +70,14 @@ public class AccountsListActivity
     {
         super.onCreate(savedInstanceState);
 
+        if(AndroidGUIActivator.bundleContext == null)
+        {
+            // No OSGi Exists
+            logger.error("OSGi not initialized");
+            finish();
+            return;
+        }
+
         setContentView(R.layout.account_list);
 
         this.accountManager
