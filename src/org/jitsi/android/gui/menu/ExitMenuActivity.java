@@ -43,7 +43,6 @@ public abstract class ExitMenuActivity
         if(item.getItemId() == R.id.menu_exit)
         {
             // Shutdown application
-            // TODO: exit doesn't work while OSGi is starting
             JitsiApplication.shutdownApplication();
             return true;
         }

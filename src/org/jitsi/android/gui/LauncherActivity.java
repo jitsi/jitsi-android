@@ -60,6 +60,12 @@ public class LauncherActivity
 
         super.onCreate(savedInstanceState);
 
+        if(OSGiService.isShuttingDown())
+        {
+            switchActivity(ShutdownActivity.class);
+            return;
+        }
+
         setProgressBarIndeterminateVisibility(true);
 
         setContentView(R.layout.main);
@@ -80,8 +86,6 @@ public class LauncherActivity
         restoreView.setVisibility(
             restoreIntent != null ? View.VISIBLE : View.GONE);
     }
-
-
 
     @Override
     protected void start(BundleContext osgiContext)

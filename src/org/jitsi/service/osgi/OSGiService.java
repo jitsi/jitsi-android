@@ -68,15 +68,51 @@ public class OSGiService
         return impl.onBind(intent);
     }
 
+    /**
+     * Protects against starting next OSGi service while the previous one has
+     * not completed it's shutdown procedure.
+     *
+     * This field will be cleared by System.exit() called after shutdown
+     * completes.
+     */
+    private static boolean started;
+
+    public static boolean hasStarted()
+    {
+        return started;
+    }
+
+    /**
+     * This field will be cleared by System.exit() called after shutdown
+     * completes.
+     */
+    private static boolean shuttingdown;
+
+    public static boolean isShuttingDown()
+    {
+        return shuttingdown;
+    }
+
     @Override
     public void onCreate()
     {
+        if(started)
+        {
+            // We are still running
+            return;
+        }
+        started = true;
         impl.onCreate();
     }
 
     @Override
     public void onDestroy()
     {
+        if(shuttingdown)
+        {
+            return;
+        }
+        shuttingdown = true;
         impl.onDestroy();
     }
 

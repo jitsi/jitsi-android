@@ -110,6 +110,9 @@
     <string name="service_gui_RESTORING">
         Restoring...
     </string>
+    <string name="service_gui_SHUTDOWN_IN_PROGRESS">
+        Shutdown in progress...
+    </string>
     <string name="service_gui_VOLUME_GAIN_LEVEL">Volume gain level: %s%%</string>
 
     <!-- Sign in -->
