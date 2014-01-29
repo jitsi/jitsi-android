@@ -13,7 +13,6 @@ import android.view.*;
 import android.widget.*;
 
 import net.java.sip.communicator.service.protocol.jabber.*;
-import net.java.sip.communicator.util.*;
 
 import org.jitsi.*;
 import org.jitsi.android.gui.menu.*;
@@ -28,11 +27,6 @@ import org.osgi.framework.*;
 public class ServerListActivity
     extends MainMenuActivity
 {
-    /**
-     * The logger
-     */
-    private static Logger logger = Logger.getLogger(ServerListActivity.class);
-
     /**
      * Request code when launched for STUN servers list edit
      */
@@ -157,7 +151,7 @@ public class ServerListActivity
     /**
      * The server list fragment. Required to catch events.
      */
-    class ServerListFragment extends ListFragment
+    static public class ServerListFragment extends ListFragment
     {
 
         @Override
@@ -173,7 +167,9 @@ public class ServerListActivity
         public void onListItemClick(ListView l, View v, int position, long id)
         {
             super.onListItemClick(l, v, position, id);
-            showServerEditDialog(position);
+
+            ((ServerListActivity)getActivity())
+                .showServerEditDialog(position);
         }
     }
 
