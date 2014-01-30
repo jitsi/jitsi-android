@@ -444,6 +444,11 @@ public class ChatFragment
         final int ERROR_MESSAGE_VIEW = 3;
 
         /**
+         * The type for corrected message view.
+         */
+        final int CORRECTED_MESSAGE_VIEW = 4;
+
+        /**
          * Counter used to generate row ids.
          */
         private long idGenerator=0;
@@ -615,7 +620,7 @@ public class ChatFragment
 
         public int getViewTypeCount()
         {
-            return 4;
+            return 5;
         }
 
         public int getItemViewType(int position)
@@ -626,7 +631,26 @@ public class ChatFragment
             if (messageType == ChatMessage.INCOMING_MESSAGE)
                 return INCOMING_MESSAGE_VIEW;
             else if (messageType == ChatMessage.OUTGOING_MESSAGE)
-                return OUTGOING_MESSAGE_VIEW;
+            {
+                String sessionCorrUID = chatSession.getCorrectionUID();
+                String msgCorrUID = message.getUidForCorrection();
+
+                /*logger.error( "pos: " + position
+                                 + "S UID: " + sessionCorrUID
+                                 + "M UID: " + msgCorrUID );*/
+
+                if( sessionCorrUID != null
+                    && sessionCorrUID.equals(msgCorrUID) )
+                {
+                    //logger.error("pos: "+position+" corrected");
+                    return CORRECTED_MESSAGE_VIEW;
+                }
+                else
+                {
+                    return OUTGOING_MESSAGE_VIEW;
+                }
+
+            }
             else if (messageType == ChatMessage.SYSTEM_MESSAGE)
                 return SYSTEM_MESSAGE_VIEW;
             else if(messageType == ChatMessage.ERROR_MESSAGE)
@@ -665,90 +689,31 @@ public class ChatFragment
 
             if (convertView == null)
             {
-                LayoutInflater inflater = getActivity().getLayoutInflater();
-
                 messageViewHolder = new MessageViewHolder();
 
                 int viewType = getItemViewType(position);
 
-                messageViewHolder.viewType = viewType;
-
-                if (viewType == INCOMING_MESSAGE_VIEW)
-                {
-                    convertView = inflater.inflate( R.layout.chat_incoming_row,
-                                                    parent,
-                                                    false);
-
-                    messageViewHolder.avatarView
-                        = (ImageView) convertView.findViewById(
-                            R.id.incomingAvatarIcon);
-
-                    messageViewHolder.statusView
-                        = (ImageView) convertView.findViewById(
-                            R.id.incomingStatusIcon);
-
-                    messageViewHolder.messageView
-                        = (TextView) convertView.findViewById(
-                            R.id.incomingMessageView);
-
-                    messageViewHolder.timeView
-                        = (TextView) convertView.findViewById(
-                            R.id.incomingTimeView);
-
-                    messageViewHolder.typingView
-                        = (ImageView) convertView.findViewById(
-                            R.id.typingImageView);
-                }
-                else if(viewType == OUTGOING_MESSAGE_VIEW)
-                {
-                    convertView = inflater.inflate( R.layout.chat_outgoing_row,
-                                                    parent,
-                                                    false);
-
-                    messageViewHolder.avatarView
-                        = (ImageView) convertView.findViewById(
-                            R.id.outgoingAvatarIcon);
-
-                    messageViewHolder.statusView
-                        = (ImageView) convertView.findViewById(
-                            R.id.outgoingStatusIcon);
-
-                    messageViewHolder.messageView
-                        = (TextView) convertView.findViewById(
-                            R.id.outgoingMessageView);
-
-                    messageViewHolder.timeView
-                        = (TextView) convertView.findViewById(
-                            R.id.outgoingTimeView);
-                }
-                else
-                {
-                    // System or error view
-                    convertView = inflater.inflate(
-                            viewType == SYSTEM_MESSAGE_VIEW
-                                    ? R.layout.chat_system_row
-                                    : R.layout.chat_error_row,
-                                    parent, false);
-
-                    messageViewHolder.messageView
-                            = (TextView) convertView.findViewById(
-                            R.id.messageView);
-                }
-
-                // Set link movement method
-                messageViewHolder
-                    .messageView
-                        .setMovementMethod(
-                            LinkMovementMethod.getInstance());
-                // Set clicks adapter
-                messageViewHolder
-                    .messageView.setOnClickListener(msgClickAdapter);
-
-                convertView.setTag(messageViewHolder);
+                convertView
+                    = inflateViewForType(viewType, messageViewHolder, parent);
             }
             else
             {
                 messageViewHolder = (MessageViewHolder) convertView.getTag();
+
+                // Convert between OUTGOING and CORRECTED
+                if(messageViewHolder.viewType == CORRECTED_MESSAGE_VIEW
+                    || messageViewHolder.viewType == OUTGOING_MESSAGE_VIEW)
+                {
+                    int currentViewType = getItemViewType(position);
+                    // Convert if has changed
+                    if(messageViewHolder.viewType != currentViewType)
+                    {
+                        messageViewHolder = new MessageViewHolder();
+
+                        convertView = inflateViewForType(
+                            currentViewType, messageViewHolder, parent);
+                    }
+                }
             }
 
             // Set position used for click handling from click adapter
@@ -760,7 +725,8 @@ public class ChatFragment
             if (message != null)
             {
                 if(messageViewHolder.viewType == INCOMING_MESSAGE_VIEW
-                        || messageViewHolder.viewType == OUTGOING_MESSAGE_VIEW)
+                    || messageViewHolder.viewType == OUTGOING_MESSAGE_VIEW
+                    || messageViewHolder.viewType == CORRECTED_MESSAGE_VIEW)
                 {
                     updateStatusAndAvatarView(messageViewHolder);
 
@@ -769,6 +735,101 @@ public class ChatFragment
 
                 messageViewHolder.messageView.setText(message.getBody());
             }
+
+            return convertView;
+        }
+
+        private View inflateViewForType( int viewType,
+                                         MessageViewHolder messageViewHolder,
+                                         ViewGroup parent )
+        {
+            messageViewHolder.viewType = viewType;
+
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+
+            View convertView;
+
+            if (viewType == INCOMING_MESSAGE_VIEW)
+            {
+                convertView = inflater.inflate( R.layout.chat_incoming_row,
+                                                parent,
+                                                false);
+
+                messageViewHolder.avatarView
+                    = (ImageView) convertView.findViewById(
+                    R.id.incomingAvatarIcon);
+
+                messageViewHolder.statusView
+                    = (ImageView) convertView.findViewById(
+                    R.id.incomingStatusIcon);
+
+                messageViewHolder.messageView
+                    = (TextView) convertView.findViewById(
+                    R.id.incomingMessageView);
+
+                messageViewHolder.timeView
+                    = (TextView) convertView.findViewById(
+                    R.id.incomingTimeView);
+
+                messageViewHolder.typingView
+                    = (ImageView) convertView.findViewById(
+                    R.id.typingImageView);
+            }
+            else if( viewType == OUTGOING_MESSAGE_VIEW
+                     || viewType == CORRECTED_MESSAGE_VIEW )
+            {
+                if(viewType == OUTGOING_MESSAGE_VIEW)
+                {
+                    convertView
+                        = inflater.inflate( R.layout.chat_outgoing_row,
+                                            parent,
+                                            false);
+                }
+                else
+                {
+                    convertView
+                        = inflater.inflate( R.layout.chat_corrected_row,
+                                            parent,
+                                            false);
+                }
+
+                messageViewHolder.avatarView
+                    = (ImageView) convertView.findViewById(
+                    R.id.outgoingAvatarIcon);
+
+                messageViewHolder.statusView
+                    = (ImageView) convertView.findViewById(
+                    R.id.outgoingStatusIcon);
+
+                messageViewHolder.messageView
+                    = (TextView) convertView.findViewById(
+                    R.id.outgoingMessageView);
+
+                messageViewHolder.timeView
+                    = (TextView) convertView.findViewById(
+                    R.id.outgoingTimeView);
+            }
+            else
+            {
+                // System or error view
+                convertView = inflater.inflate(
+                    viewType == SYSTEM_MESSAGE_VIEW
+                        ? R.layout.chat_system_row : R.layout.chat_error_row,
+                    parent, false );
+
+                messageViewHolder.messageView
+                    = (TextView) convertView.findViewById(R.id.messageView);
+            }
+
+            // Set link movement method
+            messageViewHolder
+                .messageView
+                .setMovementMethod(LinkMovementMethod.getInstance());
+            // Set clicks adapter
+            messageViewHolder
+                .messageView.setOnClickListener(msgClickAdapter);
+
+            convertView.setTag(messageViewHolder);
 
             return convertView;
         }
@@ -789,7 +850,8 @@ public class ChatFragment
                 status = MetaContactRenderer.getStatusDrawable(
                     chatSession.getMetaContact());
             }
-            else if (viewHolder.viewType == OUTGOING_MESSAGE_VIEW)
+            else if (viewHolder.viewType == OUTGOING_MESSAGE_VIEW
+                     || viewHolder.viewType == CORRECTED_MESSAGE_VIEW)
             {
                 AndroidLoginRenderer loginRenderer
                         = AndroidGUIActivator.getLoginRenderer();

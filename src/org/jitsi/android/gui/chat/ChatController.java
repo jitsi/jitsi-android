@@ -54,6 +54,11 @@ public class ChatController
      */
     private View cancelBtn;
     /**
+     * Correction indicator.
+     */
+    private View editingImage;
+
+    /**
      * Send button's View.
      */
     private View sendBtn;
@@ -61,6 +66,10 @@ public class ChatController
      * Message <tt>EditText</tt>.
      */
     private EditText msgEdit;
+    /**
+     * Message edit text background.
+     */
+    private ImageView msgEditBg;
     /**
      * Chat session used by this controller and it' parent chat fragment.
      */
@@ -123,12 +132,17 @@ public class ChatController
         if(session.allowsTypingNotifications())
             msgEdit.addTextChangedListener(this);
 
+        // Message text background
+        this.msgEditBg = (ImageView) parent.findViewById(R.id.chatWriteTextBg);
+
         // Gets the cancel correction button and hooks on click action
         this.cancelBtn = parent.findViewById(R.id.cancelCorrectionBtn);
         cancelBtn.setOnClickListener(this);
         // Gets the send message button and hooks on click action
         this.sendBtn = parent.findViewById(R.id.sendMessageButton);
         sendBtn.setOnClickListener(this);
+
+        this.editingImage = parent.findViewById(R.id.editingImage);
 
         updateCorrectionState();
 
@@ -267,9 +281,14 @@ public class ChatController
         }
         else if(v == cancelBtn)
         {
-            session.setCorrectionUID(null);
+            // Reset correction status
+            if(session.getCorrectionUID() != null)
+            {
+                session.setCorrectionUID(null);
+                updateCorrectionState();
+            }
+            // Clear edited text
             msgEdit.setText("");
-            updateCorrectionState();
         }
     }
 
@@ -281,10 +300,15 @@ public class ChatController
     {
         boolean correction = session.getCorrectionUID() != null;
 
-        int bgColorId = correction ? R.color.msg_correction_bg : R.color.white;
-        msgEdit.setBackgroundColor(parent.getResources().getColor(bgColorId));
+        int bgId = correction
+            ? R.drawable.yellow_rounded : R.drawable.white_rounded;
 
-        cancelBtn.setVisibility(correction ? View.VISIBLE : View.GONE);
+        msgEditBg.setImageDrawable(
+            parent.getResources().getDrawable(bgId));
+
+        editingImage.setVisibility(correction ? View.VISIBLE : View.GONE);
+
+        chatFragment.getChatListView().invalidateViews();
     }
 
     @Override
