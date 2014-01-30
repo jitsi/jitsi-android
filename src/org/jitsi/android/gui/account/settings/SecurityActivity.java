@@ -74,12 +74,6 @@ public class SecurityActivity
                     .getString(R.string.pref_key_enc_savp_option);
 
     /**
-     * The logger
-     */
-    private static final Logger logger =
-            Logger.getLogger(SecurityActivity.class);
-
-    /**
      * Fragment implementing {@link Preference} support in this activity.
      */
     private SecurityPreferenceFragment securityFragment;
@@ -241,10 +235,10 @@ public class SecurityActivity
             selected = new HashSet<String>();
             if(ciphers != null)
             {
-                for(int e=0; e< entries.length; e++)
+                for (String entry : entries)
                 {
-                    if(ciphers.contains(entries[e]))
-                        selected.add(entries[e]);
+                    if (ciphers.contains(entry))
+                        selected.add(entry);
                 }
             }
             cipherList.setValues(selected);
@@ -351,11 +345,11 @@ public class SecurityActivity
             int idx = 1;
             for(String encryption : encryptionsInOrder)
             {
-                if(encStatus.get(encryption))
+                if(Boolean.TRUE.equals(encStatus.get(encryption)))
                 {
                     if(idx > 1)
                         summary.append(" ");
-                    summary.append((idx++)+". "+encryption);
+                    summary.append(idx++).append(". ").append(encryption);
                 }
             }
 
