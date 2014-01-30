@@ -399,7 +399,10 @@ public class ChatFragment
 
         super.onDetach();
 
-        chatSession.removeMessageListener(chatListAdapter);
+        if(chatSession != null)
+        {
+            chatSession.removeMessageListener(chatListAdapter);
+        }
 
         chatListAdapter = null;
 
