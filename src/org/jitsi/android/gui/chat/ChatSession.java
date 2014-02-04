@@ -421,7 +421,7 @@ public class ChatSession
             }
             else
             {
-                System.err.println("Other event in history: "+o);
+                logger.error("Unexpected event in history: "+o);
             }
         }
 
@@ -438,7 +438,7 @@ public class ChatSession
                 // Add messages to the cache
                 msgCache.addAll(0, historyMsgs);
             }
-            return historyMsgs;
+            return msgCache;
         }
     }
 

@@ -111,18 +111,11 @@ public class ChatSessionManager
      */
     public synchronized static void removeAllActiveChats()
     {
-        if(chatListeners.isEmpty())
+        ArrayList<ChatSession> sessions
+            = new ArrayList<ChatSession>(activeChats.values());
+        for(ChatSession chat : sessions)
         {
-            activeChats.clear();
-        }
-        else
-        {
-            ArrayList<ChatSession> sessions
-                = new ArrayList<ChatSession>(activeChats.values());
-            for(ChatSession chat : sessions)
-            {
-                removeActiveChat(chat);
-            }
+            removeActiveChat(chat);
         }
     }
 
