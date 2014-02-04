@@ -45,6 +45,16 @@ public class ContactListFragment
         = Logger.getLogger(ContactListFragment.class);
 
     /**
+     * Key for preserving contact list scroll position.
+     */
+    private static final String STATE_SCROLL_POSITION = "state.scroll.pos";
+
+    /**
+     * Key used to store contact list item's scroll top offset(y).
+     */
+    private static final String STATE_SCROLL_TOP = "state.scroll.top";
+
+    /**
      * Search options menu items.
      */
     private MenuItem searchItem;
@@ -78,6 +88,16 @@ public class ContactListFragment
      * Stores recently clicked contact group.
      */
     private MetaContactGroup clickedGroup;
+
+    /**
+     * Contact list item scroll position.
+     */
+    private int scrollPosition;
+
+    /**
+     * Contact list scroll top position.
+     */
+    private int scrollTopPosition;
 
     /**
      * Creates new instance of <tt>ContactListFragment</tt>.
@@ -215,6 +235,10 @@ public class ContactListFragment
 
             bindSearchListener();
         }
+
+        // Restore scroll position
+        contactListView.setSelectionFromTop(scrollPosition,
+                                            scrollTopPosition);
     }
 
     private MetaContactListAdapter getContactListAdapter()
@@ -265,6 +289,11 @@ public class ContactListFragment
             searchView.setOnCloseListener(null);
         }
 
+        // Save scroll position
+        scrollPosition = contactListView.getFirstVisiblePosition();
+        View itemView = contactListView.getChildAt(0);
+        scrollTopPosition = itemView == null ? 0 : itemView.getTop();
+
         // Dispose of group expand memory
         if(listExpandHandler != null)
         {
@@ -282,6 +311,29 @@ public class ContactListFragment
         }
 
         disposeSourcesAdapter();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+
+        // Store list scroll position
+        outState.putInt(STATE_SCROLL_POSITION, scrollPosition);
+        outState.putInt(STATE_SCROLL_TOP, scrollTopPosition);
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState)
+    {
+        super.onViewStateRestored(savedInstanceState);
+
+        if(savedInstanceState != null)
+        {
+            // Retrieve scroll position
+            scrollPosition = savedInstanceState.getInt(STATE_SCROLL_POSITION);
+            scrollTopPosition = savedInstanceState.getInt(STATE_SCROLL_TOP);
+        }
     }
 
     /**
