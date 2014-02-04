@@ -4,6 +4,7 @@
               android:orientation="horizontal"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
+              android:id="@+id/chatTypingArea"
               android:background="@color/blue"
               android:padding="6dp">
     <ImageView
@@ -11,10 +12,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:background="@drawable/yellow_rounded"
+            android:background="@drawable/white_rounded"
             android:layout_alignTop="@+id/sendMessageButton"
             android:layout_alignBottom="@+id/sendMessageButton"
-            android:layout_toRightOf="@+id/cancelCorrectionBtn"
             android:layout_toLeftOf="@+id/sendMessageButton"
             android:layout_marginLeft="3dp"/>
     <EditText
@@ -31,31 +31,27 @@
             android:textCursorDrawable="@null"
             android:layout_alignTop="@+id/chatWriteTextBg"
             android:layout_alignBottom="@+id/chatWriteTextBg"
-            android:layout_toLeftOf="@+id/editingImage"
-            android:layout_alignLeft="@+id/chatWriteTextBg"
-            />
+            android:layout_toRightOf="@+id/editingImage"
+            android:layout_toLeftOf="@+id/cancelCorrectionBtn"/>
     <ImageButton android:id="@+id/sendMessageButton"
                  android:src="@drawable/send_message"
                  android:layout_width="wrap_content"
                  android:layout_height="wrap_content"
-                 android:background="@color/blue"
+                 android:background="@null"
                  android:padding="3dp"
                  android:layout_alignParentRight="true"
                  android:layout_centerVertical="true"
                  android:minHeight="40dp"
                  android:minWidth="40dp"
-                 android:layout_marginLeft="5dp"
-            />
+                 android:layout_marginLeft="16dp"/>
     <ImageView android:id="@+id/editingImage"
                android:src="@drawable/editing"
                android:layout_width="wrap_content"
                android:layout_height="wrap_content"
+               android:layout_marginLeft="8dp"
                android:layout_centerVertical="true"
-               android:padding="8dp"
                android:background="@null"
-               android:layout_marginRight="3dp"
-               android:layout_toLeftOf="@+id/sendMessageButton"
-            />
+               android:layout_alignLeft="@+id/chatWriteTextBg"/>
     <ImageButton android:id="@+id/cancelCorrectionBtn"
                  android:src="@drawable/reset_editing"
                  android:layout_width="wrap_content"
@@ -64,5 +60,6 @@
                  android:background="@null"
                  android:minWidth="40dp"
                  android:minHeight="40dp"
+                 android:layout_toLeftOf="@+id/sendMessageButton"
             />
 </RelativeLayout>

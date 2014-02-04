@@ -67,9 +67,9 @@ public class ChatController
      */
     private EditText msgEdit;
     /**
-     * Message edit text background.
+     * Message editing area background.
      */
-    private ImageView msgEditBg;
+    private View msgEditBg;
     /**
      * Chat session used by this controller and it' parent chat fragment.
      */
@@ -132,8 +132,8 @@ public class ChatController
         if(session.allowsTypingNotifications())
             msgEdit.addTextChangedListener(this);
 
-        // Message text background
-        this.msgEditBg = (ImageView) parent.findViewById(R.id.chatWriteTextBg);
+        // Message typing area background
+        this.msgEditBg = parent.findViewById(R.id.chatTypingArea);
 
         // Gets the cancel correction button and hooks on click action
         this.cancelBtn = parent.findViewById(R.id.cancelCorrectionBtn);
@@ -204,6 +204,14 @@ public class ChatController
     public void onItemClick(AdapterView<?> adapter, View view, int position,
                             long id)
     {
+        // Detect outgoing message area
+        if(view.getId() != R.id.outgoingMessageView
+            && view.getId() != R.id.outgoingMessageHolder)
+        {
+            cancelCorrection();
+            return;
+        }
+
         ChatFragment.ChatListAdapter chatListAdapter
                 = chatFragment.getChatListAdapter();
 
@@ -213,9 +221,6 @@ public class ChatController
 
         ChatMessage chatMessage = chatListAdapter.getMessage(position);
 
-        if(chatMessage.getMessageType() != ChatMessage.OUTGOING_MESSAGE)
-            return;
-
         // Check if it's the last outgoing message
         if(position != chatListAdapter.getCount()-1)
         {
@@ -224,6 +229,7 @@ public class ChatController
                 if(chatListAdapter.getMessage(i).getMessageType()
                         == ChatMessage.OUTGOING_MESSAGE)
                 {
+                    cancelCorrection();
                     return;
                 }
             }
@@ -281,12 +287,22 @@ public class ChatController
         }
         else if(v == cancelBtn)
         {
-            // Reset correction status
-            if(session.getCorrectionUID() != null)
-            {
-                session.setCorrectionUID(null);
-                updateCorrectionState();
-            }
+            cancelCorrection();
+            // Clear edited text
+            msgEdit.setText("");
+        }
+    }
+
+    /**
+     * Cancels last message correction mode.
+     */
+    private void cancelCorrection()
+    {
+        // Reset correction status
+        if(session.getCorrectionUID() != null)
+        {
+            session.setCorrectionUID(null);
+            updateCorrectionState();
             // Clear edited text
             msgEdit.setText("");
         }
@@ -300,11 +316,11 @@ public class ChatController
     {
         boolean correction = session.getCorrectionUID() != null;
 
-        int bgId = correction
-            ? R.drawable.yellow_rounded : R.drawable.white_rounded;
+        int bgColorId = correction
+            ? R.color.msg_correction_bg : R.color.blue;
 
-        msgEditBg.setImageDrawable(
-            parent.getResources().getDrawable(bgId));
+        msgEditBg.setBackgroundColor(
+            parent.getResources().getColor(bgColorId));
 
         editingImage.setVisibility(correction ? View.VISIBLE : View.GONE);
 

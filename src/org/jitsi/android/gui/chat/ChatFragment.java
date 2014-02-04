@@ -720,8 +720,10 @@ public class ChatFragment
             }
 
             // Set position used for click handling from click adapter
-            messageViewHolder.messageView.setTag(
-                position + chatListView.getHeaderViewsCount());
+            int clickedPos = position + chatListView.getHeaderViewsCount();
+            messageViewHolder.messageView.setTag(clickedPos);
+            if(messageViewHolder.outgoingMessageHolder != null)
+                messageViewHolder.outgoingMessageHolder.setTag(clickedPos);
 
             MessageDisplay message = getMessageDisplay(position);
 
@@ -810,7 +812,11 @@ public class ChatFragment
 
                 messageViewHolder.timeView
                     = (TextView) convertView.findViewById(
-                    R.id.outgoingTimeView);
+                        R.id.outgoingTimeView);
+
+                messageViewHolder.outgoingMessageHolder
+                    = convertView.findViewById(
+                        R.id.outgoingMessageHolder);
             }
             else
             {
@@ -831,6 +837,11 @@ public class ChatFragment
             // Set clicks adapter
             messageViewHolder
                 .messageView.setOnClickListener(msgClickAdapter);
+            if(messageViewHolder.outgoingMessageHolder != null)
+            {
+                messageViewHolder.outgoingMessageHolder
+                    .setOnClickListener(msgClickAdapter);
+            }
 
             convertView.setTag(messageViewHolder);
 
@@ -1097,6 +1108,9 @@ public class ChatFragment
         TextView timeView;
         ImageView typingView;
         int viewType;
+        // Outgoing message background area
+        // (instance used to capture clicks and trigger message correction)
+        View outgoingMessageHolder;
     }
 
     /**
