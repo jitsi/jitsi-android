@@ -124,15 +124,15 @@ public class ProximitySensorFragment
 
         float proximity = event.values[0];
         float max = event.sensor.getMaximumRange();
-        logger.debug("Proximity updated: " + proximity + " max range: " + max);
+        logger.info("Proximity updated: " + proximity + " max range: " + max);
 
-        if(proximity != max)
+        if(proximity > 0)
         {
-            screenOff();
+            screenOn();
         }
         else
         {
-            screenOn();
+            screenOff();
         }
     }
 
@@ -227,6 +227,9 @@ public class ProximitySensorFragment
                      android.R.style.Theme_Black_NoTitleBar_Fullscreen);
 
             Dialog d = super.onCreateDialog(savedInstanceState);
+
+            d.setContentView(R.layout.screen_off);
+
             d.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN
                                    | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             d.setOnKeyListener(new DialogInterface.OnKeyListener()
