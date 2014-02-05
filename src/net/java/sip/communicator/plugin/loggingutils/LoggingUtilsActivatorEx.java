@@ -6,6 +6,9 @@
  */
 package net.java.sip.communicator.plugin.loggingutils;
 
+import net.java.sip.communicator.util.*;
+
+import org.jitsi.service.fileaccess.*;
 import org.jitsi.service.log.*;
 import org.osgi.framework.*;
 
@@ -25,6 +28,8 @@ public class LoggingUtilsActivatorEx
      * <tt>LogUploadService</tt> impl instance.
      */
     private LogUploadServiceImpl logUploadImpl;
+
+    private static FileAccessService fileAccessService;
 
     /**
      * Creates and register logging configuration.
@@ -55,12 +60,31 @@ public class LoggingUtilsActivatorEx
      * @param bundleContext  the OSGI bundle context
      */
     public void stop(BundleContext bundleContext)
-            throws
-            Exception
+            throws Exception
     {
         super.stop(bundleContext);
 
         logUploadServReg.unregister();
         logUploadImpl.dispose();
+    }
+
+    /**
+     * Returns a reference to a FileAccessService implementation
+     * currently registered in the bundle context or null if no such
+     * implementation was found.
+     *
+     * @return a currently valid implementation of the
+     * FileAccessService .
+     */
+    public static FileAccessService getFileAccessService()
+    {
+        if (fileAccessService == null)
+        {
+            fileAccessService
+                = ServiceUtils.getService(
+                        bundleContext,
+                        FileAccessService.class);
+        }
+        return fileAccessService;
     }
 }

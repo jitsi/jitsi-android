@@ -6,9 +6,12 @@
  */
 package org.jitsi.android.plugin.errorhandler;
 
+import java.io.*;
+
 import android.content.*;
 import net.java.sip.communicator.util.*;
 import org.jitsi.android.*;
+import org.jitsi.service.fileaccess.*;
 
 /**
  * The <tt>ExceptionHandler</tt> is used to catch unhandled exceptions which
@@ -77,9 +80,25 @@ public class ExceptionHandler
 
         parent.uncaughtException(thread, ex);
 
-        Logger.getLogger(ExceptionHandler.class)
-                .fatal("Uncaught exception occurred, killing the process...",
+        Logger logger = Logger.getLogger(ExceptionHandler.class);
+        logger.fatal("Uncaught exception occurred, killing the process...",
                        ex);
+
+        // Save logcat for more information.
+        File logFile;
+        try
+        {
+            logFile = ExceptionHandlerActivator.getFileAccessService()
+                .getPrivatePersistentFile(
+                    new File("log", "jitsi-crash-logcat.txt").toString(),
+                    FileCategory.LOG);
+
+            Runtime.getRuntime().exec("logcat -f " + logFile.getAbsolutePath());
+        }
+        catch (Exception e)
+        {
+            logger.error("Couldn't save logcat file.");
+        }
 
         android.os.Process.killProcess(android.os.Process.myPid());
         System.exit(10);

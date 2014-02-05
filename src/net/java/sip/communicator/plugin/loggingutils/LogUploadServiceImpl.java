@@ -10,6 +10,7 @@ import android.net.*;
 import android.os.*;
 
 import org.jitsi.android.*;
+import org.jitsi.service.fileaccess.*;
 import org.jitsi.service.log.*;
 
 import net.java.sip.communicator.util.*;
@@ -61,6 +62,22 @@ public class LogUploadServiceImpl
             if(!storageDir.exists())
                 storageDir.mkdir();
 
+            File logcatFile = null;
+            try
+            {
+                logcatFile = LoggingUtilsActivatorEx.getFileAccessService()
+                    .getPrivatePersistentFile(
+                        new File("log", "jitsi-current-logcat.txt").toString(),
+                        FileCategory.LOG);
+
+                Runtime.getRuntime()
+                    .exec("logcat -f " + logcatFile.getAbsolutePath());
+            }
+            catch (Exception e)
+            {
+                logger.error("Couldn't save logcat file.");
+            }
+System.err.println("STORAGE DIR======" + storageDir);
             File externalStorageFile
                 = LogsCollector.collectLogs(storageDir, null);
 
@@ -94,6 +111,7 @@ public class LogUploadServiceImpl
      */
     public void dispose()
     {
+        System.err.println("DISPOSE!!!!!!!!!!!!!");
         for(File logFile : storedLogFiles)
         {
             logFile.delete();
