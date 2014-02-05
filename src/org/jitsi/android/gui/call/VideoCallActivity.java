@@ -25,7 +25,6 @@ import org.jitsi.R;
 import org.jitsi.android.*;
 import org.jitsi.android.gui.call.notification.*;
 import org.jitsi.android.gui.controller.*;
-import org.jitsi.android.gui.fragment.*;
 import org.jitsi.android.gui.util.*;
 import org.jitsi.android.gui.widgets.*;
 import org.jitsi.service.neomedia.*;
@@ -679,6 +678,17 @@ public class VideoCallActivity
 
         if(autoHide != null)
             autoHide.show();
+    }
+
+    /**
+     * Returns <tt>CallVolumeCtrlFragment</tt> if it exists or <tt>null</tt>
+     * otherwise.
+     * @return <tt>CallVolumeCtrlFragment</tt> if it exists or <tt>null</tt>
+     *         otherwise.
+     */
+    public CallVolumeCtrlFragment getVolCtrlFragment()
+    {
+        return volControl;
     }
 
     public void setErrorReason(final String reason)

@@ -4,7 +4,7 @@
  * Distributable under LGPL license.
  * See terms of license at gnu.org.
  */
-package org.jitsi.android.gui.fragment;
+package org.jitsi.android.gui.call;
 
 import android.app.*;
 import android.content.*;
@@ -21,7 +21,7 @@ import org.jitsi.service.osgi.*;
 import java.util.*;
 
 /**
- * This fragment when added to parent <tt>Activity</tt> will listen for
+ * This fragment when added to parent <tt>VideoCallActivity</tt> will listen for
  * proximity sensor updates and turn the screen on and off when NEAR/FAR
  * distance is detected.
  *
@@ -201,6 +201,25 @@ public class ProximitySensorFragment
     public static class ScreenOffDialog
         extends android.support.v4.app.DialogFragment
     {
+        private CallVolumeCtrlFragment volControl;
+
+        @Override
+        public void onResume()
+        {
+            super.onResume();
+
+            volControl
+                = ((VideoCallActivity)getActivity()).getVolCtrlFragment();
+        }
+
+        @Override
+        public void onPause()
+        {
+            super.onPause();
+
+            volControl = null;
+        }
+
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState)
         {
@@ -216,7 +235,20 @@ public class ProximitySensorFragment
                 public boolean onKey(DialogInterface dialog, int keyCode,
                                      KeyEvent event)
                 {
-                    // Capture all events
+                    // Capture all events,
+                    // but dispatch volume keys to volume control fragment
+                    if(volControl != null
+                        && event.getAction() == KeyEvent.ACTION_DOWN)
+                    {
+                        if(keyCode == KeyEvent.KEYCODE_VOLUME_UP)
+                        {
+                            volControl.onKeyVolUp();
+                        }
+                        else if(keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
+                        {
+                            volControl.onKeyVolDown();
+                        }
+                    }
                     return true;
                 }
             });

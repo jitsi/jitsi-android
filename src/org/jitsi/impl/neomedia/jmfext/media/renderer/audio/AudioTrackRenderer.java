@@ -78,7 +78,7 @@ public class AudioTrackRenderer
      * using <tt>AudioManager</tt> by adjusting stream volume. When the minimum
      * value is reached we keep lowering the volume using software gain control.
      * The opposite happens for the maximum volume.
-     * See {@link org.jitsi.android.gui.fragment.CallVolumeCtrlFragment}.
+     * See {@link org.jitsi.android.gui.call.CallVolumeCtrlFragment}.
      */
     private static final boolean USE_SOFTWARE_GAIN = true;
 
