@@ -15,7 +15,7 @@ import android.widget.*;
 import net.java.sip.communicator.service.protocol.jabber.*;
 
 import org.jitsi.*;
-import org.jitsi.android.gui.menu.*;
+import org.jitsi.service.osgi.*;
 import org.osgi.framework.*;
 
 /**
@@ -25,7 +25,7 @@ import org.osgi.framework.*;
  * @author Pawel Domas
  */
 public class ServerListActivity
-    extends MainMenuActivity
+    extends OSGiActivity
 {
     /**
      * Request code when launched for STUN servers list edit

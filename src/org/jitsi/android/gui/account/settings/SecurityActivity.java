@@ -17,9 +17,9 @@ import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.*;
 import org.jitsi.*;
 import org.jitsi.android.*;
-import org.jitsi.android.gui.menu.*;
 import org.jitsi.android.gui.settings.util.*;
 import org.jitsi.service.neomedia.*;
+import org.jitsi.service.osgi.*;
 import org.osgi.framework.*;
 
 import java.io.*;
@@ -31,7 +31,7 @@ import java.util.*;
  * @author Pawel Domas
  */
 public class SecurityActivity
-        extends MainMenuActivity
+        extends OSGiActivity
         implements SecProtocolsDialogFragment.DialogClosedListener
 {
 
