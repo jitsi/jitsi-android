@@ -429,27 +429,27 @@ public class ChatFragment
         /**
          * The type of the incoming message view.
          */
-        final int INCOMING_MESSAGE_VIEW = 0;
+        static final int INCOMING_MESSAGE_VIEW = 0;
 
         /**
          * The type of the outgoing message view.
          */
-        final int OUTGOING_MESSAGE_VIEW = 1;
+        static final int OUTGOING_MESSAGE_VIEW = 1;
 
         /**
          * The type of the system message view.
          */
-        final int SYSTEM_MESSAGE_VIEW = 2;
+        static final int SYSTEM_MESSAGE_VIEW = 2;
 
         /**
          * The type of the error message view.
          */
-        final int ERROR_MESSAGE_VIEW = 3;
+        static final int ERROR_MESSAGE_VIEW = 3;
 
         /**
          * The type for corrected message view.
          */
-        final int CORRECTED_MESSAGE_VIEW = 4;
+        static final int CORRECTED_MESSAGE_VIEW = 4;
 
         /**
          * Counter used to generate row ids.
@@ -1183,6 +1183,11 @@ public class ChatFragment
         {
             super.onPostExecute(result);
 
+            if(chatListView == null || chatSession == null)
+            {
+                return;
+            }
+
             for (int i = 0; i < chatListView.getChildCount(); i++)
             {
                 View chatRowView = chatListView.getChildAt(i);
@@ -1192,7 +1197,7 @@ public class ChatFragment
 
                 if (viewHolder != null
                     && viewHolder.viewType
-                        == chatListAdapter.INCOMING_MESSAGE_VIEW)
+                        == ChatListAdapter.INCOMING_MESSAGE_VIEW)
                 {
                     Drawable status
                         = MetaContactRenderer.getStatusDrawable(
