@@ -73,13 +73,15 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="@dimen/label_text_size"
-                            android:textColor="@color/white"/>
+                            android:textColor="@color/white"
+                            android:layout_centerVertical="true"/>
                     <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:id="@+id/security_padlock"
                             android:layout_toRightOf="@+id/security_protocol"
-                            android:src="@drawable/secure_off"/>
+                            android:src="@drawable/secure_off"
+                            android:layout_centerVertical="true"/>
                 </RelativeLayout>
                 <TextView
                         android:id="@+id/callTime"

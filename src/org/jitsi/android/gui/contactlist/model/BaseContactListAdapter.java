@@ -316,7 +316,7 @@ public abstract class BaseContactListAdapter
             contactViewHolder.statusView
                 = (ImageView) convertView.findViewById(R.id.contactStatusIcon);
             contactViewHolder.callButton
-                = (ImageButton) convertView
+                = (ImageView) convertView
                     .findViewById(R.id.contactCallButton);
             contactViewHolder.selectedBgView
                 = (ImageView) convertView
@@ -607,7 +607,7 @@ public abstract class BaseContactListAdapter
         TextView statusMessage;
         ImageView avatarView;
         ImageView statusView;
-        ImageButton callButton;
+        ImageView callButton;
         ImageView selectedBgView;
         ImageView buttonSeparatorView;
         View callButtonLayout;

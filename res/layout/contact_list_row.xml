@@ -7,13 +7,14 @@
     <RelativeLayout
             android:id="@+id/avatarLayout"
             android:layout_height="fill_parent"
-            android:layout_width="@dimen/account_list_row_height">
+            android:layout_width="@dimen/account_list_row_height"
+            android:padding="4dp" android:layout_marginBottom="1dp">
         <ImageView
             android:id="@+id/avatarIcon"
             android:layout_height="fill_parent"
             android:layout_width="@dimen/account_list_row_height"
             android:layout_centerVertical="true"
-            android:src="@drawable/avatar"/>
+            android:src="@drawable/avatar" android:scaleType="fitXY"/>
         <ImageView
             android:id="@+id/contactStatusIcon"
             android:layout_height="20dip"
@@ -30,7 +31,9 @@
         android:layout_toRightOf="@+id/avatarLayout"
         android:layout_centerVertical="true"
         android:layout_marginLeft="8dip"
-        android:layout_toLeftOf="@+id/callButtonLayout">
+        android:layout_marginRight="8dip"
+        android:layout_toLeftOf="@+id/callButtonLayout"
+            >
 
         <TextView
             android:id="@+id/displayName"
@@ -66,25 +69,30 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:clickable="true"
-        android:visibility="invisible">
+        android:visibility="visible" android:layout_marginRight="10dp"
+            >
 
         <ImageView
             android:id="@+id/buttonSeparatorView"
             android:src="@drawable/contact_list_separator"
             android:layout_width="1dip"
             android:layout_height="40dip"
-            android:layout_marginRight="15dp"
+            android:layout_marginRight="5dp"
             android:layout_gravity="center_vertical"/>
 
-        <ImageButton
+        <ImageView
             android:id="@+id/contactCallButton"
             android:src="@drawable/video_call"
             android:background="@android:color/transparent"
             android:contentDescription="@string/service_gui_CALL"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingRight="15dp"
-            android:layout_gravity="center_vertical"/>
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:layout_gravity="center_vertical"
+            android:scaleType="fitCenter"
+            android:paddingLeft="15dp" android:paddingRight="15dp"
+            android:paddingTop="22dp" android:paddingBottom="22dp"/>
     </LinearLayout>
 
     <LinearLayout
