@@ -425,20 +425,26 @@ public class ChatSession
             }
         }
 
-        historyLoaded = true;
-
         synchronized (cacheLock)
         {
-            if(msgCache.size() > 0)
+            if(!historyLoaded)
             {
+                // We have something cached and we want
+                // to merge it with the history.
+                // Do it only when we haven't merged it yet(ever).
                 msgCache = mergeMsgLists(historyMsgs, msgCache, -1);
+                historyLoaded = true;
             }
             else
             {
-                // Add messages to the cache
+                // Otherwise just append the history
                 msgCache.addAll(0, historyMsgs);
             }
-            return msgCache;
+
+            if(init)
+                return msgCache;
+            else
+                return historyMsgs;
         }
     }
 
