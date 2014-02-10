@@ -405,9 +405,7 @@ public class AndroidLoginRenderer
         {
             localAvatarRaw = avatarImage;
             localAvatar
-                = avatarImage != null
-                        ? AndroidImageUtil.drawableFromBytes(avatarImage)
-                        : null;
+                = AndroidImageUtil.roundedDrawableFromBytes(avatarImage);
         }
         return localAvatar;
     }

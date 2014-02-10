@@ -285,4 +285,15 @@ public class AndroidUtils
     {
         return Looper.getMainLooper().getThread() == Thread.currentThread();
     }
+
+    /**
+     * Converts pixels to density independent pixels.
+     * @param px pixels value to convert.
+     * @return density independent pixels value for given pixels value.
+     */
+    public static int pxToDp(int px)
+    {
+        return (int) (((float)px) * JitsiApplication.getAppResources()
+            .getDisplayMetrics().density + 0.5f);
+    }
 }

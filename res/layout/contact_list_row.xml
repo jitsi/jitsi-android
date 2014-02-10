@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
              android:layout_width="fill_parent"
-             android:layout_height="@dimen/account_list_row_height"
-             android:descendantFocusability="blocksDescendants">
+             android:layout_height="@dimen/contact_list_row_height"
+             android:descendantFocusability="blocksDescendants"
+             android:background="@color/white">
 
     <RelativeLayout
             android:id="@+id/avatarLayout"
             android:layout_height="fill_parent"
-            android:layout_width="@dimen/account_list_row_height"
-            android:padding="4dp" android:layout_marginBottom="1dp">
+            android:layout_width="@dimen/contact_list_avatar_width"
+            android:padding="4dp"
+            android:layout_marginBottom="1dp"
+            android:layout_marginLeft="5dp">
         <ImageView
             android:id="@+id/avatarIcon"
             android:layout_height="fill_parent"
-            android:layout_width="@dimen/account_list_row_height"
+            android:layout_width="fill_parent"
+            android:layout_marginRight="1px"
             android:layout_centerVertical="true"
             android:src="@drawable/avatar" android:scaleType="fitXY"/>
         <ImageView
@@ -24,10 +28,10 @@
             android:src="@drawable/contact_offline"/>
     </RelativeLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_toRightOf="@+id/avatarLayout"
         android:layout_centerVertical="true"
         android:layout_marginLeft="8dip"
@@ -39,24 +43,29 @@
             android:id="@+id/displayName"
             style="@style/MediumFont"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:gravity="center_vertical"
             android:textColor="@color/list_text_selection_color"
             android:singleLine="true"
-            android:ellipsize="end"/>
+            android:ellipsize="end"
+            android:text="Displayname@server.com"
+            android:layout_centerVertical="true"/>
 
         <TextView
             android:id="@+id/statusMessage"
             style="@style/SmallFont"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:gravity="center_vertical"
             android:textColor="@color/list_details_selection_color"
             android:singleLine="true"
-            android:ellipsize="end"/>
-    </LinearLayout>
+            android:ellipsize="end"
+            android:text="Some long status message"
+            android:layout_marginBottom="5dp"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@+id/displayName"
+            android:gravity="bottom"/>
+    </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/callButtonLayout"
@@ -69,8 +78,10 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:clickable="true"
-        android:visibility="visible" android:layout_marginRight="10dp"
-            >
+        android:visibility="visible"
+        android:layout_marginRight="10dp"
+        android:minHeight="@dimen/min_button_height"
+        android:minWidth="@dimen/min_button_width">
 
         <ImageView
             android:id="@+id/buttonSeparatorView"
@@ -85,14 +96,13 @@
             android:src="@drawable/video_call"
             android:background="@android:color/transparent"
             android:contentDescription="@string/service_gui_CALL"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="48dp"
-            android:minHeight="48dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
-            android:scaleType="fitCenter"
-            android:paddingLeft="15dp" android:paddingRight="15dp"
-            android:paddingTop="22dp" android:paddingBottom="22dp"/>
+            android:scaleType="center"
+            android:minWidth="@dimen/min_button_width"
+            android:minHeight="@dimen/min_button_height"
+            />
     </LinearLayout>
 
     <LinearLayout

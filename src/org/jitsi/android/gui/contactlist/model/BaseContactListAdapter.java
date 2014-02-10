@@ -394,7 +394,9 @@ public abstract class BaseContactListAdapter
             .setImageDrawable(renderer.getStatusImage(child));
 
         // Show call button.
-        boolean isShowVideoCall = renderer.isShowVideoCallBtn(child);
+        // TODO: we start voice call by default so we shouldn't show video icon
+        //boolean isShowVideoCall = renderer.isShowVideoCallBtn(child);
+        boolean isShowVideoCall = false;
 
         boolean isShowCall = renderer.isShowCallBtn(child);
 
@@ -465,6 +467,8 @@ public abstract class BaseContactListAdapter
             groupViewHolder = new GroupViewHolder();
             groupViewHolder.displayName
                 = (TextView) convertView.findViewById(R.id.displayName);
+            groupViewHolder.indicator
+                = (ImageView) convertView.findViewById(R.id.groupIndicatorView);
 
             convertView.setTag(groupViewHolder);
         }
@@ -476,7 +480,13 @@ public abstract class BaseContactListAdapter
         Object group = getGroup(groupPosition);
         UIGroupRenderer groupRenderer = getGroupRenderer(groupPosition);
         groupViewHolder.displayName.setText(
-            groupRenderer.getDisplayName(group));
+            groupRenderer.getDisplayName(group).toUpperCase());
+
+        // Group expand indicator
+        int indicatorResId
+            = isExpanded ? R.drawable.expanded : R.drawable.collapsed;
+
+        groupViewHolder.indicator.setImageResource(indicatorResId);
     
         return convertView;
     }
@@ -617,6 +627,7 @@ public abstract class BaseContactListAdapter
 
     private static class GroupViewHolder
     {
+        ImageView indicator;
         TextView displayName;
     }
 }

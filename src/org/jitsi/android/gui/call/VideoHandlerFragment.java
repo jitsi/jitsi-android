@@ -765,9 +765,7 @@ public class VideoHandlerFragment
             if(marginBottom < ctrlButtonsHeight
                 && ctrlButtonsGroup.getVisibility() == View.VISIBLE)
             {
-                // Calculate 10 dp size
-                int size10dp = (int) (10 * displaymetrics.density + 0.5f);
-                marginBottom = ctrlButtonsHeight + size10dp;
+                marginBottom = ctrlButtonsHeight + AndroidUtils.pxToDp(10);
             }
 
             // This can be used if we want to keep it on the same height

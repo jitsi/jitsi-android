@@ -90,5 +90,6 @@
         android:choiceMode="singleChoice"
         android:dividerHeight="0dip"
         android:divider="@null"
+        android:groupIndicator="@null"
         android:cacheColorHint="@color/white"/>
 </LinearLayout>

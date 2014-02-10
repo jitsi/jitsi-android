@@ -160,4 +160,51 @@ public class AndroidImageUtil
         options.inJustDecodeBounds = false;
         return BitmapFactory.decodeResource(res, resId, options);
     }
+
+    /**
+     * Creates a <tt>Bitmap</tt> with rounded corners.
+     * @param bitmap the bitmap that will have it's corners rounded.
+     * @param pixels corners round in pixels.
+     * @return a <tt>Bitmap</tt> with rounded corners created from given
+     *         <tt>bitmap</tt>.
+     */
+    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels)
+    {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap
+            .getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final RectF rectF = new RectF(rect);
+        final float roundPx = pixels;
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+
+        return output;
+    }
+
+    /**
+     * Creates <tt>BitmapDrawable</tt> with rounded corners from raw image data.
+     * @param rawData raw bitmap data
+     * @return <tt>BitmapDrawable</tt> with rounded corners from raw image data.
+     */
+    public static BitmapDrawable roundedDrawableFromBytes(byte[] rawData)
+    {
+        Bitmap bmp = bitmapFromBytes(rawData);
+
+        if(bmp == null)
+            return null;
+
+        bmp = getRoundedCornerBitmap(bmp, AndroidUtils.pxToDp(8));
+
+        return new BitmapDrawable(JitsiApplication.getAppResources(), bmp);
+    }
 }

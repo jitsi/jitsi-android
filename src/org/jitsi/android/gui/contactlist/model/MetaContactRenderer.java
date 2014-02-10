@@ -10,6 +10,7 @@ import android.graphics.drawable.*;
 import net.java.sip.communicator.service.contactlist.*;
 import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.*;
+import org.jitsi.android.*;
 import org.jitsi.android.gui.*;
 import org.jitsi.android.gui.chat.*;
 import org.jitsi.android.gui.util.*;
@@ -164,18 +165,31 @@ public class MetaContactRenderer
      *
      * @param metaContact the <tt>MetaContact</tt>, which status drawable we're
      * looking for
-     * @return a <tt>Drawable</tt> object representing the status of the given
-     * <tt>MetaContact</tt>
+     * @return a <tt>BitmapDrawable</tt> object representing the status of
+     * the given <tt>MetaContact</tt>
      */
-    public static Drawable getAvatarDrawable(MetaContact metaContact)
+    public static BitmapDrawable getAvatarDrawable(MetaContact metaContact)
     {
-        byte[] avatarImage = metaContact.getAvatar();
+        byte[] avatar = metaContact.getAvatar();
+        if(avatar == null)
+            return null;
 
-        if (avatarImage != null)
-            return AndroidImageUtil
-                .scaledDrawableFromBytes(avatarImage, 78, 78);
+        String bmpKey = String.valueOf(avatar.hashCode());
+        DrawableCache cache = JitsiApplication.getImageCache();
 
-        return null;
+        BitmapDrawable avatarImage = cache.getBitmapFromMemCache(bmpKey);
+        if(avatarImage == null)
+        {
+            BitmapDrawable roundedAvatar
+                = AndroidImageUtil.roundedDrawableFromBytes(avatar);
+            if(roundedAvatar != null)
+            {
+                avatarImage = roundedAvatar;
+
+                cache.cacheImage(bmpKey, avatarImage);
+            }
+        }
+        return avatarImage;
     }
 
     /**

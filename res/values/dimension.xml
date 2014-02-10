@@ -17,11 +17,15 @@
     <dimen name="chat_arrow_height">20dip</dimen>
     <dimen name="chat_arrow_top">10dip</dimen>
     <dimen name="chat_text_margin">3dip</dimen>
+    <dimen name="contact_list_row_height" >75dp</dimen>
     <dimen name="contact_list_group_row_height" >30dp</dimen>
+    <dimen name="contact_list_avatar_width" >75dp</dimen>
     <dimen name="actionbar_height" >50dp</dimen>
     <dimen name="action_bar_padding" >1dp</dimen>
     <dimen name="list_item_height" >75dp</dimen>
     <dimen name="expanded_item_height" >100dp</dimen>
     <dimen name="enc_list_drag_s_x" >0dp</dimen>
     <dimen name="enc_list_drag_e_x" >50dp</dimen>
+    <dimen name="min_button_width" >48dp</dimen>
+    <dimen name="min_button_height" >48dp</dimen>
 </resources>

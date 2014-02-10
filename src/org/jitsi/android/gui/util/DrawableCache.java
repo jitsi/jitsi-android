@@ -6,9 +6,11 @@
  */
 package org.jitsi.android.gui.util;
 
+import android.annotation.*;
 import android.content.res.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
+import android.os.*;
 import android.support.v4.util.*;
 
 import org.jitsi.android.*;
@@ -21,10 +23,11 @@ import org.jitsi.android.*;
  */
 public class DrawableCache
 {
+    //TODO: there is no LruCache prior API 12
     /**
      * The cache
      */
-    private LruCache<Integer, BitmapDrawable> cache;
+    private LruCache<String, BitmapDrawable> cache;
 
     /**
      * Creates new instance of <tt>DrawableCache</tt>.
@@ -39,12 +42,23 @@ public class DrawableCache
         // Use 1/8th of the available memory for this memory cache.
         final int cacheSize = maxMemory / 8;
 
-        cache = new LruCache<Integer, BitmapDrawable>(cacheSize)
+        cache = new LruCache<String, BitmapDrawable>(cacheSize)
         {
+            @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
             @Override
-            protected int sizeOf(Integer key, BitmapDrawable value)
+            protected int sizeOf(String key, BitmapDrawable value)
             {
-                return value.getBitmap().getByteCount() / 1024;
+                Bitmap bmp = value.getBitmap();
+                int byteSize;
+                if (AndroidUtils.hasAPI(Build.VERSION_CODES.HONEYCOMB_MR1))
+                {
+                    byteSize = bmp.getByteCount();
+                }
+                else
+                {
+                    byteSize = bmp.getRowBytes() * bmp.getHeight();
+                }
+                return byteSize / 1024;
             }
         };
     }
@@ -63,8 +77,9 @@ public class DrawableCache
     public BitmapDrawable getBitmapFromMemCache(Integer resId)
         throws Resources.NotFoundException
     {
+        String key = "res:"+resId;
         // Check for cached bitmap
-        BitmapDrawable img = cache.get(resId);
+        BitmapDrawable img = cache.get(key);
         // Eventually loads the bitmap
         if(img == null)
         {
@@ -75,8 +90,28 @@ public class DrawableCache
             img.setBounds(0, 0,
                           img.getIntrinsicWidth(),
                           img.getIntrinsicHeight());
-            cache.put(resId, img);
+            cache.put(key, img);
         }
-        return cache.get(resId);
+        return cache.get(key);
+    }
+
+    /**
+     * Gets bitmap from the cache.
+     * @param key drawable key string.
+     * @return bitmap from the cache if it exists or <tt>null</tt> otherwise.
+     */
+    public BitmapDrawable getBitmapFromMemCache(String key)
+    {
+        return cache.get(key);
+    }
+
+    /**
+     * Puts given <tt>BitmapDrawable</tt> to the cache.
+     * @param key drawable key string.
+     * @param bmp the <tt>BitmapDrawable</tt> to be cached.
+     */
+    public void cacheImage(String key, BitmapDrawable bmp)
+    {
+        cache.put(key, bmp);
     }
 }

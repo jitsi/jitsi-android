@@ -82,7 +82,7 @@ public class ActionBarUtil
 
         avatarDrawable
             .setDrawableByLayerId(R.id.avatarDrawable,
-                AndroidImageUtil.drawableFromBytes(avatar));
+                AndroidImageUtil.roundedDrawableFromBytes(avatar));
 
         // setLogo not supported prior API 14
         if(AndroidUtils.hasAPI(14) && a != null)

@@ -7,13 +7,14 @@
 
     <TextView
         android:id="@+id/displayName"
-        style="@style/MediumFont"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_marginLeft="30dp"
         android:textColor="@color/white"
-        android:layout_centerVertical="true"/>
+        android:textStyle="bold"
+        android:layout_centerVertical="true"
+        android:text="CONTACTS"/>
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -26,5 +27,12 @@
         android:layout_height="fill_parent"
         android:layout_alignParentRight="true"
         android:background="@drawable/chatseparator"/>
+    <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/groupIndicatorView"
+            android:src="@drawable/collapsed"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="6dp"/>
 
 </RelativeLayout>
