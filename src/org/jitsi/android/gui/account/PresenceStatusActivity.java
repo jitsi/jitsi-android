@@ -355,6 +355,7 @@ public class PresenceStatusActivity
                             logger.trace("Avatar set");
                         }
                     }).start();
+                    fin.close();
                 }
                 catch (IOException e)
                 {
