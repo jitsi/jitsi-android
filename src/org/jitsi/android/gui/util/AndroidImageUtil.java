@@ -164,11 +164,12 @@ public class AndroidImageUtil
     /**
      * Creates a <tt>Bitmap</tt> with rounded corners.
      * @param bitmap the bitmap that will have it's corners rounded.
-     * @param pixels corners round in pixels.
+     * @param factor factor used to calculate corners radius based on width
+     *               and height of the image.
      * @return a <tt>Bitmap</tt> with rounded corners created from given
      *         <tt>bitmap</tt>.
      */
-    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels)
+    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, float factor)
     {
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap
             .getHeight(), Bitmap.Config.ARGB_8888);
@@ -178,12 +179,16 @@ public class AndroidImageUtil
         final Paint paint = new Paint();
         final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
         final RectF rectF = new RectF(rect);
-        final float roundPx = pixels;
 
         paint.setAntiAlias(true);
         canvas.drawARGB(0, 0, 0, 0);
         paint.setColor(color);
-        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+
+        float rX = ((float)bitmap.getWidth())*factor;
+        float rY = ((float)bitmap.getHeight())*factor;
+        //float r = (rX+rY)/2;
+
+        canvas.drawRoundRect(rectF, rX, rY, paint);
 
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, rect, rect, paint);
@@ -203,7 +208,7 @@ public class AndroidImageUtil
         if(bmp == null)
             return null;
 
-        bmp = getRoundedCornerBitmap(bmp, AndroidUtils.pxToDp(8));
+        bmp = getRoundedCornerBitmap(bmp, 0.08f);
 
         return new BitmapDrawable(JitsiApplication.getAppResources(), bmp);
     }

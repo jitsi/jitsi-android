@@ -9,7 +9,7 @@
             android:id="@+id/avatarLayout"
             android:layout_height="fill_parent"
             android:layout_width="@dimen/contact_list_avatar_width"
-            android:padding="4dp"
+            android:padding="5dp"
             android:layout_marginBottom="1dp"
             android:layout_marginLeft="5dp">
         <ImageView
@@ -18,7 +18,8 @@
             android:layout_width="fill_parent"
             android:layout_marginRight="1px"
             android:layout_centerVertical="true"
-            android:src="@drawable/avatar" android:scaleType="fitXY"/>
+            android:src="@drawable/avatar"
+            />
         <ImageView
             android:id="@+id/contactStatusIcon"
             android:layout_height="20dip"
@@ -85,7 +86,7 @@
 
         <ImageView
             android:id="@+id/buttonSeparatorView"
-            android:src="@drawable/contact_list_separator"
+            android:src="@drawable/contact_list_v_separator"
             android:layout_width="1dip"
             android:layout_height="40dip"
             android:layout_marginRight="5dp"
@@ -109,7 +110,7 @@
         android:layout_width="fill_parent"
         android:layout_height="1dip"
         android:layout_alignParentBottom="true"
-        android:background="@color/contact_list_divider"/>
+        android:background="@drawable/contact_list_h_separator"/>
 
     <ImageView
         android:id="@+id/selectedBackgroundIcon"

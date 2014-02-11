@@ -13,7 +13,6 @@
     <dimen name="status_edit_height" >65dp</dimen>
     <dimen name="avatar_height" >220dp</dimen>
     <dimen name="chat_avatar" >40dp</dimen>
-    <dimen name="chat_arrow_margin">39dip</dimen>
     <dimen name="chat_arrow_height">20dip</dimen>
     <dimen name="chat_arrow_top">10dip</dimen>
     <dimen name="chat_text_margin">3dip</dimen>
