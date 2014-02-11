@@ -170,7 +170,17 @@ public class MetaContactRenderer
      */
     public static BitmapDrawable getAvatarDrawable(MetaContact metaContact)
     {
-        byte[] avatar = metaContact.getAvatar();
+        return getCachedAvatarFromBytes(metaContact.getAvatar());
+    }
+
+    /**
+     * Returns avatar <tt>BitmapDrawable</tt> with rounded corners. Bitmap will
+     * be cached in app global drawable cache.
+     * @param avatar raw avatar image data.
+     * @return avatar <tt>BitmapDrawable</tt> with rounded corners
+     */
+    static BitmapDrawable getCachedAvatarFromBytes(byte[] avatar)
+    {
         if(avatar == null)
             return null;
 

@@ -8,7 +8,6 @@ package org.jitsi.android.gui.contactlist.model;
 
 import android.graphics.drawable.*;
 import net.java.sip.communicator.service.contactsource.*;
-import org.jitsi.android.gui.util.*;
 
 /**
  * Class used to obtain UI specific data for <tt>SourceContact</tt> instances.
@@ -60,7 +59,9 @@ public class SourceContactRenderer
     public Drawable getAvatarImage(Object contactImpl)
     {
         SourceContact contact = (SourceContact) contactImpl;
-        return AndroidImageUtil.drawableFromBytes(contact.getImage());
+
+        return MetaContactRenderer.getCachedAvatarFromBytes(
+                    contact.getImage());
     }
 
     @Override
