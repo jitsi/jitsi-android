@@ -406,7 +406,6 @@ public abstract class BaseContactListAdapter
                 .setVisibility(View.VISIBLE);
 
             AndroidUtils.setOnTouchBackgroundEffect(
-                contactListFragment.getActivity(),
                 contactViewHolder.callButtonLayout);
 
             if (renderer.isSelected(child))

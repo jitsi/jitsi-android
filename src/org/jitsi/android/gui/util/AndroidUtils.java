@@ -225,8 +225,7 @@ public class AndroidUtils
         return isServiceFound; 
     }
 
-    public static void setOnTouchBackgroundEffect(  final Context context,
-                                                    View view)
+    public static void setOnTouchBackgroundEffect( View view)
     {
         view.setOnTouchListener(new OnTouchListener()
         {
@@ -243,6 +242,8 @@ public class AndroidUtils
                 case MotionEvent.ACTION_DOWN:
                     transition.startTransition(500);
                     break;
+                case MotionEvent.ACTION_HOVER_EXIT:
+                case MotionEvent.ACTION_CANCEL:
                 case MotionEvent.ACTION_UP:
                     transition.reverseTransition(500);
                     break;
