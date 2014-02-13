@@ -162,6 +162,9 @@ public class CallInfoDialogFragment
     {
         CallConference conference =  call.getConference();
         List<Call> calls = conference.getCalls();
+        if(calls.size() == 0)
+            return;
+
         Call aCall = calls.get(0);
         // Identity.
         setTextViewValue(
@@ -183,7 +186,11 @@ public class CallInfoDialogFragment
                 R.id.transport,
                 preferredTransport.toString());
 
-        constructPeerInfo(conference.getCallPeers().get(0));
+        List<CallPeer> callPeers = conference.getCallPeers();
+        if(callPeers.size() == 0)
+            return;
+
+        constructPeerInfo(callPeers.get(0));
     }
 
     /**
@@ -790,6 +797,12 @@ public class CallInfoDialogFragment
     public void onStart()
     {
         super.onStart();
+
+        if(call == null)
+        {
+            dismiss();
+            return;
+        }
 
         startUpdateThread();
     }

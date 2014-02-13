@@ -149,6 +149,9 @@ public class ZrtpInfoDialog
         {
             public void onClick(View view)
             {
+                if(mediaAwarePeer.getCall() == null)
+                    return;
+
                 // Confirms / clears SAS confirmation status
                 masterControl.setSASVerification(
                         !masterControl.isSecurityVerified());
@@ -238,8 +241,11 @@ public class ZrtpInfoDialog
     @Override
     public void onStop()
     {
-        mediaAwarePeer.removeCallPeerSecurityListener(this);
-        mediaAwarePeer.getMediaHandler().removeVideoListener(this);
+        if(mediaAwarePeer != null)
+        {
+            mediaAwarePeer.removeCallPeerSecurityListener(this);
+            mediaAwarePeer.getMediaHandler().removeVideoListener(this);
+        }
 
         super.onStop();
     }

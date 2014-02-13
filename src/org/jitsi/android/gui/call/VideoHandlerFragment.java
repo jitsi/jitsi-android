@@ -6,6 +6,7 @@
  */
 package org.jitsi.android.gui.call;
 
+import android.annotation.*;
 import android.app.*;
 import android.hardware.*;
 import android.opengl.*;
@@ -139,6 +140,7 @@ public class VideoHandlerFragment
             .addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener()
                 {
+                    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
                     @SuppressWarnings("deprecation")
                     @Override
                     public void onGlobalLayout()
@@ -196,6 +198,12 @@ public class VideoHandlerFragment
     {
         super.onResume();
 
+        if(call == null)
+        {
+            logger.error("Call is null");
+            return;
+        }
+
         // Restores local video state
         if(wasVideoEnabled)
         {
@@ -231,6 +239,12 @@ public class VideoHandlerFragment
             {
                 throw new RuntimeException(e);
             }
+        }
+
+        if(call == null)
+        {
+            logger.error("Call is null");
+            return;
         }
 
         removeVideoListener();
@@ -398,6 +412,12 @@ public class VideoHandlerFragment
      */
     private void setLocalVideoEnabled(boolean enable)
     {
+        if(call == null)
+        {
+            logger.error("Call instance is null(the call has ended already ?)");
+            return;
+        }
+
         CallManager.enableLocalVideo(call, enable);
     }
 
