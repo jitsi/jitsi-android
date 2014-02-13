@@ -208,7 +208,7 @@ public class AndroidImageUtil
         if(bmp == null)
             return null;
 
-        bmp = getRoundedCornerBitmap(bmp, 0.08f);
+        bmp = getRoundedCornerBitmap(bmp, 0.25f);
 
         return new BitmapDrawable(JitsiApplication.getAppResources(), bmp);
     }
