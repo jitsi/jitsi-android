@@ -8,6 +8,7 @@ package org.jitsi.android.gui.util;
 
 import java.util.*;
 
+import android.app.*;
 import android.content.*;
 import android.view.*;
 import android.widget.*;
@@ -186,6 +187,34 @@ public class AndroidCallUtil
         }
 
         popup.show();
+    }
+
+    /**
+     * Checks if there is a call in progress. If true then shows a warning toast
+     * and finishes the activity.
+     * @param activity activity doing a check.
+     * @return <tt>true</tt> if there is call in progress and <tt>Activity</tt>
+     *         was finished.
+     */
+    public static boolean checkCallInProgress(Activity activity)
+    {
+        if(CallManager.getActiveCallsCount() >0)
+        {
+            logger.warn("Call is in progress");
+
+            Toast t = Toast.makeText(
+                activity,
+                R.string.service_gui_WARN_CALL_IN_PROGRESS,
+                Toast.LENGTH_SHORT);
+            t.show();
+
+            activity.finish();
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
 }

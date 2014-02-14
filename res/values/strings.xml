@@ -114,6 +114,9 @@
         Shutdown in progress...
     </string>
     <string name="service_gui_VOLUME_GAIN_LEVEL">Volume gain level: %s%%</string>
+    <string name="service_gui_WARN_CALL_IN_PROGRESS">
+        Can\'t do this during a call
+    </string>
 
     <!-- Sign in -->
     <string name="service_gui_SIGN_IN">Sign in</string>

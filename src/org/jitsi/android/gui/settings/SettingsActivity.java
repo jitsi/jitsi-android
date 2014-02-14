@@ -112,6 +112,11 @@ public class SettingsActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        // We do not allow opening settings if there is a call currently active
+        if(AndroidCallUtil.checkCallInProgress(this))
+            return;
+
         if(savedInstanceState == null)
         {
             // Display the fragment as the main content.

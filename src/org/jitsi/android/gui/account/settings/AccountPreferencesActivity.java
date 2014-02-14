@@ -14,6 +14,7 @@ import net.java.sip.communicator.service.protocol.*;
 import net.java.sip.communicator.util.*;
 import net.java.sip.communicator.util.account.*;
 
+import org.jitsi.android.gui.util.*;
 import org.jitsi.service.osgi.*;
 
 /**
@@ -54,6 +55,10 @@ public class AccountPreferencesActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        // Settings can not be opened during a call
+        if(AndroidCallUtil.checkCallInProgress(this))
+            return;
 
         String userUniqueID = getIntent().getStringExtra(EXTRA_USER_ID);
         AccountID account = AccountUtils.getAccountForID(userUniqueID);
