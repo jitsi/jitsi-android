@@ -6,10 +6,14 @@
  */
 package org.jitsi.android.gui.util;
 
+import android.content.*;
 import android.content.res.*;
 import android.graphics.*;
 import android.graphics.drawable.*;
+import android.net.*;
 import org.jitsi.android.*;
+
+import java.io.*;
 
 /**
  * Class containing utility methods for Android's Displayable and Bitmap
@@ -107,7 +111,7 @@ public class AndroidImageUtil
      * @param reqHeight requested height.
      * @return <tt>options.inSampleSize</tt> for requested width and height.
      */
-    private static int calculateInSampleSize(
+    public static int calculateInSampleSize(
         BitmapFactory.Options options, int reqWidth, int reqHeight)
     {
         // Raw height and width of image
@@ -159,6 +163,73 @@ public class AndroidImageUtil
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
         return BitmapFactory.decodeResource(res, resId, options);
+    }
+
+    /**
+     * Reads <tt>Bitmap</tt> from given <tt>uri</tt> using
+     * <tt>ContentResolver</tt>. Output image is scaled to given
+     * <tt>reqWidth</tt> and <tt>reqHeight</tt>. Output size is not guaranteed
+     * to match exact given values, because only powers of 2 are used as scale
+     * factor. Algorithm tries to scale image down as long as the output size
+     * stays larger than requested value.
+     *
+     * @param ctx the context used to create <tt>ContentResolver</tt>.
+     * @param uri the <tt>Uri</tt> that points to the image.
+     * @param reqWidth requested width.
+     * @param reqHeight requested height.
+     * @return <tt>Bitmap</tt> from given <tt>uri</tt> retrieved using
+     * <tt>ContentResolver</tt> and down sampled as close as possible to match
+     * requested width and height.
+     * @throws IOException
+     */
+    public static Bitmap scaledBitmapFromContentUri(
+        Context ctx, Uri uri, int reqWidth, int reqHeight)
+        throws IOException
+    {
+        InputStream imageStream = null;
+        try
+        {
+            // First decode with inJustDecodeBounds=true to check dimensions
+            imageStream = ctx.getContentResolver().openInputStream(uri);
+            if(imageStream == null)
+                return null;
+
+            final BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(imageStream, null, options);
+            imageStream.close();
+
+            // Calculate inSampleSize
+            options.inSampleSize = calculateInSampleSize(
+                options, reqWidth, reqHeight);
+
+            // Decode bitmap with inSampleSize set
+            options.inJustDecodeBounds = false;
+            imageStream = ctx.getContentResolver().openInputStream(uri);
+
+            return BitmapFactory.decodeStream(imageStream, null, options);
+        }
+        finally
+        {
+            if(imageStream != null)
+            {
+                imageStream.close();
+            }
+        }
+    }
+
+    /**
+     * Encodes given <tt>Bitmap</tt> to array of bytes using given
+     * compression <tt>quality</tt> in PNG format.
+     * @param bmp the bitmap to encode.
+     * @param quality encoding quality in range 0-100.
+     * @return raw bitmap data PNG encoded using given <tt>quality</tt>.
+     */
+    public static byte[] convertToBytes(Bitmap bmp, int quality)
+    {
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, quality, bout);
+        return bout.toByteArray();
     }
 
     /**

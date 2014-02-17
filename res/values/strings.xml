@@ -161,6 +161,7 @@
     </string>
 
     <!-- General -->
+    <string name="service_gui_AVATAR_SET_ERROR">Failed to set avatar for %s</string>
     <string name="service_gui_CLOSE">Close</string>
     <string name="service_gui_CLOSE_CHAT">Close chat</string>
     <string name="service_gui_CLOSE_ALL_CHATS">Close all chats</string>

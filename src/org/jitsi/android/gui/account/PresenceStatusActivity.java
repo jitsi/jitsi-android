@@ -6,12 +6,9 @@
  */
 package org.jitsi.android.gui.account;
 
-import android.app.*;
 import android.content.*;
-import android.database.*;
 import android.graphics.*;
 import android.net.*;
-import android.provider.*;
 import android.text.*;
 import android.view.*;
 import android.widget.*;
@@ -87,12 +84,6 @@ public class PresenceStatusActivity
         super.onCreate(savedInstanceState);
         // Set the main layout
         setContentView(R.layout.presence_status);
-    }
-
-    protected void start(BundleContext bundleContext)
-            throws Exception
-    {
-        super.start(bundleContext);
         // Get account ID from intent extras
         String accountIDStr = getIntent().getStringExtra(INTENT_ACCOUNT_ID);
         // Find account for given account ID
@@ -103,8 +94,11 @@ public class PresenceStatusActivity
             finish();
             return;
         }
-        this.account = new Account(accountID, bundleContext, getBaseContext());
-        
+
+        this.account = new Account(accountID,
+                                   AndroidGUIActivator.bundleContext,
+                                   this);
+
         initPresenceStatus();
 
         account.addAccountEventListener(this);
@@ -265,39 +259,13 @@ public class PresenceStatusActivity
                         + account.getAccountName());
             return;
         }
-        logger.error("Starting selected avatar activity!");
         //Intent pickIntent = new Intent(Intent.ACTION_PICK_ACTIVITY);
         Intent gallIntent=new Intent(Intent.ACTION_GET_CONTENT);
         gallIntent.setType("image/*");
         //Intent camIntent = new Intent("android.media.action.IMAGE_CAPTURE");
-        gallIntent.putExtra( Intent.EXTRA_TITLE,
-                             R.string.service_gui_SELECT_AVATAR);
+        gallIntent.putExtra(Intent.EXTRA_TITLE,
+                            R.string.service_gui_SELECT_AVATAR);
         startActivityForResult(gallIntent, SELECT_IMAGE);
-    }
-
-    /**
-     * Gets the real path for the image referenced from the {@link Uri}
-     *
-     * @param activity the parent {@link Activity}
-     *
-     * @param contentUri the {@link Uri} that points to the image
-     *
-     * @return the real path that can be opened by
-     *  for instance {@link FileInputStream}
-     */
-    public static String getRealPathFromUri(Activity activity, Uri contentUri)
-    {
-        String[] proj = { MediaStore.Images.Media.DATA };
-
-        Cursor cursor =
-                activity.managedQuery(contentUri, proj, null, null, null);
-
-        int column_index =
-                cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-
-        cursor.moveToFirst();
-
-        return cursor.getString(column_index);
     }
 
     /**
@@ -313,55 +281,69 @@ public class PresenceStatusActivity
     protected void onActivityResult( int requestCode, int resultCode,
                                      Intent data )
     {
-        if (requestCode == SELECT_IMAGE)
+        if (requestCode != SELECT_IMAGE || resultCode != RESULT_OK)
+            return;
+
+        final OperationSetAvatar avatarOpSet = account.getAvatarOpSet();
+        if(avatarOpSet == null)
         {
-            if (resultCode == RESULT_OK)
-            {
-                // A contact was picked.  Here we will just display it
-                // to the user.
-                Uri imageUri = data.getData();
-                String resolvedPath = getRealPathFromUri(this,imageUri);
-                File f = new File(resolvedPath);
-                try
-                {
-                    final OperationSetAvatar avatarOpSet =
-                            account.getAvatarOpSet();
-                    if(avatarOpSet == null)
-                    {
-                        logger.warn("No avatar operation set found for "
-                                    + account.getAccountName());
-                        return;
-                    }
-
-                    FileInputStream fin = new FileInputStream(f);
-
-                    final ByteArrayOutputStream bout =
-                            new ByteArrayOutputStream(fin.available());
-                    int read;
-                    byte[] buffer = new byte[2048];
-                    do
-                    {
-                        read = fin.read(buffer);
-                        if(read > 0)
-                            bout.write(buffer, 0, read);
-                    }while (read > 0);
-
-                    new Thread(new Runnable()
-                    {
-                        public void run()
-                        {
-                            logger.trace("Trying to set avatar");
-                            avatarOpSet.setAvatar(bout.toByteArray());
-                            logger.trace("Avatar set");
-                        }
-                    }).start();
-                }
-                catch (IOException e)
-                {
-                    logger.error("Error reading the avatar: "+e);
-                }
-            }
+            logger.warn("No avatar operation set found for "
+                            + account.getAccountName());
+            showAvatarChangeError();
+            return;
         }
+
+        // A contact was picked.  Here we will just display it
+        // to the user.
+        Uri imageUri = data.getData();
+        if(imageUri == null)
+        {
+            logger.error("No data returned: "+data);
+            showAvatarChangeError();
+            return;
+        }
+
+        try
+        {
+            // The size we want to scale to
+            final int PREFERRED_SIZE = 100;
+            Bitmap bmp
+                = AndroidImageUtil.scaledBitmapFromContentUri(
+                    this, imageUri, PREFERRED_SIZE, PREFERRED_SIZE);
+
+            if(bmp == null)
+            {
+                logger.error("Failed to obtain bitmap from: " + data);
+                showAvatarChangeError();
+                return;
+            }
+
+            // Convert to bytes
+            final byte[] rawImage
+                = AndroidImageUtil.convertToBytes(bmp, 100);
+
+            // Prevents network on main thread exception...
+            new Thread(new Runnable()
+            {
+                public void run()
+                {
+                    avatarOpSet.setAvatar(rawImage);
+                }
+            }).start();
+        }
+        catch (IOException e)
+        {
+            logger.error(e, e);
+            showAvatarChangeError();
+        }
+    }
+      
+    private void showAvatarChangeError()
+    {
+        AndroidUtils.showAlertDialog(
+            this, getString(R.string.service_gui_ERROR),
+            getString(R.string.service_gui_AVATAR_SET_ERROR,
+                      account.getAccountName()));
     }
 
     /**
