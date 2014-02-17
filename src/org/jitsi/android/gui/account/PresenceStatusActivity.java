@@ -322,6 +322,7 @@ public class PresenceStatusActivity
                 Uri imageUri = data.getData();
                 String resolvedPath = getRealPathFromUri(this,imageUri);
                 File f = new File(resolvedPath);
+                FileInputStream fin = null;
                 try
                 {
                     final OperationSetAvatar avatarOpSet =
@@ -333,7 +334,7 @@ public class PresenceStatusActivity
                         return;
                     }
 
-                    FileInputStream fin = new FileInputStream(f);
+                    fin = new FileInputStream(f);
 
                     final ByteArrayOutputStream bout =
                             new ByteArrayOutputStream(fin.available());
@@ -360,6 +361,17 @@ public class PresenceStatusActivity
                 {
                     logger.error("Error reading the avatar: "+e);
                 }
+				finally
+				{
+				if(fin != null)
+					try
+					{
+						fin.close();
+					} catch (IOException e)
+					{
+						logger.error("Unable to close FileInputStream: " + e);
+					}
+				}
             }
         }
     }
