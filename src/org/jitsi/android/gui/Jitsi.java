@@ -144,6 +144,14 @@ public class Jitsi
         this.instanceState = savedInstanceState;
     }
 
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+
+        instanceState = null;
+    }
+
     /**
      * Decides what should be displayed based on supplied <tt>Intent</tt> and
      * instance state.

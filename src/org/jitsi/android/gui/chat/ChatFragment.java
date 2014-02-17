@@ -152,6 +152,11 @@ public class ChatFragment
     }
 
     /**
+     * Flag indicates that we have loaded the history for the first time.
+     */
+    private boolean historyLoaded = false;
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -232,8 +237,6 @@ public class ChatFragment
 
         chatSession.addMessageListener(chatListAdapter);
 
-        initAdapter();
-
         return content;
     }
 
@@ -277,6 +280,8 @@ public class ChatFragment
             // Also register global status listener
             AndroidGUIActivator.getLoginRenderer()
                     .addGlobalStatusListener(globalStatusListener);
+            // Init the history
+            initAdapter();
         }
         else if(!visibleToUser)
         {
@@ -296,9 +301,22 @@ public class ChatFragment
      */
     private void initAdapter()
     {
-        loadHistoryTask = new LoadHistoryTask(true);
+        /**
+         * Initial history load is delayed until the chat is displayed
+         * to the user. We previously relyed on onCreate, but it will be called
+         * too early on phone layouts where ChatPagerAdapter is used. It creates
+         * ChatFragment too early that is before the first message is added to
+         * the history and we are unable to retrieve it without hacks.
+         */
+        if(!historyLoaded)
+        {
+            loadHistoryTask
+                = new LoadHistoryTask(chatListAdapter.isEmpty());
 
-        loadHistoryTask.execute();
+            loadHistoryTask.execute();
+
+            historyLoaded = true;
+        }
     }
 
     @Override
