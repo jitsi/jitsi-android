@@ -29,6 +29,7 @@
             android:inputType="number"
             custom:intMax="65535"
             custom:intMin="0"
+            custom:allowEmpty="true"
             custom:storeInNewThread="true"
             />
         <org.jitsi.android.gui.settings.widget.ConfigEditText

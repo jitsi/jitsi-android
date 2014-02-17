@@ -15,6 +15,7 @@
         <attr name="intMin" format="integer" />
         <attr name="floatMax" format="float" />
         <attr name="floatMin" format="float" />
+        <attr name="allowEmpty" format="boolean" />
         <attr name="editable" format="boolean" />
     </declare-styleable>
     <declare-styleable name="ConfigListPreference">

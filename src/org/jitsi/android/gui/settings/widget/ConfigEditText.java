@@ -13,6 +13,7 @@ import android.util.*;
 
 import org.jitsi.*;
 import org.jitsi.android.gui.*;
+import org.jitsi.util.*;
 
 /**
  * Edit text preference which persists it's value through the
@@ -51,6 +52,11 @@ public class ConfigEditText
      * Flag indicates if this edit text field is editable.
      */
     private boolean editable = true;
+    /**
+     * Flag indicates if we want to allow empty values to go thought
+     * the value range check.
+     */
+    private boolean allowEmpty = true;
 
     public ConfigEditText(Context context,
                           AttributeSet attrs, int defStyle)
@@ -102,6 +108,9 @@ public class ConfigEditText
                     break;
                 case R.styleable.ConfigEditText_editable:
                     this.editable = attArray.getBoolean(attribute, true);
+                    break;
+                case R.styleable.ConfigEditText_allowEmpty:
+                    this.allowEmpty = attArray.getBoolean(attribute, true);
                     break;
             }
         }
@@ -163,17 +172,36 @@ public class ConfigEditText
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue)
     {
+        if(allowEmpty && StringUtils.isNullOrEmpty((String)newValue))
+        {
+            return true;
+        }
+
         if(intMax != null && intMin != null)
         {
             //Integer range check
-            Integer newInt = Integer.parseInt((String)newValue);
-            return intMin <= newInt && newInt <= intMax;
+            try
+            {
+                Integer newInt = Integer.parseInt((String) newValue);
+                return intMin <= newInt && newInt <= intMax;
+            }
+            catch (NumberFormatException e)
+            {
+                return false;
+            }
         }
         else if(floatMax != null && floatMax != null)
         {
             // Float range check
-            Float newFloat = Float.parseFloat((String)newValue);
-            return floatMin <= newFloat && newFloat <= floatMax;
+            try
+            {
+                Float newFloat = Float.parseFloat((String)newValue);
+                return floatMin <= newFloat && newFloat <= floatMax;
+            }
+            catch (NumberFormatException e)
+            {
+                return false;
+            }
         }
         // No checks by default
         return true;
