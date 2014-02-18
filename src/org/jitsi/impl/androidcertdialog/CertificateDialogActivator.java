@@ -49,11 +49,19 @@ public class CertificateDialogActivator
      * @param requestId identifier of the request managed by
      *                  <tt>CertificateDialogServiceImpl</tt>.
      *
-     * @return <tt>VerifyCertDialog</tt> for given <tt>requestId</tt>.
+     * @return <tt>VerifyCertDialog</tt> for given <tt>requestId</tt> or
+     *         <tt>null</tt> if service has been shutdown.
      */
     public static VerifyCertDialog getDialog(Long requestId)
     {
-        return impl.retrieveDialog(requestId);
+        if(impl != null)
+        {
+            return impl.retrieveDialog(requestId);
+        }
+        else
+        {
+            return null;
+        }
     }
 
     /**

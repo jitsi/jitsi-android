@@ -35,9 +35,7 @@ public class RequestAuthorizationDialog
     private AuthorizationHandlerImpl.AuthorizationRequestedHolder request;
 
     /**
-     * Flag stores the discard state. It is reseted in
-     * <tt>onSaveInstanceState</tt> in order to prevent from discarding
-     * the request when the device is rotated.
+     * Flag stores the discard state.
      */
     private boolean discard;
 
@@ -89,28 +87,6 @@ public class RequestAuthorizationDialog
         discard = true;
 
         finish();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
-
-        discard = true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void onSaveInstanceState(Bundle outState)
-    {
-        super.onSaveInstanceState(outState);
-
-        this.discard = false;
     }
 
     /**

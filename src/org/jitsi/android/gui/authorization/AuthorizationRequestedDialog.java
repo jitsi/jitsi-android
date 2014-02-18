@@ -45,13 +45,6 @@ public class AuthorizationRequestedDialog
     AuthorizationResponse.AuthorizationResponseCode responseCode
             = AuthorizationResponse.IGNORE;
 
-
-    /**
-     * Flag indicates that is instance is destroyed, but it state was saved
-     * and will be recreated later. This happens when the view is rotated.
-     */
-    private boolean flagPaused;
-
     /**
      * {@inheritDoc}
      */
@@ -117,8 +110,6 @@ public class AuthorizationRequestedDialog
         updateAddToContactsStatus(
                 ViewUtil.isCompoundChecked(getContentView(),
                                            R.id.addToContacts));
-
-        flagPaused = false;
     }
 
     /**
@@ -170,31 +161,12 @@ public class AuthorizationRequestedDialog
     }
 
     /**
-     * The method is fired when <tt>Activity</tt> is paused. Then it may be
-     * destroyed and recreated later, so we mark flag paused here to prevent
-     * from discarding the request too early in <tt>onDestroy</tt> event.
-     * This happens when device is rotated.
-     */
-    @Override
-    protected void onSaveInstanceState(Bundle outState)
-    {
-        super.onSaveInstanceState(outState);
-
-        this.flagPaused = true;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     protected void onDestroy()
     {
         super.onDestroy();
-
-        if(flagPaused)
-        {
-            return;
-        }
 
         if(ViewUtil.isCompoundChecked(getContentView(),R.id.addToContacts)
                 && responseCode.equals(AuthorizationResponse.ACCEPT))

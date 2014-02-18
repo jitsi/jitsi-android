@@ -38,12 +38,6 @@ public class AuthWindowActivity
     private boolean cancelled = true;
 
     /**
-     * Flag is set to <tt>true</tt> on save instance state which means that the
-     * dialog is paused and might be restored later.
-     */
-    private boolean paused;
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -130,17 +124,6 @@ public class AuthWindowActivity
      * {@inheritDoc}
      */
     @Override
-    protected void onSaveInstanceState(Bundle outState)
-    {
-        super.onSaveInstanceState(outState);
-
-        this.paused = true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void onDestroy()
     {
         super.onDestroy();
@@ -156,11 +139,8 @@ public class AuthWindowActivity
                     ViewUtil.isCompoundChecked(content, R.id.store_password));
         }
 
-        if(!paused)
-        {
-            authWindow.setCanceled(cancelled);
+        authWindow.setCanceled(cancelled);
 
-            authWindow.windowClosed();
-        }
+        authWindow.windowClosed();
     }
 }
