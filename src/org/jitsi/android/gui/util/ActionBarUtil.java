@@ -11,6 +11,7 @@ import android.app.*;
 import android.graphics.drawable.*;
 import android.os.*;
 import android.widget.*;
+import net.java.sip.communicator.util.*;
 import org.jitsi.R;
 import org.jitsi.android.*;
 
@@ -22,6 +23,11 @@ import org.jitsi.android.*;
  */
 public class ActionBarUtil
 {
+    /**
+     * The logger
+     */
+    private final static Logger logger = Logger.getLogger(ActionBarUtil.class);
+
     /**
      * The avatar drawable.
      */
@@ -80,9 +86,28 @@ public class ActionBarUtil
         if (avatarDrawable == null)
             avatarDrawable = getDefaultAvatarIcon();
 
-        avatarDrawable
-            .setDrawableByLayerId(R.id.avatarDrawable,
-                AndroidImageUtil.roundedDrawableFromBytes(avatar));
+        BitmapDrawable avatarBmp = null;
+        if(avatar != null)
+        {
+            if(avatar.length < 256*1024)
+            {
+                avatarBmp = AndroidImageUtil.roundedDrawableFromBytes(avatar);
+            }
+            else
+            {
+                logger.error("Avatar image is too large: " + avatar.length);
+            }
+
+            if(avatarBmp != null)
+            {
+                avatarDrawable
+                    .setDrawableByLayerId(R.id.avatarDrawable, avatarBmp);
+            }
+            else
+            {
+                logger.error("Failed to get avatar drawable from bytes");
+            }
+        }
 
         // setLogo not supported prior API 14
         if(AndroidUtils.hasAPI(14) && a != null)
