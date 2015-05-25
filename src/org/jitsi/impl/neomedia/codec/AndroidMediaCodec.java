@@ -6,6 +6,7 @@
  */
 package org.jitsi.impl.neomedia.codec;
 
+import java.io.*;
 import java.util.*;
 import java.util.List; // Disambiguation
 
@@ -1027,8 +1028,15 @@ public class AndroidMediaCodec
         if ((this.colorFormat != OMX_COLOR_FormatUnused)
                 && (this.type != null))
         {
-            MediaCodec mediaCodec
-                = MediaCodec.createByCodecName(codecInfo.getName());
+            MediaCodec mediaCodec = null;
+            try
+            {
+                mediaCodec = MediaCodec.createByCodecName(codecInfo.getName());
+            }
+            catch (IOException e)
+            {
+                logger.error(e, e);
+            }
 
             if (mediaCodec != null)
             {

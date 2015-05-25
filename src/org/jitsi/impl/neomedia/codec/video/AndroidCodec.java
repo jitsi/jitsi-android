@@ -18,6 +18,7 @@ import org.jitsi.impl.neomedia.codec.*;
 import org.jitsi.service.neomedia.codec.*;
 
 import javax.media.*;
+import java.io.*;
 
 /**
  * Abstract codec class that uses <tt>MediaCodec</tt> for video encoding.
@@ -152,7 +153,17 @@ abstract class AndroidCodec
                     "No " + getStrName() + " found for type: "+codecType);
         }
 
-        codec = MediaCodec.createByCodecName(codecInfo.getName());
+        try
+        {
+            codec = MediaCodec.createByCodecName(codecInfo.getName());
+        }
+        catch (IOException e)
+        {
+            logger.error(e, e);
+
+            throw new ResourceUnavailableException(
+                "Could not create codec for name: " + codecInfo.getName());
+        }
 
         configureMediaCodec(codec, codecType);
 

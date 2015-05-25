@@ -30,6 +30,15 @@ To make and run the project after modification:
 
     ant make run
 
+## Sources
+
+To obtain sources for .jar files located in lib folder checkout jitsi_android
+ branch of jitsi and libjitsi projects.
+ 
+ https://github.com/jitsi/jitsi/tree/jitsi_android
+ 
+ https://github.com/jitsi/libjitsi/tree/jitsi_android
+
 ## Contribution
 
 Before making any pull requests please see: https://jitsi.org/Documentation/FAQ#patch 
