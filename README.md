@@ -1,3 +1,8 @@
+# Unmaintained!
+The development of Jitsi for Android has been stopped in early 2015. Issues and Pull Requests will not be addressed.
+
+******
+
 # Jitsi for Android
 
 Jitsi for Android is an Android port of the [Jitsi] project: The most feature-rich communicator with support for encrypted audio/video, chat and presence over SIP and XMPP.
