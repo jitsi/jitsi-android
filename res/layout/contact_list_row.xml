@@ -127,6 +127,7 @@
         android:layout_height="fill_parent"
         android:layout_above="@id/selectedBackgroundIcon"
         android:layout_alignParentRight="true"
+        android:orientation="horizontal"
         android:background="@drawable/chatseparator"
         android:visibility="invisible"/>
 
@@ -136,6 +137,7 @@
         android:layout_height="fill_parent"
         android:layout_below="@id/selectedBackgroundIcon"
         android:layout_alignParentRight="true"
+        android:orientation="horizontal"
         android:background="@drawable/chatseparator"
         android:visibility="invisible"/>
 

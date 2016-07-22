@@ -136,7 +136,7 @@ public class JabberPreferenceFragment
 
     private static final String PREF_KEY_AUTO_RELAY_DISCOVERY =
             JitsiApplication.getAppResources()
-                    .getString(R.string.pref_key_auto_relay_dicovery);
+                    .getString(R.string.pref_key_auto_relay_discovery);
 
     private static final String PREF_KEY_JINGLE_NODES_LIST =
             JitsiApplication.getAppResources()
@@ -497,11 +497,9 @@ public class JabberPreferenceFragment
         }
         else if(key.equals(PREF_KEY_RESOURCE_PRIORITY))
         {
-            reg.setPriority(
-                    new Integer(shPrefs.getString(
-                                    PREF_KEY_RESOURCE_PRIORITY,
-                                    null))
-            );
+            reg.setPriority(Integer.valueOf(
+                    shPrefs.getString(PREF_KEY_RESOURCE_PRIORITY, null)
+            ));
         }
         else if(key.equals(PREF_KEY_ICE_ENABLED))
         {

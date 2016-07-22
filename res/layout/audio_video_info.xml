@@ -189,7 +189,7 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/service_gui_callinfo_BANDWITH"
+            android:text="@string/service_gui_callinfo_BANDWIDTH"
             android:id="@+id/bandwidthLabel"
             android:layout_below="@+id/remoteIp"
             style="@style/CallInfo.Header"/>

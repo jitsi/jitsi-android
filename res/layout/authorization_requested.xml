@@ -18,22 +18,19 @@
             android:layout_marginBottom="@dimen/between_padding"
             android:text="@string/service_gui_ADD_AUTHORIZED_CONTACT"
             android:id="@+id/addToContacts"
-            android:checked="true"
-            android:layout_below="@+id/requestInfo"/>
+            android:checked="true"/>
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/between_padding"
             android:text="@string/service_gui_SELECT_GROUP"
             style="@style/MediumFont"
-            android:id="@+id/selectGroupTxt"
-            android:layout_below="@+id/addToContacts"/>
+            android:id="@+id/selectGroupTxt"/>
     <Spinner
             android:layout_width="wrap_content"
             android:layout_height="@dimen/item_height"
             android:id="@+id/selectGroupSpinner"
-            android:layout_marginBottom="@dimen/between_padding"
-            android:layout_below="@+id/selectGroupTxt"/>
+            android:layout_marginBottom="@dimen/between_padding"/>
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:orientation="horizontal">

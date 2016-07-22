@@ -125,6 +125,8 @@ public class ConfigEditText
                     break;
             }
         }
+        attArray.recycle();
+
         // Register listener to perform checks before new value is accepted
         setOnPreferenceChangeListener(this);
 

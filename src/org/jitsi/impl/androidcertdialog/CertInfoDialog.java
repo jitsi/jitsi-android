@@ -98,7 +98,7 @@ public class CertInfoDialog
 
             // Validity
             appendTxtRow(table, R.string.service_gui_CERT_INFO_VALIDITY);
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
             appendTxtRow(table,
                          getString(R.string.service_gui_CERT_INFO_ISSUED_ON),
                          dateFormat.format(x509.getNotBefore()));

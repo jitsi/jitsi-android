@@ -180,7 +180,7 @@ public class StunTurnDialogFragment
         if(portStr.isEmpty())
         {
             Toast toast = Toast.makeText(
-                    getActivity(), "The port can not be empty", 3);
+                    getActivity(), "The port can not be empty", Toast.LENGTH_LONG);
             toast.show();
             return false;
         }

@@ -82,6 +82,7 @@ public class ConfigListPreference
                     break;
             }
         }
+        attArray.recycle();
     }
 
     @Override

@@ -107,6 +107,11 @@ public class AndroidNotifications
                         -1,  // Notification hide timeout
                         MESSAGE_GROUP
                 ));
+        VibrateNotificationAction inMessageVibrate
+                = new VibrateNotificationAction("incoming_message", 500);
+        notificationService.registerNotificationForEvent(
+                NotificationManager.INCOMING_MESSAGE,
+                inMessageVibrate);
         // Proactive notifications
         notificationService.registerDefaultNotificationForEvent(
                 NotificationManager.PROACTIVE_NOTIFICATION,

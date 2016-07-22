@@ -144,7 +144,7 @@ class JingleNodeDialogFragment
         if(jidAddress.isEmpty())
         {
             Toast toast = Toast.makeText(
-                    getActivity(), "The JID address can not be empty", 3);
+                    getActivity(), "The JID address can not be empty", Toast.LENGTH_LONG);
             toast.show();
             return false;
         }

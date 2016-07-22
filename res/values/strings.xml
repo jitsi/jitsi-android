@@ -279,7 +279,7 @@
     <string name="plugin_otr_authbuddydialog_I_HAVE">I have</string>
     <string name="plugin_otr_authbuddydialog_I_HAVE_NOT">I have not</string>
     <string name="plugin_otr_authbuddydialog_VERIFY_ACTION">verified that this is in fact the correct fingerprint for {0}.</string>
-    <string name="plugin_otr_authbuddydialog_FINGERPRINT_CHECK">Please enter the fingerprint you recieved from {0}.</string>
+    <string name="plugin_otr_authbuddydialog_FINGERPRINT_CHECK">Please enter the fingerprint you received from {0}.</string>
     <string name="plugin_otr_configform_MY_PRIVATE_KEYS">My Private Keys</string>
     <string name="plugin_otr_configform_KNOWN_FINGERPRINTS">Known Fingerprints</string>
     <string name="plugin_otr_configform_CB_AUTO">Automatically initiate private messaging</string>
@@ -416,7 +416,7 @@
     <string name="service_gui_ADD_CONTACT_TO">Add contact to</string>
     <string name="service_gui_ADD_CONTACT_ERROR_TITLE">Add contact Error</string>
     <string name="service_gui_ADD_CONTACT_NOT_CONNECTED">
-        You need to be connected in in order to add a contact.
+        You need to be connected in order to add a contact.
         Please sign in to the selected provider and try again.
     </string>
     <string name="service_gui_ADD_CONTACT_ERROR" >
@@ -461,7 +461,7 @@
     <string name="service_gui_callinfo_VIDEO_INFO">Video info</string>
     <string name="service_gui_callinfo_LOCAL_IP">Local IP / Port</string>
     <string name="service_gui_callinfo_REMOTE_IP">Remote IP / Port</string>
-    <string name="service_gui_callinfo_BANDWITH">Bandwith</string>
+    <string name="service_gui_callinfo_BANDWIDTH">Bandwidth</string>
     <string name="service_gui_callinfo_LOSS_RATE">Loss rate</string>
     <string name="service_gui_callinfo_RTT">RTT</string>
     <string name="service_gui_callinfo_JITTER">Jitter</string>
@@ -902,7 +902,7 @@
     <string name="pref_key_stun_turn_servers" >pref_key_stun_turn_servers</string>
 
     <string name="pref_key_use_jingle_nodes" >pref_key_use_jingle_nodes</string>
-    <string name="pref_key_auto_relay_dicovery" >pref_key_auto_relay_dicovery</string>
+    <string name="pref_key_auto_relay_discovery" >pref_key_auto_relay_discovery</string>
 
     <string name="pref_key_jingle_node_list" >pref_key_jingle_node_list</string>
 
@@ -1004,6 +1004,7 @@
     <string name="plugin_notificationconfig_event_CallSaved">Call Saved</string>
     <string name="plugin_notificationconfig_event_HangUp">Hang Up</string>
     <string name="plugin_notificationconfig_event_HangUp_description">Hang up description</string>
+	<string name="plugin_notificationconfig_event_missed_call">Missed Call</string>
     <string name="plugin_notificationconfig_popup_notification">Popup notification</string>
     <string name="plugin_notificationconfig_notification_sound">Sound on notification device
     </string>
@@ -1013,6 +1014,9 @@
     <!-- Jitsi icon -->
     <string name="pref_key_show_jitsi_icon">org.jitsi.android.show_icon</string>
     <string name="service_gui_settings_SHOW_ICON">Display Jitsi icon</string>
+    <!-- start on boot -->
+    <string name="pref_key_start_on_boot">org.jitsi.android.start_on_boot</string>
+    <string name="service_gui_settings_START_ON_BOOT">Start Jitsi on boot</string>
     <!-- Locale -->
     <string name="pref_key_locale">pref.key.locale</string>
     <string name="service_gui_settings_LOCALE">Interface language</string>

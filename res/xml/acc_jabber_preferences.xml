@@ -132,7 +132,7 @@
                         android:title="@string/service_gui_JBR_JINGLE_SUMMARY"
                     />
                 <CheckBoxPreference
-                        android:key="@string/pref_key_auto_relay_dicovery"
+                        android:key="@string/pref_key_auto_relay_discovery"
                         android:title="@string/service_gui_JBR_JINGLE_AUTO"
                         />
                 <Preference

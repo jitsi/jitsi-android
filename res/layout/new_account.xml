@@ -6,7 +6,7 @@
         android:padding="@dimen/screen_padding"
         android:layout_centerHorizontal="true"
         android:orientation="vertical"
-        android:background="@drawable/loginbackground">
+        android:background="@drawable/background">
 
         <Spinner
             android:id="@+id/networkSpinner"

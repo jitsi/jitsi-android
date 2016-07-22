@@ -7,7 +7,7 @@
               android:layout_centerHorizontal="true"
               android:orientation="vertical"
               android:gravity="center"
-              android:background="@drawable/loginbackground">
+              android:background="@drawable/background">
 
     <TextView
             style="@style/MediumFont"

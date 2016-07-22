@@ -28,6 +28,7 @@
             android:textColorHighlight="@color/blue"
             android:imeOptions="actionSend|flagNoExtractUi"
             android:singleLine="true"
+            android:inputType="text"
             android:textCursorDrawable="@null"
             android:layout_alignTop="@+id/chatWriteTextBg"
             android:layout_alignBottom="@+id/chatWriteTextBg"

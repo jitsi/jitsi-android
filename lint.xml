@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+	<issue id="Suspicious0dp">
+		<!-- ignore the warning about android:layout_height of RelativeLayout -->
+		<ignore path="res/layout/contact_list.xml" />
+	</issue>
+</lint>

@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:hint="@string/service_gui_EDIT_STATUS_MSG_TIP"
-                android:editable="true" android:enabled="true"
+                android:enabled="true"
                 android:focusable="true"
                 android:inputType="textCapSentences|textMultiLine"
                 android:layout_centerHorizontal="true"
