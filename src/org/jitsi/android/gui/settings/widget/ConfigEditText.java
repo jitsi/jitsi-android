@@ -201,7 +201,7 @@ public class ConfigEditText
                 return false;
             }
         }
-        else if(floatMax != null && floatMax != null)
+        else if(floatMax != null && floatMin != null)
         {
             // Float range check
             try
